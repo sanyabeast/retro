@@ -3,6 +3,7 @@
 class Frame {
     constructor() {
         this.dom = document.createElement("div");
+        
         this.set_styles(this.dom, {
             position: "absolute",
             top: 0,

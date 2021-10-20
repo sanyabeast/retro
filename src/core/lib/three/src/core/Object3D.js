@@ -6,8 +6,7 @@ import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import * as MathUtils from '../math/MathUtils.js';
-import { Task, TaskScheduler } from "core/utils/TaskScheduler"
-import StateMachine from "core/utils/StateMachine"
+
 
 let _object3DId = 0;
 
@@ -41,10 +40,8 @@ class Object3D extends EventDispatcher {
 		this.type = 'Object3D';
 		this.parent = null;
 		this.children = [];
-		this.components = []
-		this.refs = {}
-		this.states = new StateMachine(params && params.states ? params.states : {}, this)
-		this.tasks = new TaskScheduler(params && params.tasks ? params.tasks : [])
+
+
 		this.up = Object3D.DefaultUp.clone();
 		const position = new Vector3();
 		const rotation = new Euler();

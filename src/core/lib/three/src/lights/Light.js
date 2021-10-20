@@ -12,6 +12,8 @@ class Light extends Object3D {
 		this.color = new Color( params.color );
 		this.intensity = params.intensity;
 
+		console.log(this.color, this.intensity, this.type)
+
 	}
 
 	dispose() {

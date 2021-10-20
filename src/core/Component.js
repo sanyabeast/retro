@@ -190,6 +190,10 @@ class Component extends EventDispatcher {
         }
     }
 
+    load_prefab(){
+        return this.object.load_prefab(...arguments)
+    }
+
     add_component(data) {
         if (typeof data === 'object') {
             return this.object.add_component(data)

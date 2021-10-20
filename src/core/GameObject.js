@@ -3,6 +3,8 @@ import { update } from 'lodash';
 import * as THREE from 'three';
 import { Group } from 'three/src/objects/Group';
 import AssetManager from 'core/utils/AssetManager';
+import { Task, TaskScheduler } from "core/utils/TaskScheduler"
+import StateMachine from "core/utils/StateMachine"
 
 
 class GameObject extends Group {
@@ -11,9 +13,15 @@ class GameObject extends Group {
     constructor(params) {
         super(...arguments)
         this.extra_data = {}
+        this.components = []
+		this.refs = {}
+        this.states = new StateMachine(params && params.states ? params.states : {}, this)
+		this.tasks = new TaskScheduler(params && params.tasks ? params.tasks : [])
+
         if (typeof window.F_THREE_PATCH_PROPS === "function") {
             window.F_THREE_PATCH_PROPS(this)
         }
+        
         /**patch */
         if (params !== undefined) {
             if (typeof params.render_layer !== "undefined") {
@@ -69,7 +77,6 @@ class GameObject extends Group {
         if (prefab.components) {
             this.setup_components(prefab.components)
         }
-
         if (prefab.children) {
             if (Array.isArray(prefab.children)) {
                 prefab.children.forEach(child => {

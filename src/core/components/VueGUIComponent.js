@@ -25,11 +25,21 @@ MyPlugin.install = function (Vue, options) {
         },
         props: {},
         computed: {
-            ...mapState([
-                "globals",
-                "app",
-                "object"
-            ]),
+            object(){
+                return this.$store.getters.object()
+            },
+            globals(){
+                return this.$store.getters.globals()
+            },
+            app(){
+                return this.$store.getters.app()
+            },
+            launcher(){
+                return this.$store.getters.launcher()
+            },
+            gui_component(){
+                return this.$store.getters.gui_component()
+            },
             /**CORE COMP COMPAT */
             camera() {
                 return this.globals.camera;
@@ -142,11 +152,11 @@ class VueGUIComponent extends Component {
                 getters: {}
             }
         }
-        store_config.state.globals = this.globals
-        store_config.state.app = this.globals.app
-        store_config.state.launcher = this.globals.launcher
-        store_config.state.gui_component = this
-        store_config.state.object = this.object
+        store_config.getters.globals = i => this.globals
+        store_config.getters.app = i => this.globals.app
+        store_config.getters.launcher = i => this.globals.launcher
+        store_config.getters.gui_component = i => this
+        store_config.getters.object = i => this.object
 
         this.vuex_store = new Vuex.Store(store_config)
         let ui = this.ui = new Vue({

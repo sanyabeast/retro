@@ -60,9 +60,9 @@ const arrayCacheI32 = [];
 
 // Float32Array caches used for uploading Matrix uniforms
 
-const mat4array = new Float32Array( 16 );
-const mat3array = new Float32Array( 9 );
-const mat2array = new Float32Array( 4 );
+const mat4array = new Float32Array(16);
+const mat3array = new Float32Array(9);
+const mat2array = new Float32Array(4);
 
 // Flattening for arrays of vectors and matrices
 
@@ -312,8 +312,8 @@ function setValueV4ui(gl, v) {
 }
 // Single texture (2D / Cube)
 function setValueT1(gl, v, textures) {
-    if (typeof v === "string"){
-        if (typeof window.F_TEXTURE_STREAMING_FUNCTION === "function"){
+    if (typeof v === "string") {
+        if (typeof window.F_TEXTURE_STREAMING_FUNCTION === "function") {
             v = window.F_TEXTURE_STREAMING_FUNCTION(v)
         }
     }

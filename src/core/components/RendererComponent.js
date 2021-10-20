@@ -8,8 +8,20 @@
 import Component from "core/Component";
 import { Vector2 } from "spine-ts-threejs";
 import * as THREE from 'three';
+import Device from "core/utils/Device";
 
-
+const renderer_presets = {
+    desktop: {
+        antialias: true,
+        alpha: true,
+        stencil: true,
+        depth: true
+    },
+    smartphone: {
+        antialias: false,
+        powerPreference: "high-performance"
+    }
+}
 
 class RendererComponent extends Component {
     target_fps = 33
@@ -35,11 +47,22 @@ class RendererComponent extends Component {
         let render_scene = this.render_scene = new THREE.Scene()
 
         let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({
-            antialias: this.globals.rendering_antialias,
+            antialias: true,
             alpha: true,
             stencil: this.clear_stencil,
-            depth: this.clear_depth
+            depth: this.clear_depth,
+            ...renderer_presets[Device.device_type]
         });
+
+        // renderer.shadowMap.enabled = true
+
+        console.log(`creating new WebGLRenderer with params: ${JSON.stringify({
+            antialias: true,
+            alpha: true,
+            stencil: this.clear_stencil,
+            depth: this.clear_depth,
+            ...renderer_presets[Device.device_type]
+        }, null, "\t")}`)
 
         renderer.setClearAlpha(1)
         renderer.setSize(1000, 1000);
@@ -130,7 +153,7 @@ class RendererComponent extends Component {
     }
     update_render_scene() {
         let scene = this.globals.app
-        // scene.updateMatrixWorld()
+        scene.updateMatrixWorld()
         let render_list = []
         //scene.subject.updateMatrixWorld(true)
         scene.traverse_components((comp, object) => {

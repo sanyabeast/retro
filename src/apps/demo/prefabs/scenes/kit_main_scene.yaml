@@ -1,16 +1,20 @@
 components:
   point_light:
     enabled: true
-    name: LightComponent
+    name: "LightComponent"
+    ref: "point_light"
+    tag: "point_light"
     params:
-      position:
-        - 1
-        - 1
-        - 0
-      type: PointLight
-      intensity: 2
-      distance: 10
-      color: "#ffffff"
+      position: [0, 21, 0]
+      type: "PointLight"
+      intensity: 1.2
+      distance: 4
+      color: "#ffeeff"
+  # dir_light: 
+  #   name: LightComponent
+  #   params:
+  #     type: DirectionalLight
+  #     intensity: 10
   fog: "@prefab:default.FogComponent"
   skybox: "@prefab:default.SkyBox"
   posfx: "@prefab:default.Postprocessing"

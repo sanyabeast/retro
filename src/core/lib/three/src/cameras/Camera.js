@@ -3,12 +3,17 @@ import { Object3D } from '../core/Object3D.js';
 
 class Camera extends Object3D {
 
-	constructor(params) {
-		super(params);
+	constructor() {
+
+		super();
+
 		this.type = 'Camera';
+
 		this.matrixWorldInverse = new Matrix4();
+
 		this.projectionMatrix = new Matrix4();
 		this.projectionMatrixInverse = new Matrix4();
+
 	}
 
 	copy(source, recursive) {

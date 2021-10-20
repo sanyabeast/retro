@@ -1,0 +1,18 @@
+components:
+  - enabled: true
+    name: MeshComponent
+    tag: cool_box
+    params:
+      position:
+        - 0
+        - -0.5
+        - 0
+      geometry:
+        - BoxBufferGeometry
+        - - 1
+          - 1
+          - 1
+      material:
+        - PBRMaterial
+        - color: "#ffffff"
+          pbr: "res/core/pbr/storage-container2-bl/storage-container2"

@@ -12,9 +12,11 @@ class LightComponent extends TransformComponent {
     type = "PointLight"
     intensity = 1
     color = "#eeffdd"
-    distance = 0
+    distance = 1
     decay = 0
-    save_prefab(){
+    sky_color = "#ffaaaa"
+    ground_color = "#aaaaff"
+    save_prefab() {
         return {
             ...super.save_prefab(),
             type: this.type,
@@ -25,12 +27,44 @@ class LightComponent extends TransformComponent {
         }
     }
     on_created() {
-        let light = this.subject = new THREE[this.type]({
-            intensity: this.intensity,
-            color: this.color,
-            decay: this.decay,
-            distance: this.distance,
-        })
+        let light
+        switch (this.type) {
+            case "HemisphereLight": {
+                light = this.subject = new THREE.HemisphereLight(this.sky_color, this.ground_color, this.intensity)
+                break
+            }
+            case "DirectionalLight": {
+                light = this.subject = new THREE.DirectionalLight({
+                    intensity: this.intensity,
+                    color: this.color,
+                    decay: this.decay,
+                    distance: this.distance,
+                })
+
+
+
+                console.log(light)
+                break
+            }
+            default: {
+                light = this.subject = new THREE[this.type]({
+                    intensity: this.intensity,
+                    color: this.color,
+                    decay: this.decay,
+                    distance: this.distance,
+                })
+            }
+        }
+
+
+        // light.shadowCameraVisible =  true
+        // if (light.shadow) {
+        //     light.shadow.mapSize.width = 512;
+        //     light.shadow.mapSize.height = 512;
+        //     light.shadow.camera.near = 0.5;
+        //     light.shadow.camera.far = 500
+        // }
+        // light.castShadow = true
 
         let renderer = this.find_component_of_type("RendererComponent")
         if (renderer) {
@@ -49,15 +83,39 @@ class LightComponent extends TransformComponent {
         return [
             "intensity",
             "color",
-            "distane",
-            "decay"
+            "distance",
+            "decay",
+            "sky_color",
+            "ground_color"
         ].concat(super.get_reactive_props())
     }
-    on_update() {
-        this.subject.color.set_any(this.color)
-        this.subject.distance = this.distance
-        this.subject.intensity = this.intensity
-        this.subject.decay = this.decay
+    on_update(props) {
+        super.on_update(...arguments)
+        props.forEach(prop => {
+            switch (prop) {
+                case "color": {
+                    this.subject.color.set_any(this.color)
+                    break
+                }
+                case "sky_color": {
+                    this.subject.color.set_any(this.sky_color)
+                    break
+                }
+                case "ground_color": {
+                    if (this.subject.ground_color !== undefined) {
+                        this.subject.ground_color.set_any(this.ground_color)
+                    }
+                    break
+                }
+                default: {
+                    this.subject.distance = this.distance
+                    this.subject.intensity = this.intensity
+                    this.subject.decay = this.decay
+                }
+            }
+        })
+
+
     }
     on_tick(time_delta) {
     }

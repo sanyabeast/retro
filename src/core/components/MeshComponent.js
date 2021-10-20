@@ -17,6 +17,9 @@ class MeshComponent extends TransformComponent {
             material: this.material,
             geometry_translation: this.geometry_translation
         })
+
+        mesh.receiveShadow = true
+        mesh.castShadow = true
     }
 
     static create_mesh(params) {

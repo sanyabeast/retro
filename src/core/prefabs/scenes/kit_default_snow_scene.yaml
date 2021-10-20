@@ -1,4 +1,5 @@
 children:
+  - prefab: "core.actors.test_box_1"
   - components:
       ground:
         enabled: true
@@ -16,19 +17,22 @@ children:
               - 8
           material:
             - PBRMaterial
-            - color: "#ffffff"
+            - color: "#daefe5"
               pbr: "res/core/pbr/rocks-hexagon-1/t"
               file_format: jpg
               tiling: 6
-      box:
+      
+      box2:
         enabled: true
         name: MeshComponent
         tag: cool_box
         params:
           position:
+            - -1.2
+            - -0.8
             - 0
-            - -0.5
-            - 0
+          scale: [0.3, 0.3, 0.3]
+          rotation: [0, -2, 0]
           geometry:
             - BoxBufferGeometry
             - - 1
@@ -37,24 +41,65 @@ children:
           material:
             - PBRMaterial
             - color: "#ffffff"
-              pbr: "res/core/pbr/storage-container2-bl/storage-container2"
+              pbr: "res/core/pbr/modern-metal-wall1-bl/modern-metal-wall"
+      box3:
+        enabled: true
+        name: MeshComponent
+        tag: cool_box
+        params:
+          position:
+            - 2.2
+            - -0.8
+            - 1
+          scale: [0.6, 0.6, 0.4]
+          rotation: [0, 2, 0]
+          geometry:
+            - BoxBufferGeometry
+            - - 1
+              - 1
+              - 1
+          material:
+            - PBRMaterial
+            - color: "#ffffdd"
+              pbr: "res/core/pbr/rock-slab-wall1-bl/rock-slab-wall"
+              tiling: [2, 2]
+      box4:
+        enabled: true
+        name: MeshComponent
+        tag: cool_box
+        params:
+          position:
+            - 0
+            - 0.15
+            - 0
+          scale: [0.5, 0.5, 0.4]
+          rotation: [0, 4, 0]
+          geometry:
+            - BoxBufferGeometry
+            - - 1
+              - 1
+              - 1
+          material:
+            - PBRMaterial
+            - color: "#ffffff"
+              pbr: "res/core/pbr/ridged-foam1-bl/ridged-foam1"
       caption_a:
         enabled: true
         name: TroikaTextComponent
         params:
-          text: "THAT BOX"
-          font_size: 0.3
+          text: "These boxes"
+          font_size: 0.36
           color: "#ffffff"
           anchor_x: 0
           position:
             - -0.5
-            - 0.6
+            - 0.7
             - 0.51
       caption_b:
         enabled: true
         name: TroikaTextComponent
         params:
-          text: "IS COOL"
+          text: "are cool"
           font_size: 0.5
           color: "#f44336"
           anchor_x: 0

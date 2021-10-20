@@ -1,5 +1,5 @@
 <template>
-  <div class="dev-gui">
+  <div class="dev-gui" :class="{ mobile: device.device_type === `smartphone` }">
     <div class="status">
       <div class="status-line"><p>dev mode</p></div>
       <div class="status-line">
@@ -39,6 +39,7 @@
 import { mapState } from "vuex";
 import * as THREE from "three";
 import AssetManager from "core/utils/AssetManager";
+import Device from "core/utils/Device"
 
 export default {
   mixins: [],
@@ -50,13 +51,15 @@ export default {
       },
       camera_pos: [0, 0, 0],
       pointer_pos: [0, 0],
-      render_items_count: 0
+      render_items_count: 0,
+      device: Device
     };
   },
   props: {},
   computed: {},
   watch: {},
   mounted() {
+    console.log(this.$store)
     this.asset_stats = AssetManager.get_asset_stats();
   },
   methods: {
@@ -100,6 +103,13 @@ export default {
   color: #ffffff;
   font-family: monospace;
   font-size: 14px;
+  &.mobile {
+    font-size: 8px;
+    .status .status-line {
+      font-size: 8px;
+      line-height: 0.5em;
+    }
+  }
   .status {
     position: absolute;
     top: 16px;
@@ -107,6 +117,7 @@ export default {
     .status-line {
       color: #eeeeee;
       font-size: 10px;
+      line-height: 0.75em;
     }
   }
 }

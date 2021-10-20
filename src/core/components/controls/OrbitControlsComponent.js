@@ -98,6 +98,10 @@ class OrbitControlsComponent extends Component {
         }
     }
     on_tick(time_delta) {
+        let camera = this.find_component_of_type("CameraComponent")
+        camera.position[0] = camera.subject.position.x
+        camera.position[1] = camera.subject.position.y
+        camera.position[2] = camera.subject.position.z
         this.controls.update();
     }
 }

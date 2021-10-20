@@ -91,6 +91,7 @@ class Launcher extends EventDispatcher {
         this.dom.style.width = "100%";
         this.dom.style.height = "100%";
         this.dom.style.position = "relative";
+        this.dom.style.userSelect = "none"
 
         this.globals.launcher = this;
         this.globals.wait = this.wait;
