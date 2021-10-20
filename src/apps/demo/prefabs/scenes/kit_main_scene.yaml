@@ -1,0 +1,20 @@
+components:
+  point_light:
+    enabled: true
+    name: LightComponent
+    params:
+      position:
+        - 1
+        - 1
+        - 0
+      type: PointLight
+      intensity: 2
+      distance: 10
+      color: "#ffffff"
+  fog: "@prefab:default.FogComponent"
+  skybox: "@prefab:default.SkyBox"
+  posfx: "@prefab:default.Postprocessing"
+  orbit_controls: "@prefab:default.controls.OrbitControlsComponent"
+  ambient_sound: "@prefab:core.sound.default_ambient_audio_source"
+children:
+  - "@prefab:core.scenes.kit_default_snow_scene"
