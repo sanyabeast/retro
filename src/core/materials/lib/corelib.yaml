@@ -1,0 +1,176 @@
+code: >
+  uniform float time;
+  uniform vec2 resolution;
+  uniform vec2 mouse;
+  varying vec2 vUv;
+  uniform float opacity;
+  uniform float texture_crop;
+  uniform float pixel_ratio;
+  uniform vec3 camera_pos;
+
+
+  #define PI 3.141592653589793
+  
+  float measure(vec4 color){
+      return ((color.x + color.y + color.z) / 3.) * color.a; 
+  }
+
+  float measure_color(vec4 color){
+      return ((color.x + color.y + color.z) / 3.); 
+  }
+
+  vec2 transform_uv(vec2 vuv, vec2 offset, vec2 scale){
+      float x = vuv.x;
+      float y = vuv.y;
+      x -= 0.5; 
+      y -= 0.5;
+      x /= scale.x;
+      y /= scale.y;
+      x += 0.5;
+      y += 0.5;
+      x += offset.x;
+      y += offset.y;
+      return vec2(x, y);
+  }
+
+  float round_to(float n, float a){
+      float r = floor(n / a) * a;
+      return r;
+  }
+
+  float round_to2(float n, float a){
+      float r = ceil(n / a) * a;
+      return r;
+  }
+
+  vec2 rotate_uv(vec2 uv, vec2 pivot, float rotation) {
+      float cosa = cos(rotation);
+      float sina = sin(rotation);
+      uv -= pivot;
+      return vec2(
+          cosa * uv.x - sina * uv.y,
+          cosa * uv.y + sina * uv.x 
+      ) + pivot;
+  }
+
+  float get_uv_radius(){
+      return sqrt(pow(vUv.x-0.5, 2.) + pow(vUv.y-0.5, 2.)) * 2.;
+  }
+  float get_viewport_radius(vec4 viewport_coords){
+      return 2. * sqrt(
+          pow((viewport_coords.x / (resolution.x * pixel_ratio)) - 0.5, 2.) + 
+          pow((viewport_coords.y / (resolution.y * pixel_ratio)) - 0.5, 2.)
+      );
+  }
+
+  void draw_texture_tinted(inout vec4 out_color, sampler2D map, vec2 vuv, float opacity, vec3 tint_color, int tint_mode, vec2 offset, vec2 scale){
+      vec2 uv = transform_uv(vuv, offset, scale);
+      vec4 texture_color = texture2D(map, uv);
+      
+
+      if (tint_mode == 0){
+          if (uv.x > texture_crop && uv.y > texture_crop && uv.x < 1.-texture_crop && uv.y < 1.-texture_crop){
+              out_color = mix(out_color, texture_color, texture_color.a * opacity);
+          } 
+      }
+      
+      if (tint_mode == 1){
+          out_color = vec4(mix(out_color.xyz, tint_color, texture_color.a * (1.-measure_color(texture_color)) * opacity), out_color.a);
+      }
+
+      if (tint_mode == 2){
+          out_color = vec4(mix(out_color.xyz, tint_color, texture_color.a * measure_color(texture_color) * opacity), out_color.a);
+      }
+
+      if (tint_mode == 3){
+          out_color = vec4(mix(out_color.xyz, tint_color, 1.-(measure_color(texture_color)) * opacity), out_color.a);
+      }
+
+      if (tint_mode == 4){
+          out_color = vec4(mix(out_color.xyz, tint_color, (measure_color(texture_color)) * opacity), out_color.a);
+      }
+  }
+
+  void apply_opacity(inout vec4 out_color){
+      out_color.a *= opacity;
+  }
+
+  /** BC*/
+  uniform vec2 bc;
+  void apply_bc(inout vec4 out_color){
+      out_color.rgb /= out_color.a;
+      out_color.rgb = ((out_color.rgb - 0.5) * max(bc.y, 0.)) + 0.5;
+      out_color.rgb += bc.x;
+      out_color.rgb *= out_color.a;
+  }
+
+  vec3 get_normal(vec3 pos){
+    return normalize(vec3(pos.y, -pos.x, pos.z));
+  }
+
+  vec3 get_normal_inverted(vec3 pos){
+    return normalize(vec3(-pos.y, pos.x, pos.z));
+  }
+
+  vec3 rotate(vec3 v3, vec2 pivot, float rotation) {
+      float cosa = cos(rotation);
+      float sina = sin(rotation);
+      v3 -= vec3(pivot, 0.);
+      return vec3(
+          cosa * v3.x - sina * v3.y,
+          cosa * v3.y + sina * v3.x,
+          v3.z
+      ) + vec3(pivot, 0.);
+  }
+
+  vec2 rotateUV(vec2 uv, float rotation)
+  {
+      float mid = 0.5;
+      return vec2(
+          cos(rotation) * (uv.x - mid) + sin(rotation) * (uv.y - mid) + mid,
+          cos(rotation) * (uv.y - mid) - sin(rotation) * (uv.x - mid) + mid
+      );
+  }
+
+  vec2 rotateUV(vec2 uv, float rotation, vec2 mid)
+  {
+      return vec2(
+        cos(rotation) * (uv.x - mid.x) + sin(rotation) * (uv.y - mid.y) + mid.x,
+        cos(rotation) * (uv.y - mid.y) - sin(rotation) * (uv.x - mid.x) + mid.y
+      );
+  }
+
+  vec2 rotateUV(vec2 uv, float rotation, float mid)
+  {
+
+      if (rotation < 0.) {
+        rotation = (2. * 3.14) + rotation;
+      }
+
+      return vec2(
+        cos(rotation) * (uv.x - mid) + sin(rotation) * (uv.y - mid) + mid,
+        cos(rotation) * (uv.y - mid) - sin(rotation) * (uv.x - mid) + mid
+      );
+  }
+uniforms: 
+  bc: 
+    type: v2
+    value: [0, 1]
+  time:
+    type: f
+    valie: 0
+  pixel_ratio:
+    type: f
+    value: 1
+  resolution: 
+    type: v2
+    value: [1, 1]
+  mouse:
+    type: v2
+    value: [0, 0]
+  opacity:
+    type: f
+    value: 1
+  texture_crop: 
+    type: f
+    value: -0.1

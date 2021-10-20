@@ -1,0 +1,20 @@
+
+/* created by @sanyabeast 9/6/2021 
+ *
+ *
+ */
+
+import Component from "core/Component";
+import AssetManager  from "core/utils/AssetManager";
+import * as THREE from 'three';
+
+class SomeComponent extends Component {
+    on_created() {
+
+    }
+    on_tick(time_delta) {
+        
+    }
+}
+
+export default SomeComponent;

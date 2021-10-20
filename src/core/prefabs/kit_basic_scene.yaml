@@ -1,0 +1,31 @@
+components:
+  camera:
+    prefab: "default.CameraComponent"
+    params:
+      position:
+        - 1
+        - 1
+        - 4
+  input: "@prefab:default.InputComponent"
+  clock: "@prefab:default.ClockComponent"
+  renderer: "@prefab:default.RendererComponent"
+  ambient_light:
+    enabled: true
+    name: LightComponent
+    params:
+      type: AmbientLight
+      intensity: 0.1
+  user_pointer:
+    name: UserPointer
+    params:
+      events:
+        - move
+        - over
+        - out
+        - down
+        - up
+        - scroll
+        - press
+      raycasting: true
+  animator: "@prefab:default.Animator"
+  devgui: "@prefab:default.VueGUIComponent"

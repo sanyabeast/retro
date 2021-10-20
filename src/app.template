@@ -1,0 +1,18 @@
+import CoreApp from "core/App"
+import * as THREE from 'three';
+import Main from "apps/aviator/gui/Main.vue"
+import store from "apps/aviator/gui/store"
+import AssetManager from "core/utils/AssetManager";
+
+class App extends CoreApp {
+    constructor(params) {
+        super({
+            ...params,
+        });
+    }
+    on_tick() {
+        let time = this.globals.uniforms.time.value
+    }
+}
+
+export default App;

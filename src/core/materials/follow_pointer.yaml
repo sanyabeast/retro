@@ -1,0 +1,4 @@
+type: MeshBasicMaterial
+params: 
+  color: 0xd7d3dc
+  transparent: true

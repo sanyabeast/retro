@@ -1,0 +1,51 @@
+type: ShaderMaterial
+params:
+  vertexShader: >
+      varying vec2 vUv;
+      uniform float opacity;
+      uniform float cell_scale;
+
+      void main() {
+          vUv = uv;
+          vec4 pos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          gl_Position = pos;
+      }
+
+  fragmentShader: >
+      varying vec2 vUv;
+      uniform float time;
+      uniform vec2 resolution;
+      uniform vec2 mouse;
+      uniform float opacity;
+      uniform sampler2D sheet;
+      uniform vec2 grid;
+      uniform vec2 current_frame;
+      uniform int playing;
+
+      void main(void) {
+        vec2 frame_frac = vec2(1./grid.x, 1./grid.y);
+
+        vec2 auv = vec2(
+          (vUv.x / grid.x) + (frame_frac.x * current_frame.x),
+          (vUv.y / grid.y) + (frame_frac.y * current_frame.y)
+        );
+        vec4 t_color = texture2D(sheet, auv);
+        gl_FragColor = t_color;
+        gl_FragColor.a = length(t_color.xyz);
+      }
+  transparent: true
+  blending: 1
+  uniforms: 
+    opacity: 
+      type: f
+      value: 1
+    grid:
+      type: v2
+      value: [1, 1]
+    current_frame:
+      type: f
+      value: [0, 0]
+    sheet:
+      type: t
+    
+      

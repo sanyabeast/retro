@@ -1,0 +1,6 @@
+name: AudioComponent
+params:
+  src: "res/core/music/fashion_fantasy_lofihiphop_1"
+  autoplay: true
+  loop: true
+  volume: 0.5

@@ -1,0 +1,71 @@
+children:
+  - components:
+      ground:
+        enabled: true
+        name: MeshComponent
+        tag: cool_ground
+        params:
+          position:
+            - 0
+            - -1
+            - 0
+          geometry:
+            - BoxBufferGeometry
+            - - 8
+              - 0.1
+              - 8
+          material:
+            - PBRMaterial
+            - color: "#ffffff"
+              pbr: "res/core/pbr/rocks-hexagon-1/t"
+              file_format: jpg
+              tiling: 6
+      box:
+        enabled: true
+        name: MeshComponent
+        tag: cool_box
+        params:
+          position:
+            - 0
+            - -0.5
+            - 0
+          geometry:
+            - BoxBufferGeometry
+            - - 1
+              - 1
+              - 1
+          material:
+            - PBRMaterial
+            - color: "#ffffff"
+              pbr: "res/core/pbr/storage-container2-bl/storage-container2"
+      caption_a:
+        enabled: true
+        name: TroikaTextComponent
+        params:
+          text: "THAT BOX"
+          font_size: 0.3
+          color: "#ffffff"
+          anchor_x: 0
+          position:
+            - -0.5
+            - 0.6
+            - 0.51
+      caption_b:
+        enabled: true
+        name: TroikaTextComponent
+        params:
+          text: "IS COOL"
+          font_size: 0.5
+          color: "#f44336"
+          anchor_x: 0
+          rotation: [0, 1.5, 0]
+          position:
+            - 0.5
+            - 0.1
+            - 0.75
+  - prefab: "core.snow_fx"
+    components:
+      snow:
+        params:
+          particles_global_size: 0.3
+          particles_end_color: "#ffffff"
