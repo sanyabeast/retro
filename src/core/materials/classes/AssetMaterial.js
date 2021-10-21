@@ -105,7 +105,7 @@ class AssetMaterial extends THREE.Material {
                 src = `${asset_dir}/maps/${src}`
                 material_params.normalMap = src
                 material_params.displacementMap = src
-                material_params.displacementScale = this.displacement_scale
+                material_params.displacementScale = -1*Math.abs(this.displacement_scale)
                 material_params.bumpMap = 0.01
                 material_params.bumpScale = this.bump_scale
             }
