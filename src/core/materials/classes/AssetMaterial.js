@@ -7,8 +7,9 @@ class AssetMaterial extends THREE.Material {
     src = ""
     material_type = "MeshPhongMaterial"
     bump_scale = 0.001
-    shininess = 16
+    shininess = 10
     displacement_scale = 0.01
+    doubleside = false
     constructor(params) {
         super(params)
         let src = this.src = params.src
@@ -16,6 +17,7 @@ class AssetMaterial extends THREE.Material {
         this.bump_scale = params.bump_scale || 0.001
         this.displacement_scale = params.displacement_scale || 0.01
         this.shininess = params.shininess || 16
+        this.doubleside = params.doubleside || false
         let r = []
 
 
@@ -51,7 +53,7 @@ class AssetMaterial extends THREE.Material {
         })
 
         function parse_block(block_data) {
-            let parsed_props = ['newmtl', "Ns", "Ka", "Kd", "Ks", "Ke", "Ni", "d", "illum", "map_Bump", "map_Kd", "map_d"]
+            let parsed_props = ['newmtl', "Ns", "Ka", "Kd", "Ks", "Ke", "Ni", "d", "illum", "map_Bump", "map_Kd", "map_d", "map_Ns", "refl"]
             let parsed_data = {}
             parsed_props.forEach(p => {
                 let parsed_line = parse_line(chunk_line(p, block_data))
@@ -88,6 +90,33 @@ class AssetMaterial extends THREE.Material {
                 let src = path.basename(map_Ka.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
                 material_params.map = src
+            }
+
+            if (block_data.map_Kd) {
+                let map_Kd = block_data.map_Kd[block_data.map_Kd.length - 1]
+                let src = path.basename(map_Kd.replace(/\\\\/gm, "/"))
+                src = `${asset_dir}/maps/${src}`
+                material_params.map = src
+            }
+
+            if (this.doubleside){
+                material_params.side = THREE.DoubleSide
+            }
+
+            if (block_data.map_Ns) {
+                let map_Ns = block_data.map_Ns[block_data.map_Ns.length - 1]
+                let src = path.basename(map_Ns.replace(/\\\\/gm, "/"))
+                src = `${asset_dir}/maps/${src}`
+                material_params.specularMap = src
+                material_params.roughnessMap = src
+            }
+
+            if (block_data.refl) {
+                let refl = block_data.refl[block_data.refl.length - 1]
+                let src = path.basename(refl.replace(/\\\\/gm, "/"))
+                src = `${asset_dir}/maps/${src}`
+                material_params.metallnessMap = src
+                material_params.metallness = 0.1
             }
             
             if (block_data.map_d) {

@@ -69,3 +69,19 @@ children:
             - AssetMaterial
             - color: "#daefe5"
               src: "res/demo/models/phone/phone.mtl"
+      chalkboard: 
+        name: MeshComponent
+        params:
+          position:
+            - 2
+            - 0
+            - 2.2
+          rotation: [0, -2, 0]
+          geometry:
+            - "url:res/core/models/rest_chalkboard_1/chalkboard.obj"
+            - 0.3
+          material:
+            - AssetMaterial
+            - src: "res/core/models/rest_chalkboard_1/chalkboard.mtl"
+              transparent: false
+              doubleside: true

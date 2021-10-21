@@ -12,9 +12,9 @@ children:
             - 0
           geometry:
             - BoxBufferGeometry
-            - - 8
+            - - 12
               - 0.1
-              - 8
+              - 12
           material:
             - PBRMaterial
             - color: "#daefe5"

@@ -21,6 +21,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             })
             break
         }
+        case "phablet": {
+            let launcher = window.launcher = new Launcher()
+            document.body.appendChild(launcher.dom)
+            document.body.addEventListener("mousedown", ()=>{
+                document.body.requestFullscreen()
+            })
+            break
+        }
         default: {
             let frame = new Frame();
             frame.set_size(window.innerWidth * 0.777, window.innerHeight * 0.777)

@@ -94,8 +94,8 @@ class Postprocessing extends Component {
                 new postfx.BloomEffect({
                     blendFunction: postfx.BlendFunction.ADD,
                     kernelSize: postfx.KernelSize.MEDIUM,
-                    luminanceThreshold: 0.825,
-                    luminanceSmoothing: 0.075,
+                    luminanceThreshold: 0.87,
+                    luminanceSmoothing: 0.18,
                     height: 480
                 }),
                 outline_effect
