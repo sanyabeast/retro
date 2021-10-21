@@ -5,7 +5,7 @@ import {
 	MeshBasicMaterial,
 	PlaneGeometry,
 	sRGBEncoding
-} from 'three';
+} from '../../../build/three.module.js';
 
 class HTMLMesh extends Mesh {
 

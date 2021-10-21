@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from "three"
 
 const _object_pattern = /^[og]\s*(.+)?/; // mtllib file_reference
 

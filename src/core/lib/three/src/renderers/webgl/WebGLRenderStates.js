@@ -15,6 +15,7 @@ function WebGLRenderState( extensions, capabilities ) {
 	}
 
 	function pushLight( light ) {
+
 		lightsArray.push( light );
 
 	}
@@ -25,8 +26,9 @@ function WebGLRenderState( extensions, capabilities ) {
 
 	}
 
-	function setupLights() {
-		lights.setup( lightsArray );
+	function setupLights( physicallyCorrectLights ) {
+
+		lights.setup( lightsArray, physicallyCorrectLights );
 
 	}
 

@@ -2,8 +2,8 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Vector3
-} from 'three';
-import { BufferGeometryUtils } from '../utils/BufferGeometryUtils.js';
+} from '../../../build/three.module.js';
+import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
 
 const _A = new Vector3();
 const _B = new Vector3();

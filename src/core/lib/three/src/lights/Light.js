@@ -3,16 +3,14 @@ import { Color } from '../math/Color.js';
 
 class Light extends Object3D {
 
-	constructor( params ) {
+	constructor( color, intensity = 1 ) {
 
 		super();
 
 		this.type = 'Light';
 
-		this.color = new Color( params.color );
-		this.intensity = params.intensity;
-
-		console.log(this.color, this.intensity, this.type)
+		this.color = new Color( color );
+		this.intensity = intensity;
 
 	}
 

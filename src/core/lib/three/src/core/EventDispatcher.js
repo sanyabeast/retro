@@ -4,50 +4,50 @@
 
 class EventDispatcher {
 
-	addEventListener(type, listener) {
+	addEventListener( type, listener ) {
 
-		if (this._listeners === undefined) this._listeners = {};
+		if ( this._listeners === undefined ) this._listeners = {};
 
 		const listeners = this._listeners;
 
-		if (listeners[type] === undefined) {
+		if ( listeners[ type ] === undefined ) {
 
-			listeners[type] = [];
+			listeners[ type ] = [];
 
 		}
 
-		if (listeners[type].indexOf(listener) === - 1) {
+		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
 
-			listeners[type].push(listener);
+			listeners[ type ].push( listener );
 
 		}
 
 	}
 
-	hasEventListener(type, listener) {
+	hasEventListener( type, listener ) {
 
-		if (this._listeners === undefined) return false;
+		if ( this._listeners === undefined ) return false;
 
 		const listeners = this._listeners;
 
-		return listeners[type] !== undefined && listeners[type].indexOf(listener) !== - 1;
+		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
 
 	}
 
-	removeEventListener(type, listener) {
+	removeEventListener( type, listener ) {
 
-		if (this._listeners === undefined) return;
+		if ( this._listeners === undefined ) return;
 
 		const listeners = this._listeners;
-		const listenerArray = listeners[type];
+		const listenerArray = listeners[ type ];
 
-		if (listenerArray !== undefined) {
+		if ( listenerArray !== undefined ) {
 
-			const index = listenerArray.indexOf(listener);
+			const index = listenerArray.indexOf( listener );
 
-			if (index !== - 1) {
+			if ( index !== - 1 ) {
 
-				listenerArray.splice(index, 1);
+				listenerArray.splice( index, 1 );
 
 			}
 
@@ -55,23 +55,23 @@ class EventDispatcher {
 
 	}
 
-	dispatchEvent(event) {
+	dispatchEvent( event ) {
 
-		if (this._listeners === undefined) return;
+		if ( this._listeners === undefined ) return;
 
 		const listeners = this._listeners;
-		const listenerArray = listeners[event.type];
+		const listenerArray = listeners[ event.type ];
 
-		if (listenerArray !== undefined) {
+		if ( listenerArray !== undefined ) {
 
 			event.target = this;
 
 			// Make a copy, in case listeners are removed while iterating.
-			const array = listenerArray.slice(0);
+			const array = listenerArray.slice( 0 );
 
-			for (let i = 0, l = array.length; i < l; i++) {
+			for ( let i = 0, l = array.length; i < l; i ++ ) {
 
-				array[i].call(this, event);
+				array[ i ].call( this, event );
 
 			}
 

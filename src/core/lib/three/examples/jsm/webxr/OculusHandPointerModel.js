@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../../../build/three.module.js';
 
 const PINCH_MAX = 0.05;
 const PINCH_THRESHOLD = 0.02;
@@ -343,7 +343,7 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 		if ( this.raycaster ) {
 
-			return this.raycaster.intersectObjects( objects );
+			return this.raycaster.intersectObjects( objects, false );
 
 		}
 
@@ -353,7 +353,7 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 		if ( this.raycaster && ! this.attached ) {
 
-			const intersections = this.raycaster.intersectObjects( objects );
+			const intersections = this.raycaster.intersectObjects( objects, false );
 			const direction = new THREE.Vector3( 0, 0, - 1 );
 			if ( intersections.length > 0 ) {
 

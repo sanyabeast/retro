@@ -4,7 +4,7 @@ import {
 	Quaternion,
 	Vector2,
 	Vector3
-} from 'three';
+} from '../../../build/three.module.js';
 
 const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
@@ -208,7 +208,7 @@ class TrackballControls extends EventDispatcher {
 
 				} else if ( scope.object.isOrthographicCamera ) {
 
-					scope.object.zoom *= factor;
+					scope.object.zoom /= factor;
 					scope.object.updateProjectionMatrix();
 
 				} else {

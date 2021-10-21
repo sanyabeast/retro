@@ -11,6 +11,8 @@ import { set, get } from "lodash-es"
 class MeshComponent extends TransformComponent {
     mesh = null;
     tick_skip = 1
+    drop_shadow = true
+    recieve_shadow = false
     on_created() {
         let mesh = this.subject = MeshComponent.create_mesh({
             geometry: this.geometry,
@@ -18,8 +20,9 @@ class MeshComponent extends TransformComponent {
             geometry_translation: this.geometry_translation
         })
 
-        mesh.receiveShadow = true
-        mesh.castShadow = true
+        mesh.castShadow = this.drop_shadow
+        mesh.receiveShadow = this.recieve_shadow
+
     }
 
     static create_mesh(params) {
@@ -31,11 +34,7 @@ class MeshComponent extends TransformComponent {
             : undefined;
 
 
-        let mesh = new THREE.Mesh({
-            ...params,
-            geometry: geometry,
-            material: material
-        });
+        let mesh = new THREE.Mesh(geometry, material);
 
         if (params) {
             if (params.geometry_translation) {
@@ -56,8 +55,27 @@ class MeshComponent extends TransformComponent {
         }
     }
 
-    on_update() {
+    get_reactive_props() {
+        return [
+            "drop_shadow",
+            "recieve_shadow"
+        ].concat(super.get_reactive_props())
+    }
+
+    on_update(props) {
         super.on_update(...arguments)
+        props.forEach(prop => {
+            switch (prop) {
+                case "drop_shadow": {
+
+                    this.subject.castShadow = this.drop_shadow
+                    break
+                }
+                case "recieve_shadow": {
+                    this.subject.receiveShadow = this.recieve_shadow
+                }
+            }
+        })
     }
 
     on_enabled() {

@@ -2,10 +2,9 @@ import { Light } from './Light.js';
 
 class AmbientLight extends Light {
 
-	constructor(params ) {
-		console.log(params)
-		params = params || {  color: "#ffffff", intensity: 1 }
-		super( params );
+	constructor( color, intensity ) {
+
+		super( color, intensity );
 
 		this.type = 'AmbientLight';
 

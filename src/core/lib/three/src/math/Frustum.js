@@ -67,7 +67,6 @@ class Frustum {
 		const geometry = object.geometry;
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-
 		_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
 
 		return this.intersectsSphere( _sphere );

@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import * as fflate from 'fflate';
+import * as THREE from "three"
+
 
 /**
 * THREE.Loader loads FBX file and generates THREE.Group representing FBX scene.
@@ -637,17 +637,7 @@ class FBXTreeParser {
 
 		}
 
-		const texture = textureMap.get(id);
-
-		if (texture.image !== undefined) {
-
-			return texture;
-
-		} else {
-
-			return undefined;
-
-		}
+		return textureMap.get(id);
 
 	} // Parse nodes in FBXTree.Objects.Deformer
 	// Deformer node can contain skinning or Vertex Cache animation data, however only skinning is supported here
@@ -3823,5 +3813,7 @@ function inject(a1, index, a2) {
 	return a1.slice(0, index).concat(a2).concat(a1.slice(index));
 
 }
+
+THREE.FBXLoader = FBXLoader;
 
 export default FBXLoader

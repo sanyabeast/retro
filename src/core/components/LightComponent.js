@@ -16,6 +16,7 @@ class LightComponent extends TransformComponent {
     decay = 0
     sky_color = "#ffaaaa"
     ground_color = "#aaaaff"
+    shadows_enabled = false
     save_prefab() {
         return {
             ...super.save_prefab(),
@@ -41,8 +42,6 @@ class LightComponent extends TransformComponent {
                     distance: this.distance,
                 })
 
-
-
                 console.log(light)
                 break
             }
@@ -56,15 +55,16 @@ class LightComponent extends TransformComponent {
             }
         }
 
+        if (this.shadows_enabled) {
+            if (light.shadow) {
+                light.shadow.mapSize.width = 512;
+                light.shadow.mapSize.height = 512;
+                light.shadow.camera.near = 0.5;
+                light.shadow.camera.far = 1000
+            }
+            light.castShadow = true
+        }
 
-        // light.shadowCameraVisible =  true
-        // if (light.shadow) {
-        //     light.shadow.mapSize.width = 512;
-        //     light.shadow.mapSize.height = 512;
-        //     light.shadow.camera.near = 0.5;
-        //     light.shadow.camera.far = 500
-        // }
-        // light.castShadow = true
 
         let renderer = this.find_component_of_type("RendererComponent")
         if (renderer) {
@@ -86,7 +86,8 @@ class LightComponent extends TransformComponent {
             "distance",
             "decay",
             "sky_color",
-            "ground_color"
+            "ground_color",
+            "shadows_enabled"
         ].concat(super.get_reactive_props())
     }
     on_update(props) {
@@ -105,6 +106,10 @@ class LightComponent extends TransformComponent {
                     if (this.subject.ground_color !== undefined) {
                         this.subject.ground_color.set_any(this.ground_color)
                     }
+                    break
+                }
+                case "shadows_enabled": {
+                    this.subject.castShadow = this.shadows_enabled
                     break
                 }
                 default: {

@@ -19,7 +19,7 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	sRGBEncoding
-} from 'three';
+} from '../../../build/three.module.js';
 import * as fflate from '../libs/fflate.module.js';
 
 /**
@@ -1431,7 +1431,7 @@ class ThreeMFLoader extends Loader {
 			for ( let i = 0; i < buildData.length; i ++ ) {
 
 				const buildItem = buildData[ i ];
-				const object3D = objects[ buildItem[ 'objectId' ] ];
+				const object3D = objects[ buildItem[ 'objectId' ] ].clone();
 
 				// apply transform
 

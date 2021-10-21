@@ -1,7 +1,7 @@
 import {
 	UniformsLib,
 	UniformsUtils
-} from 'three';
+} from '../../../../../build/three.module.js';
 
 import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';

@@ -2,27 +2,27 @@ import { BufferAttribute } from './BufferAttribute.js';
 
 class InstancedBufferAttribute extends BufferAttribute {
 
-	constructor(array, itemSize, normalized, meshPerAttribute = 1) {
+	constructor( array, itemSize, normalized, meshPerAttribute = 1 ) {
 
-		if (typeof normalized === 'number') {
+		if ( typeof normalized === 'number' ) {
 
 			meshPerAttribute = normalized;
 
 			normalized = false;
 
-			console.error('THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.');
+			console.error( 'THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.' );
 
 		}
 
-		super(array, itemSize, normalized);
+		super( array, itemSize, normalized );
 
 		this.meshPerAttribute = meshPerAttribute;
 
 	}
 
-	copy(source) {
+	copy( source ) {
 
-		super.copy(source);
+		super.copy( source );
 
 		this.meshPerAttribute = source.meshPerAttribute;
 

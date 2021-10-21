@@ -5,16 +5,25 @@ components:
     ref: "point_light"
     tag: "point_light"
     params:
-      position: [0, 21, 0]
+      position: [0, 10, 0]
+      shadows_enabled: true
       type: "PointLight"
-      intensity: 1.9
-      distance: 4
-      color: "#ffeeff"
+      intensity: 1
+      distance: 20
+      decay: 0
+      color: "#ffaaaa"
   # dir_light: 
   #   name: LightComponent
   #   params:
   #     type: DirectionalLight
-  #     intensity: 10
+  #     intensity: 1
+  #     rotation: [1, 1, 1]
+  #     position: [-20, 20, 0]
+  sun:
+    name: Sun
+    tag: sun
+    params: 
+      height: 20
   fog: "@prefab:default.FogComponent"
   skybox: "@prefab:default.SkyBox"
   posfx: "@prefab:default.Postprocessing"
@@ -23,6 +32,16 @@ components:
 children:
   - "@prefab:core.scenes.kit_default_snow_scene"
   - components:
+      # spine3:
+      #   enabled: true
+      #   name: SpineAnimationPlayer
+      #   ref: spine
+      #   params:
+      #     position: [1, 1, 0]
+      #     asset_name: demo/spine/ship_for_spine
+      #     file_name: ship_for_spine
+      #     animation_name: idle_flight
+      #     skeleton_scale: 2
       bush_1:
         name: MeshComponent
         tag: bush
@@ -85,3 +104,37 @@ children:
             - src: "res/core/models/rest_chalkboard_1/chalkboard.mtl"
               transparent: false
               doubleside: true
+      lantern: 
+        name: MeshComponent
+        params:
+          recieve_shadow: false
+          position:
+            - 0
+            - 1
+            - 0
+          rotation: [0, -2, 0]
+          geometry:
+            - "url:res/core/models/lantern/lantern_obj.obj"
+            - 0.2
+          material:
+            - AssetMaterial
+            - src: "res/core/models/lantern/lantern_obj.mtl"
+              transparent: false
+              doubleside: true
+      lantern_core: 
+        name: MeshComponent
+        params:
+          position:
+            - 0
+            - 1.1
+            - 0
+          material:
+            - MeshPhongMaterial
+            - fog: false
+              emissive: "#ffddaa"
+              emissiveIntensity: 2
+          geometry:
+            - SphereBufferGeometry
+            - - 0.03
+              - 6
+              - 9

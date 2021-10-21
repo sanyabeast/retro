@@ -40,6 +40,7 @@ class RendererComponent extends Component {
     render_items_count = 0
     composer = undefined
     resolution = undefined
+    shadows_enabled = true
 
     on_created() {
         this.resolution = new Vector2(1, 1)
@@ -54,7 +55,7 @@ class RendererComponent extends Component {
             ...renderer_presets[Device.device_type]
         });
 
-        // renderer.shadowMap.enabled = true
+        renderer.shadowMap.enabled = this.shadows_enabled
 
         console.log(`creating new WebGLRenderer with params: ${JSON.stringify({
             antialias: true,
@@ -88,7 +89,8 @@ class RendererComponent extends Component {
     get_reactive_props() {
         return [
             "clear_stencil",
-            "clear_depth"
+            "clear_depth",
+            "shadows_enabled"
         ].concat(super.get_reactive_props())
     }
 
@@ -110,6 +112,10 @@ class RendererComponent extends Component {
                 }
                 case "auto_clear": {
                     this.renderer.autoClear = this.auto_clear
+                    break
+                }
+                case "shadows_enabled": {
+                    renderer.shadowMap.enabled = this.shadows_enabled
                     break
                 }
             }
@@ -134,10 +140,6 @@ class RendererComponent extends Component {
         this.globals.uniforms.mouse.value.y = y;
     }
     on_tick(time_delta) {
-        if (this.renderer.prev_render_list) {
-            this.globals.stats.update(`render list size`, this.renderer.prev_render_list.opaque.length + this.renderer.prev_render_list.transmissive.length + this.renderer.prev_render_list.transparent.length)
-        }
-
         this.update_render_scene()
     }
     on_destroy() {

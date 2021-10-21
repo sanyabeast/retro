@@ -13,7 +13,7 @@ import {
 	Vector3,
 	Vector4,
 	WebGLRenderTarget
-} from 'three';
+} from '../../../build/three.module.js';
 
 class Refractor extends Mesh {
 

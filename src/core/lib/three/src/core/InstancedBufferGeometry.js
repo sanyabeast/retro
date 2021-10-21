@@ -11,9 +11,9 @@ class InstancedBufferGeometry extends BufferGeometry {
 
 	}
 
-	copy(source) {
+	copy( source ) {
 
-		super.copy(source);
+		super.copy( source );
 
 		this.instanceCount = source.instanceCount;
 
@@ -23,13 +23,13 @@ class InstancedBufferGeometry extends BufferGeometry {
 
 	clone() {
 
-		return new this.constructor().copy(this);
+		return new this.constructor().copy( this );
 
 	}
 
 	toJSON() {
 
-		const data = super.toJSON(this);
+		const data = super.toJSON( this );
 
 		data.instanceCount = this.instanceCount;
 

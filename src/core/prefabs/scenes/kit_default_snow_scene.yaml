@@ -6,6 +6,8 @@ children:
         name: MeshComponent
         tag: cool_ground
         params:
+          recieve_shadow: true
+          drop_shadow: false
           position:
             - 0
             - 0
@@ -64,26 +66,6 @@ children:
             - color: "#ffffdd"
               pbr: "res/core/pbr/rock-slab-wall1-bl/rock-slab-wall"
               tiling: [2, 2]
-      box4:
-        enabled: true
-        name: MeshComponent
-        tag: cool_box
-        params:
-          position:
-            - 0
-            - 1.15
-            - 0
-          scale: [0.5, 0.5, 0.4]
-          rotation: [0, 4, 0]
-          geometry:
-            - BoxBufferGeometry
-            - - 1
-              - 1
-              - 1
-          material:
-            - PBRMaterial
-            - color: "#ffffff"
-              pbr: "res/core/pbr/ridged-foam1-bl/ridged-foam1"
       caption_a:
         enabled: true
         name: TroikaTextComponent

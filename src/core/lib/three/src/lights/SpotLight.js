@@ -4,11 +4,9 @@ import { Object3D } from '../core/Object3D.js';
 
 class SpotLight extends Light {
 
-	constructor( params ) {
+	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1 ) {
 
-		params = params || { color: "#ffffff", intensity: 1, distance: 0, angle: Math.PI / 3, penumbra: 0, decay: 1 }
-
-		super( params );
+		super( color, intensity );
 
 		this.type = 'SpotLight';
 
@@ -17,12 +15,10 @@ class SpotLight extends Light {
 
 		this.target = new Object3D();
 
-		this.distance = params.distance;
-		this.angle = params.angle;
-		this.penumbra = params.penumbra;
-		this.decay = params.decay; // for physically correct lights, should be 2.
-
-		console.log(this)
+		this.distance = distance;
+		this.angle = angle;
+		this.penumbra = penumbra;
+		this.decay = decay; // for physically correct lights, should be 2.
 
 		this.shadow = new SpotLightShadow();
 
@@ -30,16 +26,15 @@ class SpotLight extends Light {
 
 	get power() {
 
-		// intensity = power per solid angle.
-		// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+		// compute the light's luminous power (in lumens) from its intensity (in candela)
+		// by convention for a spotlight, luminous power (lm) = π * luminous intensity (cd)
 		return this.intensity * Math.PI;
 
 	}
 
 	set power( power ) {
 
-		// intensity = power per solid angle.
-		// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+		// set the light's intensity (in candela) from the desired luminous power (in lumens)
 		this.intensity = power / Math.PI;
 
 	}

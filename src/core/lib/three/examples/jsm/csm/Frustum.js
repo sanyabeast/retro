@@ -1,4 +1,4 @@
-import { Vector3, Matrix4 } from 'three';
+import { Vector3, Matrix4 } from '../../../build/three.module.js';
 
 const inverseProjectionMatrix = new Matrix4();
 
@@ -109,7 +109,7 @@ class Frustum {
 
 			}
 
-			if ( i === breaks - 1 ) {
+			if ( i === breaks.length - 1 ) {
 
 				for ( let j = 0; j < 4; j ++ ) {
 

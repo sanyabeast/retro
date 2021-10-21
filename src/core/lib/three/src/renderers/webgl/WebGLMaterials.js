@@ -1,3 +1,4 @@
+
 import { BackSide } from '../../constants.js';
 
 function WebGLMaterials( properties ) {
@@ -139,6 +140,12 @@ function WebGLMaterials( properties ) {
 
 		}
 
+		if ( material.alphaTest > 0 ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
+
+		}
+
 		const envMap = properties.get( material ).envMap;
 
 		if ( envMap ) {
@@ -148,6 +155,7 @@ function WebGLMaterials( properties ) {
 			uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) ? - 1 : 1;
 
 			uniforms.reflectivity.value = material.reflectivity;
+			uniforms.ior.value = material.ior;
 			uniforms.refractionRatio.value = material.refractionRatio;
 
 			const maxMipLevel = properties.get( envMap ).__maxMipLevel;
@@ -189,6 +197,8 @@ function WebGLMaterials( properties ) {
 		// 12. clearcoat roughnessMap map
 		// 13. specular intensity map
 		// 14. specular tint map
+		// 15. transmission map
+		// 16. thickness map
 
 		let uvScaleMap;
 
@@ -248,13 +258,27 @@ function WebGLMaterials( properties ) {
 
 			uvScaleMap = material.specularTintMap;
 
+		} else if ( material.transmissionMap ) {
+
+			uvScaleMap = material.transmissionMap;
+
+		} else if ( material.thicknessMap ) {
+
+			uvScaleMap = material.thicknessMap;
+
 		}
 
-		if ( uvScaleMap !== undefined ) {
-			if (typeof uvScaleMap === "string" && typeof window.F_TEXTURE_STREAMING_FUNCTION === 'function'){
-				uvScaleMap = window.F_TEXTURE_STREAMING_FUNCTION(uvScaleMap)
-			}
 
+		/**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+		/**PATCH PATCH PATCH */
+		if (typeof uvScaleMap === "string"){
+			uvScaleMap = window.F_TEXTURE_STREAMING_FUNCTION(uvScaleMap)
+		}
+
+		/**!PATCH PATCH PATCH */
+		/**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+		if ( uvScaleMap !== undefined ) {
 
 			// backwards compatibility
 			if ( uvScaleMap.isWebGLRenderTarget ) {
@@ -289,11 +313,15 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		if ( uv2ScaleMap !== undefined ) {
+		/**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+		/**PATCH PATCH PATCH */
+		if (typeof uv2ScaleMap === "string"){
+			uv2ScaleMap = window.F_TEXTURE_STREAMING_FUNCTION(uv2ScaleMap)
+		}
+		/**PATCH PATCH PATCH */
+		/**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-			if (typeof uv2ScaleMap === "string" && F_TEXTURE_STREAMING_FUNCTION){
-				uv2ScaleMap = F_TEXTURE_STREAMING_FUNCTION(uv2ScaleMap)
-			}
+		if ( uv2ScaleMap !== undefined ) {
 
 			// backwards compatibility
 			if ( uv2ScaleMap.isWebGLRenderTarget ) {
@@ -348,6 +376,12 @@ function WebGLMaterials( properties ) {
 
 		}
 
+		if ( material.alphaTest > 0 ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
+
+		}
+
 		// uv repeat and offset setting priorities
 		// 1. color map
 		// 2. alpha map
@@ -393,6 +427,12 @@ function WebGLMaterials( properties ) {
 		if ( material.alphaMap ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
+
+		}
+
+		if ( material.alphaTest > 0 ) {
+
+			uniforms.alphaTest.value = material.alphaTest;
 
 		}
 
@@ -575,63 +615,72 @@ function WebGLMaterials( properties ) {
 
 		refreshUniformsStandard( uniforms, material );
 
-		uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
+		uniforms.ior.value = material.ior; // also part of uniforms common
 
-		uniforms.clearcoat.value = material.clearcoat;
-		uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
+		if ( material.sheen > 0 ) {
 
-		if ( material.sheen ) uniforms.sheen.value.copy( material.sheen );
+			uniforms.sheenTint.value.copy( material.sheenTint ).multiplyScalar( material.sheen );
 
-		if ( material.clearcoatMap ) {
-
-			uniforms.clearcoatMap.value = material.clearcoatMap;
+			uniforms.sheenRoughness.value = material.sheenRoughness;
 
 		}
 
-		if ( material.clearcoatRoughnessMap ) {
+		if ( material.clearcoat > 0 ) {
 
-			uniforms.clearcoatRoughnessMap.value = material.clearcoatRoughnessMap;
+			uniforms.clearcoat.value = material.clearcoat;
+			uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
 
-		}
+			if ( material.clearcoatMap ) {
 
-		if ( material.clearcoatNormalMap ) {
+				uniforms.clearcoatMap.value = material.clearcoatMap;
 
-			uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
-			uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
+			}
 
-			if ( material.side === BackSide ) {
+			if ( material.clearcoatRoughnessMap ) {
 
-				uniforms.clearcoatNormalScale.value.negate();
+				uniforms.clearcoatRoughnessMap.value = material.clearcoatRoughnessMap;
+
+			}
+
+			if ( material.clearcoatNormalMap ) {
+
+				uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
+				uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
+
+				if ( material.side === BackSide ) {
+
+					uniforms.clearcoatNormalScale.value.negate();
+
+				}
 
 			}
 
 		}
 
-		uniforms.transmission.value = material.transmission;
+		if ( material.transmission > 0 ) {
 
-		if ( material.transmissionMap ) {
-
-			uniforms.transmissionMap.value = material.transmissionMap;
-
-		}
-
-		if ( material.transmission > 0.0 ) {
-
+			uniforms.transmission.value = material.transmission;
 			uniforms.transmissionSamplerMap.value = transmissionRenderTarget.texture;
 			uniforms.transmissionSamplerSize.value.set( transmissionRenderTarget.width, transmissionRenderTarget.height );
 
+			if ( material.transmissionMap ) {
+
+				uniforms.transmissionMap.value = material.transmissionMap;
+
+			}
+
+			uniforms.thickness.value = material.thickness;
+
+			if ( material.thicknessMap ) {
+
+				uniforms.thicknessMap.value = material.thicknessMap;
+
+			}
+
+			uniforms.attenuationDistance.value = material.attenuationDistance;
+			uniforms.attenuationTint.value.copy( material.attenuationTint );
+
 		}
-
-		uniforms.thickness.value = material.thickness;
-
-		if ( material.thicknessMap ) {
-
-			uniforms.thicknessMap.value = material.thicknessMap;
-
-		}
-
-		uniforms.attenuationDistance.value = material.attenuationDistance;
-		uniforms.attenuationTint.value.copy( material.attenuationTint );
 
 		uniforms.specularIntensity.value = material.specularIntensity;
 		uniforms.specularTint.value.copy( material.specularTint );

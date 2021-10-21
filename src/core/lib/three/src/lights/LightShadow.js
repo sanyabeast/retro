@@ -11,11 +11,13 @@ const _lookTarget = /*@__PURE__*/ new Vector3();
 class LightShadow {
 
 	constructor( camera ) {
+
 		this.camera = camera;
-		
+
 		this.bias = 0;
 		this.normalBias = 0;
 		this.radius = 1;
+		this.blurSamples = 8;
 
 		this.mapSize = new Vector2( 512, 512 );
 

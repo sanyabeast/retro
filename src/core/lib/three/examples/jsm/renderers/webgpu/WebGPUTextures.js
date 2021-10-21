@@ -6,12 +6,11 @@ import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
 class WebGPUTextures {
 
-	constructor( device, properties, info, glslang ) {
+	constructor( device, properties, info ) {
 
 		this.device = device;
 		this.properties = properties;
 		this.info = info;
-		this.glslang = glslang;
 
 		this.defaultTexture = null;
 		this.defaultCubeTexture = null;
@@ -206,7 +205,7 @@ class WebGPUTextures {
 					depthOrArrayLayers: 1
 				},
 				format: colorTextureFormat,
-				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.SAMPLED
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
 			} );
 
 			this.info.memory.textures ++;
@@ -316,7 +315,7 @@ class WebGPUTextures {
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = this._getFormat( texture );
 
-		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
+		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
 
 		if ( needsMipmaps === true ) {
 
@@ -481,7 +480,7 @@ class WebGPUTextures {
 
 		if ( this.utils === null ) {
 
-			this.utils = new WebGPUTextureUtils( this.device, this.glslang ); // only create this helper if necessary
+			this.utils = new WebGPUTextureUtils( this.device ); // only create this helper if necessary
 
 		}
 
