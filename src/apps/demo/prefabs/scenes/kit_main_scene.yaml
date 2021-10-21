@@ -7,7 +7,7 @@ components:
     params:
       position: [0, 21, 0]
       type: "PointLight"
-      intensity: 1.2
+      intensity: 1.9
       distance: 4
       color: "#ffeeff"
   # dir_light: 
@@ -53,3 +53,19 @@ children:
             - AssetMaterial
             - color: "#daefe5"
               src: "res/core/models/monsterra/monsterra.mtl"
+      phone:
+        name: MeshComponent
+        tag: bush
+        params:
+          position:
+            - -2
+            - 0
+            - -2.2
+          rotation: [0, 1, 0]
+          geometry:
+            - "url:res/demo/models/phone/phone.obj"
+            - 2
+          material:
+            - AssetMaterial
+            - color: "#daefe5"
+              src: "res/demo/models/phone/phone.mtl"

@@ -18,6 +18,7 @@ children:
           material:
             - PBRMaterial
             - color: "#daefe5"
+              # pbr: "res/core/pbr/rocks-hexagon-1/t"
               pbr: "res/core/pbr/rocks-hexagon-1/t"
               file_format: jpg
               tiling: 6

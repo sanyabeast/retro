@@ -26,6 +26,7 @@ class OrbitControlsComponent extends Component {
     min_zoom = 0.01
     pan_speed = 1
     rotate_speed = 1
+    zoom_speed = 0.2
     target = [0, 0, 0]
     keys = ["a", "w", "d", "s"]
     /**private */
@@ -49,7 +50,8 @@ class OrbitControlsComponent extends Component {
             "pan_speed",
             "rotate_speed",
             "target",
-            "keys"
+            "keys",
+            "zoom_speed"
         ].concat(super.get_reactive_props())
     }
     on_update(props) {
@@ -85,6 +87,7 @@ class OrbitControlsComponent extends Component {
                     controls.minZoom = this.min_zoom
                     controls.panSpeed = this.pan_speed
                     controls.rotateSpeed = this.rotate_speed
+                    controls.zoomSpeed = this.zoom_speed
                 }
             }
         })
@@ -120,8 +123,9 @@ OrbitControlsComponent.DEFAULT = {
     max_zoom: Infinity,
     min_distance: 0.1,
     min_zoom: 0.01,
-    pan_speed: 1,
-    rotate_speed: 1,
+    pan_speed: 0.1,
+    rotate_speed: 0.5,
+    
     target: [0, 0, 0],
     keys: ["a", "w", "d", "s"],
 }

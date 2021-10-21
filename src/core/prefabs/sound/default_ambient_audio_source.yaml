@@ -1,6 +1,6 @@
 name: AudioComponent
 params:
-  src: "res/core/music/fitness_tense_hiphop_1"
+  src: "res/core/ambient_sound/polar_wind_a1"
   autoplay: true
   loop: true
   volume: 0.11

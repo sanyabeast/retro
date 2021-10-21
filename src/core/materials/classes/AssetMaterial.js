@@ -79,7 +79,17 @@ class AssetMaterial extends THREE.Material {
         blocks.forEach(b => {
             let block_data = parse_block(b)
 
+            console.log(block_data)
+
             let material_params = {}
+
+            if (block_data.map_Ka) {
+                let map_Ka = block_data.map_Ka[block_data.map_Ka.length - 1]
+                let src = path.basename(map_Ka.replace(/\\\\/gm, "/"))
+                src = `${asset_dir}/maps/${src}`
+                material_params.map = src
+            }
+            
             if (block_data.map_d) {
                 let map_d = block_data.map_d[block_data.map_d.length - 1]
                 let src = path.basename(map_d.replace(/\\\\/gm, "/"))
@@ -107,12 +117,7 @@ class AssetMaterial extends THREE.Material {
                 material_params.map = src
             }
 
-            if (block_data.map_Ka) {
-                let map_Ka = block_data.map_Ka[block_data.map_Ka.length - 1]
-                let src = path.basename(map_Ka.replace(/\\\\/gm, "/"))
-                src = `${asset_dir}/maps/${src}`
-                material_params.map = src
-            }
+            
 
             if (block_data.Ka) {
                 material_params.color = new THREE.Color(Number(block_data.Ka[0] || 0), Number(block_data.Ka[1] || 0), Number(block_data.Ka[2] || 0))

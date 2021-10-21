@@ -92,11 +92,11 @@ class Postprocessing extends Component {
             composer.addPass(new postfx.EffectPass(camera,
                 ssao_effect,
                 new postfx.BloomEffect({
-                    blendFunction: postfx.BlendFunction.SCREEN,
-                    kernelSize: postfx.KernelSize.SMALL,
-                    luminanceThreshold: 0.3,
-                    luminanceSmoothing: 0.45,
-                    height: 960
+                    blendFunction: postfx.BlendFunction.ADD,
+                    kernelSize: postfx.KernelSize.MEDIUM,
+                    luminanceThreshold: 0.825,
+                    luminanceSmoothing: 0.075,
+                    height: 480
                 }),
                 outline_effect
             ));
@@ -129,7 +129,7 @@ class Postprocessing extends Component {
 }
 
 Postprocessing.DEFAULT = {
-    
+
 }
 
 export default Postprocessing;
