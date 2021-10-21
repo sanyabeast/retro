@@ -22,3 +22,34 @@ components:
   ambient_sound: "@prefab:core.sound.default_ambient_audio_source"
 children:
   - "@prefab:core.scenes.kit_default_snow_scene"
+  - components:
+      bush_1:
+        name: MeshComponent
+        tag: bush
+        params:
+          position:
+            - -2
+            - 0
+            - 1.5
+          geometry:
+            - "url:res/core/models/monsterra/monsterra.obj"
+            - 0.07
+          material:
+            - AssetMaterial
+            - color: "#daefe5"
+              src: "res/core/models/monsterra/monsterra.mtl"
+      bush_2:
+        name: MeshComponent
+        tag: bush
+        params:
+          position:
+            - 1.6
+            - 0
+            - -1.5
+          geometry:
+            - "url:res/core/models/monsterra/monsterra.obj"
+            - 0.1
+          material:
+            - AssetMaterial
+            - color: "#daefe5"
+              src: "res/core/models/monsterra/monsterra.mtl"

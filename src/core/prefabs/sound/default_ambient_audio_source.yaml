@@ -3,4 +3,4 @@ params:
   src: "res/core/music/fitness_tense_hiphop_1"
   autoplay: true
   loop: true
-  volume: 0.333
+  volume: 0.11

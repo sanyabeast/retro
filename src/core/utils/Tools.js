@@ -40,5 +40,17 @@ function get_app_name() {
 
 }
 
+function request_text_sync(url) {
+    let xhr = new XMLHttpRequest()
+    xhr.open("get", url, false)
+    xhr.send()
+    return xhr.responseText
+}
 
-export { log, get_query_string_params, get_app_name }
+
+export {
+    log,
+    get_query_string_params,
+    get_app_name,
+    request_text_sync
+}

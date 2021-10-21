@@ -213,8 +213,8 @@ class AssetManager {
             }
         }
     }
-    static load_obj_geometry(src) {
-        let geometry = new AssetBufferGeometry(src)
+    static load_obj_geometry(src, scale) {
+        let geometry = new AssetBufferGeometry(src, scale)
         return geometry
     }
     static create_geometry_with_template(type, params, id) {
@@ -229,9 +229,9 @@ class AssetManager {
         geometry.scale(scale[0], scale[1], scale[2])
         return geometry;
     }
-    static create_obj_geometry(type, params, id) {
+    static create_obj_geometry(type, scale, id) {
         let src = type.replace("url:", "");
-        let geometry = this.load_obj_geometry(src);
+        let geometry = this.load_obj_geometry(src, scale);
         return geometry
     }
     static create_geometry(type, params, id) {
