@@ -71,5 +71,6 @@ void main() {
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>
 
+	/*{INJECT_HERE}*/
 }
 `;

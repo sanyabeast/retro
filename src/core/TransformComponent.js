@@ -6,6 +6,7 @@
 import { log } from "core/utils/Tools";
 import Component from "core/Component";
 import * as THREE from 'three';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
 let id = 0
 const exclude_props = [
@@ -22,11 +23,15 @@ class TransformComponent extends Component {
     render_layer = 0
     render_index = 0
     render_order = 0
+    debug_transform = false
+    /**private */
+    transform_gizmo = undefined
     constructor(params) {
         super(params);
         this.position = [...this.position]
         this.scale = [...this.scale]
         this.rotation = [...this.rotation]
+
     }
     save_prefab() {
         let r = {
@@ -143,6 +148,20 @@ class TransformComponent extends Component {
         } else {
             return false
         }
+    }
+
+    on_tick() {
+        if (this.debug_transform) {
+            let camera = this.find_component_of_type("CameraComponent")
+            if (!this.transform_gizmo) {
+                this.transform_gizmo = new TransformControls(camera, this.globals.dom)
+            }
+            if (!this.transform_gizmo.parent) {
+                this.transform_gizmo.camera = camera.subject
+                this.transform_gizmo.attach(this.subject)
+            }
+        }
+
     }
 
     get_render_data() {

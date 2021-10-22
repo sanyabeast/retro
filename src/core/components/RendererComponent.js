@@ -9,6 +9,7 @@ import Component from "core/Component";
 import { Vector2 } from "spine-ts-threejs";
 import * as THREE from 'three';
 import Device from "core/utils/Device";
+import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
 
 const renderer_presets = {
     desktop: {
@@ -32,6 +33,7 @@ class RendererComponent extends Component {
     clear_stencil = true
     clear_color = true
     auto_clear = true
+    use_progressive_lightmap = false
     //** private*/
     canvas = null
     pixel_ratio = window.devicePixelRatio
@@ -42,9 +44,12 @@ class RendererComponent extends Component {
     resolution = undefined
     shadows_enabled = true
     tonemapping = "cineon"
+    progressive_lightmap = undefined
+    progressive_lightmap_dirlight = undefined
 
     on_created() {
         this.resolution = new Vector2(1, 1)
+
 
         let render_scene = this.render_scene = new THREE.Scene()
 
@@ -56,6 +61,22 @@ class RendererComponent extends Component {
             ...renderer_presets[Device.device_type]
         });
 
+        /**lightmap */
+        this.progressive_lightmap = new ProgressiveLightMap(renderer, 1024);
+        let dirlight = this.progressive_lightmap_dirlight = new THREE.DirectionalLight(0xffffff, 1.0 )
+        dirlight.castShadow = true;
+        dirlight.shadow.camera.near = 100;
+        dirlight.shadow.camera.far = 5000;
+        dirlight.shadow.camera.right = 150;
+        dirlight.shadow.camera.left = - 150;
+        dirlight.shadow.camera.top = 150;
+        dirlight.shadow.camera.bottom = - 150;
+        dirlight.shadow.mapSize.width = 512;
+        dirlight.shadow.mapSize.height = 512;
+        this.progressive_lightmap.scene.add(this.progressive_lightmap_dirlight)
+
+
+        /**shadowmap */
         renderer.shadowMap.enabled = this.shadows_enabled
         renderer.shadowMap.type = THREE.PCFSoftShadowMap
         renderer.toneMappingExposure = 2
@@ -159,6 +180,9 @@ class RendererComponent extends Component {
     }
     on_tick(time_delta) {
         this.update_render_scene()
+        if (this.use_progressive_lightmap) this.update_progressive_lightmap()
+
+        // this.progressive_lightmap.showDebugLightmap( true );
     }
     on_destroy() {
         if (this.raf_loop) {
@@ -177,6 +201,9 @@ class RendererComponent extends Component {
         let render_list = []
         //scene.subject.updateMatrixWorld(true)
         scene.traverse_components((comp, object) => {
+            if (comp.transform_gizmo){
+                render_list.push(comp.transform_gizmo)
+            }
             if (comp.enabled && object.visible) {
                 let render_data = comp.get_render_data()
                 if (Array.isArray(render_data)) {
@@ -203,10 +230,38 @@ class RendererComponent extends Component {
 
         this.render_scene.fog = scene.fog
         this.render_scene.background = scene.background
-        this.render_scene.environment  = scene.environment 
+        this.render_scene.environment = scene.environment
         this.render_scene.children = render_list
         this.render_items_count = render_list.length
 
+
+
+    }
+    update_progressive_lightmap() {
+
+        let children = []
+        this.render_scene.traverse((c) => {
+            if (c.isMesh) {
+                children.push(c)
+            }
+        })
+
+        let sun = this.find_component_of_type("Sun")
+        if (sun) {
+            this.progressive_lightmap_dirlight.position.set(...sun.position)
+            // this.progressive_lightmap_dirlight.color.set_any(1, 1, 1)
+            this.progressive_lightmap_dirlight.intensity = sun.subject.intensity
+        }
+
+        this.progressive_lightmap.addObjectsToLightMap(children)
+
+    }
+    accumulate_progressive_lightmap() {
+        let camera = this.find_component_of_type("CameraComponent")
+        this.progressive_lightmap.update(camera.subject, 200, true);
+    }
+    add_object_to_lightmap(object) {
+        this.progressive_lightmap.addObjectsToLightMap(object)
     }
     render() {
 

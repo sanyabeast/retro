@@ -14,8 +14,8 @@ class Sun extends TransformComponent {
 
     n_distance = 500
     d_distance = 150
-    n_intensity = 0.1
-    d_intensity = 1.2
+    n_intensity = 0.01
+    d_intensity = 1
     n_height = -50
     d_height = 100
     n_emissive = 1.25
@@ -30,8 +30,8 @@ class Sun extends TransformComponent {
     n_hemi_sky_color = "#34116a"
     n_hemi_ground_color = "#da5a6a"
 
-    d_hemi_intensity = 0.333
-    n_hemi_intensity = 0.025
+    d_hemi_intensity = 0.4
+    n_hemi_intensity = 0.0025
 
     shadows_enabled = true
     shadow_resolution = 1024
@@ -105,7 +105,7 @@ class Sun extends TransformComponent {
             switch (prop) {
                 case "time": {
                     let t = (this.time % 1)
-                    let p = Math.pow(((Math.sin((1 - t) * Math.PI * 2) + 1) / 2), 5) + 0.1
+                    let p = Math.pow(((Math.sin((1 - t) * Math.PI * 2) + 1) / 2), 5) + 0.3
                     let d = this.lerp(this.n_distance, this.d_distance, p)
                     let pos_x = Math.sin(t * Math.PI * 2) * d
                     let pos_z = Math.cos(t * Math.PI * 2) * d
@@ -172,6 +172,7 @@ class Sun extends TransformComponent {
         )
     }
     on_tick(time_delta) {
+        super.on_tick(time_delta)
         if (this.cycling > 0) {
             let step = (1 / 86400) * this.cycling * time_delta.delta
             this.time = (this.time + step) % 1

@@ -55,5 +55,7 @@ void main() {
 	#include <shadowmap_vertex>
 	#include <fog_vertex>
 
+	/*{INJECT_HERE}*/
+
 }
 `;

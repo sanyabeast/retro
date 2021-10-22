@@ -17,6 +17,7 @@ varying vec3 vViewPosition;
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 
+/*{INJECT_PARS}*/
 void main() {
 
 	#include <uv_vertex>
@@ -45,6 +46,7 @@ void main() {
 	#include <shadowmap_vertex>
 	#include <fog_vertex>
 
+	/*{INJECT_HERE}*/
 }
 `;
 
@@ -84,6 +86,7 @@ uniform float opacity;
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
+/*{INJECT_PARS}*/
 void main() {
 
 	#include <clipping_planes_fragment>
@@ -120,6 +123,8 @@ void main() {
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>
+
+	/*{INJECT_HERE}*/
 
 }
 `;
