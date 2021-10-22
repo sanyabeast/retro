@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { request_text_sync } from 'core/utils/Tools';
+import Device from 'core/utils/Device';
 const path = require("path")
+
+const LQ_MAT = "MeshLambertMaterial"
+const HQ_MAT = "MeshPhysicalMaterial"
 
 
 class AssetMaterial extends THREE.Material {
     src = ""
-    material_type = "MeshPhongMaterial"
     bump_scale = 0.001
     shininess = 10
     displacement_scale = 0.01
@@ -13,7 +16,6 @@ class AssetMaterial extends THREE.Material {
     constructor(params) {
         super(params)
         let src = this.src = params.src
-        this.material_type = params.material_type || "MeshPhongMaterial"
         this.bump_scale = params.bump_scale || 0.001
         this.displacement_scale = params.displacement_scale || 0.01
         this.shininess = params.shininess || 16
@@ -81,7 +83,7 @@ class AssetMaterial extends THREE.Material {
         blocks.forEach(b => {
             let block_data = parse_block(b)
 
-            console.log(block_data)
+            // console.log(block_data)
 
             let material_params = {}
 
@@ -99,7 +101,7 @@ class AssetMaterial extends THREE.Material {
                 material_params.map = src
             }
 
-            if (this.doubleside){
+            if (this.doubleside) {
                 material_params.side = THREE.DoubleSide
             }
 
@@ -118,7 +120,7 @@ class AssetMaterial extends THREE.Material {
                 material_params.metallnessMap = src
                 material_params.metallness = 0.1
             }
-            
+
             if (block_data.map_d) {
                 let map_d = block_data.map_d[block_data.map_d.length - 1]
                 let src = path.basename(map_d.replace(/\\\\/gm, "/"))
@@ -134,8 +136,8 @@ class AssetMaterial extends THREE.Material {
                 src = `${asset_dir}/maps/${src}`
                 material_params.normalMap = src
                 material_params.displacementMap = src
-                material_params.displacementScale = -1*Math.abs(this.displacement_scale)
-                material_params.bumpMap = 0.01
+                material_params.displacementScale = -1 * Math.abs(this.displacement_scale)
+                material_params.bumpMap = src
                 material_params.bumpScale = this.bump_scale
             }
 
@@ -146,7 +148,7 @@ class AssetMaterial extends THREE.Material {
                 material_params.map = src
             }
 
-            
+
 
             if (block_data.Ka) {
                 material_params.color = new THREE.Color(Number(block_data.Ka[0] || 0), Number(block_data.Ka[1] || 0), Number(block_data.Ka[2] || 0))
@@ -174,7 +176,7 @@ class AssetMaterial extends THREE.Material {
 
 
 
-            let mat = new THREE[this.material_type](material_params)
+            let mat = new THREE[Device.is_mobile ? LQ_MAT : HQ_MAT](material_params)
 
             r.push(mat)
         })

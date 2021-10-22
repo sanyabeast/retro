@@ -5,14 +5,14 @@ components:
     ref: "point_light"
     tag: "point_light"
     params:
-      position: [0, 10, 0]
+      position: [0, 1.1, 0]
       shadows_enabled: true
       type: "PointLight"
-      intensity: 1
-      distance: 20
-      decay: 0
-      color: "#ffaaaa"
-  # dir_light: 
+      intensity: 15
+      distance: 2.5
+      decay: 1
+      color: "#ff5722"
+  # dir_light:
   #   name: LightComponent
   #   params:
   #     type: DirectionalLight
@@ -22,8 +22,10 @@ components:
   sun:
     name: Sun
     tag: sun
-    params: 
+    params:
       height: 20
+      cycling: 10
+      time: 0.6
   fog: "@prefab:default.FogComponent"
   skybox: "@prefab:default.SkyBox"
   posfx: "@prefab:default.Postprocessing"
@@ -88,7 +90,7 @@ children:
             - AssetMaterial
             - color: "#daefe5"
               src: "res/demo/models/phone/phone.mtl"
-      chalkboard: 
+      chalkboard:
         name: MeshComponent
         params:
           position:
@@ -104,24 +106,24 @@ children:
             - src: "res/core/models/rest_chalkboard_1/chalkboard.mtl"
               transparent: false
               doubleside: true
-      lantern: 
-        name: MeshComponent
-        params:
-          recieve_shadow: false
-          position:
-            - 0
-            - 1
-            - 0
-          rotation: [0, -2, 0]
-          geometry:
-            - "url:res/core/models/lantern/lantern_obj.obj"
-            - 0.2
-          material:
-            - AssetMaterial
-            - src: "res/core/models/lantern/lantern_obj.mtl"
-              transparent: false
-              doubleside: true
-      lantern_core: 
+      # lantern:
+      #   name: MeshComponent
+      #   params:
+      #     recieve_shadow: false
+      #     position:
+      #       - 0
+      #       - 1
+      #       - 0
+      #     rotation: [0, -2, 0]
+      #     geometry:
+      #       - "url:res/core/models/lantern/lantern_obj.obj"
+      #       - 0.2
+      #     material:
+      #       - AssetMaterial
+      #       - src: "res/core/models/lantern/lantern_obj.mtl"
+      #         transparent: false
+      #         doubleside: true
+      lantern_core:
         name: MeshComponent
         params:
           position:
@@ -129,10 +131,11 @@ children:
             - 1.1
             - 0
           material:
-            - MeshPhongMaterial
+            - MeshBasicMaterial
             - fog: false
-              emissive: "#ffddaa"
-              emissiveIntensity: 2
+              emissive: "#ff0000"
+              emissiveIntensity: 0.5
+
           geometry:
             - SphereBufferGeometry
             - - 0.03

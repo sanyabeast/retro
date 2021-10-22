@@ -18,7 +18,7 @@ class SkyBox extends Component {
     scene_background = undefined
     on_created() {
         let scene = this.globals.app
-        scene.background = this.scene_background = this.create_background(
+        scene.background = this.scene_background = scene.environment = this.create_background(
             this.color,
             this.cubemap,
             this.texture

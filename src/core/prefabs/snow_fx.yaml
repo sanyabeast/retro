@@ -19,7 +19,7 @@ components:
       particles_texture: "res/core/flake_a.png"
       system_particles_count: 2000
       emitters:
-        - on_interval: "rand:MinMaxRandomizer?0;2"
+        - on_interval: "rand:MinMaxRandomizer?0;0.2"
           interval: 0.001
   radial_movement:
     enabled: true

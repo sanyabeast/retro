@@ -45,6 +45,10 @@ class LightComponent extends TransformComponent {
                 console.log(light)
                 break
             }
+            case "PointLight": {
+                light = this.subject = new THREE.PointLight(this.color, this.intensity, this.distance, this.decay)
+                break
+            }
             default: {
                 light = this.subject = new THREE[this.type]({
                     intensity: this.intensity,

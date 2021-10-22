@@ -115,12 +115,31 @@ function hsl_to_rgb(h, s, l) {
     } else if (300 <= h && h < 360) {
         r = c; g = 0; b = x;
     }
-    r = Math.round((r + m) * 255);
-    g = Math.round((g + m) * 255);
-    b = Math.round((b + m) * 255);
+    r = Math.round((r + m));
+    g = Math.round((g + m));
+    b = Math.round((b + m));
 
     return [r, g, b]
 }
+
+function hex_to_rgb(h) {
+    let r = 0, g = 0, b = 0;
+  
+    // 3 digits
+    if (h.length == 4) {
+      r = "0x" + h[1] + h[1];
+      g = "0x" + h[2] + h[2];
+      b = "0x" + h[3] + h[3];
+  
+    // 6 digits
+    } else if (h.length == 7) {
+      r = "0x" + h[1] + h[2];
+      g = "0x" + h[3] + h[4];
+      b = "0x" + h[5] + h[6];
+    }
+    
+    return [(+r)/255, (+g)/255, (+b)/255]
+  }
 
 export {
     log,
@@ -128,5 +147,6 @@ export {
     get_app_name,
     request_text_sync,
     hex_to_hsl,
-    hsl_to_rgb
+    hsl_to_rgb,
+    hex_to_rgb
 }

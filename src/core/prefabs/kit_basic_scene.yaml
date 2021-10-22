@@ -12,7 +12,7 @@ components:
   hemisphere_light: 
     name: "LightComponent"
     params:
-      type: HemisphereLight
+      type: AmbientLight
       intensity: 0.15
   # ambient_light:
   #   enabled: true

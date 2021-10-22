@@ -12,7 +12,7 @@ class MeshComponent extends TransformComponent {
     mesh = null;
     tick_skip = 1
     drop_shadow = true
-    recieve_shadow = false
+    recieve_shadow = true
     on_created() {
         let mesh = this.subject = MeshComponent.create_mesh({
             geometry: this.geometry,

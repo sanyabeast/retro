@@ -157,9 +157,9 @@ export class RealisticBokehEffect extends Effect {
 
 	set showFocus(value) {
 
-		if(this.showFocus !== value) {
+		if (this.showFocus !== value) {
 
-			if(value) {
+			if (value) {
 
 				this.defines.set("SHOW_FOCUS", "1");
 
@@ -197,9 +197,9 @@ export class RealisticBokehEffect extends Effect {
 
 	set manualDoF(value) {
 
-		if(this.manualDoF !== value) {
+		if (this.manualDoF !== value) {
 
-			if(value) {
+			if (value) {
 
 				this.defines.set("MANUAL_DOF", "1");
 				this.uniforms.get("dof").value = new Vector4(0.2, 1.0, 0.2, 2.0);
@@ -237,9 +237,9 @@ export class RealisticBokehEffect extends Effect {
 
 	set pentagon(value) {
 
-		if(this.pentagon !== value) {
+		if (this.pentagon !== value) {
 
-			if(value) {
+			if (value) {
 
 				this.defines.set("PENTAGON", "1");
 

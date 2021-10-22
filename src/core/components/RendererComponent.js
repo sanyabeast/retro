@@ -41,6 +41,7 @@ class RendererComponent extends Component {
     composer = undefined
     resolution = undefined
     shadows_enabled = true
+    tonemapping = "cineon"
 
     on_created() {
         this.resolution = new Vector2(1, 1)
@@ -56,6 +57,8 @@ class RendererComponent extends Component {
         });
 
         renderer.shadowMap.enabled = this.shadows_enabled
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap
+        renderer.toneMappingExposure = 2
 
         console.log(`creating new WebGLRenderer with params: ${JSON.stringify({
             antialias: true,
@@ -90,7 +93,8 @@ class RendererComponent extends Component {
         return [
             "clear_stencil",
             "clear_depth",
-            "shadows_enabled"
+            "shadows_enabled",
+            "tonemapping"
         ].concat(super.get_reactive_props())
     }
 
@@ -115,7 +119,21 @@ class RendererComponent extends Component {
                     break
                 }
                 case "shadows_enabled": {
-                    renderer.shadowMap.enabled = this.shadows_enabled
+                    this.renderer.shadowMap.enabled = this.shadows_enabled
+                    break
+                }
+                case "tonemapping": {
+                    this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+                    // switch (this.tonemapping) {
+                    //     case "reinhard":
+                    //         this.renderer.toneMapping = THREE.ReinhardToneMapping
+                    //         break;
+                    //     case "cineon":
+                    //         this.renderer.toneMapping = THREE.CineonToneMapping
+                    //         break
+                    //     default:
+                    //         break;
+                    // }
                     break
                 }
             }
@@ -185,6 +203,7 @@ class RendererComponent extends Component {
 
         this.render_scene.fog = scene.fog
         this.render_scene.background = scene.background
+        this.render_scene.environment  = scene.environment 
         this.render_scene.children = render_list
         this.render_items_count = render_list.length
 

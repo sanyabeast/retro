@@ -1,4 +1,9 @@
 import * as THREE from 'three';
+import Device from 'core/utils/Device';
+
+const LQ_MAT = "MeshLambertMaterial"
+const HQ_MAT = "MeshPhysicalMaterial"
+
 
 function setup_pbr(params) {
     let repeat = new THREE.Vector2(1, 1)
@@ -21,19 +26,36 @@ function setup_pbr(params) {
     this.displacementMap = `${this.pbr}_h.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.bumpMap = `${this.pbr}_h.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.emissiveMap = `${this.pbr}_e.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
-    this.bumpScale = typeof params.bumpScale  === "number" ? params.bumpScale : 0.333
+    this.bumpScale = typeof params.bumpScale === "number" ? params.bumpScale : 0.333
     this.displacementScale = -0.002
 }
 
-class PBRMaterial extends THREE.MeshPhongMaterial {
-    file_format = "png"
-    pbr = ""
-    constructor(params) {
-        super(params)
-        setup_pbr.call(this, params)
-        // this.map = `${this.pbr}_c.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
+let PBRMaterial
 
+if (Device.is_mobile) {
+    PBRMaterial = class PBRMaterial extends THREE[LQ_MAT] {
+        file_format = "png"
+        pbr = ""
+        constructor(params) {
+            super(params)
+            setup_pbr.call(this, params)
+            // this.map = `${this.pbr}_c.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
+    
+        }
     }
+    
+} else {
+    PBRMaterial = class PBRMaterial extends THREE[HQ_MAT] {
+        file_format = "png"
+        pbr = ""
+        constructor(params) {
+            super(params)
+            setup_pbr.call(this, params)
+            // this.map = `${this.pbr}_c.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
+    
+        }
+    }
+    
 }
 
 export default PBRMaterial

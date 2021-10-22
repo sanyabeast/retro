@@ -13,10 +13,10 @@ children:
             - 0
             - 0
           geometry:
-            - BoxBufferGeometry
-            - - 12
-              - 0.1
-              - 12
+            - CircleGeometry
+            - - 6
+              - 6
+          rotation: [-1.5707, 0, 0]
           material:
             - PBRMaterial
             - color: "#daefe5"
@@ -24,7 +24,7 @@ children:
               pbr: "res/core/pbr/rocks-hexagon-1/t"
               file_format: jpg
               tiling: 6
-      
+
       box2:
         enabled: true
         name: MeshComponent

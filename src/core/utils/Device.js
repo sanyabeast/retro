@@ -14,4 +14,7 @@ export default {
     client_type: device.client.type,
     client_version: device.client.version,
     client_engineVersion: device.client.engineVersion,
+    get is_mobile(){
+        return this.device_type !== "desktop"
+    }
 }
