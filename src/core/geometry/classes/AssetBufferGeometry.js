@@ -43,7 +43,7 @@ class AssetBufferGeometry extends THREE.BufferGeometry {
                             this[k] = g[k]
                         }
 
-                        console.log(src, object, g)
+                        // console.log(src, object, g)
 
                         this.scale(scale, scale, scale)
 

@@ -13,25 +13,25 @@ class Sun extends TransformComponent {
     time = 0.5
 
     n_distance = 500
-    d_distance = 150
-    n_intensity = 0.01
-    d_intensity = 1
+    d_distance = 50
+    n_intensity = 0.25
+    d_intensity = 1.1
     n_height = -50
     d_height = 100
     n_emissive = 1.25
     d_emissive = 4
     n_color = "#da5a6a"
-    d_color = "#a4e4e2"
+    d_color = "#e9c28a"
     sun_size = 3
 
     d_hemi_sky_color = "#f3ead7"
-    d_hemi_ground_color = "#eeffee"
+    d_hemi_ground_color = "#f3ead7"
 
     n_hemi_sky_color = "#34116a"
     n_hemi_ground_color = "#da5a6a"
 
-    d_hemi_intensity = 0.4
-    n_hemi_intensity = 0.0025
+    d_hemi_intensity = 0.66
+    n_hemi_intensity = 0.05
 
     shadows_enabled = true
     shadow_resolution = 1024
@@ -107,7 +107,8 @@ class Sun extends TransformComponent {
             switch (prop) {
                 case "time": {
                     let t = (this.time % 1)
-                    let p = Math.pow(((Math.sin((1 - t) * Math.PI * 2) + 1) / 2), 5) + 0.3
+                    let p = Math.sin((t * Math.PI * 2) - Math.PI/2)
+                    p = (p + 1)/2 
                     let d = this.lerp(this.n_distance, this.d_distance, p)
                     let pos_x = Math.sin(t * Math.PI * 2) * d
                     let pos_z = Math.cos(t * Math.PI * 2) * d
@@ -117,7 +118,7 @@ class Sun extends TransformComponent {
                     this.position[1] = pos_y
                     this.position[2] = pos_z
 
-                    let intensity = this.lerp(this.n_intensity, this.d_intensity, p)
+                    let intensity = this.lerp(this.n_intensity, this.d_intensity, Math.pow(p, 0.2))
                     this.light.intensity = intensity
 
                     let emissive = this.lerp(this.n_emissive, this.d_emissive, p)
@@ -152,7 +153,7 @@ class Sun extends TransformComponent {
                         this.lerp(n_hemi_ground_color[2], d_hemi_ground_color[2], p)
                     ]
 
-                    let hemi_intensity = this.lerp(this.n_hemi_intensity, this.d_hemi_intensity, p)
+                    let hemi_intensity = this.lerp(this.n_hemi_intensity, this.d_hemi_intensity, Math.pow(p, 0.2))
                     this.hemi_light.intensity = hemi_intensity
                     this.hemi_light.color.set_any(c_hemi_sky)
                     this.hemi_light.groundColor.set_any(c_hemi_ground)

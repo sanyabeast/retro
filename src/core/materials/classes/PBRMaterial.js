@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import Device from 'core/utils/Device';
 
 const LQ_MAT = "MeshLambertMaterial"
-const HQ_MAT = "MeshPhysicalMaterial"
+const HQ_MAT = "MeshPhongMaterial"
 
 
 function setup_pbr(params) {

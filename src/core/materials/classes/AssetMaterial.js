@@ -4,7 +4,7 @@ import Device from 'core/utils/Device';
 const path = require("path")
 
 const LQ_MAT = "MeshLambertMaterial"
-const HQ_MAT = "MeshPhysicalMaterial"
+const HQ_MAT = "MeshPhongMaterial"
 
 
 class AssetMaterial extends THREE.Material {

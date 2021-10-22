@@ -39,10 +39,14 @@ components:
     params:
       debug_transform: true
       height: 20
-      cycling: 1
-      time: 0.875
+      cycling: 10
+      time: 0.5
   fog: "@prefab:default.FogComponent"
-  skybox: "@prefab:default.SkyBox"
+  skybox:
+    name: SkyBox
+    params:
+      cubemap: "res/core/cubemaps/purplenebula"
+      cubemap_format: png
   posfx: "@prefab:default.Postprocessing"
   orbit_controls: "@prefab:default.controls.OrbitControlsComponent"
   ambient_sound: "@prefab:core.sound.default_ambient_audio_source"
@@ -158,27 +162,27 @@ children:
             - - 0.03
               - 6
               - 9
-  - children: 
-    - position: [1, 0, 0]
-      children:
-        - position: [-6, 0, 0]
-          rotation: [0, -2.57, 0]
-          components:
-            linker_1:
-              name: MeshComponent
-              params:
-                position:
-                  - 0
-                  - 0
-                  - 0
-                geometry:
-                  - "url:res/core/models/wood_fence_a1/linker_1.obj"
-                  - 1
-                material:
-                  - AssetMaterial
-                  - color: "#daefe5"
-                    src: "res/core/models/wood_fence_a1/linker_1.mtl"
-            fence_a:
+  - children:
+      - position: [1, 0, 0]
+        children:
+          - position: [-6, 0, 0]
+            rotation: [0, -2.57, 0]
+            components:
+              linker_1:
+                name: MeshComponent
+                params:
+                  position:
+                    - 0
+                    - 0
+                    - 0
+                  geometry:
+                    - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                    - 1
+                  material:
+                    - AssetMaterial
+                    - color: "#daefe5"
+                      src: "res/core/models/wood_fence_a1/linker_1.mtl"
+              fence_a:
                 name: MeshComponent
                 params:
                   position:
@@ -193,24 +197,24 @@ children:
                     - color: "#daefe5"
                       doubleside: true
                       src: "res/core/models/wood_fence_a1/fence_1.mtl"
-        - position: [3, 0, 0]
-          rotation: [0, -2, 0]
-          components:
-            linker_1:
-              name: MeshComponent
-              params:
-                position:
-                  - 0
-                  - 0
-                  - 0
-                geometry:
-                  - "url:res/core/models/wood_fence_a1/linker_1.obj"
-                  - 1
-                material:
-                  - AssetMaterial
-                  - color: "#daefe5"
-                    src: "res/core/models/wood_fence_a1/linker_1.mtl"
-            fence_a:
+          - position: [3, 0, 0]
+            rotation: [0, -2, 0]
+            components:
+              linker_1:
+                name: MeshComponent
+                params:
+                  position:
+                    - 0
+                    - 0
+                    - 0
+                  geometry:
+                    - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                    - 1
+                  material:
+                    - AssetMaterial
+                    - color: "#daefe5"
+                      src: "res/core/models/wood_fence_a1/linker_1.mtl"
+              fence_a:
                 name: MeshComponent
                 params:
                   position:
@@ -225,24 +229,24 @@ children:
                     - color: "#daefe5"
                       doubleside: true
                       src: "res/core/models/wood_fence_a1/fence_1.mtl"
-        - position: [3.9, 0, 1.9]
-          rotation: [0, -1.2, 0]
-          components:
-            linker_1:
-              name: MeshComponent
-              params:
-                position:
-                  - 0
-                  - 0
-                  - 0
-                geometry:
-                  - "url:res/core/models/wood_fence_a1/linker_1.obj"
-                  - 1
-                material:
-                  - AssetMaterial
-                  - color: "#daefe5"
-                    src: "res/core/models/wood_fence_a1/linker_1.mtl"
-            fence_a:
+          - position: [3.9, 0, 1.9]
+            rotation: [0, -1.2, 0]
+            components:
+              linker_1:
+                name: MeshComponent
+                params:
+                  position:
+                    - 0
+                    - 0
+                    - 0
+                  geometry:
+                    - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                    - 1
+                  material:
+                    - AssetMaterial
+                    - color: "#daefe5"
+                      src: "res/core/models/wood_fence_a1/linker_1.mtl"
+              fence_a:
                 name: MeshComponent
                 params:
                   position:
@@ -257,4 +261,3 @@ children:
                     - color: "#daefe5"
                       doubleside: true
                       src: "res/core/models/wood_fence_a1/fence_1.mtl"
-

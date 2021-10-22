@@ -33,6 +33,9 @@
         <div class="status-line">
           <p v-html="`render items: ${render_items_count}`"></p>
         </div>
+        <div class="status-line">
+          <p v-html="`sun time: ${sun_time}`"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -56,6 +59,7 @@ export default {
       pointer_pos: [0, 0],
       render_items_count: 0,
       device: Device,
+      sun_time: "00:00",
     };
   },
   props: {},
@@ -86,6 +90,23 @@ export default {
       if (renderer) {
         this.render_items_count = renderer.render_items_count;
       }
+
+      let sun = this.find_component_of_type("Sun");
+      if (sun) {
+        this.sun_time = this.calc_sun_time(sun.time);
+      }
+    },
+    calc_sun_time(progress) {
+      let r = "00:00";
+
+      let total_mins = 60 * 24;
+      let current_mins = Math.floor(total_mins * progress);
+      let h = Math.floor(current_mins / 60).toString();
+      let m = (current_mins % 60).toString();
+      if (h.length === 1) h = "0" + h;
+      if (m.length === 1) m = "0" + m;
+
+      return `${h}:${m}`;
     },
   },
   /** */

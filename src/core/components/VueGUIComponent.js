@@ -124,6 +124,7 @@ class VueGUIComponent extends Component {
     store = undefined
     module_name = "gui"
     vuex_store = undefined
+    tick_rate = 5
     props = {}
     constructor() {
         super(...arguments)
