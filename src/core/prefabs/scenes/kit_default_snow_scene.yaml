@@ -14,7 +14,7 @@ children:
             - 0
           geometry:
             - CircleGeometry
-            - - 6
+            - - 9
               - 6
           rotation: [-1.5707, 0, 0]
           material:

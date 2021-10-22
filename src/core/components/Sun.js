@@ -42,6 +42,8 @@ class Sun extends TransformComponent {
     hemi_light = undefined
     d_color3 = undefined
     n_color3 = undefined
+
+    tick_rate = 10
     on_created() {
 
         /*dir light*/

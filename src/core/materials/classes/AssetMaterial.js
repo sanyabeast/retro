@@ -35,7 +35,11 @@ class AssetMaterial extends THREE.Material {
             }
         }
 
-        return r
+        if (r.length === 1) {
+            return r[0]
+        } else {
+            return r
+        }
 
     }
 
@@ -83,7 +87,7 @@ class AssetMaterial extends THREE.Material {
         blocks.forEach(b => {
             let block_data = parse_block(b)
 
-            // console.log(block_data)
+            console.log(block_data)
 
             let material_params = {}
 
@@ -180,6 +184,7 @@ class AssetMaterial extends THREE.Material {
 
             r.push(mat)
         })
+
 
         return r
     }

@@ -1,4 +1,17 @@
 components:
+  phone_light:
+    enabled: true
+    name: "LightComponent"
+    ref: "point_light"
+    tag: "point_light"
+    params:
+      position: [-2, 1.1, -2.2]
+      shadows_enabled: true
+      type: "PointLight"
+      intensity: 4
+      distance: 4.5
+      decay: 1
+      color: "#dbaa6c"
   point_light:
     enabled: true
     name: "LightComponent"
@@ -7,6 +20,7 @@ components:
     params:
       position: [0, 1.1, 0]
       shadows_enabled: true
+      debug_transform: true
       type: "PointLight"
       intensity: 15
       distance: 2.5
@@ -144,3 +158,103 @@ children:
             - - 0.03
               - 6
               - 9
+  - children: 
+    - position: [1, 0, 0]
+      children:
+        - position: [-6, 0, 0]
+          rotation: [0, -2.57, 0]
+          components:
+            linker_1:
+              name: MeshComponent
+              params:
+                position:
+                  - 0
+                  - 0
+                  - 0
+                geometry:
+                  - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                  - 1
+                material:
+                  - AssetMaterial
+                  - color: "#daefe5"
+                    src: "res/core/models/wood_fence_a1/linker_1.mtl"
+            fence_a:
+                name: MeshComponent
+                params:
+                  position:
+                    - 0
+                    - 0
+                    - 0
+                  geometry:
+                    - "url:res/core/models/wood_fence_a1/fence_1.obj"
+                    - 1
+                  material:
+                    - AssetMaterial
+                    - color: "#daefe5"
+                      doubleside: true
+                      src: "res/core/models/wood_fence_a1/fence_1.mtl"
+        - position: [3, 0, 0]
+          rotation: [0, -2, 0]
+          components:
+            linker_1:
+              name: MeshComponent
+              params:
+                position:
+                  - 0
+                  - 0
+                  - 0
+                geometry:
+                  - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                  - 1
+                material:
+                  - AssetMaterial
+                  - color: "#daefe5"
+                    src: "res/core/models/wood_fence_a1/linker_1.mtl"
+            fence_a:
+                name: MeshComponent
+                params:
+                  position:
+                    - 0
+                    - 0
+                    - 0
+                  geometry:
+                    - "url:res/core/models/wood_fence_a1/fence_1.obj"
+                    - 1
+                  material:
+                    - AssetMaterial
+                    - color: "#daefe5"
+                      doubleside: true
+                      src: "res/core/models/wood_fence_a1/fence_1.mtl"
+        - position: [3.9, 0, 1.9]
+          rotation: [0, -1.2, 0]
+          components:
+            linker_1:
+              name: MeshComponent
+              params:
+                position:
+                  - 0
+                  - 0
+                  - 0
+                geometry:
+                  - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                  - 1
+                material:
+                  - AssetMaterial
+                  - color: "#daefe5"
+                    src: "res/core/models/wood_fence_a1/linker_1.mtl"
+            fence_a:
+                name: MeshComponent
+                params:
+                  position:
+                    - 0
+                    - 0
+                    - 0
+                  geometry:
+                    - "url:res/core/models/wood_fence_a1/fence_1.obj"
+                    - 1
+                  material:
+                    - AssetMaterial
+                    - color: "#daefe5"
+                      doubleside: true
+                      src: "res/core/models/wood_fence_a1/fence_1.mtl"
+

@@ -10,92 +10,81 @@ import StateMachine from "core/utils/StateMachine"
 class GameObject extends Group {
     tick_id = 0
     NodeConstructor = undefined
-    constructor(params) {
+    constructor(prefab) {
         super(...arguments)
         this.extra_data = {}
         this.components = []
-		this.refs = {}
-        this.states = new StateMachine(params && params.states ? params.states : {}, this)
-		this.tasks = new TaskScheduler(params && params.tasks ? params.tasks : [])
+        this.refs = {}
+        this.states = new StateMachine(prefab && prefab.states ? prefab.states : {}, this)
+        this.tasks = new TaskScheduler(prefab && prefab.tasks ? prefab.tasks : [])
 
         if (typeof window.F_THREE_PATCH_PROPS === "function") {
             window.F_THREE_PATCH_PROPS(this)
         }
-        
-        /**patch */
-        if (params !== undefined) {
-            if (typeof params.render_layer !== "undefined") {
-                this.render_layer = params.render_layer;
-            }
-            if (typeof params.render_index !== "undefined") {
-                this.render_index = params.render_index;
-            }
-            if (typeof params.components === `object`) {
-                this.setup_components(params.components)
-            }
-            if (typeof params.on_tick === `function`) {
-                this.on_tick = params.on_tick
-            }
-            if (typeof params.position === `object`) {
-                if (Array.isArray(params.position)) {
-                    this.position.set(params.position[0], params.position[1], params.position[2])
-                } else {
-                    this.position.set(params.position.x, params.position.y, params.position.z)
-                }
-            }
-            if (typeof params.rotation === `object`) {
-                if (Array.isArray(params.position)) {
-                    this.rotation.set(params.rotation[0], params.rotation[1], params.rotation[2])
-                } else {
-                    this.rotation.set(params.rotation.x, params.rotation.y, params.rotation.z)
-                }
-            }
-            if (typeof params.scale === `object`) {
-                if (Array.isArray(params.position)) {
-                    this.scale.set(params.scale[0], params.scale[1], params.scale[2])
-                } else {
-                    this.scale.set(params.scale.x, params.scale.y, params.scale.z)
-                }
-            }
-            if (typeof params.visible !== `undefined`) {
-                this.visible = params.visible;
-            }
-            if (typeof params.parent === `object` && params.parent !== null) {
-                params.parent.add(this)
-            }
-            if (Array.isArray(params.topics)) {
-                params.topics.forEach(event_name, this.listen(event_name))
-            }
-            if (params.extra_data) {
-                this.extra_data = {
-                    ...params.extra_data
-                }
-            }
-        }
+
+       this.load_prefab(prefab)
+
     }
     load_prefab(prefab) {
-        if (prefab.components) {
-            this.setup_components(prefab.components)
-        }
-        if (prefab.children) {
-            if (Array.isArray(prefab.children)) {
-                prefab.children.forEach(child => {
-                    let node = new GameObject()
-                    node.isGroup = true
-                    node.load_prefab(child)
-                    this.add(node)
-                })
-            } else if (typeof prefab.children === "object" && prefab.children !== null) {
-                for (let k in prefab.children) {
-                    let child = prefab.children[k]
-                    let node = new GameObject()
-                    node.isGroup = true
-                    node.load_prefab(child)
-                    this.add(node)
+        if (typeof prefab === "object" && prefab !== null) {
+            if (prefab.components) {
+                this.setup_components(prefab.components)
+            }
+            if (prefab.children) {
+                if (Array.isArray(prefab.children)) {
+                    prefab.children.forEach(child => {
+                        let node = new GameObject(child)
+                        this.add(node)
+                    })
+                } else if (typeof prefab.children === "object" && prefab.children !== null) {
+                    for (let k in prefab.children) {
+                        let child = prefab.children[k]
+                        let node = new GameObject(child)
+                        this.add(node)
+                    }
+                }
+
+            }
+            if (typeof prefab.on_tick === `function`) {
+                this.on_tick = prefab.on_tick
+            }
+            if (typeof prefab.position === `object`) {
+                if (Array.isArray(prefab.position)) {
+                    this.position.set(prefab.position[0], prefab.position[1], prefab.position[2])
+                } else {
+                    this.position.set(prefab.position.x, prefab.position.y, prefab.position.z)
                 }
             }
-
+            if (typeof prefab.rotation === `object`) {
+                if (Array.isArray(prefab.position)) {
+                    this.rotation.set(prefab.rotation[0], prefab.rotation[1], prefab.rotation[2])
+                } else {
+                    this.rotation.set(prefab.rotation.x, prefab.rotation.y, prefab.rotation.z)
+                }
+            }
+            if (typeof prefab.scale === `object`) {
+                if (Array.isArray(prefab.position)) {
+                    this.scale.set(prefab.scale[0], prefab.scale[1], prefab.scale[2])
+                } else {
+                    this.scale.set(prefab.scale.x, prefab.scale.y, prefab.scale.z)
+                }
+            }
+            if (typeof prefab.visible !== `undefined`) {
+                this.visible = prefab.visible;
+            }
+            if (typeof prefab.parent === `object` && prefab.parent !== null) {
+                prefab.parent.add(this)
+            }
+            if (Array.isArray(prefab.topics)) {
+                prefab.topics.forEach(event_name, this.listen(event_name))
+            }
+            if (prefab.extra_data) {
+                this.extra_data = {
+                    ...prefab.extra_data
+                }
+            }
         }
+
     }
     set_prefab(prefab) {
         console.log(set_prefab)
@@ -255,7 +244,6 @@ class GameObject extends Group {
             component.object = this
             component.apply_params()
             component._enabled = enabled
-            if (typeof data.tick_skip === 'number') component.tick_skip = data.tick_skip
             if (ref !== undefined) {
                 component._ref = ref
                 this.refs[ref] = component
@@ -329,16 +317,13 @@ class GameObject extends Group {
             this.on_tick()
             this.components.forEach((component) => {
                 if (component.enabled) {
-                    if (component.tick % (component.tick_skip * window.F_GLOBAL_TICK_SKIP) === 0) {
-                        if (component.need_reactive_update) {
-                            let updated_props = [...component.updated_props]
-                            component.need_reactive_update = false
-                            component.updated_props.length = 0
-                            component.on_update(updated_props)
-                        }
-                        component.on_tick(time_data)
+                    component.tick(time_data)
+                    if (component.need_reactive_update) {
+                        let updated_props = [...component.updated_props]
+                        component.need_reactive_update = false
+                        component.updated_props.length = 0
+                        component.on_update(updated_props)
                     }
-                    component.tick++
                 }
             })
             this.tasks.on_tick()

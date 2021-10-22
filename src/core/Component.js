@@ -13,16 +13,26 @@ const exclude_props = [
 
 class Component extends EventDispatcher {
 
-    needs_update = false
+    tick_data = undefined
     object = null;
     subject = null;
     _enabled = true;
-    tick_skip = 1;
-    tick = 0;
     _params_applied = false;
     globals = undefined
+    tick_rate = 30
+    tick_enabled = true
     constructor(params) {
+
         super(params);
+
+        this.tick_data = {
+            prev_time: +new Date(),
+            delta: 1,
+            ticks: 0,
+            rate: 30,
+            enabled: true
+        }
+
         if (window.F_PATCH_COMP_PROPS) {
             window.F_PATCH_COMP_PROPS(this)
         }
@@ -32,28 +42,37 @@ class Component extends EventDispatcher {
         if (this.topics) {
             this.topics.forEach(event_name => this.listen(event_name))
         }
-        this.tick = Math.floor(Math.random() * this.tick_skip)
-
     }
+    tick(tick_data) {
+        this.tick_data.rate = this.tick_rate
+        this.tick_data.enabled = this.tick_enabled
+        if (this.tick_data.enabled) {
+            let now = +new Date()
+            if (now - this.tick_data.prev_time >= (1000 / this.tick_data.rate)) {
+                let d = now - this.tick_data.prev_time
+                let delta = d / (1000 / 60)
+                this.tick_data.ticks++
+                this.tick_data.now = now
+                this.tick_data.prev_time = now
+                this.on_tick(this.tick_data)
+            }
 
-    save_prefab(){
+        }
+    }
+    save_prefab() {
         let r = {
             enabled: this.enabled,
-            tick_skip: this.tick_skip,
             name: this.name,
             ref: this._ref
         }
         return r
     }
-
     get_reactive_props() {
         return []
     }
-
-    get_render_data (){
+    get_render_data() {
         return undefined
     }
-
     apply_params() {
         if (!this._params_applied) {
             this._params_applied = true;
@@ -81,19 +100,10 @@ class Component extends EventDispatcher {
                         }
                     }
                 }
-
-                // Object.defineProperty(this, k, {
-                //     value: this._params[k],
-                //     configurable: true,
-                //     enumerable: true,
-                //     writable: true,
-                // });
             }
         }
     }
-
     on_update() { }
-
     on_created() {
         if (this._on_created) this._on_created(td)
     }
@@ -109,7 +119,6 @@ class Component extends EventDispatcher {
     on_disabled() {
         if (this._on_disabled) this._on_disabled(td)
     }
-
     get parent() {
         let r = null;
         if (this.object && this.object.parent) {
@@ -117,7 +126,6 @@ class Component extends EventDispatcher {
         }
         return r;
     }
-
     get enabled() {
         return this._enabled;
     }
@@ -190,7 +198,7 @@ class Component extends EventDispatcher {
         }
     }
 
-    load_prefab(){
+    load_prefab() {
         return this.object.load_prefab(...arguments)
     }
 

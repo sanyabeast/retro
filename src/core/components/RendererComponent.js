@@ -11,7 +11,7 @@ import * as THREE from 'three';
 import Device from "core/utils/Device";
 import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
 
-class RenderScene extends THREE.Scene {}
+class RenderScene extends THREE.Scene { }
 
 const renderer_presets = {
     desktop: {
@@ -49,6 +49,16 @@ class RendererComponent extends Component {
     progressive_lightmap = undefined
     progressive_lightmap_dirlight = undefined
 
+    current_override_material = null
+    override_normal_material = new THREE.MeshNormalMaterial()
+    override_depth_material = new THREE.MeshDepthMaterial()
+    override_distance_material = new THREE.MeshDistanceMaterial()
+    override_wireframe_material = new THREE.MeshBasicMaterial({ wireframe: true, wireframeLinewidth: 1, fog: false })
+    override_matcap_material = new THREE.MeshMatcapMaterial({ fog: false, matcap: "res/core/matcap_texture/matcap (1).png" })
+    use_postfx = undefined
+    use_fog = undefined
+    current_matcap_id = 1
+
     on_created() {
         this.resolution = new Vector2(1, 1)
 
@@ -78,8 +88,6 @@ class RendererComponent extends Component {
             renderer.setClearColor(0x000000, 0);
         }
 
-
-
         this.globals.uniforms.pixel_ratio.value = this.pixel_ratio
         renderer.setPixelRatio(this.pixel_ratio)
         this.canvas = this.globals.canvas = this.renderer.domElement
@@ -91,6 +99,7 @@ class RendererComponent extends Component {
         this.handle_mousemove = this.handle_mousemove.bind(this);
         document.body.addEventListener("mousemove", this.handle_mousemove);
     }
+
 
     get_reactive_props() {
         return [
@@ -209,14 +218,16 @@ class RendererComponent extends Component {
 
         })
 
-        this.render_scene.fog = scene.fog
+        if (this.use_fog !== false) {
+            this.render_scene.fog = scene.fog
+        } else {
+            this.render_scene.fog = null
+        }
         this.render_scene.background = scene.background
         this.render_scene.environment = scene.environment
         this.render_scene.children = render_list
         this.render_items_count = render_list.length
-
-
-
+        // this.render_scene.updateMatrixWorld()
     }
     update_progressive_lightmap() {
 
@@ -273,7 +284,7 @@ class RendererComponent extends Component {
                 this.renderer.need_update_render_list = true
                 this.globals.stats.update('rendering', this.globals.need_render)
 
-                if (this.custom_render_function === undefined) {
+                if (this.custom_render_function === undefined || this.use_postfx === false) {
                     this.renderer.render(this.render_scene, camera.subject)
                 } else {
                     this.custom_render_function(this.render_scene, camera.subject)
@@ -284,6 +295,34 @@ class RendererComponent extends Component {
 
 
     }
+
+
+    set_service_view_mode(mode = "scene") {
+        switch (mode) {
+            case "normal":
+                this.current_override_material = this.override_normal_material
+                break;
+            case "depth":
+                this.current_override_material = this.override_depth_material
+                break;
+            case "distance":
+                this.current_override_material = this.override_distance_material
+                break;
+            case "wireframe":
+                this.current_override_material = this.override_wireframe_material
+                break;
+            case "matcap":
+                this.current_override_material = this.override_matcap_material
+                let matcap_id = this.current_matcap_id = 1 + Math.floor(Math.random() * 640)
+                this.override_matcap_material.matcap = `res/core/matcap_texture/matcap (${matcap_id}).png`
+                break;
+            default:
+                this.current_override_material = null
+        }
+
+        this.render_scene.overrideMaterial = this.current_override_material
+    }
+
     check_size() {
         let camera = this.find_component_of_type("CameraComponent")
         let new_rect = this.globals.dom.getBoundingClientRect();

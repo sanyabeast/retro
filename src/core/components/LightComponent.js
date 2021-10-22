@@ -127,6 +127,7 @@ class LightComponent extends TransformComponent {
 
     }
     on_tick(time_delta) {
+        super.on_tick(...arguments)
     }
 }
 

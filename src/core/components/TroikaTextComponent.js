@@ -41,7 +41,11 @@ class TroikaTextComponent extends TransformComponent {
         subject.depthWrite = false
         subject.depthTest = false
         subject.stencilWrite = false
-        console.log(subject)
+        subject.excluded_materials = [
+            "MeshNormalMaterial",
+            "MeshDepthMaterial",
+            "MeshMatcapMaterial"
+        ]
         subject.material._depthMaterial = subject._depthMaterial = new THREE.ShaderMaterial({
             vertexShader: `
                 void main(){

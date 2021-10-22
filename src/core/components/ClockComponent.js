@@ -38,11 +38,7 @@ class ClockComponent extends Component {
         this.time_data.prev_frame_time = now
         let scene = this.globals.app
         if (scene) {
-            if (now - this.prev_scene_tick_date >= this.tick_interval && this.scene_tick_enabled){
-                this.tick_delta = (now - this.prev_scene_tick_date) / this.tick_interval
-                this.prev_scene_tick_date = now
-                scene.tick(this.time_data)
-            }
+            scene.tick(this.time_data)
         }
 
         for (let k in this.raf_callbacks) {

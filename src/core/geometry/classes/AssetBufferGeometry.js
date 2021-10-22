@@ -25,8 +25,8 @@ class AssetBufferGeometry extends THREE.BufferGeometry {
                 obj_loader.load(
                     src,
                     (object) => {
-                        console.log(object)
-                        let g 
+
+                        let g
                         if (object instanceof THREE.Group) {
                             if (object.children && object.children[0] && object.children[0] instanceof THREE.Mesh) {
                                 g = obj_cache[src] = object.children[0].geometry.clone()
@@ -38,10 +38,12 @@ class AssetBufferGeometry extends THREE.BufferGeometry {
                                 this[k] = g[k]
                             }
                         }
-                        
+
                         for (let k in g) {
                             this[k] = g[k]
                         }
+
+                        console.log(src, object, g)
 
                         this.scale(scale, scale, scale)
 

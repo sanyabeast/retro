@@ -1121,6 +1121,7 @@ function WebGLRenderer( parameters = {} ) {
 					const geometry = objects.update( object );
 					const material = object.material;
 
+
 					if ( Array.isArray( material ) ) {
 
 						const groups = geometry.groups;
@@ -1228,6 +1229,24 @@ function WebGLRenderer( parameters = {} ) {
 			const geometry = renderItem.geometry;
 			const material = overrideMaterial === null ? renderItem.material : overrideMaterial;
 			const group = renderItem.group;
+
+			/**PATCH PATCH PATCH */
+			let skip_rendering = false
+			if (overrideMaterial){
+				if (Array.isArray(object.excluded_materials)){
+					object.excluded_materials.forEach((mat)=>{
+						if (mat === overrideMaterial.type){
+							skip_rendering = true
+						}
+					})
+				}
+			}
+
+			if (skip_rendering){
+				continue
+			}
+
+			/**!PATCH !PATCH !PATCH */
 
 			if ( object.layers.test( camera.layers ) ) {
 

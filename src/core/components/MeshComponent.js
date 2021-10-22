@@ -10,9 +10,10 @@ import { set, get } from "lodash-es"
 
 class MeshComponent extends TransformComponent {
     mesh = null;
-    tick_skip = 1
     drop_shadow = true
     recieve_shadow = true
+
+    tick_rate = 1
     on_created() {
         let mesh = this.subject = MeshComponent.create_mesh({
             geometry: this.geometry,
