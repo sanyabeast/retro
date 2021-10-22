@@ -25,7 +25,7 @@ components:
     params:
       debug_transform: true
       height: 20
-      cycling: 200
+      cycling: 1
       time: 0.875
   fog: "@prefab:default.FogComponent"
   skybox: "@prefab:default.SkyBox"
@@ -108,7 +108,7 @@ children:
             - AssetMaterial
             - src: "res/core/models/rest_chalkboard_1/chalkboard.mtl"
               transparent: false
-              doubleside: false
+              doubleside: true
       # lantern:
       #   name: MeshComponent
       #   params:

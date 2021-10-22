@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         default: {
             let frame = new Frame();
-            frame.set_size(window.innerWidth * 0.777, window.innerHeight * 0.777)
+            frame.set_size(window.innerWidth * 0.94, window.innerHeight * 0.94)
             frame.set_caption("Launcher");
 
             let launcher = new Launcher()

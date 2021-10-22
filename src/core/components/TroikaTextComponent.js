@@ -38,6 +38,18 @@ class TroikaTextComponent extends TransformComponent {
     }
     on_created() {
         const subject = this.subject = new Text();
+        subject.depthWrite = false
+        subject.depthTest = false
+        subject.stencilWrite = false
+        console.log(subject)
+        subject.material._depthMaterial = subject._depthMaterial = new THREE.ShaderMaterial({
+            vertexShader: `
+                void main(){
+
+                    gl_FragCoord = vec4(0., 0., 0., 1.);
+                }
+            `
+        })
         this.init_visibility_rule()
     }
     on_update() {

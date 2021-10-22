@@ -11,6 +11,8 @@ import * as THREE from 'three';
 import Device from "core/utils/Device";
 import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
 
+class RenderScene extends THREE.Scene {}
+
 const renderer_presets = {
     desktop: {
         antialias: true,
@@ -51,7 +53,7 @@ class RendererComponent extends Component {
         this.resolution = new Vector2(1, 1)
 
 
-        let render_scene = this.render_scene = new THREE.Scene()
+        let render_scene = this.render_scene = new RenderScene()
 
         let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({
             antialias: true,
@@ -62,33 +64,13 @@ class RendererComponent extends Component {
         });
 
         /**lightmap */
-        this.progressive_lightmap = new ProgressiveLightMap(renderer, 1024);
-        let dirlight = this.progressive_lightmap_dirlight = new THREE.DirectionalLight(0xffffff, 1.0 )
-        dirlight.castShadow = true;
-        dirlight.shadow.camera.near = 100;
-        dirlight.shadow.camera.far = 5000;
-        dirlight.shadow.camera.right = 150;
-        dirlight.shadow.camera.left = - 150;
-        dirlight.shadow.camera.top = 150;
-        dirlight.shadow.camera.bottom = - 150;
-        dirlight.shadow.mapSize.width = 512;
-        dirlight.shadow.mapSize.height = 512;
-        this.progressive_lightmap.scene.add(this.progressive_lightmap_dirlight)
+        this.setup_progressive_lightmap()
 
 
         /**shadowmap */
         renderer.shadowMap.enabled = this.shadows_enabled
         renderer.shadowMap.type = THREE.PCFSoftShadowMap
         renderer.toneMappingExposure = 2
-
-        console.log(`creating new WebGLRenderer with params: ${JSON.stringify({
-            antialias: true,
-            alpha: true,
-            stencil: this.clear_stencil,
-            depth: this.clear_depth,
-            ...renderer_presets[Device.device_type]
-        }, null, "\t")}`)
-
         renderer.setClearAlpha(1)
         renderer.setSize(1000, 1000);
         renderer.setPixelRatio(this.globals.uniforms.pixel_ratio.value);
@@ -144,7 +126,6 @@ class RendererComponent extends Component {
                     break
                 }
                 case "tonemapping": {
-                    this.renderer.toneMapping = THREE.ACESFilmicToneMapping
                     // switch (this.tonemapping) {
                     //     case "reinhard":
                     //         this.renderer.toneMapping = THREE.ReinhardToneMapping
@@ -201,7 +182,7 @@ class RendererComponent extends Component {
         let render_list = []
         //scene.subject.updateMatrixWorld(true)
         scene.traverse_components((comp, object) => {
-            if (comp.transform_gizmo){
+            if (comp.transform_gizmo) {
                 render_list.push(comp.transform_gizmo)
             }
             if (comp.enabled && object.visible) {
@@ -255,6 +236,21 @@ class RendererComponent extends Component {
 
         this.progressive_lightmap.addObjectsToLightMap(children)
 
+    }
+    setup_progressive_lightmap() {
+        let renderer = this.renderer
+        this.progressive_lightmap = new ProgressiveLightMap(renderer, 1024);
+        let dirlight = this.progressive_lightmap_dirlight = new THREE.DirectionalLight(0xffffff, 1.0)
+        dirlight.castShadow = true;
+        dirlight.shadow.camera.near = 100;
+        dirlight.shadow.camera.far = 5000;
+        dirlight.shadow.camera.right = 150;
+        dirlight.shadow.camera.left = - 150;
+        dirlight.shadow.camera.top = 150;
+        dirlight.shadow.camera.bottom = - 150;
+        dirlight.shadow.mapSize.width = 512;
+        dirlight.shadow.mapSize.height = 512;
+        this.progressive_lightmap.scene.add(this.progressive_lightmap_dirlight)
     }
     accumulate_progressive_lightmap() {
         let camera = this.find_component_of_type("CameraComponent")
