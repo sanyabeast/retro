@@ -16,6 +16,8 @@ class App extends CoreApp {
 
         // postfx.enabled = Device.device_type === "desktop"
         camera.fov = 60
+
+        this.start()
     }
     on_tick() {
         let point_light = this.find_component_with_tag("point_light")

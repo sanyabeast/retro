@@ -10,7 +10,7 @@ import * as THREE from 'three';
 
 class ClockComponent extends Component {
     scene_tick_enabled = true
-    tick_interval = 1000/45
+    tick_interval = 1000 / 45
     tick_delta = 1
     prev_scene_tick_date = +new Date()
     time_data = {
@@ -25,15 +25,17 @@ class ClockComponent extends Component {
     on_created() {
         this.time_data.started_at = +new Date()
         this.handle_raf = this.handle_raf.bind(this)
-        this.loop_id = requestAnimationFrame(this.handle_raf)
         this.raf_cb_id = 0
         this.raf_callbacks = {}
+    }
+    begin_tick() {
+        this.loop_id = requestAnimationFrame(this.handle_raf)
     }
     handle_raf() {
         this.loop_id = requestAnimationFrame(this.handle_raf)
         let now = this.time_data.now = +new Date()
         let frame_time = this.time_data.frame_time = now - this.time_data.prev_frame_time
-        let delta = this.time_data.delta = frame_time / (1000/60)
+        let delta = this.time_data.delta = frame_time / (1000 / 60)
         let fps = this.time_data.fps = 1000 / frame_time
         this.time_data.prev_frame_time = now
         let scene = this.globals.app
@@ -50,7 +52,7 @@ class ClockComponent extends Component {
     on_tick(time_data) {
         this.globals.uniforms.time.value += 0.01 * this.tick_delta;
     }
-    on_destroy(){
+    on_destroy() {
         cancelAnimationFrame(this.loop_id)
     }
     add(cb) {

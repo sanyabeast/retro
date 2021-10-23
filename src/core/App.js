@@ -7,6 +7,7 @@ import AssetManager from "core/utils/AssetManager";
 import DevGUI from "core/gui/DevGUI.vue"
 import * as THREE from 'three';
 import GameObject from "core/GameObject";
+import { log } from "core/utils/Tools"
 
 class CoreApp extends GameObject {
     constructor(params) {
@@ -28,6 +29,15 @@ class CoreApp extends GameObject {
     on_tick(){
         let time = this.globals.uniforms.time.value
         let camera = this.find_component_of_type("CameraComponent")
+    }
+    start () {
+        let clock = this.find_component_of_type("ClockComponent")
+        if (clock){
+            log(`App`, `starting clock...`)
+            clock.begin_tick()
+        } else {
+            log(`App`, `cant find clock component. application did not started`)
+        }
     }
 }
 
