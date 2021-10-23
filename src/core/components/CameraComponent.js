@@ -39,6 +39,7 @@ class CameraComponent extends TransformComponent {
             position: new THREE.Vector3(0, 0, 20),
         });
 
+        console.log(`Camera COMPONENT CREATED`, this._params)
 
     }
 

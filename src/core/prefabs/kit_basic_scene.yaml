@@ -1,6 +1,7 @@
 components:
   camera:
     prefab: "default.CameraComponent"
+    test: 1
     params:
       position:
         - 1

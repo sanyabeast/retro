@@ -41,7 +41,7 @@ class Sun extends TransformComponent {
 
     shadows_enabled = true
     shadow_resolution = 1024
-    cycling = 0
+    cycling = 24
     use_postfx = true
 
     n_grain_power = 0.09

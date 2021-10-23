@@ -1,4 +1,5 @@
 import map from "lodash-es/map"
+import isObject from "lodash-es/isObject"
 
 
 function log(tag, ...data) {
@@ -21,6 +22,21 @@ function get_query_string_params(query) {
             )
         : {}
 };
+
+function get_unique_props(dict_list) {
+    let r = []
+    dict_list.forEach(d => {
+        if (isObject(d)) {
+            let keys = Object.getOwnPropertyNames(d)
+            keys.forEach(k => {
+                if (r.indexOf(k) < 0) {
+                    r.push(k)
+                }
+            })
+        }
+    })
+    return r
+}
 
 function get_app_name() {
     let result = ""
@@ -124,22 +140,26 @@ function hsl_to_rgb(h, s, l) {
 
 function hex_to_rgb(h) {
     let r = 0, g = 0, b = 0;
-  
+
     // 3 digits
     if (h.length == 4) {
-      r = "0x" + h[1] + h[1];
-      g = "0x" + h[2] + h[2];
-      b = "0x" + h[3] + h[3];
-  
-    // 6 digits
+        r = "0x" + h[1] + h[1];
+        g = "0x" + h[2] + h[2];
+        b = "0x" + h[3] + h[3];
+
+        // 6 digits
     } else if (h.length == 7) {
-      r = "0x" + h[1] + h[2];
-      g = "0x" + h[3] + h[4];
-      b = "0x" + h[5] + h[6];
+        r = "0x" + h[1] + h[2];
+        g = "0x" + h[3] + h[4];
+        b = "0x" + h[5] + h[6];
     }
-    
-    return [(+r)/255, (+g)/255, (+b)/255]
-  }
+
+    return [(+r) / 255, (+g) / 255, (+b) / 255]
+}
+
+function is_none(v) {
+    return v === undefined || v === null || v === NaN
+}
 
 export {
     log,
@@ -148,5 +168,7 @@ export {
     request_text_sync,
     hex_to_hsl,
     hsl_to_rgb,
-    hex_to_rgb
+    hex_to_rgb,
+    get_unique_props,
+    is_none
 }

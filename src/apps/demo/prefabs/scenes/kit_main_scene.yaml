@@ -42,7 +42,7 @@ components:
       time: 0.33
   fog: "@prefab:default.FogComponent"
   skybox:
-    name: SkyBox
+    prefab: default.SkyBox
     params:
       cubemap: "res/core/cubemaps/purplenebula"
       cubemap_format: png

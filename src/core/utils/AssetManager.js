@@ -4,8 +4,8 @@
  */
 
 import * as THREE from 'three';
-import { log, get_query_string_params, get_app_name, mixin_object } from "core/utils/Tools";
-import { isObject, merge, forEach, template } from "lodash-es";
+import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none } from "core/utils/Tools";
+import { isObject, isArray, merge, forEach, template } from "lodash-es";
 import GameObject from 'core/GameObject';
 
 import { set, map, filter } from "lodash-es";
@@ -53,9 +53,9 @@ class AssetManager {
     static cached_geometries = {};
     static cached_materials = {};
     static get_asset_stats() { return asset_stats; }
-    static mixin_object(data, mixins = []) {
-        return mixin_object(data, mixins)
-    }
+    // static mixin_object(data, mixins = []) {
+    //     return mixin_object(data, mixins)
+    // }
     static create_material_with_template(template_name, params, id) {
         template_name = template_name.replace("@", "");
         if (!AssetManager.material_templates[template_name]) {
@@ -64,6 +64,7 @@ class AssetManager {
 
         template_data = AssetManager.mixin_object(template_data)
         template_data = AssetManager.resolve_interlinks(template_data)
+
         if (params) {
             for (let k in params) {
                 set(template_data.params, k, AssetManager.resolve_interlinks(params[k]))
@@ -84,34 +85,40 @@ class AssetManager {
         return mat
     }
     static mixin_object(data, mixins = []) {
-        let r = {}
+        let r = data
         let merged_mixins = [data, ...mixins]
         if (typeof data === "object" && data !== null) {
             if (Array.isArray(data)) {
                 r = []
                 data.forEach((item, index) => {
-                    r[index] = AssetManager.mixin_object(item, map(mixins, m => m ? m[index] : undefined))
+                    r[index] = AssetManager.mixin_object(item, map(mixins, m => isArray(m) ? m[index] : undefined))
                 })
             } else {
                 r = {}
                 if (data.prefab) {
-                    data = AssetManager.mixin_object(AssetManager.load_prefab(data.prefab), [data])
+                    let prefab_id = data.prefab
+                    delete data.prefab
+                    let prefab_template = AssetManager.load_prefab(prefab_id)
+
+                    data = AssetManager.mixin_object(prefab_template, [data])
+                    merged_mixins[0] = data
                 }
-                for (let k in data) {
+
+                let keys = get_unique_props(merged_mixins)
+                keys.forEach(k => {
                     if (k === "prefab") {
-                        continue
+                        return
                     }
-                    let v = data[k]
-                    v = r[k] = AssetManager.mixin_object(v, map(mixins, m => m ? m[k] : undefined))
-                }
+
+                    r[k] = AssetManager.mixin_object(data[k], map(mixins, m => isObject(m) ? m[k] : undefined))
+                })
             }
         } else {
             let type = typeof data
             r = data
             for (let a = merged_mixins.length - 1; a >= 0; a--) {
                 let mv = merged_mixins[a]
-                let mv_type = typeof mv
-                if (type === mv_type) {
+                if (!is_none(mv)) {
                     r = mv
                     break
                 }
@@ -122,7 +129,8 @@ class AssetManager {
                 let arg = r.split(":")[1]
                 switch (directive) {
                     case "prefab": {
-                        r = AssetManager.load_prefab(arg)
+                        let prefab_template = AssetManager.load_prefab(arg)
+                        r = prefab_template
                         break
                     }
                 }
@@ -145,8 +153,8 @@ class AssetManager {
             if (type.indexOf("@") === 0) {
                 mat = this.create_material_with_template(type, params, id);
             } else {
-                if (THREE[type] === undefined){
-                    console.error(`Cannot find constructor for material "${type}"`) 
+                if (THREE[type] === undefined) {
+                    console.error(`Cannot find constructor for material "${type}"`)
                 } else {
                     mat = new THREE[type](params)
                 }
@@ -327,7 +335,7 @@ class AssetManager {
 
         })
     }
-    static resolve_string_placeholders(data){
+    static resolve_string_placeholders(data) {
         data = data.replace("{app_name}", process.env.APP_NAME)
         return data
     }
@@ -336,8 +344,9 @@ class AssetManager {
         if (AssetManager.prefab_lib[id] === undefined) {
             throw new Error(`no prefab with id "${id} found"`)
         }
-        let prefab = AssetManager.mixin_object(AssetManager.prefab_lib[id])
 
+        let prefab_template = AssetManager.prefab_lib[id]
+        let prefab = AssetManager.mixin_object(prefab_template)
         prefab = AssetManager.resolve_interlinks(prefab)
         for (let k in params) {
             set(prefab, k, AssetManager.resolve_interlinks(params[k]))
@@ -435,7 +444,7 @@ class AssetManager {
         })
     }
     static preload_prefabs(ns, context) {
-        AssetManager.prefab_lib = AssetManager.prefab_lib || {}
+        AssetManager.prefab_lib = AssetManager.prefab_lib || { test: { test_prop1: 1, test_prop2: "hello" } }
         AssetManager.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".yaml", "").replace(/\//gm, ".");
             let data = mod
@@ -443,8 +452,8 @@ class AssetManager {
             AssetManager.register_prefab(`${ns}.${name}`, data)
         })
     }
-    static register_prefab(id, prefab){
-        AssetManager.prefab_lib = AssetManager.prefab_lib || {}
+    static register_prefab(id, prefab) {
+        AssetManager.prefab_lib = AssetManager.prefab_lib || { test: { test_prop1: 1, test_prop2: "hello" } }
         AssetManager.prefab_lib[id] = prefab
     }
 
