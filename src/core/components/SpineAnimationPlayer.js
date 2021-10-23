@@ -130,9 +130,11 @@ class SpineAnimationPlayer extends TransformComponent {
 
         this.subject.state.setAnimation(0, this.animation_name, true);
 
-        this.position = this.position
-        this.scale = this.scale
-        this.rotation = this.rotation
+        this.on_update([
+            "position",
+            "rotation",
+            "scale"
+        ])
     }
     load_assets() {
         let asset_manager = this.asset_manager;

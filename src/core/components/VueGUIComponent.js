@@ -20,39 +20,32 @@ MyPlugin.install = function (Vue, options) {
         name: "BasicComponent",
         data() {
             return {
-
+                object: undefined,
+                global: undefined,
+                app: undefined,
+                launcher: undefined,
+                gui_component: undefined,
+                camera: undefined,
+                tasks: undefined
             }
         },
         props: {},
-        computed: {
-            object(){
-                return this.$store.getters.object()
-            },
-            globals(){
-                return this.$store.getters.globals()
-            },
-            app(){
-                return this.$store.getters.app()
-            },
-            launcher(){
-                return this.$store.getters.launcher()
-            },
-            gui_component(){
-                return this.$store.getters.gui_component()
-            },
-            /**CORE COMP COMPAT */
-            camera() {
-                return this.globals.camera;
-            },
-            scene() {
-                return this.globals.scene;
-            },
-            tasks() {
-                return this.object.tasks;
-            }
-        },
         watch: {},
-        mounted() { },
+        beforeMount() {
+            let p = this
+            while (p.$parent !== undefined) {
+                p = p.$parent
+            }
+            let gui_component = p.gui_component
+            this.object = gui_component.object
+            this.globals = gui_component.globals
+            this.app = gui_component.globals.app
+            this.launcher = gui_component.globals.launcher
+            this.camera = gui_component.globals.camera
+        },
+        mounted() {
+
+        },
         methods: {
             format_money(v) {
                 return `$ ${v.toFixed(2)}`
@@ -125,13 +118,13 @@ class VueGUIComponent extends Component {
     module_name = "gui"
     vuex_store = undefined
     tick_rate = 5
-    props = {}
+    props = undefined
     constructor() {
         super(...arguments)
-
-
+        this.props = {}
     }
     on_created() {
+        console.log(this.store)
         this.dom = document.createElement("div")
         this.dom.style.width = "100%";
         this.dom.style.height = "100%";
@@ -142,10 +135,8 @@ class VueGUIComponent extends Component {
         this.globals.dom.appendChild(this.dom)
 
         let store_config = this.store
-        if (store_config === undefined) {
-            store_config = this.root_component.store
-        }
-        if (store_config === undefined) {
+
+        if (typeof store_config !== "object" || store_config === null) {
             store_config = {
                 state: {},
                 actions: {},
@@ -153,11 +144,12 @@ class VueGUIComponent extends Component {
                 getters: {}
             }
         }
-        store_config.getters.globals = i => this.globals
-        store_config.getters.app = i => this.globals.app
-        store_config.getters.launcher = i => this.globals.launcher
-        store_config.getters.gui_component = i => this
-        store_config.getters.object = i => this.object
+
+        store_config.getters = store_config.getters || {}
+        store_config.state = store_config.state || {}
+        store_config.actions = store_config.actions || {}
+        store_config.mutations = store_config.mutations || {}
+
 
         this.vuex_store = new Vuex.Store(store_config)
         let ui = this.ui = new Vue({
@@ -168,6 +160,9 @@ class VueGUIComponent extends Component {
             props: this.props,
             store: this.vuex_store
         })
+
+        ui.gui_component = this
+
 
     }
     on_enabled() {
