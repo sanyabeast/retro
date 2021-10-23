@@ -9,11 +9,6 @@ components:
   input: "@prefab:default.InputComponent"
   clock: "@prefab:default.ClockComponent"
   renderer: "@prefab:default.RendererComponent"
-  hemisphere_light: 
-    name: "LightComponent"
-    params:
-      type: AmbientLight
-      intensity: 0.15
   # ambient_light:
   #   enabled: true
   #   name: LightComponent

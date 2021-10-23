@@ -8,6 +8,7 @@ import Component from "core/Component";
 import AssetManager from "core/utils/AssetManager";
 import { render } from "less";
 import * as THREE from 'three';
+import Device from "core/utils/Device"
 
 const BLOOM_TYPE = "default"
 const postfx = require("core/lib/postprocessing").default
@@ -38,6 +39,9 @@ class Postprocessing extends Component {
 
     vignette_power = 0.5
     vignette_offset = 0.5
+
+    bloom_smoothing = 0.4
+    bloom_threshold = 0.7
 
     gc_gamma = 1
 
@@ -70,7 +74,10 @@ class Postprocessing extends Component {
     }
     get_reactive_props() {
         return [
-            "outline_selection"
+            "outline_selection",
+            "grain_power",
+            "bloom_smoothing",
+            "bloom_threshold"
         ].concat(super.get_reactive_props())
     }
     on_update(props) {
@@ -78,6 +85,21 @@ class Postprocessing extends Component {
             switch (prop) {
                 case "outline_selection": {
                     this.outline_effect.selection.set(this.outline_selection)
+                    break
+                }
+                case "grain_power": {
+                    if (this.grain_effect) {
+                        this.grain_effect.blendMode.opacity.value = this.grain_power;
+                    }
+                    break
+                }
+                case "bloom_smoothing": {
+                    if (this.bloom_effect) this.bloom_effect.luminanceMaterial.uniforms.smoothing.value = this.bloom_smoothing
+                    break
+                }
+
+                case "bloom_threshold": {
+                    if (this.bloom_effect) this.bloom_effect.luminanceMaterial.uniforms.threshold.value = this.bloom_threshold
                     break
                 }
             }
@@ -91,6 +113,17 @@ class Postprocessing extends Component {
             let scene = renderer.render_scene
 
             composer.addPass(new postfx.RenderPass(scene, camera));
+
+            let enabled = !Device.is_mobile
+
+            this.use_godrays = enabled
+            this.use_tonemapping = enabled
+            this.use_hs = enabled
+            this.use_bc = enabled
+            this.use_chromatic_abberation = enabled
+            this.use_grain = enabled
+            this.use_vignette = enabled
+            this.use_gc = enabled
 
             if (this.use_ssao) this.setup_ssao(renderer, scene, camera, composer)
             if (this.use_hs) this.setup_hs(renderer, scene, camera, composer)
@@ -126,7 +159,7 @@ class Postprocessing extends Component {
         composer.addPass(new postfx.EffectPass(camera, vignette_effect));
     }
     setup_grain(renderer, scene, camera, composer) {
-        const grain_effect = new postfx.NoiseEffect({
+        const grain_effect = this.grain_effect = new postfx.NoiseEffect({
             blendFunction: postfx.BlendFunction.DIVIDE
         });
         grain_effect.blendMode.opacity.value = this.grain_power;
@@ -176,7 +209,6 @@ class Postprocessing extends Component {
         composer.addPass(new postfx.EffectPass(camera, tonemapping_effect));
     }
     setup_godrays(renderer, scene, camera, composer) {
-        console.log(this.local_sun)
         let godrays_effect = this.godrays_effect = new postfx.GodRaysEffect(camera, this.local_sun, {
             height: 480,
             kernelSize: postfx.KernelSize.MEDIUM,
@@ -194,7 +226,7 @@ class Postprocessing extends Component {
     setup_bloom(renderer, scene, camera, composer) {
         switch (BLOOM_TYPE) {
             case "default": {
-                let effect = new postfx.BloomEffect({
+                let effect = this.bloom_effect = new postfx.BloomEffect({
                     blendFunction: postfx.BlendFunction.ADD,
                     kernelSize: postfx.KernelSize.MEDIUM,
                     luminanceThreshold: 0.7,
@@ -208,7 +240,7 @@ class Postprocessing extends Component {
 
             case "selective": {
 
-                let effect = new postfx.SelectiveBloomEffect(scene, camera, {
+                let effect = this.bloom_effect = new postfx.SelectiveBloomEffect(scene, camera, {
                     blendFunction: postfx.BlendFunction.ADD,
                     kernelSize: postfx.KernelSize.MEDIUM,
                     luminanceThreshold: 0.4,

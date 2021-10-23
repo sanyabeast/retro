@@ -14,7 +14,7 @@ class App extends CoreApp {
         let camera = this.find_component_of_type("CameraComponent")
         let postfx = this.find_component_of_type("Postprocessing")
 
-        postfx.enabled = Device.device_type === "desktop"
+        // postfx.enabled = Device.device_type === "desktop"
         camera.fov = 60
     }
     on_tick() {

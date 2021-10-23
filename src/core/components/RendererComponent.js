@@ -58,6 +58,7 @@ class RendererComponent extends Component {
     use_postfx = undefined
     use_fog = undefined
     current_matcap_id = 1
+    correct_lights = true
 
     on_created() {
         this.resolution = new Vector2(1, 1)
@@ -78,12 +79,13 @@ class RendererComponent extends Component {
 
 
         /**shadowmap */
-        renderer.shadowMap.enabled = this.shadows_enabled
+        renderer.shadowMap.enabled = this.shadows_enabled && !Device.is_mobile
         renderer.shadowMap.type = THREE.PCFSoftShadowMap
         renderer.toneMappingExposure = 2
         renderer.setClearAlpha(1)
         renderer.setSize(1000, 1000);
         renderer.setPixelRatio(this.globals.uniforms.pixel_ratio.value);
+        renderer.physicallyCorrectLights = this.correct_lights
         if (this.globals.transparent_background) {
             renderer.setClearColor(0x000000, 0);
         }
@@ -131,7 +133,7 @@ class RendererComponent extends Component {
                     break
                 }
                 case "shadows_enabled": {
-                    this.renderer.shadowMap.enabled = this.shadows_enabled
+                    this.renderer.shadowMap.enabled = this.shadows_enabled && !Device.is_mobile
                     break
                 }
                 case "tonemapping": {

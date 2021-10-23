@@ -15,7 +15,7 @@ class Sun extends TransformComponent {
     n_distance = 500
     d_distance = 50
     n_intensity = 0.25
-    d_intensity = 1.1
+    d_intensity = 5
     n_height = -50
     d_height = 100
     n_emissive = 1.25
@@ -30,18 +30,35 @@ class Sun extends TransformComponent {
     n_hemi_sky_color = "#34116a"
     n_hemi_ground_color = "#da5a6a"
 
-    d_hemi_intensity = 0.66
+    d_hemi_intensity = 1.5
     n_hemi_intensity = 0.05
+
+    d_amb_color = "#f9e9e5"
+    n_amb_color = "#0000ff"
+
+    d_amb_intensity = 1.5
+    n_amb_intensity = 0.05
 
     shadows_enabled = true
     shadow_resolution = 1024
     cycling = 0
+    use_postfx = true
+
+    n_grain_power = 0.09
+    d_grain_power = 0.025
+
+    n_bloom_smoothing = 0.55
+    n_bloom_threshold = 0.15
+    d_bloom_smoothing = 0.7
+    d_bloom_threshold = 0.88
 
     /**private */
     light = undefined
     hemi_light = undefined
+    amb_light = undefined
     d_color3 = undefined
     n_color3 = undefined
+
 
     tick_rate = 10
     on_created() {
@@ -59,6 +76,9 @@ class Sun extends TransformComponent {
         }
 
         let hemi_light = this.hemi_light = new THREE.HemisphereLight()
+        let amb_light = this.amb_light = new THREE.AmbientLight()
+
+        amb_light.color.set_any(this.d_amb_color)
 
         /**sphere */
         let sphere = this.sphere = this.subject = new THREE.Mesh(
@@ -80,7 +100,6 @@ class Sun extends TransformComponent {
         sphere.frustumCulled = false
 
 
-
         this.d_color3 = new THREE.Color()
         this.n_color3 = new THREE.Color()
         this.d_color3.set_any(this.d_color)
@@ -99,6 +118,9 @@ class Sun extends TransformComponent {
         }, {
             object: this.hemi_light,
             parent: this.object
+        }, {
+            object: this.amb_light,
+            parent: this.object
         }]
     }
     on_update(props) {
@@ -107,8 +129,10 @@ class Sun extends TransformComponent {
             switch (prop) {
                 case "time": {
                     let t = (this.time % 1)
-                    let p = Math.sin((t * Math.PI * 2) - Math.PI/2)
-                    p = (p + 1)/2 
+                    let p = Math.sin((t * Math.PI * 2) - Math.PI / 2)
+                    p = (p + 1) / 2
+
+                    // console.log(`day_progress: ${p}`)
                     let d = this.lerp(this.n_distance, this.d_distance, p)
                     let pos_x = Math.sin(t * Math.PI * 2) * d
                     let pos_z = Math.cos(t * Math.PI * 2) * d
@@ -157,6 +181,32 @@ class Sun extends TransformComponent {
                     this.hemi_light.intensity = hemi_intensity
                     this.hemi_light.color.set_any(c_hemi_sky)
                     this.hemi_light.groundColor.set_any(c_hemi_ground)
+
+                    /**ambinet */
+                    let amb_intensity = this.lerp(this.n_amb_intensity, this.d_amb_intensity, Math.pow(p, 0.2))
+
+                    let d_amb_color = hex_to_rgb(this.d_amb_color)
+                    let n_amb_color = hex_to_rgb(this.n_amb_color)
+
+                    let c_amb_color = [
+                        this.lerp(n_amb_color[0], d_amb_color[0], p),
+                        this.lerp(n_amb_color[1], d_amb_color[1], p),
+                        this.lerp(n_amb_color[2], d_amb_color[2], p)
+                    ]
+
+                    this.amb_light.color.set_any(c_amb_color)
+                    this.amb_light.intensity = amb_intensity
+
+                    if (this.use_postfx) {
+                        let postfx = this.find_component_of_type("Postprocessing")
+                        if (postfx) {
+                            postfx.grain_power = this.lerp(this.n_grain_power, this.d_grain_power, p)
+                            postfx.bloom_smoothing = this.lerp(this.n_bloom_smoothing, this.d_bloom_smoothing, p)
+                            postfx.bloom_threshold = this.lerp(this.n_bloom_threshold, this.d_bloom_threshold, p)
+                        }
+
+                    }
+
                     break
                 }
                 case "sun_size": {

@@ -2,14 +2,14 @@ components:
   phone_light:
     enabled: true
     name: "LightComponent"
-    ref: "point_light"
-    tag: "point_light"
+    ref: "point_light2"
+    tag: "point_light2"
     params:
       position: [-2, 1.1, -2.2]
       shadows_enabled: true
       type: "PointLight"
-      intensity: 4
-      distance: 4.5
+      intensity: 12
+      distance: 5.5
       decay: 1
       color: "#dbaa6c"
   point_light:
@@ -18,7 +18,7 @@ components:
     ref: "point_light"
     tag: "point_light"
     params:
-      position: [0, 1.1, 0]
+      position: [0.6, 1.1, 1.1]
       shadows_enabled: true
       debug_transform: true
       type: "PointLight"
@@ -26,21 +26,20 @@ components:
       distance: 2.5
       decay: 1
       color: "#ff5722"
-  # dir_light:
-  #   name: LightComponent
-  #   params:
-  #     type: DirectionalLight
-  #     intensity: 1
-  #     rotation: [1, 1, 1]
-  #     position: [-20, 20, 0]
+  dir_light:
+    name: LightComponent
+    params:
+      type: DirectionalLight
+      intensity: 1
+      rotation: [1, 1, 1]
+      position: [-20, 20, 0]
   sun:
     name: Sun
     tag: sun
     params:
       debug_transform: true
-      height: 20
-      cycling: 10
-      time: 0.5
+      cycling: 48
+      time: 0.33
   fog: "@prefab:default.FogComponent"
   skybox:
     name: SkyBox
