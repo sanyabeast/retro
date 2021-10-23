@@ -2,6 +2,8 @@ node_modules/
 npm-debug.log
 src/apps/*
 !src/apps/demo/
+!src/apps/default/
 dist/*
 !dist/demo
+!dist/default
 .DS_Store
