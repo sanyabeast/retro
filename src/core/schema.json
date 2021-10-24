@@ -1,6 +1,7 @@
 {
     "prefab": {
         "type": "object",
+        "strict_props": true,
         "props": {
             "children": {
                 "type": "array|object|none"

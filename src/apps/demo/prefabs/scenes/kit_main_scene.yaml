@@ -40,7 +40,10 @@ components:
       debug_transform: true
       cycling: 48
       time: 0.33
-  fog: "@prefab:default.FogComponent"
+  fog:  
+    prefab: default.FogComponent
+    params: 
+      density: 0.02
   skybox:
     prefab: default.SkyBox
     params:

@@ -44,7 +44,7 @@ class Component extends EventDispatcher {
             }
         }
 
-        if (isObject(params) && isObject(params.meta)) {
+        if (isObject(params) && isObject(params.meta) && AssetManager.schema_validate(params.meta, "comp_meta_params")) {
             this.meta = AssetManager.mixin_object(this.meta, [params.meta])
         }
 

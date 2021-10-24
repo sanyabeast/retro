@@ -1,10 +1,10 @@
 
-import { update } from 'lodash';
 import * as THREE from 'three';
 import { Group } from 'three/src/objects/Group';
 import AssetManager from 'core/utils/AssetManager';
 import { Task, TaskScheduler } from "core/utils/TaskScheduler"
 import StateMachine from "core/utils/StateMachine"
+import { isObject } from "lodash-es"
 
 
 class GameObject extends Group {
@@ -26,7 +26,7 @@ class GameObject extends Group {
 
     }
     load_prefab(prefab) {
-        if (typeof prefab === "object" && prefab !== null) {
+        if (isObject(prefab) && AssetManager.schema_validate(prefab, "prefab")) {
             if (prefab.components) {
                 this.setup_components(prefab.components)
             }

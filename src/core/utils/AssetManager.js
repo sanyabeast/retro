@@ -4,8 +4,8 @@
  */
 
 import * as THREE from 'three';
-import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, matches_schema } from "core/utils/Tools";
-import { isObject, isArray, merge, forEach, template } from "lodash-es";
+import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate } from "core/utils/Tools";
+import { isObject, isArray, merge, forEach, isString } from "lodash-es";
 import GameObject from 'core/GameObject';
 
 import { set, map, filter } from "lodash-es";
@@ -463,16 +463,20 @@ class AssetManager {
         AssetManager.prefab_lib[id] = prefab
     }
 
-    static matches_schema(data, schema_name) {
-        let schema = AssetManager.schema_lib[schema_name]
-        if (!isObject(schema)){
-            console.log(`[AssetManager] schema with id ${schema_name} not found`)
-            return false
+    static schema_validate(data, schema_name) {
+        let schema = undefined
+        if (isString(schema_name)) {
+            schema = AssetManager.schema_lib[schema_name]
+        } else if (isObject(schema_name)) {
+            schema = schema_name
         } else {
-            return matches_schema(data, schema)
+            console.error(`[AssetManager] unknown schema type`)
+            console.dir(schema_name)
+            return false
         }
+        return schema_validate(data, schema)
     }
-    static add_schema(name, schema){
+    static add_schema(name, schema) {
         AssetManager.schema_lib[name] = schema
     }
 
@@ -503,7 +507,7 @@ if (process.env.APP_NAME === undefined) {
     AssetManager.preload_prefabs(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/prefabs/`, true, /\.yaml$/))
 }
 
-for (let k in core_schema){
+for (let k in core_schema) {
     AssetManager.add_schema(k, core_schema[k])
 }
 

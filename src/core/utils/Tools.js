@@ -182,11 +182,13 @@ function matches_types(data, allowed_types) {
     }
 }
 
-function matches_schema(data, schema, prop_path = "$") {
+function schema_validate(data, schema, prop_path = "$") {
     let valid_type = true
     let valid_props = true
     let allowed_types = ["any"]
     let invalid_props = []
+    let valid_strict_props = true
+    let non_strict_props = []
 
     if (isString(schema.type)) {
         allowed_types = schema.type.replace(/\s/g, '').split("|")
@@ -203,13 +205,25 @@ function matches_schema(data, schema, prop_path = "$") {
         } else {
             for (let k in schema.props) {
                 let prop_schema = schema.props[k]
-                let valid_prop = matches_schema(data[k], prop_schema, `${prop_path}.${k}`);
+                let valid_prop = schema_validate(data[k], prop_schema, `${prop_path}.${k}`);
                 if (!valid_prop) {
                     invalid_props.push(k)
                     valid_props = false;
                 }
             }
+
+            if (schema.strict_props === true){
+                for (let kk in data) {
+                    if (!schema.props[kk]) {
+                        valid_strict_props = false
+                        non_strict_props.push(kk)
+    
+                    }
+                }
+            }
+
         }
+
     }
 
     if (!valid_type) {
@@ -222,7 +236,12 @@ function matches_schema(data, schema, prop_path = "$") {
         console.dir(data)
     }
 
-    return valid_props && valid_type
+    if (!valid_strict_props) {
+        console.error(`[SHEMA] validation of props for "${prop_path} failed. props must be strict. restricted props: ${non_strict_props.join(', ')}"`)
+        console.dir(data)
+    }
+
+    return valid_props && valid_type && valid_strict_props
 }
 
 export {
@@ -235,5 +254,5 @@ export {
     hex_to_rgb,
     get_unique_props,
     is_none,
-    matches_schema
+    schema_validate
 }
