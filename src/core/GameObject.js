@@ -5,6 +5,7 @@ import AssetManager from 'core/utils/AssetManager';
 import { Task, TaskScheduler } from "core/utils/TaskScheduler"
 import StateMachine from "core/utils/StateMachine"
 import { isObject } from "lodash-es"
+import Schema from "core/utils/Schema"
 
 
 class GameObject extends Group {
@@ -26,7 +27,7 @@ class GameObject extends Group {
 
     }
     load_prefab(prefab) {
-        if (isObject(prefab) && AssetManager.schema_validate(prefab, "prefab")) {
+        if (isObject(prefab) && Schema.validate(prefab, ":PREFAB")) {
             if (prefab.components) {
                 this.setup_components(prefab.components)
             }

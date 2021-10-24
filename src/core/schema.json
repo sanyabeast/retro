@@ -1,39 +1,45 @@
 {
-    "prefab": {
+    "PREFAB": {
         "type": "object",
         "strict_props": true,
         "props": {
+            "prefab": "string|none",
+            "prefabs": "array|none",
             "children": {
-                "type": "array|object|none"
+                "type": "array|object|none",
+                "any_prop": ["string", ":PREFAB"]
             },
             "components": {
                 "type": "array|object|none"
             },
-            "position": {
-                "type": "array|none"
-            },
-            "scale": {
-                "type": "array|none"
-            },
-            "rotation": {
-                "type": "array|none"
-            },
-            "visible": {
-                "type": "array|none"
-            }
+            "position": "array|none",
+            "scale": "array|none",
+            "rotation":"array|none",
+            "visible": "array|none"
         }
     },
-    "comp_meta_params": {
-        "type": "object",
+    "COMPONENT_PARAMS_META": {
+        "type": "object|none",
         "props": {
             "ticking": {
                 "type": "object|none",
                 "props": {
-                    "rate": {
-                        "type": "number|none"
-                    }
+                    "rate": "number|none"
                 }
             }
+        }
+    },
+    "COMPONENT": {
+        "type": "object|none",
+        "strict_props": true,
+        "props": {
+            "name": "string",
+            "enabled": "bool|none",
+            "ref": "string|none",
+            "tag": "string|none",
+            "tick_rate": "number|none",
+            "tick_enabled": "bool|none",
+            "params": "object|none"
         }
     }
 }

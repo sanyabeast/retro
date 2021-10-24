@@ -1,3 +1,7 @@
+prefabs: 
+  - default.Postprocessing
+  - core.sound.default_ambient_audio_source
+  - default.controls.OrbitControlsComponent
 components:
   phone_light:
     enabled: true
@@ -41,17 +45,14 @@ components:
       cycling: 48
       time: 0.33
   fog:  
-    prefab: default.FogComponent
+    name: FogComponent
     params: 
       density: 0.02
   skybox:
-    prefab: default.SkyBox
+    name: SkyBox
     params:
       cubemap: "res/core/cubemaps/purplenebula"
       cubemap_format: png
-  posfx: "@prefab:default.Postprocessing"
-  orbit_controls: "@prefab:default.controls.OrbitControlsComponent"
-  ambient_sound: "@prefab:core.sound.default_ambient_audio_source"
 children:
   - "@prefab:core.scenes.default_snow_scene"
   - components:

@@ -45,29 +45,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             } catch (err) { }
 
             frame.add_button("RNDR", "View Final Render", () => {
-                launcher.app.refs.renderer.set_service_view_mode("default")
+                launcher.app.refs.renderer_component.set_service_view_mode("default")
             }, "#9c27b0")
             frame.add_button("NRML", "View Normals", () => {
-                launcher.app.refs.renderer.set_service_view_mode("normal")
+                launcher.app.refs.renderer_component.set_service_view_mode("normal")
             }, "#7e6ae5")
             frame.add_button("DPTH", "View Depth", () => {
-                launcher.app.refs.renderer.set_service_view_mode("depth")
+                launcher.app.refs.renderer_component.set_service_view_mode("depth")
             }, "#e91e63")
             frame.add_button("WRFM", "View Wireframe", () => {
-                launcher.app.refs.renderer.set_service_view_mode("wireframe")
+                launcher.app.refs.renderer_component.set_service_view_mode("wireframe")
             }, "#fe8dff")
             frame.add_button("MTCP", "View Matcap", () => {
-                launcher.app.refs.renderer.set_service_view_mode("matcap")
+                launcher.app.refs.renderer_component.set_service_view_mode("matcap")
             }, "#e91e1e")
 
             frame.add_button("|", "", i=>i, "#ffffff")
 
             frame.add_button("PSFX", "Postprocessing toggle", () => {
-                launcher.app.refs.renderer.use_postfx = !launcher.app.refs.renderer.use_postfx
+                launcher.app.refs.renderer_component.use_postfx = !launcher.app.refs.renderer_component.use_postfx
             }, "#cddc39")
 
             frame.add_button("FOG", "Toggle Fog", () => {
-                launcher.app.refs.renderer.use_fog = !launcher.app.refs.renderer.use_fog
+                launcher.app.refs.renderer_component.use_fog = !launcher.app.refs.renderer_component.use_fog
             }, "#6fdc39")
             break
         }

@@ -1,5 +1,5 @@
-import map from "lodash-es/map"
-import { isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction } from "lodash-es"
+
+import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction } from "lodash-es"
 
 
 function log(tag, ...data) {
@@ -161,88 +161,16 @@ function is_none(v) {
     return v === undefined || v === null || v === NaN
 }
 
-function get_type_name(d) {
-    let r = "none"
-    if (isObject(d) && !isNull(d)) r = "object"
-    if (isArray(d)) r = "array"
-    if (isNumber(d) && !isNaN(d)) r = "number"
-    if (isString(d)) r = "string"
-    if (isBoolean(d)) r = "bool"
-    if (isFunction(d)) r = "function"
+function camel_to_snake(key) {
+    var result = key.replace(/([A-Z])/g, " $1");
+    result = result.split(' ').join('_').toLowerCase();
+    if (result.startsWith("_")){
+        result = result.replace("_", "")
+    }
 
-    return r
+    return result
 }
 
-function matches_types(data, allowed_types) {
-    let type_name = get_type_name(data)
-    if (allowed_types.indexOf("any") > -1) {
-        return true
-    } else {
-        return allowed_types.indexOf(type_name) > -1
-    }
-}
-
-function schema_validate(data, schema, prop_path = "$") {
-    let valid_type = true
-    let valid_props = true
-    let allowed_types = ["any"]
-    let invalid_props = []
-    let valid_strict_props = true
-    let non_strict_props = []
-
-    if (isString(schema.type)) {
-        allowed_types = schema.type.replace(/\s/g, '').split("|")
-    }
-    if (isArray(schema.type)) {
-        allowed_types = [...schema.type]
-    }
-
-    valid_type = matches_types(data, allowed_types)
-
-    if (isObject(schema.props)) {
-        if (!isObject(data)) {
-            valid_props = false
-        } else {
-            for (let k in schema.props) {
-                let prop_schema = schema.props[k]
-                let valid_prop = schema_validate(data[k], prop_schema, `${prop_path}.${k}`);
-                if (!valid_prop) {
-                    invalid_props.push(k)
-                    valid_props = false;
-                }
-            }
-
-            if (schema.strict_props === true){
-                for (let kk in data) {
-                    if (!schema.props[kk]) {
-                        valid_strict_props = false
-                        non_strict_props.push(kk)
-    
-                    }
-                }
-            }
-
-        }
-
-    }
-
-    if (!valid_type) {
-        console.error(`[SHEMA] validation of type for "${prop_path} failed. type is ${get_type_name(data)}; schema needs: ${allowed_types.join(', ')}"`)
-        console.dir(data)
-    }
-
-    if (!valid_props) {
-        console.error(`[SHEMA] validation of props for "${prop_path} failed. invalid props: ${invalid_props.join(', ')}"`)
-        console.dir(data)
-    }
-
-    if (!valid_strict_props) {
-        console.error(`[SHEMA] validation of props for "${prop_path} failed. props must be strict. restricted props: ${non_strict_props.join(', ')}"`)
-        console.dir(data)
-    }
-
-    return valid_props && valid_type && valid_strict_props
-}
 
 export {
     log,
@@ -254,5 +182,5 @@ export {
     hex_to_rgb,
     get_unique_props,
     is_none,
-    schema_validate
+    camel_to_snake
 }

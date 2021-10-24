@@ -1,21 +1,16 @@
+prefabs: 
+  - default.InputComponent
+  - default.ClockComponent
+  - default.RendererComponent
+  - default.Animator
 components:
   camera:
-    prefab: "default.CameraComponent"
-    test: 1
+    name: "CameraComponent"
     params:
       position:
         - 1
         - 1
         - 4
-  input: "@prefab:default.InputComponent"
-  clock: "@prefab:default.ClockComponent"
-  renderer: "@prefab:default.RendererComponent"
-  # ambient_light:
-  #   enabled: true
-  #   name: LightComponent
-  #   params:
-  #     type: AmbientLight
-  #     intensity: 0.1
   user_pointer:
     name: UserPointer
     params:
@@ -28,5 +23,6 @@ components:
         - scroll
         - press
       raycasting: true
-  animator: "@prefab:default.Animator"
-  devgui: "@prefab:default.VueGUIComponent"
+  devgui:
+    name: VueGUIComponent
+    params:

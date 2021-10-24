@@ -4,9 +4,10 @@
  */
 
 import * as THREE from 'three';
-import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate } from "core/utils/Tools";
+import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake } from "core/utils/Tools";
 import { isObject, isArray, merge, forEach, isString } from "lodash-es";
 import GameObject from 'core/GameObject';
+import Schema from "core/utils/Schema"
 
 import { set, map, filter } from "lodash-es";
 import AssetBufferGeometry from '../geometry/classes/AssetBufferGeometry';
@@ -54,7 +55,7 @@ function process_shader_code(code, uniforms, parts) {
 }
 
 class AssetManager {
-    static schema_lib = schema_lib
+    static Schema = Schema
     static textures_cache = {};
     static cached_geometries = {};
     static cached_materials = {};
@@ -102,20 +103,37 @@ class AssetManager {
             } else {
                 r = {}
                 if (data.prefab) {
+                    
                     let prefab_id = data.prefab
-                    delete data.prefab
                     let prefab_template = AssetManager.load_prefab(prefab_id)
 
+                    data = {
+                        ...data,
+                        prefab: undefined
+                    }
                     data = AssetManager.mixin_object(prefab_template, [data])
+                    merged_mixins[0] = data
+                }
+
+                if (data.prefabs) {
+                    let prefab_mixins = []
+                    data.prefabs.forEach(prefab_id => {
+                        let prefab_template = AssetManager.load_prefab(prefab_id)
+                        prefab_mixins.push(prefab_template)
+                    })
+
+                    data = {
+                        ...data,
+                        prefabs: undefined
+                    }
+                    data = AssetManager.mixin_object(data, [...prefab_mixins, data])
+                    console.log(prefab_mixins)
+                    console.log(JSON.stringify(data, null, "\t"))
                     merged_mixins[0] = data
                 }
 
                 let keys = get_unique_props(merged_mixins)
                 keys.forEach(k => {
-                    if (k === "prefab") {
-                        return
-                    }
-
                     r[k] = AssetManager.mixin_object(data[k], map(mixins, m => isObject(m) ? m[k] : undefined))
                 })
             }
@@ -401,11 +419,14 @@ class AssetManager {
 
             let creator = mod.default
             let default_prefab = {
-                name: name,
-                enabled: true,
-                params: typeof creator.DEFAULT === "object" ? { ...creator.DEFAULT } : {}
+                components: {
+                    [camel_to_snake(name)]: {
+                        name: name,
+                        enabled: true,
+                        params: typeof creator.DEFAULT === "object" ? { ...creator.DEFAULT } : {}
+                    }
+                }
             }
-
 
             AssetManager.register_prefab(`default.${name}`, default_prefab)
 
@@ -459,27 +480,18 @@ class AssetManager {
         })
     }
     static register_prefab(id, prefab) {
+        let is_valid = Schema.validate(prefab, ":PREFAB")
+        if (!is_valid) {
+            console.error(`[AssetManager] cannot register prefab. preloaded prefab "${id}" does not match "PREFAB" schema`)
+        }
         AssetManager.prefab_lib = AssetManager.prefab_lib || { test: { test_prop1: 1, test_prop2: "hello" } }
         AssetManager.prefab_lib[id] = prefab
     }
 
-    static schema_validate(data, schema_name) {
-        let schema = undefined
-        if (isString(schema_name)) {
-            schema = AssetManager.schema_lib[schema_name]
-        } else if (isObject(schema_name)) {
-            schema = schema_name
-        } else {
-            console.error(`[AssetManager] unknown schema type`)
-            console.dir(schema_name)
-            return false
-        }
-        return schema_validate(data, schema)
-    }
-    static add_schema(name, schema) {
-        AssetManager.schema_lib[name] = schema
-    }
+}
 
+for (let k in core_schema) {
+    Schema.register(k, core_schema[k])
 }
 
 AssetManager.preload_components("core", require.context("core/components/", true, /\.js$/))
@@ -505,10 +517,6 @@ if (process.env.APP_NAME === undefined) {
     AssetManager.preload_materials(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/`, true, /\.yaml$/))
     AssetManager.preload_geometries(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/`, true, /\.yaml$/))
     AssetManager.preload_prefabs(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/prefabs/`, true, /\.yaml$/))
-}
-
-for (let k in core_schema) {
-    AssetManager.add_schema(k, core_schema[k])
 }
 
 log("AssetManaget", "initialized");
