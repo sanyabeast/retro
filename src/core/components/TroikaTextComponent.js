@@ -3,13 +3,13 @@
  *
  */
 
-import TransformComponent from "core/TransformComponent";
+import SceneComponent from "core/SceneComponent";
 import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
 
 import { Text } from "troika-three-text";
 
-class TroikaTextComponent extends TransformComponent {
+class TroikaTextComponent extends SceneComponent {
     text = ""
     font_size = 1
     color = "#ffffff"

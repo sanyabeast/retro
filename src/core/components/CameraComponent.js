@@ -9,9 +9,9 @@
  *
  */
 
-import TransformComponent from "core/TransformComponent";
+import SceneComponent from "core/SceneComponent";
 import * as THREE from 'three';
-class CameraComponent extends TransformComponent {
+class CameraComponent extends SceneComponent {
     offset = [0, 0, 0];
     camera_type = 1
     fov = 80
@@ -130,7 +130,7 @@ class CameraComponent extends TransformComponent {
 }
 
 CameraComponent.DEFAULT = {
-    ...TransformComponent.DEFAULT
+    ...SceneComponent.DEFAULT
 }
 
 export default CameraComponent;

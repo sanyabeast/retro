@@ -13,7 +13,7 @@ const exclude_props = [
     "components"
 ]
 
-class TransformComponent extends Component {
+class SceneComponent extends Component {
     subject = null;
     position = [0, 0, 0]
     scale = [1, 1, 1]
@@ -197,12 +197,12 @@ class TransformComponent extends Component {
     }
 }
 
-TransformComponent.component_name = "TransformComponent";
+SceneComponent.component_name = "SceneComponent";
 
-TransformComponent.DEFAULT = {
+SceneComponent.DEFAULT = {
     position: [0, 0, 0],
     scale: [1, 1, 1],
     rotation: [0, 0, 0]
 }
 
-export default TransformComponent;
+export default SceneComponent;

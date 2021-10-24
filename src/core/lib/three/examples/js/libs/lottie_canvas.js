@@ -6845,7 +6845,7 @@ function MaskElement(data,element,globalData) {
         defs.appendChild(this.maskElement);
     }
     if (this.viewData.length) {
-        this.element.addRenderableComponent(this);
+        this.element.addSceneComponent(this);
     }
 
 }
@@ -7126,12 +7126,12 @@ RenderableElement.prototype = {
         //list of animated components
         this.renderableComponents = [];
     },
-    addRenderableComponent: function(component) {
+    addSceneComponent: function(component) {
         if(this.renderableComponents.indexOf(component) === -1) {
             this.renderableComponents.push(component);
         }
     },
-    removeRenderableComponent: function(component) {
+    removeSceneComponent: function(component) {
         if(this.renderableComponents.indexOf(component) !== -1) {
             this.renderableComponents.splice(this.renderableComponents.indexOf(component), 1);
         }
@@ -7211,7 +7211,7 @@ function RenderableDOMElement() {}
             this.initRenderable();
             this.initRendererElement();
             this.createContainerElements();
-            this.createRenderableComponents();
+            this.createSceneComponents();
             this.createContent();
             this.hide();
         },
@@ -7612,7 +7612,7 @@ SVGBaseElement.prototype = {
         }
         return this.baseElement;
     },
-    createRenderableComponents: function() {
+    createSceneComponents: function() {
         this.maskManager = new MaskElement(this.data, this, this.globalData);
         this.renderableEffectsManager = new SVGEffects(this);
     },
@@ -7708,7 +7708,7 @@ ITextElement.prototype.initElement = function(data,globalData,comp){
     this.initRenderable();
     this.initRendererElement();
     this.createContainerElements();
-    this.createRenderableComponents();
+    this.createSceneComponents();
     this.createContent();
     this.hide();
     this.textAnimator.searchProperties(this.dynamicProperties);
@@ -7786,7 +7786,7 @@ ICompElement.prototype.initElement = function(data,globalData,comp) {
     this.initHierarchy();
     this.initRendererElement();
     this.createContainerElements();
-    this.createRenderableComponents();
+    this.createSceneComponents();
     if(this.data.xt || !globalData.progressiveLoad){
         this.buildAllItems();
     }
@@ -8354,7 +8354,7 @@ CVBaseElement.prototype = {
             globalData.canvasContext.globalCompositeOperation = blendModeValue;
         }
     },
-    createRenderableComponents: function(){
+    createSceneComponents: function(){
         this.maskManager = new CVMaskElement(this.data, this);
     },
     hideElement: function(){
@@ -8497,7 +8497,7 @@ function CVMaskElement(data,element){
     }
     this.hasMasks = hasMasks;
     if(hasMasks) {
-        this.element.addRenderableComponent(this);
+        this.element.addSceneComponent(this);
     }
 }
 

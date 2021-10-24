@@ -4,12 +4,12 @@
  *
  */
 
-import TransformComponent from "core/TransformComponent";
+import SceneComponent from "core/SceneComponent";
 import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
 import { hex_to_hsl, hsl_to_rgb, hex_to_rgb } from "core/utils/Tools";
 
-class Sun extends TransformComponent {
+class Sun extends SceneComponent {
     time = 0.5
 
     n_distance = 500

@@ -4,11 +4,11 @@
  *
  */
 
-import TransformComponent from "core/TransformComponent";
+import SceneComponent from "core/SceneComponent";
 import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
 
-class LightComponent extends TransformComponent {
+class LightComponent extends SceneComponent {
     type = "PointLight"
     intensity = 1
     color = "#eeffdd"

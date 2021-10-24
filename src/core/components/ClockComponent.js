@@ -13,6 +13,7 @@ class ClockComponent extends Component {
     tick_interval = 1000 / 45
     tick_delta = 1
     prev_scene_tick_date = +new Date()
+    started = false;
     time_data = {
         now: +new Date(),
         started_at: -1,
@@ -23,12 +24,14 @@ class ClockComponent extends Component {
     }
 
     on_created() {
-        this.time_data.started_at = +new Date()
+
         this.handle_raf = this.handle_raf.bind(this)
         this.raf_cb_id = 0
         this.raf_callbacks = {}
     }
     begin_tick() {
+        this.started = true;
+        this.time_data.started_at = +new Date()
         this.loop_id = requestAnimationFrame(this.handle_raf)
     }
     handle_raf() {
@@ -63,7 +66,9 @@ class ClockComponent extends Component {
         let raf_data = {}
         let loop_func = () => {
             raf_data.id = requestAnimationFrame(loop_func)
-            cb()
+            if (this.started) {
+                cb()
+            }
         }
         raf_data.id = requestAnimationFrame(loop_func)
         raf_data.stop = () => {

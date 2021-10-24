@@ -3,7 +3,7 @@
  *
  */
 
-import TransformComponent from "core/TransformComponent";
+import SceneComponent from "core/SceneComponent";
 import * as THREE from 'three';
 
 const SPINE_VERSION = 38
@@ -27,7 +27,7 @@ switch (SPINE_VERSION) {
 }
 
 
-class SpineAnimationPlayer extends TransformComponent {
+class SpineAnimationPlayer extends SceneComponent {
     asset_name = "animation";
     skeleton_file = "animation.json";
     atlas_file = "animation.atlas";

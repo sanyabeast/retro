@@ -5,10 +5,10 @@
 
 import * as THREE from 'three';
 import AssetManager from "core/utils/AssetManager";
-import TransformComponent from "core/TransformComponent";
+import SceneComponent from "core/SceneComponent";
 import { set, get } from "lodash-es"
 
-class MeshComponent extends TransformComponent {
+class MeshComponent extends SceneComponent {
     mesh = null;
     drop_shadow = true
     recieve_shadow = true

@@ -21,9 +21,18 @@ class Component extends EventDispatcher {
     globals = undefined
     tick_rate = 30
     tick_enabled = true
+    layers = undefined
     constructor(params) {
 
         super(params);
+
+        this.layers = {
+            rendering: true,
+            postfx: true,
+            normal: true,
+            depth: true,
+            wireframe: true,
+        }
 
         this.tick_data = {
             prev_time: +new Date(),

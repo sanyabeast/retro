@@ -4,7 +4,7 @@
  *
  */
 
-import TransformComponent from "core/TransformComponent";
+import SceneComponent from "core/SceneComponent";
 import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
 import Tools from "core/utils/Tools"
@@ -13,7 +13,7 @@ import map from "lodash-es/map"
 import { Vector2 } from "spine-ts-threejs";
 import { Vector3 } from "three";
 
-class PartykalsComponent extends TransformComponent {
+class PartykalsComponent extends SceneComponent {
     particle_system = undefined
     particles_global_size = 1
     particles_start_size = 1
