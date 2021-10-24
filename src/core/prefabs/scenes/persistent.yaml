@@ -1,0 +1,27 @@
+prefabs: 
+  - default.InputComponent
+  - default.ClockComponent
+  - default.Renderer
+  - default.Animator
+components:
+  camera:
+    name: "CameraComponent"
+    params:
+      position:
+        - 1
+        - 1
+        - 4
+  user_pointer:
+    name: UserPointer
+    params:
+      events:
+        - move
+        - over
+        - out
+        - down
+        - up
+        - scroll
+        - press
+      raycasting: true
+  devgui:
+    name: VueGUIComponent

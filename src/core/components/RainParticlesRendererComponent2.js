@@ -8,7 +8,7 @@ import Component from "core/Component";
 import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
 
-class RainParticlesRendererComponent2 extends Component {
+class RainParticlesRenderer2 extends Component {
     particles_count = 50
     particles = []
     particle_degree = Math.PI + (Math.PI / 6)
@@ -103,4 +103,4 @@ class RainParticlesRendererComponent2 extends Component {
     }
 }
 
-export default RainParticlesRendererComponent2;
+export default RainParticlesRenderer2;

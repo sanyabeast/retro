@@ -164,13 +164,29 @@ function is_none(v) {
 function camel_to_snake(key) {
     var result = key.replace(/([A-Z])/g, " $1");
     result = result.split(' ').join('_').toLowerCase();
-    if (result.startsWith("_")){
+    if (result.startsWith("_")) {
         result = result.replace("_", "")
     }
 
     return result
 }
 
+function is_inline_dict(data) {
+    return (isString(data)) && data.startsWith("??")
+}
+
+function parse_inline_dict(d) {
+    let r = {}
+    let s = d.replace("??", "")
+    let t = s.split("&")
+
+    t.forEach(p => {
+        let k = p.split("=")[0]
+        let v = p.split("=")[1]
+        r[k] = v
+    })
+    return r
+}
 
 export {
     log,
@@ -182,5 +198,7 @@ export {
     hex_to_rgb,
     get_unique_props,
     is_none,
-    camel_to_snake
+    camel_to_snake,
+    is_inline_dict,
+    parse_inline_dict
 }

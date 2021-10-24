@@ -4,26 +4,17 @@
  */
 
 import * as THREE from 'three';
-import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake } from "core/utils/Tools";
+import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict } from "core/utils/Tools";
 import { isObject, isArray, merge, forEach, isString } from "lodash-es";
 import GameObject from 'core/GameObject';
 import Schema from "core/utils/Schema"
 
 import { set, map, filter } from "lodash-es";
 import AssetBufferGeometry from '../geometry/classes/AssetBufferGeometry';
-import core_schema from "core/schema.json"
+import SCHEMA_CORE from "core/SCHEMA.yaml"
 
-console.log(core_schema)
-
-const APP_NAME = get_app_name()
-
-const interlinks = [
-    "texture",
-    "prefab"
-]
-
+const SCHEMA_APP = require(`apps/${process.env.APP_NAME}/SCHEMA.yaml`)
 const schema_lib = {}
-
 const cubemap_loader = new THREE.CubeTextureLoader();
 
 
@@ -56,13 +47,12 @@ function process_shader_code(code, uniforms, parts) {
 
 class AssetManager {
     static Schema = Schema
+    static SCHEMA_CORE = SCHEMA_CORE
+    static SCHEMA_APP = SCHEMA_APP
     static textures_cache = {};
     static cached_geometries = {};
     static cached_materials = {};
     static get_asset_stats() { return asset_stats; }
-    // static mixin_object(data, mixins = []) {
-    //     return mixin_object(data, mixins)
-    // }
     static create_material_with_template(template_name, params, id) {
         template_name = template_name.replace("@", "");
         if (!AssetManager.material_templates[template_name]) {
@@ -70,11 +60,10 @@ class AssetManager {
         let template_data = AssetManager.material_templates[template_name]
 
         template_data = AssetManager.mixin_object(template_data)
-        template_data = AssetManager.resolve_interlinks(template_data)
 
         if (params) {
             for (let k in params) {
-                set(template_data.params, k, AssetManager.resolve_interlinks(params[k]))
+                set(template_data.params, k, params[k])
             }
 
             /*@TODO: disables THREE material caching*/
@@ -94,19 +83,15 @@ class AssetManager {
     static mixin_object(data, mixins = []) {
         let r = data
         let merged_mixins = [data, ...mixins]
-        if (typeof data === "object" && data !== null) {
-            if (Array.isArray(data)) {
-                r = []
-                data.forEach((item, index) => {
-                    r[index] = AssetManager.mixin_object(item, map(mixins, m => isArray(m) ? m[index] : undefined))
-                })
-            } else {
+
+        let data_type = Schema.get_type_name(data)
+
+        switch (data_type) {
+            case "object": {
                 r = {}
                 if (data.prefab) {
-                    
                     let prefab_id = data.prefab
                     let prefab_template = AssetManager.load_prefab(prefab_id)
-
                     data = {
                         ...data,
                         prefab: undefined
@@ -114,47 +99,46 @@ class AssetManager {
                     data = AssetManager.mixin_object(prefab_template, [data])
                     merged_mixins[0] = data
                 }
-
                 if (data.prefabs) {
                     let prefab_mixins = []
                     data.prefabs.forEach(prefab_id => {
                         let prefab_template = AssetManager.load_prefab(prefab_id)
                         prefab_mixins.push(prefab_template)
                     })
-
                     data = {
                         ...data,
                         prefabs: undefined
                     }
                     data = AssetManager.mixin_object(data, [...prefab_mixins, data])
-                    console.log(prefab_mixins)
-                    console.log(JSON.stringify(data, null, "\t"))
                     merged_mixins[0] = data
                 }
-
                 let keys = get_unique_props(merged_mixins)
                 keys.forEach(k => {
                     r[k] = AssetManager.mixin_object(data[k], map(mixins, m => isObject(m) ? m[k] : undefined))
                 })
+
+                break
             }
-        } else {
-            let type = typeof data
-            r = data
-            for (let a = merged_mixins.length - 1; a >= 0; a--) {
-                let mv = merged_mixins[a]
-                if (!is_none(mv)) {
-                    r = mv
+            case "array": {
+                r = []
+                data.forEach((item, index) => {
+                    r[index] = AssetManager.mixin_object(item, map(mixins, m => isArray(m) ? m[index] : undefined))
+                })
+                break
+            }
+            case "string": {
+                if (is_inline_dict(data)) {
+                    let inline_dict = parse_inline_dict(data)
+                    r = AssetManager.mixin_object(inline_dict)
                     break
                 }
             }
-
-            if (typeof r === "string" && r.startsWith("@")) {
-                let directive = r.split(":")[0].replace("@", "")
-                let arg = r.split(":")[1]
-                switch (directive) {
-                    case "prefab": {
-                        let prefab_template = AssetManager.load_prefab(arg)
-                        r = prefab_template
+            default: {
+                r = data
+                for (let a = merged_mixins.length - 1; a >= 0; a--) {
+                    let mv = merged_mixins[a]
+                    if (!is_none(mv)) {
+                        r = mv
                         break
                     }
                 }
@@ -189,51 +173,6 @@ class AssetManager {
             }
         }
         return mat;
-    }
-    static parse_interlink(data) {
-        let url = data.split(":")[1].split("?")[0]
-        let params = data.split("?")[1]
-        if (params === undefined) {
-            params = {}
-        } else {
-            params = get_query_string_params(params)
-        }
-        return {
-            url,
-            params
-        }
-    }
-    static resolve_interlinks(data) {
-        switch (typeof data) {
-            case "object": {
-                if (Array.isArray(data)) {
-                    data.forEach((item, i) => {
-                        data[i] = AssetManager.resolve_interlinks(item)
-                    })
-                } else if (data === null) {
-                    //
-                } else {
-                    for (let k in data) {
-                        data[k] = AssetManager.resolve_interlinks(data[k])
-                    }
-                }
-                break;
-            }
-            case "string": {
-                for (let i = 0; i < interlinks.length; i++) {
-                    let name = interlinks[i]
-                    if (data.startsWith(`${name}:`)) {
-                        let interlink_data = AssetManager.parse_interlink(data)
-                        data = AssetManager.load_type(name, interlink_data.url, interlink_data.params)
-                        break
-                    }
-                }
-                break;
-            }
-            default: { }
-        }
-
-        return data
     }
     static load_type(type, ...args) {
         switch (type) {
@@ -313,7 +252,7 @@ class AssetManager {
         }
 
         for (let k in params) {
-            set(texture, k, AssetManager.resolve_interlinks(params[k]))
+            set(texture, k, params[k])
         }
 
         texture.needsUpdate = true;
@@ -371,9 +310,8 @@ class AssetManager {
 
         let prefab_template = AssetManager.prefab_lib[id]
         let prefab = AssetManager.mixin_object(prefab_template)
-        prefab = AssetManager.resolve_interlinks(prefab)
         for (let k in params) {
-            set(prefab, k, AssetManager.resolve_interlinks(params[k]))
+            set(prefab, k, params[k])
         }
         return prefab
     }
@@ -490,9 +428,14 @@ class AssetManager {
 
 }
 
-for (let k in core_schema) {
-    Schema.register(k, core_schema[k])
+for (let k in SCHEMA_CORE) {
+    Schema.register(k, SCHEMA_CORE[k])
 }
+
+for (let k in SCHEMA_APP) {
+    Schema.register(k, SCHEMA_APP[k])
+}
+
 
 AssetManager.preload_components("core", require.context("core/components/", true, /\.js$/))
 AssetManager.preload_classes("core", require.context("core/materials/classes", true, /\.js$/))

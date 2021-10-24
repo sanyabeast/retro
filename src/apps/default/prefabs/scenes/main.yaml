@@ -1,0 +1,33 @@
+prefabs:
+  - default.Postprocessing
+  - core.sound.default_ambient_audio_source
+  - default.controls.OrbitControlsComponent
+  - default.SkyBox
+  - default.Sun
+components:
+  point_light:
+    enabled: true
+    name: LightComponent
+    params:
+      position:
+        - 1
+        - 1
+        - 0
+      type: PointLight
+      intensity: 2
+      distance: 10
+      color: "#ffffff"
+children:
+  # loading scene from external prefab
+  fog: ??prefab=default.Fog
+  snow_scene:
+    prefab: core.scenes.default_snow_scene
+    children:
+      scene:
+        components:
+          ground:
+            params:
+              geometry:
+                - CircleGeometry
+                - - 2
+                  - 32

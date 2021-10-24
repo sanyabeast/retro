@@ -23,6 +23,8 @@ class SkyBox extends Component {
             this.cubemap,
             this.texture
         )
+
+        console.log(scene.background)
     }
     create_background(color = "#ffffff", cubemap = undefined, texture = undefined) {
         if (cubemap === undefined && texture === undefined) {
@@ -43,7 +45,8 @@ class SkyBox extends Component {
 
 SkyBox.DEFAULT = {
     color: "#ff00ff",
-    cubemap: "res/core/cubemaps/icelake_1"
+    cubemap: "res/core/cubemaps/icelake_1",
+    cubemap_format: "jpg"
 }
 
 export default SkyBox;

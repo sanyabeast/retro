@@ -74,7 +74,7 @@ class LightComponent extends SceneComponent {
         }
 
 
-        let renderer = this.find_component_of_type("RendererComponent")
+        let renderer = this.find_component_of_type("Renderer")
         if (renderer) {
             renderer.compile()
         }

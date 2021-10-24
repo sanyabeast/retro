@@ -7,7 +7,7 @@ const root = path.join(__dirname, "../..");
 
 module.exports = {
     entry: {
-        app: path.join(root, "src", "core", "Launcher")
+        app: path.join(root, "src", "core", "App")
     },
     mode: "production",
     optimization: {

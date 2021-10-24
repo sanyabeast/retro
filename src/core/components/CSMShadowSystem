@@ -17,7 +17,7 @@ class CSMShadowSystem extends Component {
 
     }
     on_enabled() {
-        let renderer = this.find_component_of_type("RendererComponent")
+        let renderer = this.find_component_of_type("Renderer")
 
 
         renderer.renderer.shadowMap.enabled = true;

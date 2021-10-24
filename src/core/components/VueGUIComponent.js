@@ -44,7 +44,7 @@ MyPlugin.install = function (Vue, options) {
             this.camera = gui_component.globals.camera
         },
         mounted() {
-
+            this.$el.style.zIndex = "1"
         },
         methods: {
             format_money(v) {
@@ -123,16 +123,13 @@ class VueGUIComponent extends Component {
         super(...arguments)
         this.props = {}
     }
+    get el(){
+        return this.ui.$el
+    }
     on_created() {
         console.log(this.store)
-        this.dom = document.createElement("div")
-        this.dom.style.width = "100%";
-        this.dom.style.height = "100%";
-        this.dom.style.overflow = "hidden";
-        this.dom.style.position = "relative";
-        this.dom.style.userSelect = "none";
-        this.dom.classList.add('gui-dom')
-        this.globals.dom.appendChild(this.dom)
+        
+       
 
         let store_config = this.store
 
@@ -166,6 +163,15 @@ class VueGUIComponent extends Component {
 
     }
     on_enabled() {
+        
+        this.dom = document.createElement("div")
+        this.dom.style.width = "100%";
+        this.dom.style.height = "100%";
+        this.dom.style.overflow = "hidden";
+        this.dom.style.position = "relative";
+        this.dom.style.userSelect = "none";
+        this.dom.classList.add('gui-dom')
+        this.globals.dom.appendChild(this.dom)
         this.ui.$mount(this.dom)
     }
     on_tick(time_delta) {

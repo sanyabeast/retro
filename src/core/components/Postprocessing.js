@@ -106,7 +106,7 @@ class Postprocessing extends Component {
         })
     }
     setup_postfx() {
-        let renderer = this.find_component_of_type("RendererComponent")
+        let renderer = this.find_component_of_type("Renderer")
         if (renderer) {
             let composer = this.composer = new postfx.EffectComposer(renderer.renderer)
             let camera = this.find_component_of_type("CameraComponent").subject
@@ -137,7 +137,7 @@ class Postprocessing extends Component {
             if (this.use_vignette) this.setup_vignette(renderer, scene, camera, composer)
             if (this.use_gc) this.setup_gc(renderer, scene, camera, composer)
         } else {
-            this.log("RendererComponent not found")
+            this.log("Renderer not found")
         }
 
     }
@@ -318,7 +318,7 @@ class Postprocessing extends Component {
 
     }
     on_enabled() {
-        let renderer = this.find_component_of_type("RendererComponent")
+        let renderer = this.find_component_of_type("Renderer")
         if (renderer) {
             renderer.custom_render_function = this.postfx_render_function
             renderer.clear_depth = false
@@ -326,7 +326,7 @@ class Postprocessing extends Component {
         }
     }
     on_disabled() {
-        let renderer = this.find_component_of_type("RendererComponent")
+        let renderer = this.find_component_of_type("Renderer")
         if (renderer) {
             renderer.custom_render_function = undefined
             renderer.clear_depth = true
@@ -334,7 +334,7 @@ class Postprocessing extends Component {
         }
     }
     postfx_render_function(scene, camera) {
-        let renderer = this.find_component_of_type("RendererComponent")
+        let renderer = this.find_component_of_type("Renderer")
         this.composer.setSize(renderer.resolution.x, renderer.resolution.y)
         this.composer.render()
     }

@@ -8,14 +8,13 @@ class App extends CoreApp {
             ...params,
         });
 
-        this.load_prefab(AssetManager.load_prefab("{app_name}.scenes.kit_main_scene"))
+        let stage = this.load_stage(AssetManager.load_prefab("{app_name}.scenes.main"))
 
-        let renderer = this.find_component_of_type("RendererComponent")
+        let renderer = this.find_component_of_type("Renderer")
         let camera = this.find_component_of_type("CameraComponent")
         let postfx = this.find_component_of_type("Postprocessing")
 
         renderer.target_fps = 60
-
         // postfx.enabled = Device.device_type === "desktop"
         camera.fov = 60
 

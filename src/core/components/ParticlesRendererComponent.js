@@ -9,7 +9,7 @@ import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
 import MeshComponent from "core/components/MeshComponent";
 
-class ParticlesRendererComponent extends Component {
+class ParticlesRenderer extends Component {
     max_life_time = 100
     particles_count = 50
     particles = []
@@ -188,4 +188,4 @@ class ParticlesRendererComponent extends Component {
     }
 }
 
-export default ParticlesRendererComponent;
+export default ParticlesRenderer;

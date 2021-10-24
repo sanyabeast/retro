@@ -23,10 +23,15 @@ function validate(data, schema, prop_path = "ROOT", safe_mode = false) {
     let non_strict_props = []
     let non_valid_any_props = []
 
+
     let scheme_type = get_type_name(schema)
 
     switch (scheme_type) {
         case "object": {
+            let result_v_data = {
+                props: {}
+            }
+
             if (isString(schema.type)) {
                 allowed_types = schema.type.replace(/\s/g, '').split("|")
             }
@@ -40,9 +45,10 @@ function validate(data, schema, prop_path = "ROOT", safe_mode = false) {
                 if (isObject(data) && !isArray(data)) {
                     for (let k in schema.props) {
                         let prop_schema = schema.props[k]
-                        let is_valid = validate(data[k], prop_schema, `${prop_path}.${k}`, safe_mode);
-                        if (!is_valid) {
+                        let v_data = validate(data[k], prop_schema, `${prop_path}.${k}`, safe_mode);
+                        if (!v_data.is_valid) {
                             invalid_props.push(k)
+                            result_v_data.props[k] = v_data
                             valid_props = false;
                         }
                     }
@@ -63,10 +69,10 @@ function validate(data, schema, prop_path = "ROOT", safe_mode = false) {
                 if (isObject(data) && !isArray(data)) {
                     for (let jj in data) {
 
-                        let is_valid = validate(data[jj], schema.any_prop, `${prop_path}.${jj}`, safe_mode)
-                        console.log(is_valid, data[jj], schema, schema.any_prop)
-                        if (!is_valid) {
+                        let v_data = validate(data[jj], schema.any_prop, `${prop_path}.${jj}`, safe_mode)
+                        if (!v_data.is_valid) {
                             valid_any_prop = false
+                            result_v_data.props[k] = v_data
                             non_valid_any_props.push(jj)
                         }
                     }
@@ -74,9 +80,10 @@ function validate(data, schema, prop_path = "ROOT", safe_mode = false) {
 
                 if (isArray(data)) {
                     data.forEach((item, index) => {
-                        let is_valid = validate(item, schema.any_prop, `${prop_path}.${index}`, safe_mode)
-                        if (!is_valid) {
+                        let v_data = validate(item, schema.any_prop, `${prop_path}.${index}`, safe_mode)
+                        if (!v_data.is_valid) {
                             valid_any_prop = false
+                            result_v_data.props[k] = v_data
                             non_valid_any_props.push(index)
                         }
                     })
@@ -106,13 +113,26 @@ function validate(data, schema, prop_path = "ROOT", safe_mode = false) {
                 }
             }
 
-            return valid_props && valid_type && valid_strict_props && valid_any_prop
+            return {
+                ...result_v_data,
+                is_valid: valid_props && valid_type && valid_strict_props && valid_any_prop,
+                check_props: valid_props,
+                check_type: valid_type,
+                check_strict_props: valid_strict_props,
+                check_any_prop: valid_any_prop,
+                extra: {
+                    allowed_types,
+                    non_strict_props,
+                    invalid_props,
+                    non_valid_any_props
+                }
+            }
             break
         }
         case "string": {
             if (schema.startsWith(":")) {
                 let schema_id = schema.replace(":", "")
-                return validate(data, lib[schema_id], prop_path)
+                return validate(data, lib[schema_id], prop_path, safe_mode)
             } else {
                 return validate(data, {
                     type: schema
@@ -123,13 +143,24 @@ function validate(data, schema, prop_path = "ROOT", safe_mode = false) {
         }
         case "array": {
             let r = false
+            let invalid_schemas = []
             schema.forEach(s => {
                 let r2 = validate(data, s, prop_path, true)
-                if (r2) {
+                if (r2.is_valid) {
                     r = true
+                } else {
+                    invalid_schemas.push(s)
                 }
+
             })
-            return r
+
+            if (!r) {
+                console.error(`[SHEMA] validation for property "${prop_path} failed. any of given SCHEMAS are valid: ${s.join(', ')}"`)
+            }
+            return {
+                is_valid: r,
+                invalid_schemas
+            }
             break
         }
     }

@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "gamecore",
-    "version": "1.0.35",
+    "version": "1.0.40",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
@@ -10,7 +10,7 @@
     "scripts": {
         "clear": "rm -rf dist/",
         "clear:all": "rm -rf node_modules/ && npm run clear",
-        "prebuild": "npm run clear",
+        "prebuild": "",
         "build": "npm version patch --no-git-tag-version && webpack --config webpack/webpack.config.js --env.production",
         "watch": "npm run build:development -- -w",
         "start": "http-server dist/ -c-1",

@@ -86,7 +86,7 @@ export default {
         this.pointer_pos = [input.pointer_position.x, input.pointer_position.y];
       }
 
-      let renderer = this.find_component_of_type("RendererComponent");
+      let renderer = this.find_component_of_type("Renderer");
       if (renderer) {
         this.render_items_count = renderer.render_items_count;
       }

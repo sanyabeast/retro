@@ -75,7 +75,7 @@ class UserPointer extends Component {
     }
 
     check_pointer(x, y) {
-        let rect = this.globals.dom_bounding_rect;
+        let rect = this.globals.dom_rect;
         return x > rect.left && (x < rect.left + rect.width) && y > rect.top && (y < rect.top + rect.height)
     }
 
@@ -85,7 +85,7 @@ class UserPointer extends Component {
         }
 
         let now = +new Date()
-        let rect = this.globals.dom_bounding_rect;
+        let rect = this.globals.dom_rect;
         let event_type = evt.type;
         let alias = this.event_alias[event_type];
         let pointer_a = this.pointer_a;
