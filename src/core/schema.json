@@ -1,0 +1,38 @@
+{
+    "prefab": {
+        "type": "object",
+        "props": {
+            "children": {
+                "type": "array|object|none"
+            },
+            "components": {
+                "type": "array|object|none"
+            },
+            "position": {
+                "type": "array|none"
+            },
+            "scale": {
+                "type": "array|none"
+            },
+            "rotation": {
+                "type": "array|none"
+            },
+            "visible": {
+                "type": "array|none"
+            }
+        }
+    },
+    "comp_meta_params": {
+        "type": "object",
+        "props": {
+            "ticking": {
+                "type": "object|none",
+                "props": {
+                    "rate": {
+                        "type": "number|none"
+                    }
+                }
+            }
+        }
+    }
+}

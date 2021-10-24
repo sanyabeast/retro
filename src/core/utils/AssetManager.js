@@ -4,12 +4,15 @@
  */
 
 import * as THREE from 'three';
-import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none } from "core/utils/Tools";
+import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, matches_schema } from "core/utils/Tools";
 import { isObject, isArray, merge, forEach, template } from "lodash-es";
 import GameObject from 'core/GameObject';
 
 import { set, map, filter } from "lodash-es";
 import AssetBufferGeometry from '../geometry/classes/AssetBufferGeometry';
+import core_schema from "core/schema.json"
+
+console.log(core_schema)
 
 const APP_NAME = get_app_name()
 
@@ -17,6 +20,8 @@ const interlinks = [
     "texture",
     "prefab"
 ]
+
+const schema_lib = {}
 
 const cubemap_loader = new THREE.CubeTextureLoader();
 
@@ -49,6 +54,7 @@ function process_shader_code(code, uniforms, parts) {
 }
 
 class AssetManager {
+    static schema_lib = schema_lib
     static textures_cache = {};
     static cached_geometries = {};
     static cached_materials = {};
@@ -457,6 +463,19 @@ class AssetManager {
         AssetManager.prefab_lib[id] = prefab
     }
 
+    static matches_schema(data, schema_name) {
+        let schema = AssetManager.schema_lib[schema_name]
+        if (!isObject(schema)){
+            console.log(`[AssetManager] schema with id ${schema_name} not found`)
+            return false
+        } else {
+            return matches_schema(data, schema)
+        }
+    }
+    static add_schema(name, schema){
+        AssetManager.schema_lib[name] = schema
+    }
+
 }
 
 AssetManager.preload_components("core", require.context("core/components/", true, /\.js$/))
@@ -482,6 +501,10 @@ if (process.env.APP_NAME === undefined) {
     AssetManager.preload_materials(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/`, true, /\.yaml$/))
     AssetManager.preload_geometries(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/`, true, /\.yaml$/))
     AssetManager.preload_prefabs(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/prefabs/`, true, /\.yaml$/))
+}
+
+for (let k in core_schema){
+    AssetManager.add_schema(k, core_schema[k])
 }
 
 log("AssetManaget", "initialized");

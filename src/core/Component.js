@@ -13,6 +13,7 @@ const exclude_props = [
     "components"
 ]
 
+
 class Component extends EventDispatcher {
     tick_data = undefined
     object = null;
