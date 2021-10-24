@@ -5,6 +5,8 @@
 
 import { log } from "core/utils/Tools";
 import EventDispatcher from "core/utils/EventDispatcher";
+import { get, isObject } from "lodash-es"
+import AssetManager from "core/utils/AssetManager"
 
 let id = 0
 const exclude_props = [
@@ -12,34 +14,37 @@ const exclude_props = [
 ]
 
 class Component extends EventDispatcher {
-
     tick_data = undefined
     object = null;
     subject = null;
-    _enabled = true;
-    _params_applied = false;
+    enabled = true;
     globals = undefined
     tick_rate = 30
     tick_enabled = true
-    layers = undefined
     constructor(params) {
-
         super(params);
-
-        this.layers = {
-            rendering: true,
-            postfx: true,
-            normal: true,
-            depth: true,
-            wireframe: true,
+        this.meta = {
+            enabled: true,
+            params_applied: false,
+            params: {},
+            layers: {
+                rendering: true,
+                postfx: true,
+                normal: true,
+                depth: true,
+                wireframe: true,
+            },
+            ticking: {
+                prev_time: +new Date(),
+                delta: 1,
+                ticks: 0,
+                rate: 30,
+                enabled: true
+            }
         }
 
-        this.tick_data = {
-            prev_time: +new Date(),
-            delta: 1,
-            ticks: 0,
-            rate: 30,
-            enabled: true
+        if (isObject(params) && isObject(params.meta)) {
+            this.meta = AssetManager.mixin_object(this.meta, [params.meta])
         }
 
         if (window.F_PATCH_COMP_PROPS) {
@@ -47,23 +52,24 @@ class Component extends EventDispatcher {
         }
         this.id = id
         id++
-        this._params = params;
+        this.meta.params = params || this.meta.params;
         if (this.topics) {
             this.topics.forEach(event_name => this.listen(event_name))
         }
     }
     tick(tick_data) {
-        this.tick_data.rate = this.tick_rate
-        this.tick_data.enabled = this.tick_enabled
-        if (this.tick_data.enabled) {
+        this.meta.ticking.rate = this.tick_rate
+        this.meta.ticking.enabled = this.tick_enabled
+
+        if (this.meta.ticking.enabled) {
             let now = +new Date()
-            if (now - this.tick_data.prev_time >= (1000 / this.tick_data.rate)) {
-                let d = now - this.tick_data.prev_time
+            if (now - this.meta.ticking.prev_time >= (1000 / this.meta.ticking.rate)) {
+                let d = now - this.meta.ticking.prev_time
                 let delta = d / (1000 / 60)
-                this.tick_data.ticks++
-                this.tick_data.now = now
-                this.tick_data.prev_time = now
-                this.on_tick(this.tick_data)
+                this.meta.ticking.ticks++
+                this.meta.ticking.now = now
+                this.meta.ticking.prev_time = now
+                this.on_tick(this.meta.ticking)
             }
 
         }
@@ -83,9 +89,9 @@ class Component extends EventDispatcher {
         return undefined
     }
     apply_params() {
-        if (!this._params_applied) {
-            this._params_applied = true;
-            for (let k in this._params) {
+        if (!this.meta.params_applied) {
+            this.meta.params_applied = true;
+            for (let k in this.meta.params) {
                 switch (k) {
                     case "on_tick": {
                         this._on_tick = params[k]
@@ -104,7 +110,7 @@ class Component extends EventDispatcher {
                     }
                     default: {
                         if (exclude_props.indexOf(k) < 0) {
-                            this[k] = this._params[k]
+                            this[k] = this.meta.params[k]
 
                         }
                     }
@@ -136,17 +142,17 @@ class Component extends EventDispatcher {
         return r;
     }
     get enabled() {
-        return this._enabled;
+        return this.meta.enabled;
     }
     set enabled(v) {
-        if (v !== this._enabled) {
+        if (v !== this.meta.enabled) {
             if (v) {
                 this.on_enabled();
             } else {
                 this.on_disabled();
             }
 
-            this._enabled = v;
+            this.meta.enabled = v;
         }
     }
     get refs() {
@@ -212,7 +218,7 @@ class Component extends EventDispatcher {
     }
 
     add_component(data) {
-        if (typeof data === 'object') {
+        if (isObject(data)) {
             return this.object.add_component(data)
 
         }

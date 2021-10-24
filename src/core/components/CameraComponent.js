@@ -39,7 +39,7 @@ class CameraComponent extends SceneComponent {
             position: new THREE.Vector3(0, 0, 20),
         });
 
-        console.log(`Camera COMPONENT CREATED`, this._params)
+        console.log(`Camera COMPONENT CREATED`, this.meta.params)
 
     }
 
@@ -72,7 +72,7 @@ class CameraComponent extends SceneComponent {
         ].concat(super.get_reactive_props())
     }
 
-    look_at(x, y, z){
+    look_at(x, y, z) {
         this.subject.lookAt(new THREE.Vector3(x, y, z))
     }
 
