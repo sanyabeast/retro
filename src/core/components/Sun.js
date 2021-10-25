@@ -61,10 +61,13 @@ class Sun extends SceneComponent {
 
 
     tick_rate = 10
+
+    gizmo_dirlight_helper = undefined
     on_created() {
 
         /*dir light*/
         let light = this.light = new THREE.DirectionalLight()
+        let gizmo_dirlight_helper = this.gizmo_dirlight_helper = new THREE.DirectionalLightHelper(light, 5);
         if (this.shadows_enabled) {
             if (light.shadow) {
                 light.shadow.mapSize.width = this.shadow_resolution;
@@ -75,7 +78,9 @@ class Sun extends SceneComponent {
             light.castShadow = true
         }
 
+
         let hemi_light = this.hemi_light = new THREE.HemisphereLight()
+        // let gizmo_hemi_light_helper = this.gizmo_hemi_light_helper = new THREE.HemisphereLightHelper(hemi_light, 50);
         let amb_light = this.amb_light = new THREE.AmbientLight()
 
         amb_light.color.set_any(this.d_amb_color)
@@ -122,6 +127,14 @@ class Sun extends SceneComponent {
             object: this.amb_light,
             parent: this.object
         }]
+    }
+    get_gizmo_render_data() {
+        return [{
+            object: this.gizmo_dirlight_helper,
+            layers: { gizmo: true }
+        }/*, {
+            object: this.gizmo_hemi_light_helper
+        }*/, ...super.get_gizmo_render_data()]
     }
     on_update(props) {
         super.on_update(...arguments)
@@ -230,6 +243,9 @@ class Sun extends SceneComponent {
             let step = (1 / 86400) * this.cycling * time_delta.delta
             this.time = (this.time + step) % 1
         }
+
+        if (this.gizmo_dirlight_helper) this.gizmo_dirlight_helper.update()
+        // if (this.gizmo_hemi_light_helper) this.gizmo_hemi_light_helper.update()
     }
     get_reactive_props() {
         return [

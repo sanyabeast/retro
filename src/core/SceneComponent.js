@@ -13,6 +13,16 @@ const exclude_props = [
     "components"
 ]
 
+const ANCHOR_GIZMO_GEOMETRY = new THREE.SphereBufferGeometry(0.0125, 8, 8)
+const ANCHOR_GIZMO_MATERIAL = new THREE.MeshNormalMaterial({
+    color: "#ff0000",
+    opacity: 0.5,
+    ransparent: true,
+    depthWrite: false,
+    depthTest: false,
+    fog: false
+})
+
 class SceneComponent extends Component {
     subject = null;
     position = [0, 0, 0]
@@ -20,18 +30,31 @@ class SceneComponent extends Component {
     rotation = [0, 0, 0]
     visible = true
     frustum_culled = false
-    render_layer = 0
-    render_index = 0
     render_order = 0
     is_scene_component = true
     /**private */
     transform_gizmo = undefined
+    anchor_gizmo = undefined
     constructor(params) {
         super(params);
         this.position = [...this.position]
         this.scale = [...this.scale]
         this.rotation = [...this.rotation]
 
+        /**gizmos */
+        let anchor_gizmo = this.anchor_gizmo = new THREE.Mesh(
+            ANCHOR_GIZMO_GEOMETRY,
+            ANCHOR_GIZMO_MATERIAL
+
+        )
+        anchor_gizmo.renderOrder = 1
+
+        // const axes_gizmo = this.axes_gizmo = new THREE.AxesHelper(0.25);
+        // axes_gizmo.material.depthWrite = false
+        // axes_gizmo.material.depthTest = false
+        // axes_gizmo.material.transparent = true
+        // axes_gizmo.material.fog = false
+        // axes_gizmo.renderOrder = 1
     }
     save_prefab() {
         let r = {
@@ -54,10 +77,27 @@ class SceneComponent extends Component {
             "rotation",
             "visible",
             "frustum_culled",
-            "render_layer",
-            "render_index",
             "render_order"
         ].concat(super.get_reactive_props())
+    }
+
+    get_render_data() {
+        return []
+    }
+    get_gizmo_render_data() {
+        if (this.subject) {
+            return [{
+                object: this.anchor_gizmo,
+                parent: this.subject,
+                layers: { gizmo: true }
+            }/*, {
+                object: this.axes_gizmo,
+                parent: this.subject,
+                layers: { gizmo: true }
+            }*/]
+        } else {
+            return []
+        }
     }
     init_visibility_rule() {
         if (typeof this.visibility_rule === "function") {
@@ -131,14 +171,6 @@ class SceneComponent extends Component {
                         this.subject.frustumCulled = this.frusum_culled;
                         break
                     }
-                    case "render_layer": {
-                        this.subject.render_layer = this.render_layer;
-                        break
-                    }
-                    case "render_index": {
-                        this.subject.render_index = this.render_index;
-                        break
-                    }
                     case "render_order": {
                         this.subject.renderOrder = this.render_order;
                         break
@@ -155,11 +187,13 @@ class SceneComponent extends Component {
     }
 
     get_render_data() {
-        if (this.enabled && this.subject && this.object) {
-            return {
+        if (this.subject && this.object) {
+            return [{
                 object: this.subject,
                 parent: this.object
-            }
+            }]
+        } else {
+            return []
         }
     }
     set_position(x, y, z) {

@@ -5,7 +5,6 @@ function painterSortStable( a, b ) {
 		return a.groupOrder - b.groupOrder;
 
 	} else if ( a.renderOrder !== b.renderOrder ) {
-
 		return a.renderOrder - b.renderOrder;
 
 	} else if ( a.program !== b.program ) {
@@ -35,7 +34,6 @@ function reversePainterSortStable( a, b ) {
 		return a.groupOrder - b.groupOrder;
 
 	} else if ( a.renderOrder !== b.renderOrder ) {
-
 		return a.renderOrder - b.renderOrder;
 
 	} else if ( a.z !== b.z ) {

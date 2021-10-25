@@ -1,4 +1,5 @@
 prefabs: 
+  - default.Gizmos
   - default.InputComponent
   - default.ClockComponent
   - default.Renderer

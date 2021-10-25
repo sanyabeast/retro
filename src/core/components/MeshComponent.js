@@ -48,12 +48,10 @@ class MeshComponent extends SceneComponent {
     }
 
     get_render_data() {
-        if (this.enabled) {
-            return {
-                object: this.subject,
-                parent: this.object
-            }
-        }
+        return [{
+            object: this.subject,
+            parent: this.object
+        }]
     }
 
     get_reactive_props() {

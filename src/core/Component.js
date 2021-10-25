@@ -32,7 +32,6 @@ class Component extends EventDispatcher {
             layers: {
                 rendering: true,
                 normal: true,
-                postfx: true,
                 raycast: false,
                 collision: false,
                 gizmo: false
@@ -85,9 +84,6 @@ class Component extends EventDispatcher {
     }
     get_reactive_props() {
         return []
-    }
-    get_render_data() {
-        return undefined
     }
     force_update() {
         let reactive_props = this.get_reactive_props()

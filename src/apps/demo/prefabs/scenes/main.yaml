@@ -30,13 +30,6 @@ components:
       distance: 2.5
       decay: 1
       color: "#ff5722"
-  dir_light:
-    name: LightComponent
-    params:
-      type: DirectionalLight
-      intensity: 1
-      rotation: [1, 1, 1]
-      position: [-20, 20, 0]
   sun:
     name: Sun
     tag: sun

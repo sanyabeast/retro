@@ -1,4 +1,5 @@
 function painterSortStable( a, b ) {
+	console.log(a.renderOrder)
 
 	if ( a.groupOrder !== b.groupOrder ) {
 
@@ -29,7 +30,7 @@ function painterSortStable( a, b ) {
 }
 
 function reversePainterSortStable( a, b ) {
-
+	console.log(a.renderOrder)
 	if ( a.groupOrder !== b.groupOrder ) {
 
 		return a.groupOrder - b.groupOrder;

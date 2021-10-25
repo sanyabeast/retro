@@ -8,6 +8,9 @@ import SceneComponent from "core/SceneComponent";
 import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
 
+const LAMP_ICON_TEXTURE = new THREE.TextureLoader().load('res/core/gizmo/lamp_a.png');
+const LAMP_ICON_MATERIAL = new THREE.SpriteMaterial({ map: LAMP_ICON_TEXTURE });
+
 class LightComponent extends SceneComponent {
     type = "PointLight"
     intensity = 1
@@ -17,6 +20,8 @@ class LightComponent extends SceneComponent {
     sky_color = "#ffaaaa"
     ground_color = "#aaaaff"
     shadows_enabled = false
+    /**private */
+    gizmo_lamp_icon = undefined
     save_prefab() {
         return {
             ...super.save_prefab(),
@@ -45,7 +50,6 @@ class LightComponent extends SceneComponent {
                     distance: this.distance,
                 })
 
-                console.log(light)
                 break
             }
             case "PointLight": {
@@ -81,14 +85,27 @@ class LightComponent extends SceneComponent {
         if (renderer) {
             renderer.compile()
         }
+
+        /**gizmo */
+        const gizmo_lamp_icon = this.gizmo_lamp_icon = new THREE.Sprite(LAMP_ICON_MATERIAL);
+        gizmo_lamp_icon.scale.set(0.05, 0.05, 0.05)
+        gizmo_lamp_icon.material.sizeAttenuation = false
+        gizmo_lamp_icon.material.depthTest = false
+        gizmo_lamp_icon.material.depthWrite = false
+        gizmo_lamp_icon.renderOrder = 1
     }
     get_render_data() {
-        if (this.enabled) {
-            return {
-                object: this.subject,
-                parent: this.object
-            }
-        }
+        return [{
+            object: this.subject,
+            parent: this.object
+        }]
+    }
+    get_gizmo_render_data() {
+        return [{
+            object: this.gizmo_lamp_icon,
+            parent: this.subject,
+            layers: { gizmo: true }
+        }]
     }
     get_reactive_props() {
         return [

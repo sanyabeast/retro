@@ -59,10 +59,13 @@ class Collider extends SceneComponent {
         ].concat(super.get_reactive_props())
     }
     get_render_data() {
-        return {
+        return []
+    }
+    get_gizmo_render_data() {
+        return [{
             object: this.subject,
             parent: this.object
-        }
+        }, ...super.get_gizmo_render_data()]
     }
     on_update(props) {
         super.on_update(props)

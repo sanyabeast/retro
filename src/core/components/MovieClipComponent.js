@@ -36,15 +36,11 @@ class MovieClipComponent extends MeshComponent {
         })
     }
 
-    get_render_data(){
-        if (this.playing){
-            return {
-                object: this.subject,
-                parent: this.object
-            }
-        } else {
-            return 
-        }
+    get_render_data() {
+        return [{
+            object: this.subject,
+            parent: this.object
+        }]
     }
 
     show() {

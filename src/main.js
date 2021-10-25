@@ -55,12 +55,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             frame.add_button("RNDR", "View Final Render", () => {
                 app.refs.renderer.set_render_layer_name("rendering")
             }, "#9c27b0")
+            frame.add_button("GZMO", "Toggle Gizmos", () => {
+                app.refs.renderer.rendering_layers.gizmo = !app.refs.renderer.rendering_layers.gizmo
+            }, "#d1e7e4")
             frame.add_button("NRML", "View Normals", () => {
                 app.refs.renderer.set_render_layer_name("normal")
             }, "#7e6ae5")
             frame.add_button("DPTH", "View Depth", () => {
                 app.refs.renderer.set_render_layer_name("depth")
             }, "#e91e63")
+
             frame.add_button("WRFM", "View Wireframe", () => {
                 app.refs.renderer.set_render_layer_name("wireframe")
             }, "#fe8dff")

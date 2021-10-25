@@ -63,6 +63,7 @@ class Renderer extends Component {
     override_matcap_material = new THREE.MeshMatcapMaterial({ fog: false, matcap: "res/core/matcap_texture/matcap (1).png" })
 
     object_layers = undefined
+    zero_object = new THREE.Object3D()
 
     on_created() {
         this.resolution = new Vector2(1, 1)
@@ -182,20 +183,25 @@ class Renderer extends Component {
 
         scene.traverse_components((comp, object) => {
             if (comp.is_scene_component && comp.enabled) {
+                let local_render_list = []
                 let render_data = comp.get_render_data()
-                if (!isArray(render_data)) {
-                    render_data = [render_data]
-                }
+                let gizmo_render_data = comp.get_gizmo_render_data()
+                
 
-                render_data.forEach((data, index) => {
+                local_render_list = local_render_list.concat(render_data)
+                local_render_list = local_render_list.concat(gizmo_render_data)
+
+                local_render_list.forEach((data, index) => {
                     if (isObject(data)) {
                         let layers = isObject(data.layers) ? data.layers : comp.meta.layers
                         for (let layer_name in layers) {
                             if (layers[layer_name] === false) continue
                             if (!data.object) continue
                             object_layers[layer_name] = object_layers[layer_name] || []
+                            let parent = data.parent || this.zero_object
 
-                            data.object.parent_matrix_world = data.parent.matrixWorld
+
+                            data.object.parent_matrix_world = parent.matrixWorld
                             data.object.parent = this.render_scene
                             object_layers[layer_name].push(data)
                         }
@@ -225,10 +231,13 @@ class Renderer extends Component {
     get_object_layer_list(layers) {
         return map(this.get_object_layer(layers), render_data => render_data.object)
     }
+    get_rendering_list() {
+        return this.get_object_layer_list(this.rendering_layers)
+    }
     update_render_scene() {
         let scene = this.globals.app
 
-        let render_list = this.get_object_layer_list(this.rendering_layers)
+        let render_list = this.get_rendering_list()
 
         if (this.use_fog !== false) {
             this.render_scene.fog = scene.fog
@@ -302,29 +311,35 @@ class Renderer extends Component {
         switch (mode) {
             case "normal":
                 this.current_override_material = this.override_normal_material
-                this.rendering_layers = { normal: true }
+                this.rendering_layers.normal = true
+                this.rendering_layers.rendering = false
                 break;
             case "depth":
                 this.current_override_material = this.override_depth_material
-                this.rendering_layers = { normal: true }
+                this.rendering_layers.normal = true
+                this.rendering_layers.rendering = false
                 break;
             case "distance":
                 this.current_override_material = this.override_distance_material
-                this.rendering_layers = { rendenormalring: true }
+                this.rendering_layers.normal = true
+                this.rendering_layers.rendering = false
                 break;
             case "wireframe":
                 this.current_override_material = this.override_wireframe_material
-                this.rendering_layers = { normal: true }
+                this.rendering_layers.normal = true
+                this.rendering_layers.rendering = false
                 break;
             case "matcap":
                 this.current_override_material = this.override_matcap_material
                 let matcap_id = this.current_matcap_id = 1 + Math.floor(Math.random() * 640)
                 this.override_matcap_material.matcap = `res/core/matcap_texture/matcap (${matcap_id}).png`
-                this.rendering_layers = { normal: true }
+                this.rendering_layers.normal = true
+                this.rendering_layers.rendering = false
                 break;
             default:
                 this.current_override_material = null
-                this.rendering_layers = { rendering: true }
+                this.rendering_layers.normal = false
+                this.rendering_layers.rendering = true
         }
         this.render_scene.overrideMaterial = this.current_override_material
     }

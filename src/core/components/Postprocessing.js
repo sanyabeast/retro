@@ -80,7 +80,7 @@ class Postprocessing extends Component {
         }
 
         if (this.render_pass) {
-            let postfx_rendering_list = renderer.get_object_layer_list({ postfx: true })
+            let postfx_rendering_list = renderer.get_rendering_list()
             this.render_pass.scene.children = postfx_rendering_list
         }
     }
