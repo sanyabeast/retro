@@ -10,6 +10,8 @@ import { Vector2 } from "spine-ts-threejs";
 import * as THREE from 'three';
 import Device from "core/utils/Device";
 import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
+import { isArray, isObject, map } from "lodash-es"
+import Schema from "core/utils/Schema"
 
 class RenderScene extends THREE.Scene { }
 
@@ -41,7 +43,6 @@ class Renderer extends Component {
     correct_lights = true
     current_matcap_id = 1
     shadows_enabled = true
-    tonemapping = "cineon"
     //** private*/
 
     canvas = null
@@ -61,12 +62,12 @@ class Renderer extends Component {
     override_wireframe_material = new THREE.MeshBasicMaterial({ wireframe: true, wireframeLinewidth: 1, fog: false })
     override_matcap_material = new THREE.MeshMatcapMaterial({ fog: false, matcap: "res/core/matcap_texture/matcap (1).png" })
 
+    render_layers = undefined
+
     on_created() {
         this.resolution = new Vector2(1, 1)
-
-
+        this.render_layers = {}
         let render_scene = this.render_scene = new RenderScene()
-
         let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({
             antialias: true,
             alpha: true,
@@ -111,7 +112,6 @@ class Renderer extends Component {
         ].concat(super.get_reactive_props())
     }
     on_update(props) {
-        console.log(props)
         props.forEach(prop => {
             switch (prop) {
                 case "clear_depth": {
@@ -134,19 +134,6 @@ class Renderer extends Component {
                     this.renderer.shadowMap.enabled = this.shadows_enabled && !Device.is_mobile
                     break
                 }
-                case "tonemapping": {
-                    // switch (this.tonemapping) {
-                    //     case "reinhard":
-                    //         this.renderer.toneMapping = THREE.ReinhardToneMapping
-                    //         break;
-                    //     case "cineon":
-                    //         this.renderer.toneMapping = THREE.CineonToneMapping
-                    //         break
-                    //     default:
-                    //         break;
-                    // }
-                    break
-                }
             }
         })
     }
@@ -167,6 +154,7 @@ class Renderer extends Component {
         this.globals.uniforms.mouse.value.y = y;
     }
     on_tick(time_delta) {
+        this.update_render_layers()
         this.update_render_scene()
         if (this.use_progressive_lightmap) this.update_progressive_lightmap()
 
@@ -183,46 +171,66 @@ class Renderer extends Component {
         this.raf_loop = clock.create(this.render.bind(this))
         // this.raf_cb_id = clock.add(this.render.bind(this))
     }
-    update_render_scene() {
+    update_render_layers() {
         let scene = this.globals.app
+        let render_layers = this.render_layers = {}
         scene.updateMatrixWorld()
-        let render_list = []
-        //scene.subject.updateMatrixWorld(true)
+
         scene.traverse_components((comp, object) => {
-            if (comp.transform_gizmo) {
-                render_list.push(comp.transform_gizmo)
-            }
-            if (comp.enabled && object.visible) {
+            if (comp.is_scene_component && comp.enabled) {
                 let render_data = comp.get_render_data()
-                if (Array.isArray(render_data)) {
-                    render_data.forEach(render_data => {
-                        if (render_data && render_data.object) {
-                            render_data.object.parent_matrix_world = render_data.parent.matrixWorld
-                            // render_data.object.updateMatrixWorld(true, render_data.parent.matrixWorld)
-                            render_list.push(render_data.object)
-                            render_data.object.parent = this.render_scene
-                        }
-                    })
-                } else {
-                    if (render_data && render_data.object) {
-                        render_data.object.parent_matrix_world = render_data.parent.matrixWorld
-                        // render_data.object.updateMatrixWorld(true, render_data.parent.matrixWorld)
-                        render_list.push(render_data.object)
-                        render_data.object.parent = this.render_scene
-                    }
+                if (!isArray(render_data)) {
+                    render_data = [render_data]
                 }
+
+                render_data.forEach((data, index) => {
+                    if (isObject(data)) {
+                        let layers = isObject(data.layers) ? data.layers : comp.meta.layers
+                        for (let layer_name in layers) {
+                            if (layers[layers] === false) continue
+                            if (!data.object) continue
+                            render_layers[layer_name] = render_layers[layer_name] || []
+
+                            data.object.parent_matrix_world = data.parent.matrixWorld
+                            data.object.parent = this.render_scene
+                            render_layers[layer_name].push(data)
+                        }
+                    }
+                })
             }
         })
+    }
+    get_layer_list(layers) {
+        let list = []
+        let render_layers = this.render_layers
+        for (let layer_name in layers) {
+            if (isArray(render_layers[layer_name])) {
+                list = list.concat(render_layers[layer_name])
+            }
+        }
+        return list
+    }
+    get_layer_render_list(layers) {
+        return map(this.get_layer_list(layers), render_data => render_data.object)
+    }
+    update_render_scene() {
+        let scene = this.globals.app
+
+        let render_list = this.get_layer_render_list({
+            rendering: true
+        })
+
         if (this.use_fog !== false) {
             this.render_scene.fog = scene.fog
         } else {
             this.render_scene.fog = null
         }
+
         this.render_scene.background = scene.background
         this.render_scene.environment = scene.environment
         this.render_scene.children = render_list
         this.render_items_count = render_list.length
-        // this.render_scene.updateMatrixWorld()
+        this.render_scene.updateMatrixWorld()
     }
     update_progressive_lightmap() {
 

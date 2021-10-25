@@ -24,6 +24,7 @@ class SceneComponent extends Component {
     render_index = 0
     render_order = 0
     debug_transform = false
+    is_scene_component = true
     /**private */
     transform_gizmo = undefined
     constructor(params) {
