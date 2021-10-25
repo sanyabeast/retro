@@ -34,7 +34,8 @@ class Component extends EventDispatcher {
                 normal: true,
                 postfx: true,
                 raycast: false,
-                collision: false
+                collision: false,
+                gizmo: false
             },
             ticking: {
                 prev_time: +new Date(),
@@ -87,6 +88,12 @@ class Component extends EventDispatcher {
     }
     get_render_data() {
         return undefined
+    }
+    force_update() {
+        let reactive_props = this.get_reactive_props()
+        reactive_props.forEach(prop => {
+            this[prop] = this[prop]
+        })
     }
     apply_params() {
         let params = this.meta.params

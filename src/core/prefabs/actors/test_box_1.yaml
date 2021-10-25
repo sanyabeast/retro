@@ -2,12 +2,7 @@ components:
   - enabled: true
     name: MeshComponent
     tag: cool_box
-    meta: 
-      layers:
-        include:
-          - raycast
     params:
-      
       position:
         - 0
         - 0.5
@@ -21,3 +16,9 @@ components:
         - PBRMaterial
         - color: "#ffffff"
           pbr: "res/core/pbr/storage-container2-bl/storage-container2"
+  - name: Collider
+    params:
+      collider_type: box
+      sphere_radius: 3
+      box_size: [1.1, 1.1, 1.1]
+      

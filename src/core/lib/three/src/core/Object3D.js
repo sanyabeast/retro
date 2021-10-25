@@ -528,8 +528,13 @@ class Object3D extends EventDispatcher {
 		const children = this.children;
 
 		for (let i = 0, l = children.length; i < l; i++) {
+			/**PATCH PATCH PATCH */
+			// children[i].traverse(callback);
+			if (children[i].traverse(callback) === false) {
+				break
+			}
 
-			children[i].traverse(callback);
+			/**!PATCH !PATCH !PATCH */
 
 		}
 
@@ -544,8 +549,12 @@ class Object3D extends EventDispatcher {
 		const children = this.children;
 
 		for (let i = 0, l = children.length; i < l; i++) {
-
-			children[i].traverseVisible(callback);
+			/**PATCH PATCH PATCH */
+			// children[i].traverseVisible(callback);
+			if (children[i].traverseVisible(callback) === false) {
+				break
+			}
+			/**!PATCH !PATCH !PATCH */
 
 		}
 

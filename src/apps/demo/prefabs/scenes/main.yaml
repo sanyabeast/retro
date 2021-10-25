@@ -1,4 +1,4 @@
-prefabs: 
+prefabs:
   - default.Postprocessing
   - core.sound.default_ambient_audio_source
   - default.controls.OrbitControlsComponent
@@ -44,9 +44,9 @@ components:
       debug_transform: true
       cycling: 48
       time: 0.33
-  fog:  
+  fog:
     name: Fog
-    params: 
+    params:
       density: 0.02
   skybox:
     name: SkyBox
@@ -66,21 +66,7 @@ children:
       #     file_name: ship_for_spine
       #     animation_name: idle_flight
       #     skeleton_scale: 2
-      bush_1:
-        name: MeshComponent
-        tag: bush
-        params:
-          position:
-            - -2
-            - 0
-            - 1.5
-          geometry:
-            - "url:res/core/models/monsterra/monsterra.obj"
-            - 0.07
-          material:
-            - AssetMaterial
-            - color: "#daefe5"
-              src: "res/core/models/monsterra/monsterra.mtl"
+
       bush_2:
         name: MeshComponent
         tag: bush
@@ -115,10 +101,6 @@ children:
               src: "res/demo/models/phone/phone.mtl"
       chalkboard:
         name: MeshComponent
-        meta: 
-            layers:
-              include:
-                - raycast
         params:
           debug_transform: false
           position:
@@ -191,12 +173,7 @@ children:
                       src: "res/core/models/wood_fence_a1/linker_1.mtl"
               fence_a:
                 name: MeshComponent
-                meta: 
-                  layers:
-                    include: 
-                      - raycast
                 params:
-
                   position:
                     - 0
                     - 0
@@ -273,3 +250,26 @@ children:
                     - color: "#daefe5"
                       doubleside: true
                       src: "res/core/models/wood_fence_a1/fence_1.mtl"
+  - components:
+      bush_1:
+        name: MeshComponent
+        tag: bush
+        params:
+          position:
+            - -2
+            - 0
+            - 1.5
+          geometry:
+            - "url:res/core/models/monsterra/monsterra.obj"
+            - 0.07
+          material:
+            - AssetMaterial
+            - color: "#daefe5"
+              src: "res/core/models/monsterra/monsterra.mtl"
+      collider:
+        name: Collider
+        params:
+          collider_type: sphere
+          sphere_radius: 0.5
+          box_size: [1.1, 1.1, 1.1]
+          offset: [0, 0.5, 0]

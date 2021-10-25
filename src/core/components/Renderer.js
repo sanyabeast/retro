@@ -68,7 +68,8 @@ class Renderer extends Component {
         this.resolution = new Vector2(1, 1)
         this.object_layers = {}
         this.rendering_layers = {
-            rendering: true
+            rendering: true,
+            gizmo: true
         }
         let render_scene = this.render_scene = new RenderScene()
         let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({
@@ -206,10 +207,17 @@ class Renderer extends Component {
     get_object_layer(layers) {
         let list = []
         let object_layers = this.object_layers
+        let already_in_list = {}
         for (let layer_name in layers) {
             let use = layers[layer_name]
             if (use && isArray(object_layers[layer_name])) {
-                list = object_layers[layer_name]
+                object_layers[layer_name].forEach(render_data => {
+                    let object = render_data.object
+                    if (already_in_list[object.uuid] !== true) {
+                        already_in_list[object.uuid] = true
+                        list.push(render_data)
+                    }
+                })
             }
         }
         return list

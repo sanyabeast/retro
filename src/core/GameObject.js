@@ -135,27 +135,57 @@ class GameObject extends Group {
     get_components(component_name) {
         let r = []
         this.components.forEach((component) => {
-            if (component.component_name === component_name) {
+            if (component.name === component_name) {
                 r.push(component)
             }
         })
         return r
     }
     traverse_components(cb) {
-        this.components.forEach(comp => cb(comp, this))
+        for (let a = 0; a < this.components.length; a++) {
+            let comp = this.components[a]
+            if (cb(comp, this) === false) {
+                break
+            }
+        }
+
+        this.traverse_child_components(cb)
+    }
+    traverse_child_components(cb) {
         if (this.children) {
             this.children.forEach(child => {
                 if (child instanceof GameObject) {
                     child.traverse_components(cb)
-
                 } else {
                     console.error(`Non-GameObject child added to`, this)
                 }
             })
         }
     }
-    get_component(component_name) {
-        return this.get_components(component_name)[0]
+    get_component(component_name, cb, on_not_found) {
+        let r = undefined
+        for (let a = 0; a < this.components.length; a++) {
+            if (this.components[a].name === component_name) {
+                r = this.components[a]
+                break
+            }
+        }
+
+        if (isFunction(cb)) {
+            if (r !== undefined) {
+                cb(r)
+            } else {
+                if (isFunction(on_not_found)) {
+                    on_not_found(r)
+                }
+            }
+            return r !== undefined
+        } else {
+            return r
+        }
+    }
+    find_child_component_of_type(component_name, cb, on_not_found) {
+        let r = undefined
     }
     find_component_of_type(component_name, cb, on_not_found) {
         let r = undefined
@@ -179,7 +209,22 @@ class GameObject extends Group {
             return r
 
         }
-
+    }
+    find_components_of_type(component_name, count) {
+        let c = 0
+        let r = []
+        if (GameObject.components_base[component_name]) {
+            for (let k in GameObject.components_base[component_name]) {
+                if (count === undefined || c < count) {
+                    r.push(GameObject.components_base[component_name][k])
+                    c++
+                    if (c >= count) {
+                        break
+                    }
+                }
+            }
+        }
+        return r
     }
     find_component_with_tag(tag, cb, on_not_found) {
         let r = GameObject.components_tags[tag]
@@ -221,22 +266,7 @@ class GameObject extends Group {
         GameObject.broadcasting[event_name][this.uuid] = this
     }
 
-    find_components_of_type(component_name, count) {
-        let c = 0
-        let r = []
-        if (GameObject.components_base[component_name]) {
-            for (let k in GameObject.components_base[component_name]) {
-                if (count === undefined || c < count) {
-                    r.push(GameObject.components_base[component_name][k])
-                    c++
-                    if (c >= count) {
-                        break
-                    }
-                }
-            }
-        }
-        return r
-    }
+
     setup_components(comp_data) {
         if (comp_data !== undefined) {
             if (Array.isArray(comp_data)) {
