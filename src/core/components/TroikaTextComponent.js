@@ -38,7 +38,9 @@ class TroikaTextComponent extends SceneComponent {
     }
     on_created() {
         const subject = this.subject = new Text();
+
         this.meta.layers.normal = false
+
         subject.depthWrite = false
         subject.depthTest = false
         subject.stencilWrite = false

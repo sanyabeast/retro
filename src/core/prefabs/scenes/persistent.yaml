@@ -11,17 +11,5 @@ components:
         - 1
         - 1
         - 4
-  user_pointer:
-    name: UserPointer
-    params:
-      events:
-        - move
-        - over
-        - out
-        - down
-        - up
-        - scroll
-        - press
-      raycasting: true
   devgui:
     name: VueGUIComponent

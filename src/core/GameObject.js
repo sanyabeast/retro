@@ -271,6 +271,13 @@ class GameObject extends Group {
             component.name = component_name
             reactivate_component(component)
             component.object = this
+            /**meta params */
+            if (Schema.validate(data.meta, ":COMPONENT_PARAMS_META")) {
+                let meta_params = component.meta = AssetManager.mixin_object(component.meta, [data.meta])
+
+            }
+
+
             component.apply_params()
             component._enabled = enabled
             if (ref !== undefined) {

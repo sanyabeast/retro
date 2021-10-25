@@ -5,8 +5,9 @@
 
 import { log } from "core/utils/Tools";
 import EventDispatcher from "core/utils/EventDispatcher";
-import { get, isObject } from "lodash-es"
+import { get, isObject, isArray } from "lodash-es"
 import AssetManager from "core/utils/AssetManager"
+import Schema from "core/utils/Schema"
 
 let id = 0
 const exclude_props = [
@@ -31,6 +32,7 @@ class Component extends EventDispatcher {
             layers: {
                 rendering: true,
                 normal: true,
+                postfx: true,
                 raycast: false,
                 collision: false
             },
@@ -43,10 +45,8 @@ class Component extends EventDispatcher {
             }
         }
 
-        if (isObject(params) && isObject(params.meta) && AssetManager.schema_validate(params.meta, ":COMPONENT_PARAMS_META")) {
-            this.meta = AssetManager.mixin_object(this.meta, [params.meta])
-        }
 
+        /**common patch */
         if (window.F_PATCH_COMP_PROPS) {
             window.F_PATCH_COMP_PROPS(this)
         }
@@ -89,33 +89,51 @@ class Component extends EventDispatcher {
         return undefined
     }
     apply_params() {
+        let params = this.meta.params
         if (!this.meta.params_applied) {
             this.meta.params_applied = true;
-            for (let k in this.meta.params) {
+            for (let k in params) {
                 switch (k) {
                     case "on_tick": {
                         this._on_tick = params[k]
+                        break
                     }
                     case "on_enabled": {
                         this._on_enabled = params[k]
+                        break
                     }
                     case "on_disabled": {
                         this._on_disabled = params[k]
+                        break
                     }
                     case "on_created": {
                         this._on_created = params[k]
+                        break
                     }
                     case "on_destroy": {
                         this._on_created = params[k]
+                        break
                     }
                     default: {
                         if (exclude_props.indexOf(k) < 0) {
-                            this[k] = this.meta.params[k]
+                            this[k] = params[k]
 
                         }
                     }
                 }
             }
+        }
+
+        if (isArray(this.meta.layers.include)) {
+            this.meta.layers.include.forEach(name => {
+                this.meta.layers[name] = true
+            })
+        }
+
+        if (isArray(this.meta.layers.exclude)) {
+            this.meta.layers.exclude.forEach(name => {
+                this.meta.layers[name] = true
+            })
         }
     }
     on_update() { }

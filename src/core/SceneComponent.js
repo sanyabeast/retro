@@ -23,7 +23,6 @@ class SceneComponent extends Component {
     render_layer = 0
     render_index = 0
     render_order = 0
-    debug_transform = false
     is_scene_component = true
     /**private */
     transform_gizmo = undefined
@@ -152,16 +151,6 @@ class SceneComponent extends Component {
     }
 
     on_tick() {
-        if (this.debug_transform) {
-            let camera = this.find_component_of_type("CameraComponent")
-            if (!this.transform_gizmo) {
-                this.transform_gizmo = new TransformControls(camera, this.globals.dom)
-            }
-            if (!this.transform_gizmo.parent) {
-                this.transform_gizmo.camera = camera.subject
-                this.transform_gizmo.attach(this.subject)
-            }
-        }
 
     }
 

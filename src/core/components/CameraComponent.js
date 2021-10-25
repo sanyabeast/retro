@@ -22,6 +22,13 @@ class CameraComponent extends SceneComponent {
     right = 1
     top = -1
     bottom = 1
+    moved = false
+    /**privte */
+    prev_camera_matrix = undefined
+    constructor() {
+        super(...arguments)
+        this.prev_camera_matrix = new THREE.Matrix4()
+    }
     on_created() {
         let o_camera = this.o_camera = new THREE.OrthographicCamera({
             fov: this.fov,
@@ -41,6 +48,13 @@ class CameraComponent extends SceneComponent {
 
         console.log(`Camera COMPONENT CREATED`, this.meta.params)
 
+    }
+
+    on_tick() {
+        let current_camera_matrix = this.subject.matrixWorld
+        let camera_matrix_changed = !this.prev_camera_matrix.equals(current_camera_matrix)
+        this.prev_camera_matrix.copy(current_camera_matrix)
+        this.moved = camera_matrix_changed
     }
 
     save_prefab() {

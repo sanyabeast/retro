@@ -2,7 +2,12 @@ components:
   - enabled: true
     name: MeshComponent
     tag: cool_box
+    meta: 
+      layers:
+        include:
+          - raycast
     params:
+      
       position:
         - 0
         - 0.5

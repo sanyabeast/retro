@@ -115,6 +115,10 @@ children:
               src: "res/demo/models/phone/phone.mtl"
       chalkboard:
         name: MeshComponent
+        meta: 
+            layers:
+              include:
+                - raycast
         params:
           debug_transform: false
           position:
@@ -187,7 +191,12 @@ children:
                       src: "res/core/models/wood_fence_a1/linker_1.mtl"
               fence_a:
                 name: MeshComponent
+                meta: 
+                  layers:
+                    include: 
+                      - raycast
                 params:
+
                   position:
                     - 0
                     - 0

@@ -23,7 +23,16 @@ class App extends CoreApp {
     on_tick() {
         let point_light = this.find_component_with_tag("point_light")
         let camera = this.find_component_of_type("CameraComponent")
-        // point_light.position = [...camera.position]
+        let input = this.refs.input_component
+        let postfx = this.find_component_of_type("Postprocessing")
+
+
+        if (input && postfx) {
+            if (input.intersected_objects_changed && input.intersected_objects.length > 0) {
+                postfx.outline_selection = input.intersected_objects
+            }
+
+        }
     }
 }
 

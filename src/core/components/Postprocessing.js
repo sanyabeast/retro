@@ -52,6 +52,7 @@ class Postprocessing extends Component {
 
     /**private */
     local_sun = undefined
+    outline_selection = []
 
     constructor() {
         super(...arguments)
@@ -65,17 +66,22 @@ class Postprocessing extends Component {
         this.setup_postfx()
     }
     on_tick(time_delta) {
-        
+        let renderer = this.find_component_of_type("Renderer")
+
         if (this.use_godrays && this.godrays_autodetect_sun) {
             let sun = this.find_component_of_type("Sun")
             if (sun) {
                 this.godrays_effect.lightSource = sun.sphere
             }
         }
-        if (this.normal_pass_scene){
-            let renderer = this.find_component_of_type("Renderer")
-            let normal_rendering_list = renderer.get_render_list({ normal: true })
+        if (this.normal_pass_scene) {
+            let normal_rendering_list = renderer.get_object_layer_list({ normal: true })
             this.normal_pass_scene.children = normal_rendering_list
+        }
+
+        if (this.render_pass) {
+            let postfx_rendering_list = renderer.get_object_layer_list({ postfx: true })
+            this.render_pass.scene.children = postfx_rendering_list
         }
     }
     get_reactive_props() {
@@ -117,8 +123,9 @@ class Postprocessing extends Component {
             let composer = this.composer = new postfx.EffectComposer(renderer.renderer)
             let camera = this.find_component_of_type("CameraComponent").subject
             let scene = renderer.render_scene
+            let render_pass = this.render_pass = new postfx.RenderPass(scene, camera)
 
-            composer.addPass(new postfx.RenderPass(scene, camera));
+            composer.addPass(render_pass);
 
             let enabled = !Device.is_mobile
 
@@ -265,7 +272,7 @@ class Postprocessing extends Component {
     setup_outline(renderer, scene, camera, composer) {
         const outline_effect = this.outline_effect = new postfx.OutlineEffect(scene, camera, {
             blendFunction: postfx.BlendFunction.SCREEN,
-            edgeStrength: 2.5,
+            edgeStrength: 5.5,
             pulseSpeed: 0.0,
             visibleEdgeColor: 0xffffff,
             hiddenEdgeColor: 0x22090a,

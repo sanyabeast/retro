@@ -29,6 +29,9 @@ class LightComponent extends SceneComponent {
     }
     on_created() {
         let light
+
+        this.meta.layers.light = true
+
         switch (this.type) {
             case "HemisphereLight": {
                 light = this.subject = new THREE.HemisphereLight(this.sky_color, this.ground_color, this.intensity)

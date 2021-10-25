@@ -20,6 +20,15 @@ PREFAB:
 COMPONENT_PARAMS_META:
   type: object|none
   props:
+    layers: 
+      type: object|none
+      props:
+        include: 
+          type: array|none
+          any_prop: string
+        exclude: 
+          type: array|none
+          any_prop: string
     ticking:
       type: object|none
       props:
@@ -27,6 +36,7 @@ COMPONENT_PARAMS_META:
 COMPONENT:
   type: object|none
   strict_props: true
+  meta: ["none", :COMPONENT_PARAMS_META]
   props:
     name: string
     enabled: bool|none
