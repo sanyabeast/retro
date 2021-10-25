@@ -38,18 +38,13 @@ class TroikaTextComponent extends SceneComponent {
     }
     on_created() {
         const subject = this.subject = new Text();
+        this.meta.layers.normal = false
         subject.depthWrite = false
         subject.depthTest = false
         subject.stencilWrite = false
-        subject.excluded_materials = [
-            "MeshNormalMaterial",
-            "MeshDepthMaterial",
-            "MeshMatcapMaterial"
-        ]
         subject.material._depthMaterial = subject._depthMaterial = new THREE.ShaderMaterial({
             vertexShader: `
                 void main(){
-
                     gl_FragCoord = vec4(0., 0., 0., 1.);
                 }
             `

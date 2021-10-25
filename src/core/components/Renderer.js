@@ -187,7 +187,7 @@ class Renderer extends Component {
                     if (isObject(data)) {
                         let layers = isObject(data.layers) ? data.layers : comp.meta.layers
                         for (let layer_name in layers) {
-                            if (layers[layers] === false) continue
+                            if (layers[layer_name] === false) continue
                             if (!data.object) continue
                             render_layers[layer_name] = render_layers[layer_name] || []
 
@@ -210,13 +210,13 @@ class Renderer extends Component {
         }
         return list
     }
-    get_layer_render_list(layers) {
+    get_render_list(layers) {
         return map(this.get_layer_list(layers), render_data => render_data.object)
     }
     update_render_scene() {
         let scene = this.globals.app
 
-        let render_list = this.get_layer_render_list({
+        let render_list = this.get_render_list({
             rendering: true
         })
 

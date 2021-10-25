@@ -4,7 +4,7 @@ import { Group } from 'three/src/objects/Group';
 import AssetManager from 'core/utils/AssetManager';
 import { Task, TaskScheduler } from "core/utils/TaskScheduler"
 import StateMachine from "core/utils/StateMachine"
-import { isObject } from "lodash-es"
+import { isObject, isFunction } from "lodash-es"
 import Schema from "core/utils/Schema"
 
 
@@ -23,7 +23,7 @@ class GameObject extends Group {
             window.F_THREE_PATCH_PROPS(this)
         }
 
-       this.load_prefab(prefab)
+        this.load_prefab(prefab)
 
     }
     load_prefab(prefab) {
@@ -157,18 +157,46 @@ class GameObject extends Group {
     get_component(component_name) {
         return this.get_components(component_name)[0]
     }
-    find_component_of_type(component_name) {
-        let r = null
+    find_component_of_type(component_name, cb, on_not_found) {
+        let r = undefined
         if (GameObject.components_base[component_name]) {
             for (let k in GameObject.components_base[component_name]) {
                 r = GameObject.components_base[component_name][k]
                 break
             }
         }
-        return r
+
+        if (isFunction(cb)) {
+            if (r !== undefined) {
+                cb(r)
+            } else {
+                if (isFunction(on_not_found)) {
+                    on_not_found(r)
+                }
+            }
+            return r !== undefined
+        } else {
+            return r
+
+        }
+
     }
-    find_component_with_tag(tag) {
-        return GameObject.components_tags[tag]
+    find_component_with_tag(tag, cb, on_not_found) {
+        let r = GameObject.components_tags[tag]
+
+        if (isFunction(cb)) {
+            if (r !== undefined) {
+                cb(r)
+            } else {
+                if (isFunction(on_not_found)) {
+                    on_not_found(r)
+                }
+            }
+            return r !== undefined
+        } else {
+            return r
+
+        }
     }
     broadcast(event_name, payload) {
         if (typeof window.F_BROADCAST_HOOK === "function") {

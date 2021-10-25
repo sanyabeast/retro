@@ -30,10 +30,9 @@ class Component extends EventDispatcher {
             params: {},
             layers: {
                 rendering: true,
-                postfx: true,
                 normal: true,
-                depth: true,
-                wireframe: true,
+                raycast: false,
+                collision: false
             },
             ticking: {
                 prev_time: +new Date(),

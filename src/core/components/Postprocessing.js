@@ -65,11 +65,17 @@ class Postprocessing extends Component {
         this.setup_postfx()
     }
     on_tick(time_delta) {
+        
         if (this.use_godrays && this.godrays_autodetect_sun) {
             let sun = this.find_component_of_type("Sun")
             if (sun) {
                 this.godrays_effect.lightSource = sun.sphere
             }
+        }
+        if (this.normal_pass_scene){
+            let renderer = this.find_component_of_type("Renderer")
+            let normal_rendering_list = renderer.get_render_list({ normal: true })
+            this.normal_pass_scene.children = normal_rendering_list
         }
     }
     get_reactive_props() {
@@ -273,21 +279,18 @@ class Postprocessing extends Component {
         ));
     }
     setup_ssao(renderer, scene, camera, composer) {
-        const normal_pass = new postfx.NormalPass(scene, camera);
-
-        const depth_downsampling_pass = new postfx.DepthDownsamplingPass({
+        let normal_pass_scene = this.normal_pass_scene = new THREE.Scene()
+        const normal_pass = this.normal_pass = new postfx.NormalPass(normal_pass_scene, camera);
+        const depth_downsampling_pass = this.depth_downsampling_pass = new postfx.DepthDownsamplingPass({
             normalBuffer: normal_pass.texture,
             resolutionScale: 1
         });
-
-        const normalDepthBuffer = renderer.capabilities.isWebGL2 ?
-            depth_downsampling_pass.texture : null;
-
-        const ssao_effect = new postfx.SSAOEffect(camera, normal_pass.texture, {
+        const normal_depth_buffer = this.normal_depth_buffer = renderer.capabilities.isWebGL2 ? depth_downsampling_pass.texture : null;
+        const ssao_effect = this.ssao_effect = new postfx.SSAOEffect(camera, normal_pass.texture, {
             blendFunction: postfx.BlendFunction.SUBTRACT,
             distanceScaling: false,
             depthAwareUpsampling: true,
-            // normalDepthBuffer,
+            // normal_depth_buffer,
             samples: 12,
             rings: 7,
             distanceThreshold: 0.02,	// Render up to a distance of ~20 world units
@@ -303,14 +306,11 @@ class Postprocessing extends Component {
             color: 0x000000,
             resolutionScale: 1
         });
-
-        const texture_effect = new postfx.TextureEffect({
+        const texture_effect = this.ssao_texture_effect = new postfx.TextureEffect({
             blendFunction: postfx.BlendFunction.SKIP,
             texture: depth_downsampling_pass.texture
         });
-
         composer.addPass(normal_pass)
-
         composer.addPass(new postfx.EffectPass(camera,
             ssao_effect,
             texture_effect,
