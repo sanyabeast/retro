@@ -9,28 +9,29 @@ import AssetManager from "core/utils/AssetManager";
 import { union } from "lodash";
 import { Vector2 } from "spine-ts-threejs";
 import * as THREE from 'three';
-import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { hex_to_hsl, hsl_to_rgb, hex_to_rgb } from "core/utils/Tools";
+
+
 
 class SkySphere extends SceneComponent {
     time = 0
     use_sun_time = true
     use_exposure = true
 
-    d_turbidity = 20
-    d_rayleigh = 0
+    d_turbidity = 0
+    d_rayleigh = 1
     d_mie_coeff = 0.1
     d_mie_direct = 0
-    d_elevation = 90
+    d_elevation = 45
     d_azimuth = 180
     d_exposure = 1
     d_opacity = 1
 
     n_turbidity = 20
-    n_rayleigh = 4
+    n_rayleigh = 1
     n_mie_coeff = 0.1
     n_mie_direct = 0
-    n_elevation = -90
+    n_elevation = 0
     n_azimuth = 180
     n_opacity = 0.5
     n_exposure = 1
@@ -46,12 +47,13 @@ class SkySphere extends SceneComponent {
     n_hemi_intensity = 0.05
 
     /**private */
-    tick_rate = 10
+    tick_rate = 15
     hemi_light = undefined
 
     on_created() {
-        let sky = this.subject = new Sky();
-        sky.scale.setScalar(450000);
+        let sky = this.subject = new THREE.objects.SkyMesh();
+        console.log(sky)
+
         let sun = this.sun_vector = new THREE.Vector3();
 
         let hemi_light = this.hemi_light = new THREE.HemisphereLight()
@@ -103,20 +105,20 @@ class SkySphere extends SceneComponent {
                     const uniforms = this.subject.material.uniforms;
                     uniforms['turbidity'].value = c_turbidity;
                     uniforms['rayleigh'].value = c_rayleigh
-                    uniforms['mieCoefficient'].value = c_mie_coeff
-                    uniforms['mieDirectionalG'].value = c_mie_direct
+                    uniforms['mie_coefficient'].value = c_mie_coeff
+                    uniforms['mie_directional_g'].value = c_mie_direct
                     // uniforms['opacity'].value = c_opacity
 
                     // console.log(uniforms['opacity'].value)
 
                     if (this.use_sun_time === true) {
                         let sun = this.find_component_of_type("Sun")
-                        uniforms['sunPosition'].value.copy(sun.sphere.position);
+                        uniforms['sun_position'].value.copy(sun.sphere.position);
                     } else {
                         const phi = THREE.MathUtils.degToRad(90 - c_elevation);
                         const theta = THREE.MathUtils.degToRad(c_azimuth);
                         this.sun_vector.setFromSphericalCoords(1, phi, theta);
-                        uniforms['sunPosition'].value.copy(this.sun_vector);
+                        uniforms['sun_position'].value.copy(this.sun_vector);
                     }
 
                     /**hemi */

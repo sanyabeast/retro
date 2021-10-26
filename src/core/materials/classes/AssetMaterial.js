@@ -180,7 +180,7 @@ class AssetMaterial extends THREE.Material {
 
 
 
-            let mat = new THREE[Device.is_mobile ? LQ_MAT : HQ_MAT](material_params)
+            let mat = new THREE.materials[Device.is_mobile ? LQ_MAT : HQ_MAT](material_params)
 
             r.push(mat)
         })

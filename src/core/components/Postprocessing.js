@@ -37,7 +37,7 @@ class Postprocessing extends Component {
 
     grain_power = 0.025
 
-    vignette_power = 0.5
+    vignette_power = 0.2
     vignette_offset = 0.5
 
     bloom_smoothing = 0.4

@@ -33,7 +33,7 @@ function setup_pbr(params) {
 let PBRMaterial
 
 if (Device.is_mobile) {
-    PBRMaterial = class PBRMaterial extends THREE[LQ_MAT] {
+    PBRMaterial = class PBRMaterial extends THREE.materials[LQ_MAT] {
         file_format = "png"
         pbr = ""
         constructor(params) {
@@ -45,7 +45,7 @@ if (Device.is_mobile) {
     }
     
 } else {
-    PBRMaterial = class PBRMaterial extends THREE[HQ_MAT] {
+    PBRMaterial = class PBRMaterial extends THREE.materials[HQ_MAT] {
         file_format = "png"
         pbr = ""
         constructor(params) {

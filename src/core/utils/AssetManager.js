@@ -14,9 +14,61 @@ import AssetBufferGeometry from '../geometry/classes/AssetBufferGeometry';
 import SCHEMA_CORE from "core/SCHEMA.yaml"
 
 const SCHEMA_APP = require(`apps/${process.env.APP_NAME}/SCHEMA.yaml`)
-const schema_lib = {}
 const cubemap_loader = new THREE.CubeTextureLoader();
 
+const objects = THREE.objects = {}
+const materials = THREE.materials = {
+    MeshBasicMaterial: THREE.MeshBasicMaterial,
+    MeshDistanceMaterial: THREE.MeshDistanceMaterial,
+    MeshDepthMaterial: THREE.MeshDepthMaterial,
+    MeshLambertMaterial: THREE.MeshLambertMaterial,
+    MeshMatcapMaterial: THREE.MeshMatcapMaterial,
+    MeshNormalMaterial: THREE.MeshNormalMaterial,
+    MeshPhongMaterial: THREE.MeshPhongMaterial,
+    MeshPhysicalMaterial: THREE.MeshPhysicalMaterial,
+    MeshStandardMaterial: THREE.MeshStandardMaterial,
+    MeshToonMaterial: THREE.MeshToonMaterial,
+    PointsMaterial: THREE.PointsMaterial,
+    ShaderMaterial: THREE.ShaderMaterial,
+    SpriteMaterial: THREE.SpriteMaterial,
+    LineDashedMaterial: THREE.LineDashedMaterial
+}
+const geometries = THREE.geometries = {
+    BoxBufferGeometry: THREE.BoxBufferGeometry,
+    ConeBufferGeometry: THREE.ConeBufferGeometry,
+    RingBufferGeometry: THREE.RingBufferGeometry,
+    TextBufferGeometry: THREE.TextBufferGeometry,
+    TubeBufferGeometry: THREE.TubeBufferGeometry,
+    LatheBufferGeometry: THREE.LatheBufferGeometry,
+    PlaneBufferGeometry: THREE.PlaneBufferGeometry,
+    ShapeBufferGeometry: THREE.ShapeBufferGeometry,
+    TorusBufferGeometry: THREE.TorusBufferGeometry,
+    CircleBufferGeometry: THREE.CircleBufferGeometry,
+    SphereBufferGeometry: THREE.SphereBufferGeometry,
+    ExtrudeBufferGeometry: THREE.ExtrudeBufferGeometry,
+    CylinderBufferGeometry: THREE.CylinderBufferGeometry,
+    InstancedBufferGeometry: THREE.InstancedBufferGeometry,
+    OctahedronBufferGeometry: THREE.OctahedronBufferGeometry,
+    ParametricBufferGeometry: THREE.ParametricBufferGeometry,
+    PolyhedronBufferGeometry: THREE.PolyhedronBufferGeometry,
+    BoxGeometry: THREE.BoxBufferGeometry,
+    ConeGeometry: THREE.ConeBufferGeometry,
+    RingGeometry: THREE.RingBufferGeometry,
+    TextGeometry: THREE.TextBufferGeometry,
+    TubeGeometry: THREE.TubeBufferGeometry,
+    LatheGeometry: THREE.LatheBufferGeometry,
+    PlaneGeometry: THREE.PlaneBufferGeometry,
+    ShapeGeometry: THREE.ShapeBufferGeometry,
+    TorusGeometry: THREE.TorusBufferGeometry,
+    CircleGeometry: THREE.CircleBufferGeometry,
+    SphereGeometry: THREE.SphereBufferGeometry,
+    ExtrudeGeometry: THREE.ExtrudeBufferGeometry,
+    CylinderGeometry: THREE.CylinderBufferGeometry,
+    InstancedGeometry: THREE.InstancedBufferGeometry,
+    OctahedronGeometry: THREE.OctahedronBufferGeometry,
+    ParametricGeometry: THREE.ParametricBufferGeometry,
+    PolyhedronGeometry: THREE.PolyhedronBufferGeometry,
+}
 
 let asset_stats = {
     components_count: 0,
@@ -68,16 +120,30 @@ class AssetManager {
 
             /*@TODO: disables THREE material caching*/
             if (typeof template_data.params.vertexShader === "string") {
-                template_data.params.vertexShader = `#define RANDOM_FLOAT ${Math.random()}\n${template_data.params.vertexShader}`
+                template_data.params.vertexShader = `#define RANDOM_FLOAT ${Math.random()}\n${template_data.params.vertexShader}\n`
             }
 
             if (typeof template_data.params.fragmentShader === "string") {
-                template_data.params.fragmentShader = `#define RANDOM_FLOAT ${Math.random()}\n${template_data.params.fragmentShader}`
+                template_data.params.fragmentShader = `#define RANDOM_FLOAT ${Math.random()}\n${template_data.params.fragmentShader}\n`
+            }
+        }
+
+        if (isObject(template_data.params.uniforms)) {
+            for (let name in template_data.params.uniforms) {
+                let uniform = template_data.params.uniforms[name]
+                console.log(uniform)
+                if (uniform.type === "v3" && isArray(uniform.value)) {
+                    uniform.value = new THREE.Vector3(...uniform.value)
+                }
+
+                if (uniform.type === "v2" && isArray(uniform.value)) {
+                    uniform.value = new THREE.Vector2(...uniform.value)
+                }
             }
 
         }
 
-        let mat = new THREE[template_data.type](template_data.params);
+        let mat = new THREE.materials[template_data.type](template_data.params);
         return mat
     }
     static mixin_object(data, mixins = []) {
@@ -161,10 +227,10 @@ class AssetManager {
             if (type.indexOf("@") === 0) {
                 mat = this.create_material_with_template(type, params, id);
             } else {
-                if (THREE[type] === undefined) {
+                if (THREE.materials[type] === undefined) {
                     console.error(`Cannot find constructor for material "${type}"`)
                 } else {
-                    mat = new THREE[type](params)
+                    mat = new THREE.materials[type](params)
                 }
             }
 
@@ -215,10 +281,10 @@ class AssetManager {
                 return this.create_geometry_with_template(type, params, id);
             if (type.indexOf("url:") === 0)
                 return this.create_obj_geometry(type, params, id);
-            if (THREE[type] === undefined) {
-                log("AssetManager", `cannot find geometry class "${type}"`)
+            if (THREE.geometries[type] === undefined) {
+                console.error("AssetManager", `cannot find geometry class "${type}"`)
             } else {
-                g = new THREE[type](...params);
+                g = new THREE.geometries[type](...params);
             }
             if (id !== undefined) {
                 AssetManager.cached_geometries[id] = g;
@@ -325,10 +391,11 @@ class AssetManager {
             }
         });
     }
-    static preload_classes(ns, context) {
+    static preload_classes(ns, context, category) {
         AssetManager.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".js", "");
-            THREE[name] = mod.default
+            THREE[category] = THREE[category] || {}
+            THREE[category][name] = mod.default
         })
     }
     static preload_textures(ns, context) {
@@ -438,8 +505,9 @@ for (let k in SCHEMA_APP) {
 
 
 AssetManager.preload_components("core", require.context("core/components/", true, /\.js$/))
-AssetManager.preload_classes("core", require.context("core/materials/classes", true, /\.js$/))
-AssetManager.preload_classes("core", require.context("core/geometry/classes", true, /\.js$/))
+AssetManager.preload_classes("core", require.context("core/materials/classes", true, /\.js$/), "materials")
+AssetManager.preload_classes("core", require.context("core/geometry/classes", true, /\.js$/), "geometries")
+AssetManager.preload_classes("core", require.context("core/objects", true, /\.js$/), "objects")
 AssetManager.preload_textures("core", require.context("core/textures/", true, /\.png$/))
 AssetManager.preload_textures2("core", require.context("core/textures/", true, /\.yaml$/))
 AssetManager.preload_shader_parts("core", require.context("core/materials/lib/", true, /\.yaml$/))
@@ -452,8 +520,9 @@ window.F_TEXTURE_STREAMING_FUNCTION = AssetManager.texture_stream_function
 if (process.env.APP_NAME === undefined) {
 } else {
     AssetManager.preload_components(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/components/`, true, /\.js$/))
-    AssetManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/classes`, true, /\.js$/))
-    AssetManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/classes`, true, /\.js$/))
+    AssetManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/classes`, true, /\.js$/), "materials")
+    AssetManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/classes`, true, /\.js$/), "geometries")
+    AssetManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/objects`, true, /\.js$/), "objects")
     AssetManager.preload_textures(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/textures/`, true, /\.png$/))
     AssetManager.preload_textures2(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/textures/`, true, /\.yaml$/))
     AssetManager.preload_shader_parts(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/lib/`, true, /\.yaml$/))
