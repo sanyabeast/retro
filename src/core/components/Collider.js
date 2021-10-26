@@ -28,8 +28,10 @@ class Collider extends SceneComponent {
         super(...arguments)
         this.box_size = [1, 1, 1]
         this.offset = [0, 0, 0]
+
         this.meta.layers.gizmo = true
         this.meta.layers.raycast = true
+        this.meta.layers.notmal = false
         this.meta.layers.rendering = false
     }
     on_created() {

@@ -27,16 +27,17 @@ class Sky extends Mesh {
 
 		const shader = Sky.SkyShader;
 
-		const material = new ShaderMaterial( {
+		const material = new ShaderMaterial({
 			name: 'SkyShader',
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader,
-			uniforms: UniformsUtils.clone( shader.uniforms ),
+			uniforms: UniformsUtils.clone(shader.uniforms),
 			side: BackSide,
-			depthWrite: false
-		} );
+			depthWrite: false,
+			blending: 4
+		});
 
-		super( new BoxGeometry( 1, 1, 1 ), material );
+		super(new BoxGeometry(1, 1, 1), material);
 
 	}
 
@@ -52,7 +53,8 @@ Sky.SkyShader = {
 		'mieCoefficient': { value: 0.005 },
 		'mieDirectionalG': { value: 0.8 },
 		'sunPosition': { value: new Vector3() },
-		'up': { value: new Vector3( 0, 1, 0 ) }
+		'up': { value: new Vector3(0, 1, 0) },
+		'opacity': { value: 1, }
 	},
 
 	vertexShader: /* glsl */`
@@ -137,6 +139,7 @@ Sky.SkyShader = {
 
 		uniform float mieDirectionalG;
 		uniform vec3 up;
+		uniform float opacity;
 
 		const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );
 
@@ -207,7 +210,7 @@ Sky.SkyShader = {
 
 			vec3 retColor = pow( texColor, vec3( 1.0 / ( 1.2 + ( 1.2 * vSunfade ) ) ) );
 
-			gl_FragColor = vec4( retColor, 1.0 );
+			gl_FragColor = vec4( retColor, 0.75 );
 
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>

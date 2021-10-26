@@ -361,7 +361,7 @@ class AssetManager {
                     [camel_to_snake(name)]: {
                         name: name,
                         enabled: true,
-                        params: typeof creator.DEFAULT === "object" ? { ...creator.DEFAULT } : {}
+                        params: isObject(creator.DEFAULT) ? { ...creator.DEFAULT } : {}
                     }
                 }
             }

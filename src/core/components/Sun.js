@@ -52,6 +52,8 @@ class Sun extends SceneComponent {
     d_bloom_smoothing = 0.7
     d_bloom_threshold = 0.88
 
+    show_sphere = true
+
     /**private */
     light = undefined
     hemi_light = undefined
@@ -222,6 +224,10 @@ class Sun extends SceneComponent {
 
                     break
                 }
+                case "show_sphere": {
+                    this.sphere.visible = this.show_sphere
+                    break
+                }
                 case "sun_size": {
                     this.sphere.scale.set(this.sun_size, this.sun_size, this.sun_size)
                 }
@@ -251,7 +257,8 @@ class Sun extends SceneComponent {
         return [
             "time",
             "sun_size",
-            "shadows_enabled"
+            "shadows_enabled",
+            "show_sphere"
         ].concat(super.get_reactive_props())
     }
 }

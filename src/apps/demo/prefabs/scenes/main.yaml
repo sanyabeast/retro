@@ -46,6 +46,10 @@ components:
     params:
       cubemap: "res/core/cubemaps/purplenebula"
       cubemap_format: png
+  sky_sphere:
+    name: SkySphere
+    params: 
+      test: 1
 children:
   - ??prefab=core.scenes.default_snow_scene
   - components:
@@ -268,7 +272,7 @@ children:
           offset: [0, 0.5, 0]
       bush_controller:
         name: BushController
-        inline: 
+        inline:
           props:
             speed: 1
           construct: >
