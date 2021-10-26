@@ -13,6 +13,8 @@ PREFAB:
       - ":PREFAB"
     components:
       type: array|object|none
+      any_prop: 
+        - ":COMPONENT"
     position: array|none
     scale: array|none
     rotation: array|none
@@ -36,12 +38,30 @@ COMPONENT_PARAMS_META:
 COMPONENT:
   type: object|none
   strict_props: true
-  meta: ["none", :COMPONENT_PARAMS_META]
   props:
-    name: string
+    inline: ["none", :INLINE_COMPONENT]
+    meta: ["none", :COMPONENT_PARAMS_META]
+    name: string|none
     enabled: bool|none
     ref: string|none
     tag: string|none
     tick_rate: number|none
     tick_enabled: bool|none
     params: object|none
+INLINE_COMPONENT:
+  type: object
+  strict_props: true
+  props:
+    props: object|none
+    construct: string|none
+    methods:
+      type: object|none
+      any_prop: :INLINE_COMPONENT_FUNCTION
+INLINE_COMPONENT_FUNCTION:
+  type: object
+  strict_props: true
+  props:
+    args: 
+      type: array|none
+      any_prop: string
+    body: string

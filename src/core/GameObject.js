@@ -27,7 +27,7 @@ class GameObject extends Group {
 
     }
     load_prefab(prefab) {
-        if (isObject(prefab) && Schema.validate(prefab, ":PREFAB")) {
+        if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]")) {
             if (prefab.components) {
                 this.setup_components(prefab.components)
             }

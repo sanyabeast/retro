@@ -266,3 +266,17 @@ children:
           sphere_radius: 0.5
           box_size: [1.1, 1.1, 1.1]
           offset: [0, 0.5, 0]
+      bush_controller:
+        name: BushController
+        inline: 
+          props:
+            speed: 1
+          construct: >
+            console.log(this)
+          methods:
+            on_tick:
+              args: [time_delta]
+              body: >
+                console.log("tick")
+        params:
+          speed: 1
