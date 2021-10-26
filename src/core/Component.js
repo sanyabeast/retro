@@ -27,15 +27,16 @@ class Component extends EventDispatcher {
         super(params);
         this.meta = {
             enabled: true,
-            params_applied: false,
-            params: {},
             layers: {
                 rendering: true,
                 normal: true,
                 raycast: false,
                 collision: false,
-                gizmo: false
+                gizmo: false,
+                lights: false
             },
+            params_applied: false,
+            params: {},
             ticking: {
                 prev_time: +new Date(),
                 delta: 1,
@@ -138,6 +139,8 @@ class Component extends EventDispatcher {
                 this.meta.layers[name] = true
             })
         }
+
+
     }
     on_update() { }
     on_created() {

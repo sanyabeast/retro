@@ -24,15 +24,6 @@ class Sun extends SceneComponent {
     d_color = "#e9c28a"
     sun_size = 3
 
-    d_hemi_sky_color = "#f3ead7"
-    d_hemi_ground_color = "#f3ead7"
-
-    n_hemi_sky_color = "#34116a"
-    n_hemi_ground_color = "#da5a6a"
-
-    d_hemi_intensity = 1.5
-    n_hemi_intensity = 0.05
-
     d_amb_color = "#f9e9e5"
     n_amb_color = "#0000ff"
 
@@ -56,7 +47,6 @@ class Sun extends SceneComponent {
 
     /**private */
     light = undefined
-    hemi_light = undefined
     amb_light = undefined
     d_color3 = undefined
     n_color3 = undefined
@@ -80,9 +70,6 @@ class Sun extends SceneComponent {
             light.castShadow = true
         }
 
-
-        let hemi_light = this.hemi_light = new THREE.HemisphereLight()
-        // let gizmo_hemi_light_helper = this.gizmo_hemi_light_helper = new THREE.HemisphereLightHelper(hemi_light, 50);
         let amb_light = this.amb_light = new THREE.AmbientLight()
 
         amb_light.color.set_any(this.d_amb_color)
@@ -118,25 +105,28 @@ class Sun extends SceneComponent {
     get_render_data() {
         return [{
             object: this.light,
-            parent: this.object
+            parent: this.object,
+            layers: {
+                ...this.meta.layers,
+                lights: true
+            }
         }, {
             object: this.sphere,
             parent: this.object
         }, {
-            object: this.hemi_light,
-            parent: this.object
-        }, {
             object: this.amb_light,
-            parent: this.object
+            parent: this.object,
+            layers: {
+                ...this.meta.layers,
+                lights: true
+            }
         }]
     }
     get_gizmo_render_data() {
         return [{
             object: this.gizmo_dirlight_helper,
             layers: { gizmo: true }
-        }/*, {
-            object: this.gizmo_hemi_light_helper
-        }*/, ...super.get_gizmo_render_data()]
+        }, ...super.get_gizmo_render_data()]
     }
     on_update(props) {
         super.on_update(...arguments)
@@ -174,28 +164,7 @@ class Sun extends SceneComponent {
                     let c_color_rgb = hsl_to_rgb(...c_color)
                     this.light.color.set(c_color_rgb)
 
-                    /**hemi */
-                    let n_hemi_sky_color = hex_to_rgb(this.n_hemi_sky_color)
-                    let n_hemi_ground_color = hex_to_rgb(this.n_hemi_ground_color)
-                    let d_hemi_sky_color = hex_to_rgb(this.d_hemi_sky_color)
-                    let d_hemi_ground_color = hex_to_rgb(this.d_hemi_ground_color)
 
-                    let c_hemi_sky = [
-                        this.lerp(n_hemi_sky_color[0], d_hemi_sky_color[0], p),
-                        this.lerp(n_hemi_sky_color[1], d_hemi_sky_color[1], p),
-                        this.lerp(n_hemi_sky_color[2], d_hemi_sky_color[2], p)
-                    ]
-
-                    let c_hemi_ground = [
-                        this.lerp(n_hemi_ground_color[0], d_hemi_ground_color[0], p),
-                        this.lerp(n_hemi_ground_color[1], d_hemi_ground_color[1], p),
-                        this.lerp(n_hemi_ground_color[2], d_hemi_ground_color[2], p)
-                    ]
-
-                    let hemi_intensity = this.lerp(this.n_hemi_intensity, this.d_hemi_intensity, Math.pow(p, 0.2))
-                    this.hemi_light.intensity = hemi_intensity
-                    this.hemi_light.color.set_any(c_hemi_sky)
-                    this.hemi_light.groundColor.set_any(c_hemi_ground)
 
                     /**ambinet */
                     let amb_intensity = this.lerp(this.n_amb_intensity, this.d_amb_intensity, Math.pow(p, 0.2))
@@ -251,7 +220,6 @@ class Sun extends SceneComponent {
         }
 
         if (this.gizmo_dirlight_helper) this.gizmo_dirlight_helper.update()
-        // if (this.gizmo_hemi_light_helper) this.gizmo_hemi_light_helper.update()
     }
     get_reactive_props() {
         return [

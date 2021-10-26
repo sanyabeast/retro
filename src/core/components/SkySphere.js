@@ -10,6 +10,7 @@ import { union } from "lodash";
 import { Vector2 } from "spine-ts-threejs";
 import * as THREE from 'three';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
+import { hex_to_hsl, hsl_to_rgb, hex_to_rgb } from "core/utils/Tools";
 
 class SkySphere extends SceneComponent {
     time = 0
@@ -34,13 +35,26 @@ class SkySphere extends SceneComponent {
     n_opacity = 0.5
     n_exposure = 1
 
+    /**hemi light */
+    d_hemi_sky_color = "#f3ead7"
+    d_hemi_ground_color = "#f3ead7"
+
+    n_hemi_sky_color = "#34116a"
+    n_hemi_ground_color = "#da5a6a"
+
+    d_hemi_intensity = 1.5
+    n_hemi_intensity = 0.05
+
     /**private */
     tick_rate = 10
+    hemi_light = undefined
 
     on_created() {
         let sky = this.subject = new Sky();
         sky.scale.setScalar(450000);
         let sun = this.sun_vector = new THREE.Vector3();
+
+        let hemi_light = this.hemi_light = new THREE.HemisphereLight()
 
         let material = sky.material
         material.blending = THREE.CustomBlending;
@@ -53,6 +67,13 @@ class SkySphere extends SceneComponent {
         return [{
             object: this.subject,
             parent: this.object
+        }, {
+            object: this.hemi_light,
+            parent: this.object,
+            layers: {
+                ...this.meta.layers,
+                lights: true
+            }
         }]
     }
     get_reactive_props() {
@@ -97,6 +118,29 @@ class SkySphere extends SceneComponent {
                         this.sun_vector.setFromSphericalCoords(1, phi, theta);
                         uniforms['sunPosition'].value.copy(this.sun_vector);
                     }
+
+                    /**hemi */
+                    let n_hemi_sky_color = hex_to_rgb(this.n_hemi_sky_color)
+                    let n_hemi_ground_color = hex_to_rgb(this.n_hemi_ground_color)
+                    let d_hemi_sky_color = hex_to_rgb(this.d_hemi_sky_color)
+                    let d_hemi_ground_color = hex_to_rgb(this.d_hemi_ground_color)
+
+                    let c_hemi_sky = [
+                        this.lerp(n_hemi_sky_color[0], d_hemi_sky_color[0], p),
+                        this.lerp(n_hemi_sky_color[1], d_hemi_sky_color[1], p),
+                        this.lerp(n_hemi_sky_color[2], d_hemi_sky_color[2], p)
+                    ]
+
+                    let c_hemi_ground = [
+                        this.lerp(n_hemi_ground_color[0], d_hemi_ground_color[0], p),
+                        this.lerp(n_hemi_ground_color[1], d_hemi_ground_color[1], p),
+                        this.lerp(n_hemi_ground_color[2], d_hemi_ground_color[2], p)
+                    ]
+
+                    let hemi_intensity = this.lerp(this.n_hemi_intensity, this.d_hemi_intensity, Math.pow(p, 0.2))
+                    this.hemi_light.intensity = hemi_intensity
+                    this.hemi_light.color.set_any(c_hemi_sky)
+                    this.hemi_light.groundColor.set_any(c_hemi_ground)
 
                     break
                 }

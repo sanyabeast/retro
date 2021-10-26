@@ -7,6 +7,7 @@ import { log } from "core/utils/Tools";
 import Component from "core/Component";
 import * as THREE from 'three';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
+import { get, isObject, isArray } from "lodash-es"
 
 let id = 0
 const exclude_props = [
@@ -37,6 +38,7 @@ class SceneComponent extends Component {
     anchor_gizmo = undefined
     constructor(params) {
         super(params);
+
         this.position = [...this.position]
         this.scale = [...this.scale]
         this.rotation = [...this.rotation]

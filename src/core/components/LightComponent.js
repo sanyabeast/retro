@@ -35,7 +35,7 @@ class LightComponent extends SceneComponent {
     on_created() {
         let light
 
-        this.meta.layers.light = true
+        this.meta.layers.lights = true
 
         switch (this.type) {
             case "HemisphereLight": {
