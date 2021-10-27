@@ -1,5 +1,6 @@
 
-import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction } from "lodash-es"
+import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRight, filter } from "lodash-es"
+import { log, error } from "core/utils/Tools"
 
 const lib = {}
 
@@ -13,238 +14,264 @@ function matches_types(data, allowed_types) {
 }
 
 
-function validate(data, schema, prop_path = "ROOT", silent_mode = false, trace = []) {
-    // console.log(prop_path, data, schema)
-    let valid_type = true
-    let valid_props = true
-    let allowed_types = ["any"]
-    let invalid_props = []
-    let valid_any_prop = true
-    let valid_strict_props = true
-    let non_strict_props = []
-    let non_valid_any_props = []
-    let validation_result = {
-        props: {},
-        prop_path,
-        schema,
-        value: data,
-        trace
-    }
-
-
-    let scheme_type = get_type_name(schema)
-
-    switch (scheme_type) {
-        case "object": {
-            if (isString(schema.type)) {
-                allowed_types = schema.type.replace(/\s/g, '').split("|")
-            }
-            if (isArray(schema.type)) {
-                allowed_types = [...schema.type]
-            }
-
-            valid_type = matches_types(data, allowed_types)
-            let prop_results = []
-
-            if (isObject(schema.props)) {
-                if (isObject(data) && !isArray(data)) {
-                    for (let k in schema.props) {
-                        let prop_schema = schema.props[k]
-                        let v_data = validate(data[k], prop_schema, `${prop_path}.${k}`, true, trace);
-                        if (!v_data.is_valid) {
-                            invalid_props.push(k)
-                            prop_results.push(v_data)
-                            validation_result.props[k] = v_data
-                            valid_props = false;
-                        }
-                    }
-
-                    if (schema.strict_props === true) {
-                        for (let kk in data) {
-                            if (!schema.props[kk]) {
-                                valid_strict_props = false
-                                non_strict_props.push(kk)
-
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (schema.any_prop) {
-                if (isObject(data) && !isArray(data)) {
-                    for (let jj in data) {
-                        let v_data = validate(data[jj], schema.any_prop, `${prop_path}.${jj}`, true, trace)
-                        if (!v_data.is_valid) {
-                            valid_any_prop = false
-                            prop_results.push(v_data)
-                            validation_result.props[jj] = v_data
-                            non_valid_any_props.push(jj)
-                        }
-                    }
-                }
-
-                if (isArray(data)) {
-                    data.forEach((item, index) => {
-                        let v_data = validate(item, schema.any_prop, `${prop_path}.${index}`, true, trace)
-                        if (!v_data.is_valid) {
-                            valid_any_prop = false
-                            prop_results.push(v_data)
-                            validation_result.props[index] = v_data
-                            non_valid_any_props.push(index)
-                        }
-                    })
-                }
-            }
-
-            // if (silent_mode !== true) {
-            //     if (!valid_type) {
-            //         console.error(`[SHEMA] validation of TYPE for "${prop_path} failed. type is ${get_type_name(data)}; schema needs: ${allowed_types.join(', ')}"`)
-            //         console.dir(data)
-            //     }
-
-            //     if (!valid_props) {
-            //         console.error(`[SHEMA] validation of props for "${prop_path} failed. invalid props: ${invalid_props.join(', ')}"`)
-            //         console.dir(data)
-            //     }
-
-            //     if (!valid_strict_props) {
-            //         console.error(`[SHEMA] validation of props for "${prop_path} failed. props must be STRICT. restricted props: ${non_strict_props.join(', ')}"`)
-            //         console.dir(data)
-            //     }
-
-
-            //     if (!valid_any_prop) {
-            //         console.error(`[SHEMA] validation of props for "${prop_path} failed. invalid ANY props: ${non_valid_any_props.join(', ')}"`)
-            //         console.dir(data)
-            //     }
-            // }
-
-            validation_result = {
-                ...validation_result,
-                prop_results,
-                is_valid: valid_props && valid_type && valid_strict_props && valid_any_prop,
-                check_props: valid_props,
-                check_type: valid_type,
-                check_strict_props: valid_strict_props,
-                check_any_prop: valid_any_prop,
-                actual_type: get_type_name(data),
-                extra: {
-                    allowed_types,
-                    non_strict_props,
-                    invalid_props,
-                    non_valid_any_props
-                }
-            }
-            break
-        }
+function validate_value(data, schema, prop_path, trace, root_object, root_schema) {
+    // console.log(`START VALIDATING VALUE`, data, schema)
+    let schema_format = get_type_name(schema);
+    switch (schema_format) {
         case "string": {
             if (schema.startsWith(":")) {
                 let schema_id = schema.replace(":", "")
-                validation_result = validate(data, lib[schema_id], prop_path, true, trace)
+                if (lib[schema_id] === undefined) {
+                    trace.unshift({
+                        passed: false,
+                        path: prop_path,
+                        schema_invalid: true,
+                        schema_id: schema_id,
+                        type: { passed: true },
+                        props: { passed: true },
+                        any_prop: { passed: true },
+                        strict_props: { passed: true },
+                        type: { passed: true }
+                    })
+                    return false
+                }
+                return validate_value(
+                    data,
+                    lib[schema_id],
+                    prop_path,
+                    trace,
+                    root_object,
+                    root_schema
+                )
             } else {
-                validation_result = validate(data, {
-                    type: schema
-                }, prop_path, true, trace)
+                return validate_value(
+                    data,
+                    {
+                        type: schema
+                    },
+                    prop_path,
+                    trace,
+                    root_object,
+                    root_schema
+                )
             }
-
             break
         }
         case "array": {
-            let r = false
+            let validation_result = undefined
+            let valid_schema = undefined
+            let valid_schema_trace = undefined
+            let invalid_schema_trace = undefined
             let invalid_schemas = []
-            let results = {}
             schema.forEach(s => {
-                let r2 = validate(data, s, prop_path, true, trace)
-                results[s] = r2
-                if (r2.is_valid) {
-                    r = true
+                let sub_trace = []
+                let r = validate_value(data, s, prop_path, sub_trace, root_object, root_schema)
+                if (r) {
+                    valid_schema = s
+                    valid_schema_trace = sub_trace
                 } else {
+                    invalid_schema_trace = sub_trace.concat(invalid_schema_trace)
                     invalid_schemas.push(s)
                 }
-
             })
 
-            validation_result.is_valid = r
-            validation_result.invalid_schemas = invalid_schemas
-            validation_result.results = results
+            if (valid_schema) {
+                validation_result = valid_schema_trace[0]
+                forEachRight(valid_schema_trace, (trace_data) => {
+                    trace.unshift(trace_data)
+                })
+            } else {
+                validation_result = invalid_schema_trace[0]
+                forEachRight(invalid_schema_trace, (trace_data) => {
+                    trace.unshift(trace_data)
+                })
+            }
+
+            return validation_result.passed
             break
         }
-    }
+        case "object": {
+            let validation_result = validation_result || {
+                path: prop_path,
+                passed: true,
+                root: {
+                    value: root_object,
+                    schema: root_schema
+                },
+                type: {
+                    passed: true,
+                    has: "any",
+                    need: ["any"]
+                },
+                props: {
+                    passed: true,
+                    invalid: [],
+                },
+                strict_props: {
+                    passed: true,
+                    invalid: []
+                },
+                any_prop: {
+                    passed: true,
+                    invalid: []
+                }
 
-    if (!validation_result.is_valid && silent_mode !== true) {
-        log_validation_results(validation_result)
-    }
+            }
+            let actual_type = get_type_name(data)
+            let allowed_types = ["any"]
+            if (isString(schema.type)) allowed_types = schema.type.replace(/\s/g, '').split("|")
+            if (isArray(schema.type)) allowed_types = [...schema.type]
 
-    trace.push(validation_result)
-    return validation_result
-}
-
-function log_validation_results(results) {
-
-
-    if (isArray(results.invalid_schemas) && results.invalid_schemas.length > 0) {
-        results.invalid_schemas.forEach(r => log_validation_results(results.results[r]))
-    } else {
-        if (isArray(results.prop_results) && results.prop_results.length > 0) {
-            results.prop_results.forEach(r => log_validation_results(r))
-        } else {
-            console.log(results)
-            let schema = results.schema
-            let prop_path = results.prop_path
-            let value = results.value
-            let s = `
-VALIDATION FOR "${prop_path} FAILED" \n
-`
+            let is_valid_type = matches_types(data, allowed_types)
+            validation_result.type.passed = is_valid_type
+            validation_result.type.has = actual_type
+            validation_result.type.need = allowed_types
 
 
-            if (results.check_type === false) {
-                if (schema.type !== "none") {
-                    s += `
-TYPE INVALID: 
-    actual type: ${results.actual_type}
-    allowed types: ${results.extra.allowed_types.join(",")}
-`
+            if (isObject(schema.props)) {
+                switch (actual_type) {
+                    case "object": {
+                        let invalid_props = []
+                        let odd_props = []
+                        forEach(schema.props, (prop_schema, prop_name) => {
+                            let r = validate_value(data[prop_name], prop_schema, `${prop_path}.${prop_name}`, trace, root_object, root_schema)
+                            if (!r) invalid_props.push(prop_name)
+                        })
+
+                        validation_result.props.invalid = invalid_props
+                        validation_result.props.passed = invalid_props.length === 0
+
+                        if (schema.strict_props === true) {
+                            forEach(data, (prop_value, prop_name) => {
+                                if (schema.props[prop_name] === undefined) {
+                                    odd_props.push(prop_name)
+                                }
+                            })
+                        }
+                        validation_result.strict_props.passed = odd_props.length === 0
+                        validation_result.strict_props.invalid = odd_props
+                        break
+                    }
+                    case "array": {
+                        break
+                    }
+                    default: { }
                 }
             }
 
+            if (schema.any_prop !== undefined) {
+                let invalid_any_props = []
+                switch (actual_type) {
+                    case "object": {
+                        forEach(data, (prop_value, prop_name) => {
+                            let r = validate_value(prop_value, schema.any_prop, `${prop_path}.${prop_name}`, trace, root_object, root_schema)
+                            if (!r) {
+                                invalid_any_props.push(prop_name)
+                            }
+                        })
+                        break
+                    }
+                    case "array": {
+                        let invalid_any_props = []
+                        forEach(data, (prop_value, prop_name) => {
+                            let r = validate_value(prop_value, schema.any_prop, `${prop_path}.${prop_name}`, trace, root_object, root_schema)
+                            if (!r) {
+                                invalid_any_props.push(prop_name)
+                            }
+                        })
+                        break
+                    }
+                    default: { }
+                }
 
-            if (results.check_any_prop === false) {
-                s += `
-ANY PROP INVALID: 
-    ${results.extra.non_valid_any_props.join(",")}
-`
+                validation_result.any_prop.passed = invalid_any_props.length === 0
+                validation_result.any_prop.invalid = invalid_any_props
             }
 
-            if (results.check_props === false) {
-                s += `
-PROPS INVALID: 
-    ${results.extra.invalid_props.join(",")}
-`
-            }
+            validation_result.passed =
+                validation_result.props.passed &&
+                validation_result.any_prop.passed &&
+                validation_result.strict_props.passed &&
+                validation_result.type.passed;
 
-            if (results.check_strict_props === false) {
-                s += `
-PROPS MUST BE STRICT: 
-    non-strict props: ${results.extra.non_strict_props.join(",")}
-`
-            }
 
-            if (schema.type !== "none") {
-                s += `
-SCHEMA:
-${JSON.stringify(schema, null, "\t")}
-    `
-                
-                console.error(s)
-                console.dir(value)
-            }
+            trace.unshift(validation_result)
+            return validation_result.passed
+            break;
+        }
+        default: {
+            log('Schema', `unknowm schema format: ${schema_format}`, data, schema)
         }
     }
 
-
-
 }
+
+function validate(data, schema, prop_path = "ROOT", silent_mode = false) {
+    let trace = []
+    let result = true
+
+    validate_value(data, schema, prop_path, trace, data, schema)
+    let problems = filter(trace, (data) => {
+        return !data.passed
+    })
+
+    if (problems.length > 0) {
+
+        if (silent_mode !== true) {
+            let total_message = ``
+
+            forEach(problems, (data, index) => {
+                let message = `
+^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
+PROBLEM #${index + 1}
+VALIDATION of ${data.path} FAILED`
+
+                if (data.schema_invalid) {
+                    message += `
+    # INVALID SCHEMA:
+    schema: ${data.schema_id}
+                    `
+                }
+                if (!data.type.passed) {
+                    message += `
+    # INCORRECT TYPE:
+    has: ${data.type.has.toUpperCase()}
+    need: ${data.type.need.join(", ").toUpperCase()}
+                    `
+                }
+
+                if (!data.props.passed) {
+                    message += `
+    # INCORRECT PROPS:
+    invalid: ${data.props.invalid.join(", ")}
+                    `
+                }
+
+                if (!data.strict_props.passed) {
+                    message += `
+    # PROPS MUST BE STRICT:
+    invalid: ${data.strict_props.invalid.join(", ")}
+                    `
+                }
+
+
+
+                total_message += message
+            })
+
+            error('Schema Validation', total_message)
+            error('Schema Validation', "[DATA]", data)
+            error('Schema Validation', "[SCHEMA]", schema)
+            error("Schema Validation", "[TRACE]", trace)
+            error('Schema Validation', ". . . . . . . . . . . . . . . . . . . ")
+        }
+
+    }
+
+    return problems.length === 0
+}
+
+
 function get_type_name(d) {
     let r = "none"
     if (isObject(d) && !isNull(d) && !isArray(d)) r = "object"

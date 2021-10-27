@@ -14,6 +14,16 @@ import AssetBufferGeometry from '../geometry/classes/AssetBufferGeometry';
 import SCHEMA_CORE from "core/SCHEMA.yaml"
 
 const SCHEMA_APP = require(`apps/${process.env.APP_NAME}/SCHEMA.yaml`)
+
+for (let k in SCHEMA_CORE) {
+    Schema.register(k, SCHEMA_CORE[k])
+}
+
+for (let k in SCHEMA_APP) {
+    Schema.register(k, SCHEMA_APP[k])
+}
+
+
 const cubemap_loader = new THREE.CubeTextureLoader();
 
 const objects = THREE.objects = {}
@@ -485,7 +495,7 @@ class AssetManager {
         })
     }
     static register_prefab(id, prefab) {
-        let is_valid = Schema.validate(prefab, ":PREFAB", `[PREFAB:${id}]`).is_valid
+        let is_valid = Schema.validate(prefab, ":PREFAB", `[PREFAB:${id}]`)
         if (!is_valid) {
             console.error(`[AssetManager] cannot register prefab. preloaded prefab "${id}" does not match "PREFAB" schema`)
         }
@@ -493,14 +503,6 @@ class AssetManager {
         AssetManager.prefab_lib[id] = prefab
     }
 
-}
-
-for (let k in SCHEMA_CORE) {
-    Schema.register(k, SCHEMA_CORE[k])
-}
-
-for (let k in SCHEMA_APP) {
-    Schema.register(k, SCHEMA_APP[k])
 }
 
 

@@ -28,7 +28,7 @@ class GameObject extends Group {
 
     }
     load_prefab(prefab) {
-        if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]").is_valid) {
+        if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]")) {
             if (prefab.components) {
                 this.setup_components(prefab.components)
             }
@@ -296,7 +296,7 @@ class GameObject extends Group {
             component = Object.assign({}, creator)
         } else if (isUndefined(creator)) {
             if (isObject(data.inline)) {
-                if (Schema.validate(data.inline, ":INLINE_COMPONENT").is_valid) {
+                if (Schema.validate(data.inline, ":INLINE_COMPONENT")) {
                     creator = Component.create(data.inline, component_name)
                     component = new creator(params)
                 }
@@ -309,7 +309,7 @@ class GameObject extends Group {
             reactivate_component(component)
             component.object = this
             /**meta params */
-            if (Schema.validate(data.meta, ":COMPONENT_PARAMS_META").is_valid) {
+            if (Schema.validate(data.meta, ":COMPONENT_PARAMS_META")) {
                 let meta_params = component.meta = AssetManager.mixin_object(component.meta, [data.meta])
 
             }

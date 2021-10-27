@@ -7,6 +7,11 @@ function log(tag, ...data) {
     console.log(`%c[${tag}]`, "color: magenta", ...data);
 }
 
+function error(tag, ...data) {
+    console.log(`%c[${tag}]`, "color: red", ...data);
+}
+
+
 function get_query_string_params(query) {
     return query
         ? (/^[?#]/.test(query) ? query.slice(1) : query)
@@ -221,5 +226,6 @@ export {
     is_inline_dict,
     parse_inline_dict,
     makeid,
-    datetime
+    datetime,
+    error
 }
