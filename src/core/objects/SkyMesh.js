@@ -30,6 +30,7 @@ SkyMesh.shader_data = {
         'turbidity': { value: 2 },
         'rayleigh': { value: 1 },
         'mie_coefficient': { value: 0.005 },
+        'opacity': { value: 1 },
         'mie_directional_g': { value: 0.8 },
         'sun_position': { value: new THREE.Vector3() },
         'up': { value: new THREE.Vector3(0, 1, 0) }
@@ -113,7 +114,8 @@ SkyMesh.shader_data = {
         varying vec3 vBetaR;
         varying vec3 vBetaM;
         varying float vSunE;
-
+        
+        uniform float opacity;
         uniform float mie_directional_g;
         uniform vec3 up;
 
@@ -186,7 +188,7 @@ SkyMesh.shader_data = {
 
             vec3 retColor = pow( texColor, vec3( 1.0 / ( 1.2 + ( 1.2 * vSunfade ) ) ) );
 
-            gl_FragColor = vec4( retColor, 1.0 );
+            gl_FragColor = vec4( retColor, opacity );
 
         #include <tonemapping_fragment>
         #include <encodings_fragment>

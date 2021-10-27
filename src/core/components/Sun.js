@@ -30,16 +30,19 @@ class Sun extends SceneComponent {
     d_amb_intensity = 1.5
     n_amb_intensity = 0.05
 
+    /**common */
     shadows_enabled = true
     shadow_resolution = 1024
     cycling = 24
+
+    /**postfx */
     use_postfx = true
 
-    n_grain_power = 0.09
-    d_grain_power = 0.025
+    n_grain_power = 0.04
+    d_grain_power = 0.015
 
-    n_bloom_smoothing = 0.55
-    n_bloom_threshold = 0.15
+    n_bloom_smoothing = 0.63
+    n_bloom_threshold = 0.35
     d_bloom_smoothing = 0.7
     d_bloom_threshold = 0.88
 

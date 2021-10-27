@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "gamecore",
-    "version": "1.0.45",
+    "version": "1.0.46",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
@@ -67,6 +67,7 @@
         "@esotericsoftware/spine-threejs": "^4.0.14",
         "command-line-args": "^5.2.0",
         "core-js": "^3.17.3",
+        "datetime-js": "^4.0.0",
         "device-detector-js": "^2.2.10",
         "extract-zip": "^2.0.1",
         "fflate": "^0.7.1",

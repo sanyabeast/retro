@@ -1,5 +1,6 @@
 
 import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction } from "lodash-es"
+import DateTime from "datetime-js"
 
 
 function log(tag, ...data) {
@@ -188,6 +189,24 @@ function parse_inline_dict(d) {
     return r
 }
 
+function makeid(length = 24, lowercase = true, uppercase = true, digits = true) {
+    let result = '';
+    let uc_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let lc_chars = "abcdefghijklmnopqrstuvwxyz"
+    let d_chars = "0123456789"
+    let characters = (uppercase ? uc_chars : "") + (lowercase ? lc_chars : "") + (digits ? d_chars : "");
+    let charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            charactersLength));
+    }
+    return result;
+}
+
+function datetime(template = "%H:%i:%s", date = new Date) {
+    return DateTime(date, template)
+}
+
 export {
     log,
     get_query_string_params,
@@ -200,5 +219,7 @@ export {
     is_none,
     camel_to_snake,
     is_inline_dict,
-    parse_inline_dict
+    parse_inline_dict,
+    makeid,
+    datetime
 }

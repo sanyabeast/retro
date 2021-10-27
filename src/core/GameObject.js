@@ -4,8 +4,9 @@ import { Group } from 'three/src/objects/Group';
 import AssetManager from 'core/utils/AssetManager';
 import { Task, TaskScheduler } from "core/utils/TaskScheduler"
 import StateMachine from "core/utils/StateMachine"
-import { isObject, isFunction } from "lodash-es"
+import { isObject, isFunction, isUndefined } from "lodash-es"
 import Schema from "core/utils/Schema"
+import Component from "core/Component"
 
 
 class GameObject extends Group {
@@ -27,7 +28,7 @@ class GameObject extends Group {
 
     }
     load_prefab(prefab) {
-        if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]")) {
+        if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]").is_valid) {
             if (prefab.components) {
                 this.setup_components(prefab.components)
             }
@@ -265,8 +266,6 @@ class GameObject extends Group {
         GameObject.broadcasting[event_name] = GameObject.broadcasting[event_name] || {}
         GameObject.broadcasting[event_name][this.uuid] = this
     }
-
-
     setup_components(comp_data) {
         if (comp_data !== undefined) {
             if (Array.isArray(comp_data)) {
@@ -291,10 +290,18 @@ class GameObject extends Group {
         let ref = typeof data.ref === 'string' ? data.ref : undefined
         let creator = GameObject.components_lib[component_name]
         let component
-        if (typeof creator == "function") {
+        if (isFunction(creator)) {
             component = new creator(params)
-        } else if (creator === 'object') {
+        } else if (isObject(creator)) {
             component = Object.assign({}, creator)
+        } else if (isUndefined(creator)) {
+            if (isObject(data.inline)) {
+                if (Schema.validate(data.inline, ":INLINE_COMPONENT").is_valid) {
+                    creator = Component.create(data.inline, component_name)
+                    component = new creator(params)
+                }
+            }
+            
         }
 
         if (component !== undefined) {
@@ -302,7 +309,7 @@ class GameObject extends Group {
             reactivate_component(component)
             component.object = this
             /**meta params */
-            if (Schema.validate(data.meta, ":COMPONENT_PARAMS_META")) {
+            if (Schema.validate(data.meta, ":COMPONENT_PARAMS_META").is_valid) {
                 let meta_params = component.meta = AssetManager.mixin_object(component.meta, [data.meta])
 
             }
@@ -400,6 +407,18 @@ class GameObject extends Group {
 
         this.tick_id++
     }
+    handle_game_start() {
+        if (this.visible) {
+            this.on_start()
+            this.components.forEach((component) => {
+                component.on_start()
+            })
+            this.children.forEach((child) => {
+                child.handle_game_start()
+            })
+        }
+    }
+    on_start(){}
     on_tick() { }
 }
 

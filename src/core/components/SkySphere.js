@@ -107,7 +107,7 @@ class SkySphere extends SceneComponent {
                     uniforms['rayleigh'].value = c_rayleigh
                     uniforms['mie_coefficient'].value = c_mie_coeff
                     uniforms['mie_directional_g'].value = c_mie_direct
-                    // uniforms['opacity'].value = c_opacity
+                    uniforms['opacity'].value = c_opacity
 
                     // console.log(uniforms['opacity'].value)
 

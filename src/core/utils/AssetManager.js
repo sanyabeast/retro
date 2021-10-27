@@ -485,7 +485,7 @@ class AssetManager {
         })
     }
     static register_prefab(id, prefab) {
-        let is_valid = Schema.validate(prefab, ":PREFAB", `[PREFAB:${id}]`)
+        let is_valid = Schema.validate(prefab, ":PREFAB", `[PREFAB:${id}]`).is_valid
         if (!is_valid) {
             console.error(`[AssetManager] cannot register prefab. preloaded prefab "${id}" does not match "PREFAB" schema`)
         }

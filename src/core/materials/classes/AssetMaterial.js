@@ -87,7 +87,7 @@ class AssetMaterial extends THREE.Material {
         blocks.forEach(b => {
             let block_data = parse_block(b)
 
-            console.log(block_data)
+            // console.log(block_data)
 
             let material_params = {}
 

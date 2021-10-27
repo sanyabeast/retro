@@ -37,6 +37,15 @@ children:
             - -1
             - 2.5
             - 0
+      time_component:
+        inline: 
+          methods:
+            on_tick:
+              body: >
+                let caption = this.get_component("TroikaTextComponent");
+                caption.text = datetime()
+        params:
+          tick_rate: 1
   snow_fx:
     prefab: "core.snow_fx"
     components:

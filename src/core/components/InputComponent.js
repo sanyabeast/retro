@@ -109,7 +109,7 @@ class InputComponent extends Component {
 
         if (camera && renderer) {
             if (camera.moved || this.pointer_position_changed) {
-                console.log(`cheking intersects... (pointer moved: ${this.pointer_position_changed}, camera moved: ${camera.moved})`)
+                // console.log(`cheking intersects... (pointer moved: ${this.pointer_position_changed}, camera moved: ${camera.moved})`)
                 let changed = false
                 let new_intersected_object_ids = {}
                 let raycasted_objects_list = renderer.get_object_layer_list({ raycast: true })

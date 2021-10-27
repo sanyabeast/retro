@@ -16,27 +16,13 @@ components:
       distance: 5.5
       decay: 1
       color: "#dbaa6c"
-  point_light:
-    enabled: true
-    name: "LightComponent"
-    ref: "point_light"
-    tag: "point_light"
-    params:
-      position: [0.6, 1.1, 1.1]
-      shadows_enabled: true
-      debug_transform: true
-      type: "PointLight"
-      intensity: 15
-      distance: 2.5
-      decay: 1
-      color: "#ff5722"
   sun:
     name: Sun
     tag: sun
     params:
       debug_transform: true
       cycling: 24
-      time: 0.33
+      time: 0.78
   fog:
     name: Fog
     params:
@@ -48,7 +34,7 @@ components:
       cubemap_format: png
   sky_sphere:
     name: SkySphere
-    params: 
+    params:
       test: 1
 children:
   - ??prefab=core.scenes.default_snow_scene
@@ -270,17 +256,37 @@ children:
           sphere_radius: 0.5
           box_size: [1.1, 1.1, 1.1]
           offset: [0, 0.5, 0]
-      bush_controller:
-        name: BushController
+  - components:
+      point_light:
+        enabled: true
+        name: "LightComponent"
+        ref: "point_light"
+        tag: "point_light"
+        params:
+          position: [0.6, 1.1, 1.1]
+          shadows_enabled: true
+          debug_transform: true
+          type: "PointLight"
+          intensity: 15
+          distance: 5.5
+          decay: 1
+          color: "#ff5722"
+      controller:
         inline:
           props:
-            speed: 1
-          construct: >
-            console.log(this)
+            speed: 0.2
+            radius: 4
+            height: 1
+            height_speed: 0.5
+            offset: [0, 2, 0]
           methods:
             on_tick:
-              args: [time_delta]
               body: >
-                console.log("tick")
-        params:
-          speed: 1
+                let date = +new Date();
+                let light = this.get_component("LightComponent");
+                light.position = [
+                  (Math.sin(date * 0.001 * this.speed) * this.radius) + this.offset[0],
+                  (Math.sin(date * 0.001 * this.height_speed) * this.height) + this.offset[1],
+                  (Math.cos(date * 0.001 * this.speed) * this.radius) + this.offset[2]
+                ];
+                light.intensity = 16 + (Math.sin(date * 0.01)) * 0.1
