@@ -8,7 +8,7 @@ import DevGUI from "core/gui/DevGUI.vue"
 import * as THREE from 'three';
 import DataComputed from "core/utils/DataComputed";
 import GameObject from "core/GameObject";
-import { log } from "core/utils/Tools"
+import { log , console } from "core/utils/Tools"
 
 class CoreApp extends GameObject {
     /**private */

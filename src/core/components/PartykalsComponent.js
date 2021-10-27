@@ -39,6 +39,8 @@ class PartykalsComponent extends SceneComponent {
     system_speed = 1
     emitters = undefined
 
+    tick_rate = 30
+
     constructor() {
         super(...arguments)
         this.emitters = [{

@@ -12,7 +12,9 @@ import { map } from "lodash-es"
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
+
 class InputComponent extends Component {
+    detection_mode = "colorid"
     raycasting = true
     pointer_position = new THREE.Vector2(0, 0)
     raycasting_intersects = []
@@ -20,8 +22,11 @@ class InputComponent extends Component {
     intersected_objects_ids = {}
     intersected_objects_changed = false
     pointer_position_changed = true
+
+    tick_rate = 30
     /**private */
     prev_camera_matrix = undefined
+
 
     on_created() {
         this.handle_keydown = this.handle_keydown.bind(this)
@@ -104,6 +109,8 @@ class InputComponent extends Component {
         // console.log(`mouseout`, evt)
     }
     update_raycasting_state(event_type) {
+
+
         let camera = this.find_component_of_type("CameraComponent");
         let renderer = this.find_component_of_type("Renderer")
 
@@ -133,6 +140,10 @@ class InputComponent extends Component {
             this.raycasting_intersects = []
             this.intersect_objects = []
         }
+
+        // if (this.raycasting_intersects.length > 0) {
+        //     console.log(this.raycasting_intersects[0])
+        // }
     }
 }
 

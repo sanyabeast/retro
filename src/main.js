@@ -2,22 +2,22 @@
 import "./index.html";
 import AssetManager from "core/utils/AssetManager";
 import Frame from "core/utils/Frame";
-import { log, get_app_name } from "core/utils/Tools";
+import { log, get_app_name , console } from "core/utils/Tools";
 
 import Device from "core/utils/Device"
 
 let App = null
 const APP_NAME = get_app_name()
 if (APP_NAME === undefined) {
-    console.log(`[App] no app`)
+    log(`MAIN`, `no app`)
 } else {
-    console.log(`[App] loading application "${APP_NAME}"`)
+    log(`MAIN`, `loading application "${APP_NAME}"`)
     App = require(`apps/${APP_NAME}/App`)
     App = App.default
 
 }
 
-console.log(`[MAIN] app version - ${PACKAGE_DATA.version}`)
+log(`MAIN`, `app version - ${PACKAGE_DATA.version}`)
 
 document.addEventListener("DOMContentLoaded", async () => {
     switch (Device.device_type) {

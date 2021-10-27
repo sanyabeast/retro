@@ -1,6 +1,6 @@
 
 import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRight, filter } from "lodash-es"
-import { log, error } from "core/utils/Tools"
+import { log, error , console } from "core/utils/Tools"
 
 const lib = {}
 

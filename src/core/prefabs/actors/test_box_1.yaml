@@ -25,6 +25,7 @@ components:
     name: BushController
     inline:
       props:
+        tick_rate: 30
         shake_speed: 1
         shake_ampl: 1
         rotation_speed: 1

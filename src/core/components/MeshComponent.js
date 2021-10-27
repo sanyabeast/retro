@@ -6,20 +6,34 @@
 import * as THREE from 'three';
 import AssetManager from "core/utils/AssetManager";
 import SceneComponent from "core/SceneComponent";
-import { set, get } from "lodash-es"
+import { set, get, isString, isFunction } from "lodash-es"
+import { log, error , console } from "core/utils/Tools"
 
 class MeshComponent extends SceneComponent {
     mesh = null;
     drop_shadow = true
     recieve_shadow = true
+    class = undefined
 
     tick_rate = 1
     on_created() {
-        let mesh = this.subject = MeshComponent.create_mesh({
-            geometry: this.geometry,
-            material: this.material,
-            geometry_translation: this.geometry_translation
-        })
+        let mesh = undefined
+
+        /**readymade objects stored in /objects/ directory of both app and core */
+        if (isString(this.class)) {
+            if (isFunction(THREE.objects[this.class])) {
+                mesh = this.subject = new THREE.objects[this.class](this.options)
+                console.log(this, mesh)
+            } else {
+                error("MeshComponent", `cannot create object of class "${this.class} - unknown class."`)
+            }
+        } else {
+            mesh = this.subject = MeshComponent.create_mesh({
+                geometry: this.geometry,
+                material: this.material,
+                geometry_translation: this.geometry_translation
+            })
+        }
 
         mesh.castShadow = this.drop_shadow
         mesh.receiveShadow = this.recieve_shadow
@@ -66,7 +80,6 @@ class MeshComponent extends SceneComponent {
         props.forEach(prop => {
             switch (prop) {
                 case "drop_shadow": {
-
                     this.subject.castShadow = this.drop_shadow
                     break
                 }

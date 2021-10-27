@@ -29,8 +29,7 @@ const renderer_presets = {
 }
 
 class Renderer extends Component {
-    target_fps = 33
-    tick_skip = 4
+    target_fps = 45
     postfx = true
     custom_render_function = undefined
     clear_depth = true
@@ -43,6 +42,7 @@ class Renderer extends Component {
     correct_lights = true
     current_matcap_id = 1
     shadows_enabled = true
+    tick_rate = 15
     //** private*/
 
     canvas = null

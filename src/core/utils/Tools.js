@@ -1,14 +1,38 @@
 
 import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction } from "lodash-es"
 import DateTime from "datetime-js"
+import exp from "constants";
 
+const cached_tag_colors = {}
+function get_random_color_for_string(tag) {
+    if (cached_tag_colors[tag]) return cached_tag_colors[tag]
+    let h = 0;
+    let s = 100
+    let l = 75
 
+    for (let a = 0; a < 10; a++) {
+        h += (tag.charCodeAt(a) || 0) / 3
+    }
+
+    h = Math.floor(h) % 360
+
+    cached_tag_colors[tag] = `hsl(${h}, ${s}%, ${l}%)`
+    return cached_tag_colors[tag]
+}
+
+let _console = window.console
 function log(tag, ...data) {
-    console.log(`%c[${tag}]`, "color: magenta", ...data);
+    if (!isString(tag)) {
+        return log('ANONYMOUS', ...arguments)
+    }
+    _console.log(`%c[${tag}]`, `color: ${get_random_color_for_string(tag)}`, ...data);
 }
 
 function error(tag, ...data) {
-    console.log(`%c[${tag}]`, "color: red", ...data);
+    if (!isString(tag)) {
+        return error('ANONYMOUS', ...arguments)
+    }
+    _console.log(`%c[${tag}]`, "color: red", ...data);
 }
 
 
@@ -212,6 +236,20 @@ function datetime(template = "%H:%i:%s", date = new Date) {
     return DateTime(date, template)
 }
 
+// let console = {
+//     log() {
+//         return log(...arguments)
+//     },
+//     error() {
+//         return error(...arguments)
+//     },
+//     dir() {
+//         return _console.dir(...arguments)
+//     }
+// }
+
+let console = _console
+
 export {
     log,
     get_query_string_params,
@@ -227,5 +265,7 @@ export {
     parse_inline_dict,
     makeid,
     datetime,
-    error
+    error,
+    get_random_color_for_string,
+    console
 }

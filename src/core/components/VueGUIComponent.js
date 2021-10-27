@@ -20,13 +20,6 @@ MyPlugin.install = function (Vue, options) {
         name: "BasicComponent",
         data() {
             return {
-                object: undefined,
-                global: undefined,
-                app: undefined,
-                launcher: undefined,
-                gui_component: undefined,
-                camera: undefined,
-                tasks: undefined
             }
         },
         props: {},
@@ -37,11 +30,22 @@ MyPlugin.install = function (Vue, options) {
                 p = p.$parent
             }
             let gui_component = p.gui_component
-            this.object = gui_component.object
-            this.globals = gui_component.globals
-            this.app = gui_component.globals.app
-            this.launcher = gui_component.globals.launcher
-            this.camera = gui_component.globals.camera
+
+            Object.defineProperty(this, "object", {
+                get: ()=> gui_component.object
+            })
+            Object.defineProperty(this, "globals", {
+                get: ()=> gui_component.globals
+            })
+            Object.defineProperty(this, "app", {
+                get: ()=> gui_component.globals.app
+            })
+            Object.defineProperty(this, "launcher", {
+                get: ()=> gui_component.globals.launcher
+            })
+            Object.defineProperty(this, "camera", {
+                get: ()=> gui_component.globals.camera
+            })
         },
         mounted() {
             this.$el.style.zIndex = "1"

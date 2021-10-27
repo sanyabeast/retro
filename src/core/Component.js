@@ -3,26 +3,28 @@
  *
  */
 
-import { log, makeid, datetime, is_none, hex_to_hsl, hsl_to_rgb, hex_to_rgb, request_text_sync } from "core/utils/Tools";
+import { log, makeid, datetime, is_none, hex_to_hsl, hsl_to_rgb, hex_to_rgb, request_text_sync, console } from "core/utils/Tools";
 import * as Tools from "core/utils/Tools";
-import EventDispatcher from "core/utils/EventDispatcher";
+import BasicObject from "core/utils/BasicObject";
 import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, isFunction, isString, map, keys, values, forEach } from "lodash-es"
 import AssetManager from "core/utils/AssetManager"
 import Schema from "core/utils/Schema"
 
 let id = 0
 const exclude_props = [
-    "components"
+    "components",
+    "children"
 ]
 
-class Component extends EventDispatcher {
+class Component extends BasicObject {
     tick_data = undefined
     object = null;
     subject = null;
     enabled = true;
     globals = undefined
-    tick_rate = 30
+    tick_rate = 15
     tick_enabled = true
+    debug_log_this = false
     constructor(params) {
         super(params);
         this.meta = {
@@ -41,7 +43,7 @@ class Component extends EventDispatcher {
                 prev_time: +new Date(),
                 delta: 1,
                 ticks: 0,
-                rate: 30,
+                rate: 15,
                 enabled: true
             }
         }
@@ -55,6 +57,10 @@ class Component extends EventDispatcher {
         if (this.topics) {
             this.topics.forEach(event_name => this.listen(event_name))
         }
+        if (params && params.debug_log_this === true) {
+            this.log(this)
+        }
+        
     }
     tick(tick_data) {
         this.meta.ticking.rate = this.tick_rate
@@ -122,7 +128,6 @@ class Component extends EventDispatcher {
                     default: {
                         if (exclude_props.indexOf(k) < 0) {
                             this[k] = params[k]
-
                         }
                     }
                 }
@@ -239,23 +244,10 @@ class Component extends EventDispatcher {
     get_components(component_name) {
         return this.object.get_components(component_name);
     }
-    lerp(start, end, amt) {
-        return (1 - amt) * start + amt * end;
-    }
-    log() {
-        log(this.constructor.name, ...arguments);
-    }
-    shuffle_array(arr) {
-        return arr.sort(() => (Math.random() > .5) ? 1 : -1);
-    }
-    random_range(min, max) {
-        return Math.random() * (max - min) + min;
-    }
-    random_choice(arr) {
-        return arr[Math.floor(Math.random() * arr.length)]
-    }
 }
 
+
+/**inline components (components that logic is confgured directly in prefab using special syntax (see core/SCHEMA.yaml -> COMPONENT)) */
 Component.create = (params, name) => {
     name = isString(name) ? name : `Component_${makeid(16, false, true, false)}`
     let Comp = Component

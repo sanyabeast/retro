@@ -14,7 +14,7 @@ class App extends CoreApp {
         let camera = this.find_component_of_type("CameraComponent")
         let postfx = this.find_component_of_type("Postprocessing")
 
-        renderer.target_fps = 60
+        renderer.target_fps = 45
         // postfx.enabled = Device.device_type === "desktop"
         camera.fov = 60
 

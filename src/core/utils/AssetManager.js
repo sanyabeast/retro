@@ -4,16 +4,18 @@
  */
 
 import * as THREE from 'three';
-import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict } from "core/utils/Tools";
+import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict, console } from "core/utils/Tools";
 import { isObject, isArray, merge, forEach, isString } from "lodash-es";
 import GameObject from 'core/GameObject';
 import Schema from "core/utils/Schema"
+import RenderTarget from "core/components/RenderTarget"
 
 import { set, map, filter } from "lodash-es";
 import AssetBufferGeometry from '../geometry/classes/AssetBufferGeometry';
 import SCHEMA_CORE from "core/SCHEMA.yaml"
 
 const SCHEMA_APP = require(`apps/${process.env.APP_NAME}/SCHEMA.yaml`)
+let texture_placeholder = undefined
 
 for (let k in SCHEMA_CORE) {
     Schema.register(k, SCHEMA_CORE[k])
@@ -322,16 +324,17 @@ class AssetManager {
             if (src.indexOf("@") === 0) {
                 texture = AssetManager.textures_cache[src] = AssetManager.load_from_texture_lib(src, params)
             } else {
-                texture = AssetManager.textures_cache[src] =
-                    new THREE.TextureLoader().load(src);
+                texture = AssetManager.textures_cache[src] = new THREE.TextureLoader().load(src);
             }
         }
-
-        for (let k in params) {
-            set(texture, k, params[k])
+        if (!texture) {
+            texture = texture_placeholder
+        } else {
+            for (let k in params) {
+                set(texture, k, params[k])
+            }
+            texture.needsUpdate = true;
         }
-
-        texture.needsUpdate = true;
         return texture;
     }
     static load_cubemap(src, type = "jpg") {
@@ -348,14 +351,34 @@ class AssetManager {
     }
     static texture_stream_cache = {}
     static texture_stream_function(url) {
-        let texture = AssetManager.texture_stream_cache[url]
+        let texture
+        // console.log(url)
+        if (url.startsWith("rt:")) {
+            console.log(RenderTarget.list)
+            let render_target_id = url.replace("rt:", "")
+            let render_target = RenderTarget.list[render_target_id]
+            if (render_target !== undefined) {
+                console.log('AssetManager', url, render_target)
+            }
+        } else {
+            texture = AssetManager.texture_stream_cache[url]
+
+            if (!texture) {
+                let params = get_query_string_params(url.split("?")[1] || "")
+                let src = url.split("?")[0]
+                texture = AssetManager.load_texture(src, params)
+                if (texture.is_placeholder !== true) {
+                    AssetManager.texture_stream_cache[url] = texture
+                }
+            }
+        }
+
         if (!texture) {
-            let params = get_query_string_params(url.split("?")[1] || "")
-            let src = url.split("?")[0]
-            texture = AssetManager.texture_stream_cache[url] = AssetManager.load_texture(src, params)
+            texture = texture_placeholder
         }
 
         return texture
+
     }
     static images_cache = {}
     static load_image(src) {
@@ -532,6 +555,9 @@ if (process.env.APP_NAME === undefined) {
     AssetManager.preload_geometries(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/`, true, /\.yaml$/))
     AssetManager.preload_prefabs(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/prefabs/`, true, /\.yaml$/))
 }
+
+texture_placeholder = AssetManager.load_texture("res/core/uv_checker_b.jpg")
+texture_placeholder.is_placeholder = true
 
 log("AssetManaget", "initialized");
 

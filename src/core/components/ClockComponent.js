@@ -53,7 +53,7 @@ class ClockComponent extends Component {
         this.globals.tick_skip = this.globals.need_render ? 1 : 1
     }
     on_tick(time_data) {
-        this.globals.uniforms.time.value += 0.01 * this.tick_delta;
+        this.globals.uniforms.time.value += (1 / 60) * this.tick_delta;
     }
     on_destroy() {
         cancelAnimationFrame(this.loop_id)

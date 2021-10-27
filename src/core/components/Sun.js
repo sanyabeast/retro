@@ -7,7 +7,7 @@
 import SceneComponent from "core/SceneComponent";
 import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
-import { hex_to_hsl, hsl_to_rgb, hex_to_rgb } from "core/utils/Tools";
+import { hex_to_hsl, hsl_to_rgb, hex_to_rgb , console } from "core/utils/Tools";
 
 class Sun extends SceneComponent {
     time = 0.5

@@ -3,7 +3,7 @@
  *
  */
 
-import { log } from "core/utils/Tools";
+import { log , console } from "core/utils/Tools";
 import Component from "core/Component";
 import * as THREE from 'three';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
@@ -111,7 +111,7 @@ class SceneComponent extends Component {
         }
     }
     on_update(props) {
-        if (this.subject instanceof THREE.Object3D) {
+        if (isObject(this.subject)) {
             props.forEach((prop) => {
                 switch (prop) {
                     case "position": {

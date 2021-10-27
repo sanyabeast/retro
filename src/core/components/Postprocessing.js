@@ -20,10 +20,10 @@ class Postprocessing extends Component {
     outline_effect = undefined
     use_ssao = true
     use_bloom = true
-    use_outline = true
+    use_outline = false
     use_godrays = true
     use_tonemapping = true
-    use_chromatic_abberation = true
+    use_chromatic_abberation = false
     use_hs = true
     use_bc = true
     use_grain = true
@@ -96,13 +96,11 @@ class Postprocessing extends Component {
         props.forEach(prop => {
             switch (prop) {
                 case "outline_selection": {
-                    this.outline_effect.selection.set(this.outline_selection)
+                    if (this.outline_effect !== undefined) this.outline_effect.selection.set(this.outline_selection)
                     break
                 }
                 case "grain_power": {
-                    if (this.grain_effect) {
-                        this.grain_effect.blendMode.opacity.value = this.grain_power;
-                    }
+                    if (this.grain_effect) this.grain_effect.blendMode.opacity.value = this.grain_power;
                     break
                 }
                 case "bloom_smoothing": {

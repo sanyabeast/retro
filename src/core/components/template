@@ -5,16 +5,50 @@
  */
 
 import Component from "core/Component";
-import AssetManager  from "core/utils/AssetManager";
+import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
+import { log, error, is_none, , console } from "core/utils/Tools"
+import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefined, isNull, map, filter, keys, values, set, get, unset } from "lodash-es"
+import Schema from "core/utils/Schema"
 
 class SomeComponent extends Component {
     on_created() {
 
     }
     on_tick(time_delta) {
-        
+
     }
 }
 
 export default SomeComponent;
+
+
+
+/* created by @sanyabeast 9/6/2021 
+ *
+ *
+ */
+
+import SceneComponent from "core/SceneComponent";
+import AssetManager from "core/utils/AssetManager";
+import * as THREE from 'three';
+import { log, error, is_none , console } from "core/utils/Tools"
+import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefined, isNull, map, filter, keys, values, set, get, unset } from "lodash-es"
+import Schema from "core/utils/Schema"
+
+class SomeSceneComponent extends SceneComponent {
+    on_created() {
+
+    }
+    on_tick(time_delta) {
+
+    }
+    get_reactive_props() {
+        return [].concat(super.get_reactive_props())
+    }
+    on_update(props) {
+        super.on_update(props)
+    }
+}
+
+export default SomeSceneComponent;
