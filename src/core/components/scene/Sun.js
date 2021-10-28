@@ -58,6 +58,9 @@ class Sun extends SceneComponent {
     tick_rate = 10
 
     gizmo_dirlight_helper = undefined
+    get_light_color(){
+        return this.light.color
+    }
     on_created() {
 
         /*dir light*/

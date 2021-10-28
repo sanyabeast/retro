@@ -9,7 +9,7 @@ import AssetManager from "core/utils/AssetManager";
 import { union } from "lodash";
 import { Vector2 } from "spine-ts-threejs";
 import * as THREE from 'three';
-import { hex_to_hsl, hsl_to_rgb, hex_to_rgb , console } from "core/utils/Tools";
+import { hex_to_hsl, hsl_to_rgb, hex_to_rgb, console } from "core/utils/Tools";
 
 
 
@@ -17,16 +17,31 @@ class Water extends SceneComponent {
     /**automatically finds "Sun" component and uses its sun`s position */
     find_sun = true
     sun = undefined
-    width = 10000
-    height = 10000
+    width = 1000
+    height = 1000
+    water_type = 1
 
     on_created() {
         this.meta.layers.normal = false
-        let water = this.subject = new THREE.objects.Water({
-            width: this.width,
-            height: this.height,
-            fog: false
-        });
+        let water = undefined
+        switch (this.water_type) {
+            case 1:
+                water = this.subject = new THREE.objects.Water({
+                    width: this.width,
+                    height: this.height,
+                    fog: false
+                });
+                break;
+            case 2:
+                water = this.subject = new THREE.objects.Water2({
+                    width: this.width,
+                    height: this.height,
+                    fog: false
+                });
+                break;
+            default:
+                break;
+        }
 
     }
     get_render_data() {
@@ -44,15 +59,27 @@ class Water extends SceneComponent {
         super.on_update(...arguments)
     }
     on_tick(time_delta) {
-        if (this.find_sun) {
-            this.sun = this.find_component_of_type("Sun")
-        }
+        switch (this.water_type) {
+            case 1:
+                if (this.find_sun) {
+                    this.sun = this.find_component_of_type("Sun")
+                }
 
-        if (this.sun !== undefined) {
-            this.subject.material.uniforms['sunDirection'].value.copy(this.sun.subject.position).normalize();
-        }
+                if (this.sun !== undefined) {
+                    this.subject.material.uniforms['sunDirection'].value.copy(this.sun.subject.position).normalize();
+                    let sun_color = this.sun.get_light_color()
+                    this.subject.material.uniforms['sunDirection'].value.copy(sun_color)
+                }
 
-        this.subject.material.uniforms['time'].value += 1.0 / 60.0;
+                this.subject.material.uniforms["eye"].value.copy(this.globals.camera)
+
+
+                this.subject.material.uniforms['time'].value += 1.0 / 60.0;
+                break;
+
+            default:
+                break;
+        }
     }
 }
 

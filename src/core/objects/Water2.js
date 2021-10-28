@@ -1,19 +1,22 @@
 import * as THREE from 'three';
-import { Water as TWater } from 'three/examples/jsm/objects/Water.js';
+import { Water as TWater } from 'three/examples/jsm/objects/Water2.js';
+import AssetManager from "core/utils/AssetManager"
 import { isNumber } from "lodash-es"
 
 class Water extends TWater {
     constructor(options = {}) {
         options = {
-            textureWidth: 256,
-            textureHeight: 256,
+            textureWidth: 1024,
+            textureHeight: 1024,
+            scale: 1000,
             width: 100,
             height: 100,
             radius: 50,
             segments: 32,
-            side: THREE.DoubleSide,
             geometry: "plane",
-            waterNormals: "res/core/waternormals.jpg?wrapT=1000&wrapS=1000",
+            reflectivity: 0.1,
+            normalMap0: AssetManager.load_texture("res/core/Water_1_M_Normal.jpg"),
+            normalMap1: AssetManager.load_texture("res/core/Water_1_M_Normal.jpg"),
             sunDirection: new THREE.Vector3(),
             sunColor: 0xffffff,
             waterColor: 0x001e0f,

@@ -289,14 +289,18 @@ class Water extends Mesh {
 			// Calculate the scaled plane vector
 			clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
 
+			
 			// Replacing the third row of the projection matrix
 			projectionMatrix.elements[ 2 ] = clipPlane.x;
 			projectionMatrix.elements[ 6 ] = clipPlane.y;
 			projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
 			projectionMatrix.elements[ 14 ] = clipPlane.w;
 
+			
 			eye.setFromMatrixPosition( camera.matrixWorld );
 
+
+			
 			// Render
 
 			const currentRenderTarget = renderer.getRenderTarget();
