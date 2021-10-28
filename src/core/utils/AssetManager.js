@@ -355,9 +355,10 @@ class AssetManager {
         // console.log(url)
         if (url.startsWith("rt:")) {
             let render_target_id = url.replace("rt:", "")
-            let render_target = RenderTarget.list[render_target_id]
-            if (render_target !== undefined) {
-                return render_target.texture
+            let render_target_state = RenderTarget.list[render_target_id]
+            
+            if (render_target_state !== undefined) {
+                return render_target_state.texture
             }
         } else {
             texture = AssetManager.texture_stream_cache[url]

@@ -4,19 +4,23 @@
  *
  */
 
-import Component from "core/Component";
+import SceneComponent from "core/SceneComponent";
 import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
 import { map } from "lodash-es"
+import { makeid } from "core/utils/Tools"
+import RenderTarget from "./RenderTarget";
+import Collider from "./Collider";
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 
-class InputComponent extends Component {
+class InputComponent extends SceneComponent {
     detection_mode = "colorid"
     raycasting = true
-    pointer_position = new THREE.Vector2(0, 0)
+    pointer_position = undefined
+    pointer_position_abs = undefined
     raycasting_intersects = []
     intersected_objects = []
     intersected_objects_ids = {}
@@ -27,7 +31,16 @@ class InputComponent extends Component {
     /**private */
     prev_camera_matrix = undefined
 
-
+    /**colorid */
+    colorid_changed = false
+    colorid_current_collider = undefined
+    colorid_render_target_state = undefined
+    colorid_debug_plane = undefined
+    constructor() {
+        super(...arguments)
+        this.pointer_position = new THREE.Vector2(0, 0)
+        this.pointer_position_abs = new THREE.Vector2(0, 0)
+    }
     on_created() {
         this.handle_keydown = this.handle_keydown.bind(this)
         this.handle_keyup = this.handle_keyup.bind(this)
@@ -38,6 +51,66 @@ class InputComponent extends Component {
         this.handle_mouseup = this.handle_mouseup.bind(this)
         this.handle_click = this.handle_click.bind(this)
         this.handle_mouseout = this.handle_mouseout.bind(this)
+
+        switch (this.detection_mode) {
+            case "colorid": {
+                this.setup_colorid()
+                break
+            }
+        }
+
+        console.log(this)
+    }
+    // get_gizmo_render_data() {
+    //     return [{
+    //         object: this.colorid_debug_plane
+    //     }]
+    // }
+    setup_colorid() {
+        let render_target_state = this.colorid_render_target_state = RenderTarget.get_render_target({
+            w: 256,
+            h: 256
+        })
+
+        let colorid_debug_plane = this.colorid_debug_plane = new THREE.objects.FullscreenRect({
+            map: `rt:${render_target_state.id}`,
+            scale: 1,
+            opacity: 0.5
+        })
+
+    }
+    update_colorid() {
+        this.colorid_changed = false
+
+        let camera = this.globals.camera
+        let renderer = this.find_component_of_type("Renderer")
+        if (camera) {
+            this.colorid_render_target_state.copy_camera(camera)
+        }
+        if (renderer) {
+            this.colorid_render_target_state.update_render_list(renderer, { colorid: true })
+            this.colorid_render_target_state.setup_scene(undefined, "#000000")
+            // this.colorid_render_target_state.render(renderer, true)
+            let pixel_color = this.colorid_render_target_state.pick(
+                renderer,
+                this.pointer_position_abs
+            )
+            let collider = Collider.color_id_get_with_rgb(...pixel_color)
+            if (collider) {
+                if (collider && !this.colorid_current_collider) this.colorid_changed = true
+                if (!collider && this.colorid_current_collider) this.colorid_changed = true
+                if (collider && this.colorid_current_collider) {
+                    if (collider.collider_id !== this.colorid_current_collider.collider_id) {
+                        this.colorid_changed = true
+                    }
+                }
+                this.colorid_current_collider = collider
+
+            }
+        }
+    }
+    check_color_id(r, g, b) {
+
     }
     on_enabled() {
         window.addEventListener('keydown', this.handle_keydown)
@@ -62,9 +135,17 @@ class InputComponent extends Component {
         window.removeEventListener('mouseout', this.handle_mouseout)
     }
     on_tick(time_delta) {
+        switch (this.detection_mode) {
+            case "colorid": {
+                this.update_colorid()
+                break
+            }
+        }
+
         if (this.raycasting) {
             this.update_raycasting_state();
         }
+
 
         this.pointer_position_changed = false
     }
@@ -77,13 +158,10 @@ class InputComponent extends Component {
     handle_keypress(evt) {
         // console.log(`keypress`, evt)
     }
-
     equal_with_precise(a, b, prec) {
         return parseFloat(a.toFixed(prec)) === parseFloat(b.toFixed(prec))
     }
-
     handle_mousemove(evt) {
-
         let dom_rect = this.globals.dom_rect
         let new_x = (((evt.pageX - dom_rect.x) / dom_rect.width) - 0.5) * 2
         let new_y = (((evt.pageY - dom_rect.y) / dom_rect.height) - 0.5) * 2
@@ -91,6 +169,9 @@ class InputComponent extends Component {
         this.pointer_position_changed = (!this.equal_with_precise(new_x, this.pointer_position.x, 5) || !this.equal_with_precise(new_y, this.pointer_position.y, 5))
         this.pointer_position.x = new_x
         this.pointer_position.y = new_y
+
+        this.pointer_position_abs.x = evt.pageX - dom_rect.x
+        this.pointer_position_abs.y = evt.pageY - dom_rect.y
         // console.log(`mousemove`, evt)
     }
     handle_mouseover(evt) {

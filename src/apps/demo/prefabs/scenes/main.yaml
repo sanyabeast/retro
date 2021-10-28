@@ -37,6 +37,55 @@ components:
     params:
       test: 1
 children:
+  - components:
+      chalkboard:
+        name: MeshComponent
+        params:
+          debug_transform: false
+          position:
+            - 2
+            - 0
+            - 2.2
+          rotation: [0, -2, 0]
+          geometry:
+            - "url:res/core/models/rest_chalkboard_1/chalkboard.obj"
+            - 0.3
+          material:
+            - AssetMaterial
+            - src: "res/core/models/rest_chalkboard_1/chalkboard.mtl"
+              transparent: false
+              doubleside: true
+      collider:
+        name: Collider
+        params:
+          collider_type: box
+          sphere_radius: 0.5
+          box_size: [0.6, 0.8, 0.6]
+          offset: [0, 0.4, 0]
+  - components:
+      phone:
+        name: MeshComponent
+        tag: bush
+        params:
+          position:
+            - -2
+            - 0
+            - -2.2
+          rotation: [0, 1, 0]
+          geometry:
+            - "url:res/demo/models/phone/phone.obj"
+            - 2
+          material:
+            - AssetMaterial
+            - color: "#daefe5"
+              src: "res/demo/models/phone/phone.mtl"
+      collider:
+        name: Collider
+        params:
+          collider_type: box
+          sphere_radius: 0.5
+          box_size: [1.2, 3, 1.2]
+          offset: [0, 1.5, 0]
   - children:
       - components:
           tv:
@@ -121,39 +170,7 @@ children:
                 - AssetMaterial
                 - color: "#daefe5"
                   src: "res/core/models/monsterra/monsterra.mtl"
-          phone:
-            name: MeshComponent
-            tag: bush
-            params:
-              position:
-                - -2
-                - 0
-                - -2.2
-              rotation: [0, 1, 0]
-              geometry:
-                - "url:res/demo/models/phone/phone.obj"
-                - 2
-              material:
-                - AssetMaterial
-                - color: "#daefe5"
-                  src: "res/demo/models/phone/phone.mtl"
-          chalkboard:
-            name: MeshComponent
-            params:
-              debug_transform: false
-              position:
-                - 2
-                - 0
-                - 2.2
-              rotation: [0, -2, 0]
-              geometry:
-                - "url:res/core/models/rest_chalkboard_1/chalkboard.obj"
-                - 0.3
-              material:
-                - AssetMaterial
-                - src: "res/core/models/rest_chalkboard_1/chalkboard.mtl"
-                  transparent: false
-                  doubleside: true
+
           # lantern:
           #   name: MeshComponent
           #   params:
@@ -195,20 +212,6 @@ children:
               - position: [-6, 0, 0]
                 rotation: [0, -2.57, 0]
                 components:
-                  linker_1:
-                    name: MeshComponent
-                    params:
-                      position:
-                        - 0
-                        - 0
-                        - 0
-                      geometry:
-                        - "url:res/core/models/wood_fence_a1/linker_1.obj"
-                        - 1
-                      material:
-                        - AssetMaterial
-                        - color: "#daefe5"
-                          src: "res/core/models/wood_fence_a1/linker_1.mtl"
                   fence_a:
                     name: MeshComponent
                     params:
@@ -224,6 +227,27 @@ children:
                         - color: "#daefe5"
                           doubleside: true
                           src: "res/core/models/wood_fence_a1/fence_1.mtl"
+                  linker_1:
+                    name: MeshComponent
+                    params:
+                      position:
+                        - 0
+                        - 0
+                        - 0
+                      geometry:
+                        - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                        - 1
+                      material:
+                        - AssetMaterial
+                        - color: "#daefe5"
+                          src: "res/core/models/wood_fence_a1/linker_1.mtl"
+                  collider:
+                    name: Collider
+                    params:
+                      collider_type: box
+                      sphere_radius: 0.5
+                      box_size: [2, 1, 0.05]
+                      offset: [-1, 0.5, 0]
               - position: [3, 0, 0]
                 rotation: [0, -2, 0]
                 components:
@@ -308,7 +332,7 @@ children:
             name: Collider
             params:
               collider_type: sphere
-              sphere_radius: 0.5
+              sphere_radius: 0.3
               box_size: [1.1, 1.1, 1.1]
               offset: [0, 0.5, 0]
       - components:

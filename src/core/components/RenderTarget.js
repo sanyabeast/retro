@@ -29,13 +29,10 @@ class RenderTarget extends SceneComponent {
     override_material = undefined
 
     rendering_layers = undefined
-
     tick_rate = 30
 
     /**private */
-    render_target = undefined;
-    rt_camera = undefined
-    rt_scene = undefined
+    render_target_state = undefined;
 
     current_override_material = undefined
     override_normal_material = new THREE.MeshNormalMaterial()
@@ -44,52 +41,33 @@ class RenderTarget extends SceneComponent {
     override_wireframe_material = new THREE.MeshBasicMaterial({ wireframe: true, wireframeLinewidth: 1, fog: false })
     override_matcap_material = new THREE.MeshMatcapMaterial({ fog: false, matcap: "res/core/matcap_texture/matcap (1).png" })
 
+
+
     get texture() {
-        return this.render_target.texture
+        return this.render_target_state.render_target.texture
     }
     on_created() {
         log(`RenderTarget`, `created`)
+
+
         if (isUndefined(this.rendering_layers)) {
             this.rendering_layers = {
                 rendering: true
             }
         }
-        if (isUndefined(this.render_target_id)) {
-            this.render_target_id = `RT_${makeid(8)}`
-        }
-        let render_target = this.render_target = RenderTarget.get_render_target(this.width, this.height)
+
+        let render_target_state = this.render_target_state = RenderTarget.get_render_target({
+            id: this.render_target_id,
+            width: this.width,
+            height: this.height,
+            camera_type: this.camera_type
+        })
         if (!THREE.MathUtils.isPowerOfTwo(this.width) || !THREE.MathUtils.isPowerOfTwo(this.height)) {
-            render_target.texture.generateMipmaps = false;
+            render_target_state.render_target.texture.generateMipmaps = false;
         }
 
-        log(this, render_target)
-        RenderTarget.list[this.render_target_id] = this
+        log(this, render_target_state)
 
-        let camera = this.rt_camera = this.create_camera()
-        let scene = this.rt_scene = new THREE.Scene()
-        scene.updateWorldMatrix = false
-    }
-    create_camera() {
-        let camera = undefined
-        switch (this.camera_type) {
-            case "othographic": {
-                camera = new THREE.OrthographicCamera({
-                    fov: this.fov,
-                    aspect: this.aspect,
-                    near: this.near,
-                    far: this.far,
-                    position: new THREE.Vector3(0, 0, 20),
-                });
-                break
-            }
-            default: {
-                camera = new THREE.PerspectiveCamera(this.fov, this.aspect, this.near, this.far);
-                break
-            }
-
-        }
-
-        return camera
     }
     on_tick(time_delta) {
         this.update_camera()
@@ -129,33 +107,15 @@ class RenderTarget extends SceneComponent {
     update_scene() {
         let renderer = this.find_component_of_type("Renderer")
         if (renderer) {
-            // console.log(this.rendering_layers)
-            let render_list = renderer.get_object_layer_list(this.rendering_layers)
-            this.rt_scene.children = render_list
-            // console.log(render_list)
+            this.render_target_state.update_render_list(renderer, this.rendering_layers)
+            this.render_target_state.setup_scene(this.globals.app.fog, this.globals.app.background, this.current_override_material)
         }
 
-        this.rt_scene.fog = this.globals.app.fog
-        this.rt_scene.background = this.globals.app.background
-        this.rt_scene.overrideMaterial = this.current_override_material === undefined ? null : this.current_override_material
     }
     render() {
         let renderer = this.find_component_of_type("Renderer")
         if (renderer) {
-            // three native renderer
-            let gl_renderer = renderer.renderer
-            const prev_render_target = gl_renderer.getRenderTarget();
-            const prev_xr_enabled = gl_renderer.xr.enabled;
-            const prev_shadowmap_autoupdate = gl_renderer.shadowMap.autoUpdate;
-            gl_renderer.xr.enabled = false; // Avoid camera modification and recursion
-            gl_renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
-            gl_renderer.setRenderTarget(this.render_target);
-            gl_renderer.state.buffers.depth.setMask(true); // make sure the depth buffer is writable so it can be properly cleared, see #18897
-            if (gl_renderer.autoClear === false) gl_renderer.clear();
-            gl_renderer.render(this.rt_scene, this.rt_camera);
-            gl_renderer.xr.enabled = prev_xr_enabled;
-            gl_renderer.shadowMap.autoUpdate = prev_shadowmap_autoupdate;
-            gl_renderer.setRenderTarget(prev_render_target);
+            this.render_target_state.render(renderer)
         }
     }
     get_reactive_props() {
@@ -196,24 +156,24 @@ class RenderTarget extends SceneComponent {
                     break
                 }
                 case "fov": {
-                    this.rt_camera.fov = this.fov
-                    this.rt_camera.updateProjectionMatrix()
+                    this.render_target_state.camera.fov = this.fov
+                    this.render_target_state.camera.updateProjectionMatrix()
                     break
                 }
                 case "aspect": {
-                    this.rt_camera.aspect = this.aspect
-                    this.rt_camera.updateProjectionMatrix()
+                    this.render_target_state.camera.aspect = this.aspect
+                    this.render_target_state.camera.updateProjectionMatrix()
                     break
                 }
                 case "position": {
                     if (Array.isArray(this.position)) {
-                        this.rt_camera.position.set(
+                        this.render_target_state.camera.position.set(
                             this.position[0],
                             this.position[1],
                             this.position[2]
                         );
                     } else if (typeof this.position === "object") {
-                        this.rt_camera.position.set(
+                        this.render_target_state.camera.position.set(
                             this.position.x,
                             this.position.y,
                             this.position.z
@@ -224,13 +184,13 @@ class RenderTarget extends SceneComponent {
                 }
                 case "scale": {
                     if (Array.isArray(this.scale)) {
-                        this.rt_camera.scale.set(
+                        this.render_target_state.camera.scale.set(
                             this.scale[0],
                             this.scale[1],
                             this.scale[2]
                         );
                     } else if (typeof this.scale === "object") {
-                        this.rt_camera.scale.set(
+                        this.render_target_state.camera.scale.set(
                             this.scale.x,
                             this.scale.y,
                             this.scale.z
@@ -241,13 +201,13 @@ class RenderTarget extends SceneComponent {
                 }
                 case "rotation": {
                     if (Array.isArray(this.rotation)) {
-                        this.rt_camera.rotation.set(
+                        this.render_target_state.camera.rotation.set(
                             this.rotation[0],
                             this.rotation[1],
                             this.rotation[2]
                         );
                     } else if (typeof this.rotation === "object") {
-                        this.rt_camera.rotation.set(
+                        this.render_target_state.camera.rotation.set(
                             this.rotation.x,
                             this.rotation.y,
                             this.rotation.z
@@ -274,15 +234,159 @@ class RenderTarget extends SceneComponent {
 }
 
 RenderTarget.list = {}
+RenderTarget.get_render_target = ({ id = "", w = 512, h = 512, camera_params }) => {
 
+    let canvas2d = document.createElement("canvas")
+    let canvas2d_context = canvas2d.getContext("2d")
+    document.body.appendChild(canvas2d)
 
-RenderTarget.get_render_target = (w = 512, h = 512) => {
+    if (id === "") {
+        id = `RT_${makeid(8)}`
+    }
+    camera_params = {
+        type: "perspective",
+        fov: 60,
+        aspect: 1,
+        near: 0.1,
+        far: 10000,
+        ...camera_params
+    }
     const rt = new THREE.WebGLRenderTarget(w, h, {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
-        format: THREE.RGBFormat
+        format: THREE.RGBAFormat
     });
-    return rt
+
+    rt.depthBuffer = false
+    let camera = undefined
+    switch (camera_params.type) {
+        case "othographic": {
+            camera = new THREE.OrthographicCamera({
+                fov: camera_params.fov,
+                aspect: camera_params.aspect,
+                near: camera_params.near,
+                far: camera_params.far,
+                position: new THREE.Vector3(0, 0, 20),
+            });
+            break
+        }
+        default: {
+            camera = new THREE.PerspectiveCamera(camera_params.fov, camera_params.aspect, camera_params.near, camera_params.far);
+            break
+        }
+    }
+    let scene = new THREE.Scene()
+    scene.updateWorldMatrix = false
+    let bitmap_data_array = new Uint8Array(w * h * 3)
+    let render_target_state = {
+        w,
+        h,
+        canvas2d,
+        canvas2d_context,
+        id: id,
+        render_target: rt,
+        camera: camera,
+        scene: scene,
+        bitmap_data: undefined,
+        get texture() {
+            return rt.texture
+        },
+        setup_scene(fog, background, override_material) {
+            scene.fog = fog
+            scene.background = background
+            scene.overrideMaterial = override_material === undefined ? null : override_material
+        },
+        update_render_list(renderer, rendering_layers) {
+            let render_list = renderer.get_object_layer_list(rendering_layers)
+            scene.children = render_list
+        },
+        destroy() {
+            log(`RenderTarget`, 'IMPLEMENT DESTROYING')
+            delete RenderTarget.list[id]
+        },
+        render(renderer, update_bitmap_data) {
+            let gl_renderer = renderer.renderer
+            const prev_render_target = gl_renderer.getRenderTarget();
+            const prev_xr_enabled = gl_renderer.xr.enabled;
+            const prev_shadowmap_autoupdate = gl_renderer.shadowMap.autoUpdate;
+            const prev_preserve_db = gl_renderer.preserveDrawingBuffer
+            gl_renderer.preserveDrawingBuffer = true
+            gl_renderer.xr.enabled = false; // Avoid camera modification and recursion
+            gl_renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+            gl_renderer.setRenderTarget(render_target_state.render_target);
+            gl_renderer.state.buffers.depth.setMask(true); // make sure the depth buffer is writable so it can be properly cleared, see #18897
+            if (gl_renderer.autoClear === false) gl_renderer.clear();
+
+            gl_renderer.render(render_target_state.scene, render_target_state.camera);
+            if (update_bitmap_data) {
+                // this.canvas2d_context.drawImage(gl_renderer.domElement, 0, 0, this.canvas2d.width, this.canvas2d_height)
+                let d = gl_renderer.readRenderTargetPixels(
+                    render_target_state.render_target,
+                    0,
+                    0,
+                    render_target_state.w,
+                    render_target_state.h,
+                    bitmap_data_array
+                )
+
+                this.bitmap_data = bitmap_data_array
+
+                for (let a = 0; a < bitmap_data_array.length; a++) {
+                    if (bitmap_data_array[a] !== 0) {
+                        console.log(a)
+                    }
+                }
+                console.log(bitmap_data_array)
+            }
+
+            gl_renderer.xr.enabled = prev_xr_enabled;
+            gl_renderer.shadowMap.autoUpdate = prev_shadowmap_autoupdate;
+            gl_renderer.preserveDrawingBuffer = prev_preserve_db
+            gl_renderer.setRenderTarget(prev_render_target);
+        },
+        pick(renderer, pointer) {
+            let gl_renderer = renderer.renderer
+            camera.setViewOffset(gl_renderer.domElement.width, gl_renderer.domElement.height, pointer.x * window.devicePixelRatio | 0, pointer.y * window.devicePixelRatio | 0, 1, 1);
+            // render the scene
+            gl_renderer.setRenderTarget(rt);
+            gl_renderer.render(scene, camera);
+            // clear the view offset so rendering returns to normal
+            camera.clearViewOffset();
+            //create buffer for reading single pixel
+            const pixel_buffer = new Uint8Array(4);
+            //read the pixel
+            gl_renderer.readRenderTargetPixels(rt, 0, 0, 1, 1, pixel_buffer);
+            return [pixel_buffer[0], pixel_buffer[1], pixel_buffer[2]]
+        },
+        copy_camera(target_camera) {
+            camera.position.copy(target_camera.position)
+            camera.rotation.copy(target_camera.rotation)
+            camera.scale.copy(target_camera.scale)
+            camera.fov = target_camera.fov
+            camera.aspect = target_camera.aspect
+        },
+        get_pixel_color(x, y) {
+            console.log(x)
+            console.log(x, y)
+            let xx = (w) * ((x + 1) / 2)
+            let yy = (h) * ((y + 1) / 2)
+            let id = Math.floor(xx * yy * 3)
+            console.log(xx, yy, id)
+            if (this.bitmap_data) {
+                let r = this.bitmap_data[id]
+                let g = this.bitmap_data[id + 1]
+                let b = this.bitmap_data[id + 2]
+                return [r, g, b]
+            } else {
+                console.log("!")
+                return [0, 0, 0]
+            }
+        }
+    }
+
+    RenderTarget.list[id] = render_target_state
+
+    return RenderTarget.list[id]
 }
 
 export default RenderTarget;

@@ -76,6 +76,7 @@ class Renderer extends Component {
         let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({
             antialias: true,
             alpha: true,
+            preserveDrawingBuffer: true,
             stencil: this.clear_stencil,
             depth: this.clear_depth,
             ...renderer_presets[Device.device_type]
@@ -186,7 +187,7 @@ class Renderer extends Component {
                 let local_render_list = []
                 let render_data = comp.get_render_data()
                 let gizmo_render_data = comp.get_gizmo_render_data()
-                
+
 
                 local_render_list = local_render_list.concat(render_data)
                 local_render_list = local_render_list.concat(gizmo_render_data)
@@ -313,21 +314,25 @@ class Renderer extends Component {
                 this.current_override_material = this.override_normal_material
                 this.rendering_layers.normal = true
                 this.rendering_layers.rendering = false
+                this.rendering_layers.colorid = false
                 break;
             case "depth":
                 this.current_override_material = this.override_depth_material
                 this.rendering_layers.normal = true
                 this.rendering_layers.rendering = false
+                this.rendering_layers.colorid = false
                 break;
             case "distance":
                 this.current_override_material = this.override_distance_material
                 this.rendering_layers.normal = true
                 this.rendering_layers.rendering = false
+                this.rendering_layers.colorid = false
                 break;
             case "wireframe":
                 this.current_override_material = this.override_wireframe_material
                 this.rendering_layers.normal = true
                 this.rendering_layers.rendering = false
+                this.rendering_layers.colorid = false
                 break;
             case "matcap":
                 this.current_override_material = this.override_matcap_material
@@ -335,11 +340,19 @@ class Renderer extends Component {
                 this.override_matcap_material.matcap = `res/core/matcap_texture/matcap (${matcap_id}).png`
                 this.rendering_layers.normal = true
                 this.rendering_layers.rendering = false
+                this.rendering_layers.colorid = false
+                break;
+            case "colorid":
+                this.current_override_material = null
+                this.rendering_layers.normal = false
+                this.rendering_layers.rendering = false
+                this.rendering_layers.colorid = true
                 break;
             default:
                 this.current_override_material = null
                 this.rendering_layers.normal = false
                 this.rendering_layers.rendering = true
+                this.rendering_layers.colorid = false
         }
         this.render_scene.overrideMaterial = this.current_override_material
     }

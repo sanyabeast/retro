@@ -28,8 +28,15 @@ class App extends CoreApp {
 
 
         if (input && postfx) {
-            if (input.intersected_objects_changed && input.intersected_objects.length > 0) {
-                postfx.outline_selection = input.intersected_objects
+            // if (input.intersected_objects_changed && input.intersected_objects.length > 0) {
+            //     postfx.outline_selection = input.intersected_objects
+            // }
+
+            if (input.colorid_changed){
+                if (input.colorid_current_collider){
+                    postfx.outline_selection = [input.colorid_current_collider.get_component("MeshComponent").subject]
+
+                }
             }
 
         }

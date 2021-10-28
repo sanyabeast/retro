@@ -20,7 +20,7 @@ class Postprocessing extends Component {
     outline_effect = undefined
     use_ssao = true
     use_bloom = true
-    use_outline = false
+    use_outline = true
     use_godrays = true
     use_tonemapping = true
     use_chromatic_abberation = false

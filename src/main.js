@@ -2,7 +2,7 @@
 import "./index.html";
 import AssetManager from "core/utils/AssetManager";
 import Frame from "core/utils/Frame";
-import { log, get_app_name , console } from "core/utils/Tools";
+import { log, get_app_name, console } from "core/utils/Tools";
 
 import Device from "core/utils/Device"
 
@@ -71,6 +71,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             frame.add_button("MTCP", "View Matcap", () => {
                 app.refs.renderer.set_render_layer_name("matcap")
             }, "#e91e1e")
+            frame.add_button("CLID", "Color Id", () => {
+                app.refs.renderer.set_render_layer_name("colorid")
+            }, "#4b00ff")
 
             frame.add_button("|", "", i => i, "#ffffff")
 
