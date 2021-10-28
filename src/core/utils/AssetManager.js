@@ -8,7 +8,7 @@ import { log, get_query_string_params, get_app_name, mixin_object, get_unique_pr
 import { isObject, isArray, merge, forEach, isString } from "lodash-es";
 import GameObject from 'core/GameObject';
 import Schema from "core/utils/Schema"
-import RenderTarget from "core/components/RenderTarget"
+import RenderTarget from "core/components/scene/RenderTarget"
 
 import { set, map, filter } from "lodash-es";
 import AssetBufferGeometry from '../geometry/classes/AssetBufferGeometry';

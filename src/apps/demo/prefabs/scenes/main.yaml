@@ -99,10 +99,10 @@ children:
               recieve_shadow: false
               position: [0, 3, 0]
               geometry:
-                - BoxBufferGeometry
-                - - 0.666
-                  - 0.666
-                  - 0.666
+                - PlaneBufferGeometry
+                - - 1
+                  - 1
+                  - 1
               material:
                 - MeshStandardMaterial
                 - map: rt:cctv-rt
@@ -110,6 +110,7 @@ children:
                   emissiveIntensity: 10
                   texture_cache: false
                   transparent: false
+                  side: 2 
           rotator:
             params:
               tick_rate: 30
@@ -128,10 +129,9 @@ children:
           cctv:
             name: RenderTarget
             params:
-              override_material: matcap
               tick_rate: 15
               camera_mode: "copy"
-              rendering_layers: { gizmo: true, rendering: true }
+              rendering_layers: { colorid: true }
               render_target_id: "cctv-rt"
               width: 256
               height: 256

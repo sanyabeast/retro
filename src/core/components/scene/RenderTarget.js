@@ -15,8 +15,7 @@ const modes = ["copy", "mirror", "lookat", "free"]
 
 class RenderTarget extends SceneComponent {
     render_target_id = undefined
-    width = 512
-    height = 512
+    resolution_scale = 0.5
     camera_type = "perspective"
     aspect = 1
     near = 0.1
@@ -58,8 +57,7 @@ class RenderTarget extends SceneComponent {
 
         let render_target_state = this.render_target_state = RenderTarget.get_render_target({
             id: this.render_target_id,
-            width: this.width,
-            height: this.height,
+            resolution_scale: this.resolution_scale,
             camera_type: this.camera_type
         })
         if (!THREE.MathUtils.isPowerOfTwo(this.width) || !THREE.MathUtils.isPowerOfTwo(this.height)) {
@@ -234,8 +232,10 @@ class RenderTarget extends SceneComponent {
 }
 
 RenderTarget.list = {}
-RenderTarget.get_render_target = ({ id = "", w = 512, h = 512, camera_params }) => {
+RenderTarget.get_render_target = ({ id = "", resolution_scale = 0.5, camera_params, mag_filter = "linear" }) => {
 
+    let renderer_size = new THREE.Vector2(1, 1)
+    let render_target_size = new THREE.Vector2(2, 2)
     let canvas2d = document.createElement("canvas")
     let canvas2d_context = canvas2d.getContext("2d")
     document.body.appendChild(canvas2d)
@@ -251,9 +251,22 @@ RenderTarget.get_render_target = ({ id = "", w = 512, h = 512, camera_params }) 
         far: 10000,
         ...camera_params
     }
-    const rt = new THREE.WebGLRenderTarget(w, h, {
-        minFilter: THREE.LinearFilter,
-        magFilter: THREE.LinearFilter,
+
+
+    let _mag_filter = THREE.LinearFilter
+    switch (mag_filter) {
+        case "linear": {
+            _mag_filter = THREE.LinearFilter
+            break
+        }
+        case "nearest": {
+            _mag_filter = THREE.NearestFilter
+            break
+        }
+    }
+    const rt = new THREE.WebGLRenderTarget(512, 512, {
+        minFilter: _mag_filter,
+        magFilter: _mag_filter,
         format: THREE.RGBAFormat
     });
 
@@ -277,10 +290,9 @@ RenderTarget.get_render_target = ({ id = "", w = 512, h = 512, camera_params }) 
     }
     let scene = new THREE.Scene()
     scene.updateWorldMatrix = false
-    let bitmap_data_array = new Uint8Array(w * h * 3)
     let render_target_state = {
-        w,
-        h,
+        resolution_scale,
+        size: render_target_size,
         canvas2d,
         canvas2d_context,
         id: id,
@@ -304,8 +316,16 @@ RenderTarget.get_render_target = ({ id = "", w = 512, h = 512, camera_params }) 
             log(`RenderTarget`, 'IMPLEMENT DESTROYING')
             delete RenderTarget.list[id]
         },
-        render(renderer, update_bitmap_data) {
+        render(renderer) {
             let gl_renderer = renderer.renderer
+            gl_renderer.getSize(renderer_size)
+            if (render_target_size.x !== renderer_size.x || render_target_size.x !== renderer_size.x) {
+                rt.setSize(Math.floor(renderer_size.x * resolution_scale), Math.floor(renderer_size.y * resolution_scale))
+                render_target_size.copy(renderer_size)
+                console.log(render_target_size)
+                console.log(Math.floor(renderer_size.x * resolution_scale), Math.floor(renderer_size.y * resolution_scale))
+            }
+            // rt.setSize(renderer_size.x, renderer_size.y)
             const prev_render_target = gl_renderer.getRenderTarget();
             const prev_xr_enabled = gl_renderer.xr.enabled;
             const prev_shadowmap_autoupdate = gl_renderer.shadowMap.autoUpdate;
@@ -318,26 +338,6 @@ RenderTarget.get_render_target = ({ id = "", w = 512, h = 512, camera_params }) 
             if (gl_renderer.autoClear === false) gl_renderer.clear();
 
             gl_renderer.render(render_target_state.scene, render_target_state.camera);
-            if (update_bitmap_data) {
-                // this.canvas2d_context.drawImage(gl_renderer.domElement, 0, 0, this.canvas2d.width, this.canvas2d_height)
-                let d = gl_renderer.readRenderTargetPixels(
-                    render_target_state.render_target,
-                    0,
-                    0,
-                    render_target_state.w,
-                    render_target_state.h,
-                    bitmap_data_array
-                )
-
-                this.bitmap_data = bitmap_data_array
-
-                for (let a = 0; a < bitmap_data_array.length; a++) {
-                    if (bitmap_data_array[a] !== 0) {
-                        console.log(a)
-                    }
-                }
-                console.log(bitmap_data_array)
-            }
 
             gl_renderer.xr.enabled = prev_xr_enabled;
             gl_renderer.shadowMap.autoUpdate = prev_shadowmap_autoupdate;
@@ -346,6 +346,19 @@ RenderTarget.get_render_target = ({ id = "", w = 512, h = 512, camera_params }) 
         },
         pick(renderer, pointer) {
             let gl_renderer = renderer.renderer
+            gl_renderer.getSize(renderer_size)
+            if (render_target_size.x !== renderer_size.x || render_target_size.x !== renderer_size.x) {
+                rt.setSize(Math.floor(renderer_size.x * resolution_scale), Math.floor(renderer_size.y * resolution_scale))
+                render_target_size.copy(renderer_size)
+                console.log(render_target_size)
+                console.log(Math.floor(renderer_size.x * resolution_scale), Math.floor(renderer_size.y * resolution_scale))
+            }
+            // 
+            const prev_render_target = gl_renderer.getRenderTarget();
+            const prev_xr_enabled = gl_renderer.xr.enabled;
+            const prev_shadowmap_autoupdate = gl_renderer.shadowMap.autoUpdate;
+            const prev_preserve_db = gl_renderer.preserveDrawingBuffer
+
             camera.setViewOffset(gl_renderer.domElement.width, gl_renderer.domElement.height, pointer.x * window.devicePixelRatio | 0, pointer.y * window.devicePixelRatio | 0, 1, 1);
             // render the scene
             gl_renderer.setRenderTarget(rt);
@@ -356,6 +369,11 @@ RenderTarget.get_render_target = ({ id = "", w = 512, h = 512, camera_params }) 
             const pixel_buffer = new Uint8Array(4);
             //read the pixel
             gl_renderer.readRenderTargetPixels(rt, 0, 0, 1, 1, pixel_buffer);
+
+            gl_renderer.xr.enabled = prev_xr_enabled;
+            gl_renderer.shadowMap.autoUpdate = prev_shadowmap_autoupdate;
+            gl_renderer.preserveDrawingBuffer = prev_preserve_db
+            gl_renderer.setRenderTarget(prev_render_target);
             return [pixel_buffer[0], pixel_buffer[1], pixel_buffer[2]]
         },
         copy_camera(target_camera) {

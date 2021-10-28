@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import AssetManager from "core/utils/AssetManager";
 import SceneComponent from "core/SceneComponent";
 import { set, get, isString, isFunction } from "lodash-es"
-import { log, error , console } from "core/utils/Tools"
+import { log, error, console } from "core/utils/Tools"
 
 class MeshComponent extends SceneComponent {
     mesh = null;
@@ -35,8 +35,14 @@ class MeshComponent extends SceneComponent {
             })
         }
 
-        mesh.castShadow = this.drop_shadow
-        mesh.receiveShadow = this.recieve_shadow
+        if (!mesh) {
+            this.error(`Cannot create mesh with provided options`, this.meta.params)
+        } else {
+
+            mesh.castShadow = this.drop_shadow
+            mesh.receiveShadow = this.recieve_shadow
+        }
+
 
     }
 

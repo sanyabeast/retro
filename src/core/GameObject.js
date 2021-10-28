@@ -4,7 +4,8 @@ import { Group } from 'three/src/objects/Group';
 import AssetManager from 'core/utils/AssetManager';
 import { Task, TaskScheduler } from "core/utils/TaskScheduler"
 import StateMachine from "core/utils/StateMachine"
-import { isObject, isFunction, isUndefined } from "lodash-es"
+import { isObject, isString, isFunction, isUndefined, forEach } from "lodash-es"
+import { error } from "core/utils/Tools"
 import Schema from "core/utils/Schema"
 import Component from "core/Component"
 
@@ -288,7 +289,7 @@ class GameObject extends Group {
         let params = data.params
         let enabled = typeof data.enabled === 'boolean' ? data.enabled : true
         let ref = typeof data.ref === 'string' ? data.ref : undefined
-        let creator = GameObject.components_lib[component_name]
+        let creator = get_best_match_component_creator(component_name)
         let component
         if (isFunction(creator)) {
             component = new creator(params)
@@ -301,7 +302,7 @@ class GameObject extends Group {
                     component = new creator(params)
                 }
             }
-            
+
         }
 
         if (component !== undefined) {
@@ -418,7 +419,7 @@ class GameObject extends Group {
             })
         }
     }
-    on_start(){}
+    on_start() { }
     on_tick() { }
 }
 
@@ -453,6 +454,28 @@ GameObject.components_tags = {}
 GameObject.register_component = function (creator, name) {
     GameObject.components_lib[name] = creator
 }
+
+function get_best_match_component_creator(name) {
+    if (!isString(name)) {
+        return undefined
+    }
+    let lib = GameObject.components_lib
+    let r = []
+    forEach(lib, (creator, component_id) => {
+        let match = component_id.match(new RegExp(name))
+        if (match) {
+            r.push(component_id)
+        }
+    })
+    if (r.length > 1) {
+        error('GameObject', `ambiguity when tried to created component with alias "{name}". got multiple candidated: ${r.join(", ")}`)
+    } else if (r.length === 1){
+        return lib[r[0]]
+    } else {
+        return
+    }
+}
+
 window.F_GLOBAL_TICK_SKIP = 1
 
 export default GameObject

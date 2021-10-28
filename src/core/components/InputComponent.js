@@ -9,8 +9,8 @@ import AssetManager from "core/utils/AssetManager";
 import * as THREE from 'three';
 import { map } from "lodash-es"
 import { makeid } from "core/utils/Tools"
-import RenderTarget from "./RenderTarget";
-import Collider from "./Collider";
+import RenderTarget from "core/components/scene/RenderTarget";
+import Collider from "core/components/Collider";
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -28,6 +28,9 @@ class InputComponent extends SceneComponent {
     pointer_position_changed = true
 
     tick_rate = 30
+
+    /**debug */
+    show_debug_layer = false
     /**private */
     prev_camera_matrix = undefined
 
@@ -36,6 +39,7 @@ class InputComponent extends SceneComponent {
     colorid_current_collider = undefined
     colorid_render_target_state = undefined
     colorid_debug_plane = undefined
+    colorid_resolution = 0.25
     constructor() {
         super(...arguments)
         this.pointer_position = new THREE.Vector2(0, 0)
@@ -61,15 +65,16 @@ class InputComponent extends SceneComponent {
 
         console.log(this)
     }
-    // get_gizmo_render_data() {
-    //     return [{
-    //         object: this.colorid_debug_plane
-    //     }]
-    // }
+    get_gizmo_render_data() {
+        return [{
+            object: this.colorid_debug_plane,
+            visible: this.show_debug_layer
+        }]
+    }
     setup_colorid() {
         let render_target_state = this.colorid_render_target_state = RenderTarget.get_render_target({
-            w: 256,
-            h: 256
+            resolution_scale: this.colorid_resolution,
+            mag_filter: "nearest"
         })
 
         let colorid_debug_plane = this.colorid_debug_plane = new THREE.objects.FullscreenRect({

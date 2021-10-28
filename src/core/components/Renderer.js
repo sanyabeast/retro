@@ -76,7 +76,7 @@ class Renderer extends Component {
         let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({
             antialias: true,
             alpha: true,
-            preserveDrawingBuffer: true,
+            // preserveDrawingBuffer: true,
             stencil: this.clear_stencil,
             depth: this.clear_depth,
             ...renderer_presets[Device.device_type]
@@ -198,6 +198,7 @@ class Renderer extends Component {
                         for (let layer_name in layers) {
                             if (layers[layer_name] === false) continue
                             if (!data.object) continue
+                            if (data.visible === false) continue
                             object_layers[layer_name] = object_layers[layer_name] || []
                             let parent = data.parent || this.zero_object
 
@@ -302,6 +303,7 @@ class Renderer extends Component {
                 this.check_size()
                 if (this.custom_render_function === undefined || this.use_postfx === false) {
                     this.renderer.render(this.render_scene, camera.subject)
+                    // this.renderer.clear(true, true, true)   
                 } else {
                     this.custom_render_function(this.render_scene, camera.subject)
                 }
