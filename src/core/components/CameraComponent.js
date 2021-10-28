@@ -46,7 +46,7 @@ class CameraComponent extends SceneComponent {
             position: new THREE.Vector3(0, 0, 20),
         });
 
-        console.log(`Camera COMPONENT CREATED`, this.meta.params)
+        this.log(`created`, this.meta.params)
 
     }
 

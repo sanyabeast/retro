@@ -41,7 +41,6 @@ class AudioComponent extends Component {
         ].concat(super.get_reactive_props())
     }
     on_update(props) {
-        console.log(props)
         props.forEach(prop => {
             switch (prop) {
                 case "src": {
@@ -81,7 +80,7 @@ class AudioComponent extends Component {
 
     }
     play() {
-        console.log("start playing...")
+        this.log("start playing...")
         this.playing = true
     }
 }

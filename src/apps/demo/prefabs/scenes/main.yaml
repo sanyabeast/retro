@@ -21,8 +21,8 @@ components:
     tag: sun
     params:
       debug_transform: true
-      cycling: 50
-      time: 0.4
+      cycling: 12
+      time: 0.2
   fog:
     name: Fog
     params:
@@ -38,282 +38,310 @@ components:
       test: 1
 children:
   - children:
-    - components:
-        tv: 
-          name: MeshComponent
-          params:
-            debug_log_this: true
-            geometry:
-              - PlaneBufferGeometry
-              - - 1
-                - 1
-                - 1
-            material:
-              - MeshBasicMaterial
-              - map: rt:cctv-rt
-        cctv:
-          name: RenderTarget
-          params:
-            camera_type: "orthographic"
-            render_target_id: "cctv-rt"
-            width: 300
-            height: 300
+      - components:
+          tv:
+            name: MeshComponent
+            params:
+              # class: FullscreenRect
+              # options:
+              #   map: rt:cctv-rt
+              #   alphaMap: rt:cctv-rt
+              debug_log_this: true
+              recieve_shadow: false
+              position: [0, 3, 0]
+              geometry:
+                - BoxBufferGeometry
+                - - 0.666
+                  - 0.666
+                  - 0.666
+              material:
+                - MeshStandardMaterial
+                - map: rt:cctv-rt
+                  emissiveMap: res/core/uv_checker_a.jpg
+                  emissiveIntensity: 10
+                  texture_cache: false
+                  transparent: false
+          rotator:
+            params:
+              tick_rate: 30
+            inline:
+              methods:
+                on_tick:
+                  body: >
+                    let time = (+new Date) / 1000;
+                    let mesh = this.get_component("MeshComponent");
+                    let speed = 1;
+                    mesh.rotation = [
+                      Math.sin(time * speed),
+                      Math.sin(time * speed),
+                      Math.cos(time * speed)
+                    ];
+          cctv:
+            name: RenderTarget
+            params:
+              override_material: matcap
+              tick_rate: 15
+              camera_mode: "copy"
+              rendering_layers: { gizmo: true, rendering: true }
+              render_target_id: "cctv-rt"
+              width: 256
+              height: 256
   - children:
-    - components:
-        ocean:
-          name: Water
-          params:
-            position: [0, -0.1, 0]
-    - ??prefab=core.scenes.default_snow_scene
-    - components:
-        # spine3:
-        #   enabled: true
-        #   name: SpineAnimationPlayer
-        #   ref: spine
-        #   params:
-        #     position: [1, 1, 0]
-        #     asset_name: demo/spine/ship_for_spine
-        #     file_name: ship_for_spine
-        #     animation_name: idle_flight
-        #     skeleton_scale: 2
+      - components:
+          ocean:
+            name: Water
+            params:
+              position: [0, -0.1, 0]
+      - ??prefab=core.scenes.default_snow_scene
+      - components:
+          # spine3:
+          #   enabled: true
+          #   name: SpineAnimationPlayer
+          #   ref: spine
+          #   params:
+          #     position: [1, 1, 0]
+          #     asset_name: demo/spine/ship_for_spine
+          #     file_name: ship_for_spine
+          #     animation_name: idle_flight
+          #     skeleton_scale: 2
 
-        bush_2:
-          name: MeshComponent
-          tag: bush
-          params:
-            debug_transform: false
-            position:
-              - 1.6
-              - 0
-              - -1.5
-            geometry:
-              - "url:res/core/models/monsterra/monsterra.obj"
-              - 0.1
-            material:
-              - AssetMaterial
-              - color: "#daefe5"
-                src: "res/core/models/monsterra/monsterra.mtl"
-        phone:
-          name: MeshComponent
-          tag: bush
-          params:
-            position:
-              - -2
-              - 0
-              - -2.2
-            rotation: [0, 1, 0]
-            geometry:
-              - "url:res/demo/models/phone/phone.obj"
-              - 2
-            material:
-              - AssetMaterial
-              - color: "#daefe5"
-                src: "res/demo/models/phone/phone.mtl"
-        chalkboard:
-          name: MeshComponent
-          params:
-            debug_transform: false
-            position:
-              - 2
-              - 0
-              - 2.2
-            rotation: [0, -2, 0]
-            geometry:
-              - "url:res/core/models/rest_chalkboard_1/chalkboard.obj"
-              - 0.3
-            material:
-              - AssetMaterial
-              - src: "res/core/models/rest_chalkboard_1/chalkboard.mtl"
-                transparent: false
-                doubleside: true
-        # lantern:
-        #   name: MeshComponent
-        #   params:
-        #     recieve_shadow: false
-        #     position:
-        #       - 0
-        #       - 1
-        #       - 0
-        #     rotation: [0, -2, 0]
-        #     geometry:
-        #       - "url:res/core/models/lantern/lantern_obj.obj"
-        #       - 0.2
-        #     material:
-        #       - AssetMaterial
-        #       - src: "res/core/models/lantern/lantern_obj.mtl"
-        #         transparent: false
-        #         doubleside: true
-        lantern_core:
-          name: MeshComponent
-          params:
-            position:
-              - 0
-              - 1.1
-              - 0
-            material:
-              - MeshBasicMaterial
-              - fog: false
-                emissive: "#ff0000"
-                emissiveIntensity: 0.5
-
-            geometry:
-              - SphereBufferGeometry
-              - - 0.03
-                - 6
-                - 9
-    - children:
-        - position: [1, 0, 0]
-          children:
-            - position: [-6, 0, 0]
-              rotation: [0, -2.57, 0]
-              components:
-                linker_1:
-                  name: MeshComponent
-                  params:
-                    position:
-                      - 0
-                      - 0
-                      - 0
-                    geometry:
-                      - "url:res/core/models/wood_fence_a1/linker_1.obj"
-                      - 1
-                    material:
-                      - AssetMaterial
-                      - color: "#daefe5"
-                        src: "res/core/models/wood_fence_a1/linker_1.mtl"
-                fence_a:
-                  name: MeshComponent
-                  params:
-                    position:
-                      - 0
-                      - 0
-                      - 0
-                    geometry:
-                      - "url:res/core/models/wood_fence_a1/fence_1.obj"
-                      - 1
-                    material:
-                      - AssetMaterial
-                      - color: "#daefe5"
-                        doubleside: true
-                        src: "res/core/models/wood_fence_a1/fence_1.mtl"
-            - position: [3, 0, 0]
+          bush_2:
+            name: MeshComponent
+            tag: bush
+            params:
+              debug_transform: false
+              position:
+                - 1.6
+                - 0
+                - -1.5
+              geometry:
+                - "url:res/core/models/monsterra/monsterra.obj"
+                - 0.1
+              material:
+                - AssetMaterial
+                - color: "#daefe5"
+                  src: "res/core/models/monsterra/monsterra.mtl"
+          phone:
+            name: MeshComponent
+            tag: bush
+            params:
+              position:
+                - -2
+                - 0
+                - -2.2
+              rotation: [0, 1, 0]
+              geometry:
+                - "url:res/demo/models/phone/phone.obj"
+                - 2
+              material:
+                - AssetMaterial
+                - color: "#daefe5"
+                  src: "res/demo/models/phone/phone.mtl"
+          chalkboard:
+            name: MeshComponent
+            params:
+              debug_transform: false
+              position:
+                - 2
+                - 0
+                - 2.2
               rotation: [0, -2, 0]
-              components:
-                linker_1:
-                  name: MeshComponent
-                  params:
-                    position:
-                      - 0
-                      - 0
-                      - 0
-                    geometry:
-                      - "url:res/core/models/wood_fence_a1/linker_1.obj"
-                      - 1
-                    material:
-                      - AssetMaterial
-                      - color: "#daefe5"
-                        src: "res/core/models/wood_fence_a1/linker_1.mtl"
-                fence_a:
-                  name: MeshComponent
-                  params:
-                    position:
-                      - 0
-                      - 0
-                      - 0
-                    geometry:
-                      - "url:res/core/models/wood_fence_a1/fence_1.obj"
-                      - 1
-                    material:
-                      - AssetMaterial
-                      - color: "#daefe5"
-                        doubleside: true
-                        src: "res/core/models/wood_fence_a1/fence_1.mtl"
-            - position: [3.9, 0, 1.9]
-              rotation: [0, -1.2, 0]
-              components:
-                linker_1:
-                  name: MeshComponent
-                  params:
-                    position:
-                      - 0
-                      - 0
-                      - 0
-                    geometry:
-                      - "url:res/core/models/wood_fence_a1/linker_1.obj"
-                      - 1
-                    material:
-                      - AssetMaterial
-                      - color: "#daefe5"
-                        src: "res/core/models/wood_fence_a1/linker_1.mtl"
-                fence_a:
-                  name: MeshComponent
-                  params:
-                    position:
-                      - 0
-                      - 0
-                      - 0
-                    geometry:
-                      - "url:res/core/models/wood_fence_a1/fence_1.obj"
-                      - 1
-                    material:
-                      - AssetMaterial
-                      - color: "#daefe5"
-                        doubleside: true
-                        src: "res/core/models/wood_fence_a1/fence_1.mtl"
-    - components:
-        bush_1:
-          name: MeshComponent
-          tag: bush
-          params:
-            position:
-              - -2
-              - 0
-              - 1.5
-            geometry:
-              - "url:res/core/models/monsterra/monsterra.obj"
-              - 0.07
-            material:
-              - AssetMaterial
-              - color: "#daefe5"
-                src: "res/core/models/monsterra/monsterra.mtl"
-        collider:
-          name: Collider
-          params:
-            collider_type: sphere
-            sphere_radius: 0.5
-            box_size: [1.1, 1.1, 1.1]
-            offset: [0, 0.5, 0]
-    - components:
-        point_light:
-          enabled: true
-          name: "LightComponent"
-          ref: "point_light"
-          tag: "point_light"
-          params:
-            position: [0.6, 1.1, 1.1]
-            shadows_enabled: true
-            debug_transform: true
-            type: "PointLight"
-            intensity: 15
-            distance: 5.5
-            decay: 1
-            color: "#ff5722"
-        controller:
-          inline:
-            props:
-              speed: 0.2
-              radius: 4
-              height: 1
-              height_speed: 0.5
-              offset: [0, 2, 0]
-            methods:
-              on_tick:
-                body: >
-                  let date = +new Date();
-                  let light = this.get_component("LightComponent");
-                  light.position = [
-                    (Math.sin(date * 0.001 * this.speed) * this.radius) + this.offset[0],
-                    (Math.sin(date * 0.001 * this.height_speed) * this.height) + this.offset[1],
-                    (Math.cos(date * 0.001 * this.speed) * this.radius) + this.offset[2]
-                  ];
-                  light.intensity = 16 + (Math.sin(date * 0.01)) * 0.1
+              geometry:
+                - "url:res/core/models/rest_chalkboard_1/chalkboard.obj"
+                - 0.3
+              material:
+                - AssetMaterial
+                - src: "res/core/models/rest_chalkboard_1/chalkboard.mtl"
+                  transparent: false
+                  doubleside: true
+          # lantern:
+          #   name: MeshComponent
+          #   params:
+          #     recieve_shadow: false
+          #     position:
+          #       - 0
+          #       - 1
+          #       - 0
+          #     rotation: [0, -2, 0]
+          #     geometry:
+          #       - "url:res/core/models/lantern/lantern_obj.obj"
+          #       - 0.2
+          #     material:
+          #       - AssetMaterial
+          #       - src: "res/core/models/lantern/lantern_obj.mtl"
+          #         transparent: false
+          #         doubleside: true
+          lantern_core:
+            name: MeshComponent
+            params:
+              position:
+                - 0
+                - 1.1
+                - 0
+              material:
+                - MeshBasicMaterial
+                - fog: false
+                  emissive: "#ff0000"
+                  emissiveIntensity: 0.5
+
+              geometry:
+                - SphereBufferGeometry
+                - - 0.03
+                  - 6
+                  - 9
+      - children:
+          - position: [1, 0, 0]
+            children:
+              - position: [-6, 0, 0]
+                rotation: [0, -2.57, 0]
+                components:
+                  linker_1:
+                    name: MeshComponent
+                    params:
+                      position:
+                        - 0
+                        - 0
+                        - 0
+                      geometry:
+                        - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                        - 1
+                      material:
+                        - AssetMaterial
+                        - color: "#daefe5"
+                          src: "res/core/models/wood_fence_a1/linker_1.mtl"
+                  fence_a:
+                    name: MeshComponent
+                    params:
+                      position:
+                        - 0
+                        - 0
+                        - 0
+                      geometry:
+                        - "url:res/core/models/wood_fence_a1/fence_1.obj"
+                        - 1
+                      material:
+                        - AssetMaterial
+                        - color: "#daefe5"
+                          doubleside: true
+                          src: "res/core/models/wood_fence_a1/fence_1.mtl"
+              - position: [3, 0, 0]
+                rotation: [0, -2, 0]
+                components:
+                  linker_1:
+                    name: MeshComponent
+                    params:
+                      position:
+                        - 0
+                        - 0
+                        - 0
+                      geometry:
+                        - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                        - 1
+                      material:
+                        - AssetMaterial
+                        - color: "#daefe5"
+                          src: "res/core/models/wood_fence_a1/linker_1.mtl"
+                  fence_a:
+                    name: MeshComponent
+                    params:
+                      position:
+                        - 0
+                        - 0
+                        - 0
+                      geometry:
+                        - "url:res/core/models/wood_fence_a1/fence_1.obj"
+                        - 1
+                      material:
+                        - AssetMaterial
+                        - color: "#daefe5"
+                          doubleside: true
+                          src: "res/core/models/wood_fence_a1/fence_1.mtl"
+              - position: [3.9, 0, 1.9]
+                rotation: [0, -1.2, 0]
+                components:
+                  linker_1:
+                    name: MeshComponent
+                    params:
+                      position:
+                        - 0
+                        - 0
+                        - 0
+                      geometry:
+                        - "url:res/core/models/wood_fence_a1/linker_1.obj"
+                        - 1
+                      material:
+                        - AssetMaterial
+                        - color: "#daefe5"
+                          src: "res/core/models/wood_fence_a1/linker_1.mtl"
+                  fence_a:
+                    name: MeshComponent
+                    params:
+                      position:
+                        - 0
+                        - 0
+                        - 0
+                      geometry:
+                        - "url:res/core/models/wood_fence_a1/fence_1.obj"
+                        - 1
+                      material:
+                        - AssetMaterial
+                        - color: "#daefe5"
+                          doubleside: true
+                          src: "res/core/models/wood_fence_a1/fence_1.mtl"
+      - components:
+          bush_1:
+            name: MeshComponent
+            tag: bush
+            params:
+              position:
+                - -2
+                - 0
+                - 1.5
+              geometry:
+                - "url:res/core/models/monsterra/monsterra.obj"
+                - 0.07
+              material:
+                - AssetMaterial
+                - color: "#daefe5"
+                  src: "res/core/models/monsterra/monsterra.mtl"
+          collider:
+            name: Collider
+            params:
+              collider_type: sphere
+              sphere_radius: 0.5
+              box_size: [1.1, 1.1, 1.1]
+              offset: [0, 0.5, 0]
+      - components:
+          point_light:
+            enabled: true
+            name: "LightComponent"
+            ref: "point_light"
+            tag: "point_light"
+            params:
+              position: [0.6, 1.1, 1.1]
+              shadows_enabled: true
+              debug_transform: true
+              type: "PointLight"
+              intensity: 15
+              distance: 5.5
+              decay: 1
+              color: "#ff5722"
+          controller:
+            inline:
+              props:
+                speed: 0.2
+                radius: 4
+                height: 1
+                height_speed: 0.5
+                offset: [0, 2, 0]
+              methods:
+                on_tick:
+                  body: >
+                    let date = +new Date();
+                    let light = this.get_component("LightComponent");
+                    light.position = [
+                      (Math.sin(date * 0.001 * this.speed) * this.radius) + this.offset[0],
+                      (Math.sin(date * 0.001 * this.height_speed) * this.height) + this.offset[1],
+                      (Math.cos(date * 0.001 * this.speed) * this.radius) + this.offset[2]
+                    ];
+                    light.intensity = 16 + (Math.sin(date * 0.01)) * 0.1

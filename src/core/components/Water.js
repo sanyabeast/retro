@@ -50,7 +50,6 @@ class Water extends SceneComponent {
 
         if (this.sun !== undefined) {
             this.subject.material.uniforms['sunDirection'].value.copy(this.sun.subject.position).normalize();
-            console.log(1)
         }
 
         this.subject.material.uniforms['time'].value += 1.0 / 60.0;
