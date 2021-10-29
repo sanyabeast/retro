@@ -1,5 +1,5 @@
 
-import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction } from "lodash-es"
+import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRightvv } from "lodash-es"
 import DateTime from "datetime-js"
 import exp from "constants";
 
@@ -248,6 +248,19 @@ function datetime(template = "%H:%i:%s", date = new Date) {
 //     }
 // }
 
+function get_most_suitable_dict_keys(dict, test_string, single_key = false) {
+    if (!isString(test_string) || !isObject(dict)) {
+        return []
+    }
+    let r = []
+    forEach(dict, (value, key) => {
+        if (key.match(new RegExp(test_string, "gm"))) {
+            r.push(key)
+        }
+    })
+    return r
+}
+
 let console = _console
 
 export {
@@ -267,5 +280,6 @@ export {
     datetime,
     error,
     get_random_color_for_string,
+    get_most_suitable_dict_keys,
     console
 }
