@@ -8,7 +8,6 @@ class App extends CoreApp {
         });
 
         let stage = this.load_stage(AssetManager.load_prefab("{app_name}.scenes.main"))
-        this.refs.renderer.target_fps = 60
 
         let camera = this.find_component_of_type("CameraComponent")
         camera.fov = 60

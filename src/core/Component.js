@@ -3,7 +3,7 @@
  *
  */
 
-import { log, makeid, datetime, is_none, hex_to_hsl, hsl_to_rgb, hex_to_rgb, request_text_sync, console } from "core/utils/Tools";
+import { log, makeid, datetime, is_none, hex_to_hsl, hsl_to_rgb, hex_to_rgb, request_text_sync, console, get_most_suitable_dict_keys } from "core/utils/Tools";
 import * as Tools from "core/utils/Tools";
 import BasicObject from "core/utils/BasicObject";
 import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, isFunction, isString, map, keys, values, forEach } from "lodash-es"
@@ -60,7 +60,7 @@ class Component extends BasicObject {
         if (params && params.debug_log_this === true) {
             this.log(this)
         }
-        
+
     }
     tick(tick_data) {
         this.meta.ticking.rate = this.tick_rate
@@ -309,6 +309,7 @@ Component.create = (params, name) => {
     log("Component", `just created new inline component "${name}"`)
     return result
 }
+
 
 Component.component_name = "Component";
 

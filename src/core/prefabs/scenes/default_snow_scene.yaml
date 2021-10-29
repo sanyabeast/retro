@@ -34,7 +34,7 @@ children:
           color: "#ffffff"
           anchor_x: 0
           position:
-            - -1
+            - -0.75
             - 2.5
             - 0
       time_component:

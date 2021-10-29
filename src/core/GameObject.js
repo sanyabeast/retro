@@ -17,7 +17,6 @@ class GameObject extends Group {
         super(...arguments)
         this.extra_data = {}
         this.components = []
-        this.refs = {}
         this.states = new StateMachine(prefab && prefab.states ? prefab.states : {}, this)
         this.tasks = new TaskScheduler(prefab && prefab.tasks ? prefab.tasks : [])
 
@@ -27,6 +26,12 @@ class GameObject extends Group {
 
         this.load_prefab(prefab)
 
+    }
+    get refs() {
+        if (AssetManager.gameobject_refs[this.uuid] === undefined) {
+            AssetManager.gameobject_refs[this.uuid] = {}
+        }
+        return AssetManager.gameobject_refs[this.uuid]
     }
     load_prefab(prefab) {
         if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]")) {
@@ -120,6 +125,7 @@ class GameObject extends Group {
     leave_state(name, new_state) { }
     update_state(name) { }
     destroy(params) {
+        delete AssetManager.gameobject_refs[this.uuid]
         if (this.geometry) {
             this.geometry.dispose()
         }
@@ -191,9 +197,9 @@ class GameObject extends Group {
     }
     find_component_of_type(component_name, cb, on_not_found) {
         let r = undefined
-        if (GameObject.components_base[component_name]) {
-            for (let k in GameObject.components_base[component_name]) {
-                r = GameObject.components_base[component_name][k]
+        if (AssetManager.components_base[component_name]) {
+            for (let k in AssetManager.components_base[component_name]) {
+                r = AssetManager.components_base[component_name][k]
                 break
             }
         }
@@ -215,10 +221,10 @@ class GameObject extends Group {
     find_components_of_type(component_name, count) {
         let c = 0
         let r = []
-        if (GameObject.components_base[component_name]) {
-            for (let k in GameObject.components_base[component_name]) {
+        if (AssetManager.components_base[component_name]) {
+            for (let k in AssetManager.components_base[component_name]) {
                 if (count === undefined || c < count) {
-                    r.push(GameObject.components_base[component_name][k])
+                    r.push(AssetManager.components_base[component_name][k])
                     c++
                     if (c >= count) {
                         break
@@ -229,7 +235,7 @@ class GameObject extends Group {
         return r
     }
     find_component_with_tag(tag, cb, on_not_found) {
-        let r = GameObject.components_tags[tag]
+        let r = AssetManager.components_tags[tag]
 
         if (isFunction(cb)) {
             if (r !== undefined) {
@@ -291,11 +297,11 @@ class GameObject extends Group {
         let ref = typeof data.ref === 'string' ? data.ref : undefined
         let creator = undefined
 
-        let best_match_creators = get_most_suitable_dict_keys(GameObject.components_lib, component_name)
-        if (best_match_creators.length > 1) {
-            error('GameObject', `ambiguity when tried to created component with alias "{name}". got multiple candidated: ${r.join(", ")}`)
-        } else if (best_match_creators.length === 1) {
-            creator = GameObject.components_lib[best_match_creators[0]]
+        let suitable_creators = get_most_suitable_dict_keys(AssetManager.components_lib, component_name)
+        if (suitable_creators.length > 1) {
+            error('GameObject', `ambiguity when tried to created component with alias "${component_name}". got multiple candidates: ${suitable_creators.join(", ")}`)
+        } else if (suitable_creators.length === 1) {
+            creator = AssetManager.components_lib[suitable_creators[0]]
         }
 
         let component
@@ -339,12 +345,12 @@ class GameObject extends Group {
             this.components.push(component)
             component.on_created()
             if (component.enabled) component.on_enabled()
-            GameObject.components_base[component_name] = GameObject.components_base[component_name] || {}
-            GameObject.components_base[component_name][component.id] = component
+            AssetManager.components_base[component_name] = AssetManager.components_base[component_name] || {}
+            AssetManager.components_base[component_name][component.id] = component
 
             if (data.tag) {
                 component.tag = data.tag
-                GameObject.components_tags[data.tag] = component
+                AssetManager.components_tags[data.tag] = component
             }
             // console.log(`creating component ${component_name}`, params, creator)
         } else {
@@ -367,8 +373,8 @@ class GameObject extends Group {
                     }
                 }
                 let component_name = component.name
-                delete GameObject.components_base[component_name][component.id]
-                delete GameObject.components_tags[this.tag]
+                delete AssetManager.components_base[component_name][component.id]
+                delete AssetManager.components_tags[this.tag]
             }
         } else if (typeof data === "object") {
             let component = data
@@ -384,7 +390,7 @@ class GameObject extends Group {
                 }
             }
             let component_name = component.name
-            delete GameObject.components_base[component_name][component.id]
+            delete AssetManager.components_base[component_name][component.id]
         }
     }
     update(data) {
@@ -454,32 +460,8 @@ function reactivate_component(object) {
     })
 }
 
-
 GameObject.broadcasting = {}
-GameObject.components_base = {}
-GameObject.components_lib = {}
-GameObject.components_tags = {}
-GameObject.register_component = function (creator, name) {
-    GameObject.components_lib[name] = creator
-}
 
-function get_best_match_component_creator(name) {
-    if (!isString(name)) {
-        return undefined
-    }
-    let lib = GameObject.components_lib
-
-    let r = []
-
-
-    forEach(lib, (creator, component_id) => {
-        let match = component_id.match(new RegExp(name))
-        if (match) {
-            r.push(component_id)
-        }
-    })
-
-}
 
 window.F_GLOBAL_TICK_SKIP = 1
 

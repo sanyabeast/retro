@@ -3,7 +3,7 @@ prefabs:
   - core.sound.default_ambient_audio_source
   - default.controls.OrbitControlsComponent
   - default.SkyBox
-  - default.Sun
+  - default.scene.Sun
 components:
   point_light:
     enabled: true
@@ -14,11 +14,28 @@ components:
         - 1
         - 0
       type: PointLight
-      intensity: 2
-      distance: 10
-      color: "#ffffff"
+      intensity: 5
+      distance: 5
+      color: "#ff5722"
+  point_light_controller:
+    params:
+        tick_rate: 30
+        radius: 1.5
+        speed: 0.1
+    inline:
+      methods:
+        on_tick:
+          body: >
+            let point_light = this.get_component("LightComponent");
+            let time = +new Date() / 1000;
+            let speed = this.speed;
+            let radius = this.radius;
+            let max_height = 2;
+            let x = Math.sin(time * speed) * radius;
+            let y = Math.cos(time * speed) * max_height + max_height;
+            let z = Math.cos(time * speed) * radius;
+            point_light.position = [x, y, z];
 children:
-  # loading scene from external prefab
   fog: ??prefab=default.Fog
   snow_scene:
     prefab: core.scenes.default_snow_scene

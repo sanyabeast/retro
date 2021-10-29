@@ -18,17 +18,17 @@ class Postprocessing extends Component {
     /**private */
     composer = undefined
     outline_effect = undefined
-    use_ssao = false
-    use_bloom = false
-    use_outline = false
-    use_godrays = false
-    use_tonemapping = false
-    use_chromatic_abberation = false
-    use_hs = false
-    use_bc = false
-    use_grain = false
-    use_vignette = false
-    use_gc = false
+    use_ssao = true
+    use_bloom = true
+    use_outline = true
+    use_godrays = true
+    use_tonemapping = true
+    use_chromatic_abberation = true
+    use_hs = true
+    use_bc = true
+    use_grain = true
+    use_vignette = true
+    use_gc = true
 
     chromatic_abberation_offset_x = 0.4
     chromatic_abberation_offset_y = 0.4

@@ -4,7 +4,7 @@
  */
 
 import * as THREE from 'three';
-import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict, console } from "core/utils/Tools";
+import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict, console, get_most_suitable_dict_keys } from "core/utils/Tools";
 import { isObject, isArray, merge, forEach, isString } from "lodash-es";
 import GameObject from 'core/GameObject';
 import Schema from "core/utils/Schema"
@@ -356,7 +356,7 @@ class AssetManager {
         if (url.startsWith("rt:")) {
             let render_target_id = url.replace("rt:", "")
             let render_target_state = RenderTarget.list[render_target_id]
-            
+
             if (render_target_state !== undefined) {
                 return render_target_state.texture
             }
@@ -403,6 +403,14 @@ class AssetManager {
     }
     static load_prefab(id, params) {
         id = AssetManager.resolve_string_placeholders(id)
+
+        let suitable_prefabs = get_most_suitable_dict_keys(AssetManager.prefab_lib, id)
+        if (suitable_prefabs.length > 1) {
+            error('AssetManager', `ambiguity when tried to load prefab with alias "${id}". got multiple candidates: ${suitable_prefabs.join(", ")}`)
+        } else if (suitable_prefabs.length === 1) {
+            id = suitable_prefabs[0]
+        }
+
         if (AssetManager.prefab_lib[id] === undefined) {
             throw new Error(`no prefab with id "${id} found"`)
         }
@@ -467,8 +475,7 @@ class AssetManager {
             }
 
             AssetManager.register_prefab(`default.${name}`, default_prefab)
-
-            GameObject.register_component(creator, name);
+            AssetManager.register_component(creator, name);
         })
     }
     static preload_shader_parts(ns, context) {
@@ -527,6 +534,18 @@ class AssetManager {
     }
 
 }
+
+/**gameobject */
+AssetManager.gameobject_refs = {}
+
+/**comps */
+AssetManager.components_lib = {}
+AssetManager.components_tags = {}
+AssetManager.components_base = {}
+AssetManager.register_component = function (creator, name) {
+    AssetManager.components_lib[name] = creator
+}
+
 
 
 AssetManager.preload_components("core", require.context("core/components/", true, /\.js$/))

@@ -60,8 +60,8 @@ function validate_value(data, schema, prop_path, trace, root_object, root_schema
         case "array": {
             let validation_result = undefined
             let valid_schema = undefined
-            let valid_schema_trace = undefined
-            let invalid_schema_trace = undefined
+            let valid_schema_trace = []
+            let invalid_schema_trace = []
             let invalid_schemas = []
             schema.forEach(s => {
                 let sub_trace = []
@@ -195,6 +195,7 @@ function validate_value(data, schema, prop_path, trace, root_object, root_schema
                 validation_result.type.passed;
 
 
+            
             trace.unshift(validation_result)
             return validation_result.passed
             break;
@@ -208,6 +209,7 @@ function validate_value(data, schema, prop_path, trace, root_object, root_schema
 
 function validate(data, schema, prop_path = "ROOT", silent_mode = false) {
     let trace = []
+   
     let result = true
 
     validate_value(data, schema, prop_path, trace, data, schema)
