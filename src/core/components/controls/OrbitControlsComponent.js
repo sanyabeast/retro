@@ -54,6 +54,14 @@ class OrbitControlsComponent extends Component {
             "zoom_speed"
         ].concat(super.get_reactive_props())
     }
+    on_enabled(){
+        this.controls.enabled = true
+        console.log(2)
+    }
+    on_disabled(){
+        console.log(1)
+        this.controls.enabled = false
+    }
     on_update(props) {
         let controls = this.controls
         props.forEach(prop => {
@@ -125,7 +133,7 @@ OrbitControlsComponent.DEFAULT = {
     min_zoom: 0.01,
     pan_speed: 0.1,
     rotate_speed: 0.5,
-    
+
     target: [0, 0, 0],
     keys: ["a", "w", "d", "s"],
 }

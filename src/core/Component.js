@@ -20,7 +20,6 @@ class Component extends BasicObject {
     tick_data = undefined
     object = null;
     subject = null;
-    enabled = true;
     globals = undefined
     tick_rate = 15
     tick_enabled = true

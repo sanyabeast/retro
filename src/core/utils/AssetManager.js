@@ -4,8 +4,8 @@
  */
 
 import * as THREE from 'three';
-import { log, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict, console, get_most_suitable_dict_keys } from "core/utils/Tools";
-import { isObject, isArray, merge, forEach, isString } from "lodash-es";
+import { log, error, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict, console, get_most_suitable_dict_keys } from "core/utils/Tools";
+import { isObject, isArray, merge, forEach, isString, isUndefined, isFunction } from "lodash-es";
 import GameObject from 'core/GameObject';
 import Schema from "core/utils/Schema"
 import RenderTarget from "core/components/scene/RenderTarget"
@@ -464,18 +464,25 @@ class AssetManager {
             let name = p.replace("./", "").replace(".js", "").replace(/\//gm, ".");
 
             let creator = mod.default
-            let default_prefab = {
-                components: {
-                    [camel_to_snake(name)]: {
-                        name: name,
-                        enabled: true,
-                        params: isObject(creator.DEFAULT) ? { ...creator.DEFAULT } : {}
+
+            if (isObject(creator) || isFunction(creator)) {
+                let default_prefab = {
+                    components: {
+                        [camel_to_snake(name)]: {
+                            name: name,
+                            enabled: true,
+                            params: isObject(creator.DEFAULT) ? { ...creator.DEFAULT } : {}
+                        }
                     }
                 }
+
+                AssetManager.register_prefab(`default.${name}`, default_prefab)
+                AssetManager.register_component(creator, name);
+            } else {
+                error(`AssetManager`, `failed to preload component "${ns}.${name}". Unknown type: "${typeof creator}"`)
             }
 
-            AssetManager.register_prefab(`default.${name}`, default_prefab)
-            AssetManager.register_component(creator, name);
+
         })
     }
     static preload_shader_parts(ns, context) {

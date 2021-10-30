@@ -10,7 +10,8 @@ import * as THREE from 'three';
 import Vue from "vue"
 import Vuex from "vuex"
 import { mapState, mapGetters } from "vuex"
-import { keys, set } from "lodash-es"
+import { keys, set, isFunction, isObject, isArray, isNumber, isNull, isString } from "lodash-es"
+import { log, error } from "core/utils/Tools"
 Vue.use(Vuex)
 
 let MyPlugin = {}
@@ -31,27 +32,35 @@ MyPlugin.install = function (Vue, options) {
             }
             let gui_component = p.gui_component
 
+            Object.defineProperty(this, "gui_component", {
+                get: () => gui_component
+            })
             Object.defineProperty(this, "object", {
-                get: ()=> gui_component.object
+                get: () => gui_component.object
             })
             Object.defineProperty(this, "globals", {
-                get: ()=> gui_component.globals
+                get: () => gui_component.globals
             })
             Object.defineProperty(this, "app", {
-                get: ()=> gui_component.globals.app
+                get: () => gui_component.globals.app
             })
             Object.defineProperty(this, "launcher", {
-                get: ()=> gui_component.globals.launcher
+                get: () => gui_component.globals.launcher
             })
             Object.defineProperty(this, "camera", {
-                get: ()=> gui_component.globals.camera
+                get: () => gui_component.globals.camera
             })
         },
         mounted() {
-            this.$el.style.zIndex = "1"
+            if (this.$el && this.$el.style) {
+                this.$el.style.zIndex = "2"
+            }
         },
         methods: {
             format_money(v) {
+                if (!isNumber(v)) {
+                    return '$ 0'
+                }
                 return `$ ${v.toFixed(2)}`
             },
             format_round_value(v) {
@@ -127,14 +136,15 @@ class VueGUIComponent extends Component {
         super(...arguments)
         this.props = {}
     }
-    get el(){
+    get el() {
         return this.ui.$el
     }
-    on_created() {
-        console.log(this.store)
-        
-       
+    get ui() {
+        return this.ui_wrapper.$children[0]
 
+    }
+    on_created() {
+        this.log("creating...", this.store, this.root_component.name)
         let store_config = this.store
 
         if (typeof store_config !== "object" || store_config === null) {
@@ -153,7 +163,7 @@ class VueGUIComponent extends Component {
 
 
         this.vuex_store = new Vuex.Store(store_config)
-        let ui = this.ui = new Vue({
+        let ui_wrapper = this.ui_wrapper = new Vue({
             template: `<${this.root_component.name}/>`,
             components: {
                 [`${this.root_component.name}`]: this.root_component
@@ -162,12 +172,9 @@ class VueGUIComponent extends Component {
             store: this.vuex_store
         })
 
-        ui.gui_component = this
-
-
+        ui_wrapper.gui_component = this
     }
     on_enabled() {
-        
         this.dom = document.createElement("div")
         this.dom.style.width = "100%";
         this.dom.style.height = "100%";
@@ -176,10 +183,54 @@ class VueGUIComponent extends Component {
         this.dom.style.userSelect = "none";
         this.dom.classList.add('gui-dom')
         this.globals.dom.appendChild(this.dom)
-        this.ui.$mount(this.dom)
+        this.ui_wrapper.$mount(this.dom)
     }
     on_tick(time_delta) {
-        this.ui.tick(time_delta)
+        this.ui_wrapper.tick(time_delta)
+    }
+    store_set(key, value) {
+        return this.vuex_store.state[key] = value
+    }
+    store_commit(mutation_name, payload) {
+        return this.vuex_store.commit(mutation_name, payload)
+    }
+    store_dispatch(action_name, payload) {
+        return this.vuex_store.dispatch(action_name, payload)
+    }
+    run_method(method_name, ...payload) {
+        let root_comp = this.ui
+        if (!root_comp) {
+            this.error(`cannot run nested methods: no root`)
+            return
+        }
+
+        this._run_method_on(root_comp, method_name, ...payload)
+    }
+    _run_method_on(object, method_name, ...payload) {
+        if (isObject(object) && isFunction(object[method_name])) {
+            object[method](...payload)
+        }
+    }
+    run_nested_methods(method_name, ...payload) {
+        let root_comp = this.ui
+        if (!root_comp) {
+            this.error(`cannot run nested methods: no root`)
+            return
+        }
+        this._run_nested_methods_on_comp(root_comp, method_name, ...payload)
+    }
+    _run_nested_methods_on_comp(comp, method_name, ...payload) {
+        comp = comp || this.ui
+        if (!comp) {
+            this.error(`cannot run nested methods: no comp`)
+            return
+        }
+        if (isFunction(comp[method_name])) {
+            comp[method_name](...payload)
+        }
+        if (isArray(comp.$children)) {
+            comp.$children.forEach(child => this._run_nested_methods_on_comp(child, method_name, ...payload))
+        }
     }
 }
 

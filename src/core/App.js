@@ -8,7 +8,7 @@ import DevGUI from "core/gui/DevGUI.vue"
 import * as THREE from 'three';
 import DataComputed from "core/utils/DataComputed";
 import GameObject from "core/GameObject";
-import { log , console } from "core/utils/Tools"
+import { log, console } from "core/utils/Tools"
 
 class CoreApp extends GameObject {
     /**private */
@@ -28,7 +28,7 @@ class CoreApp extends GameObject {
         }))
 
     }
-    load_stage(prefab){
+    load_stage(prefab) {
         let stage = this.stage = this.globals.stage = new GameObject(prefab)
         this.add(stage)
         return stage
@@ -37,7 +37,7 @@ class CoreApp extends GameObject {
         this.globals = {
             skeleton_scale: 0.001,
             stage: undefined,
-            dom_rect: { left: 0, top: 0, width: 1, height: 1 }, 
+            dom_rect: { left: 0, top: 0, width: 1, height: 1 },
             uniforms: {
                 bc: { value: new THREE.Vector2(0, 1), type: "v2" },
                 time: { value: 0, type: "f" },
@@ -66,6 +66,20 @@ class CoreApp extends GameObject {
         this.dom.style.height = "100%";
         this.dom.style.position = "relative";
         this.dom.style.userSelect = "none"
+        this.dom.classList.add("root-dom")
+
+
+        this.user_input_dom = this.globals.user_input_dom = document.createElement("div");
+        this.user_input_dom.style.width = "100%";
+        this.user_input_dom.style.height = "100%";
+        this.user_input_dom.style.position = "absolute";
+        this.user_input_dom.style.top = "0";
+        this.user_input_dom.style.left = "0";
+        this.user_input_dom.style.userSelect = "none"
+        this.user_input_dom.style.zIndex = " 1"
+        this.user_input_dom.classList.add("user-input-dom")
+
+        this.dom.appendChild(this.user_input_dom)
 
         F_GLOBAL_TICK_SKIP = new DataComputed(() => {
             return this.globals.tick_skip

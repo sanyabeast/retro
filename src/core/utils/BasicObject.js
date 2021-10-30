@@ -1,7 +1,9 @@
 
 import { log, error, console } from "core/utils/Tools";
-class BasicObject {
+import * as THREE from "three"
+class BasicObject extends THREE.EventDispatcher {
     constructor() {
+        super()
         this.sub_id = 0
         this.subs = {
             id: {},
@@ -50,6 +52,19 @@ class BasicObject {
     }
     random_choice(arr) {
         return arr[Math.floor(Math.random() * arr.length)]
+    }
+    /*events*/
+    on() {
+        return this.addEventListener(...arguments)
+    }
+    off() {
+        return this.removeEventListener(...arguments)
+    }
+    has_listener() {
+        return this.hasEventListener(...arguments)
+    }
+    emit(type, payoad) {
+        return this.dispatchEvent({ type: type, payoad })
     }
 }
 
