@@ -50,7 +50,7 @@ class SkySphere extends SceneComponent {
     tick_rate = 15
     hemi_light = undefined
 
-    on_created() {
+    on_create() {
         let sky = this.subject = new THREE.objects.SkyMesh();
         console.log(sky)
 

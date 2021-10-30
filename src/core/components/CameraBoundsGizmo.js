@@ -10,7 +10,7 @@ class CameraBoundsGizmo extends Component {
         super(params);
     }
 
-    on_enabled() {
+    on_enable() {
         let top_left_gizmo = (this.top_left_gizmo = new THREE.Mesh({
             geometry: new THREE.CircleBufferGeometry(0.25, 32),
             material: new THREE.MeshBasicMaterial({

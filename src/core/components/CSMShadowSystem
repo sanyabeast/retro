@@ -13,10 +13,10 @@ import CSM from "three-csm"
 console.log(CSM)
 
 class CSMShadowSystem extends Component {
-    on_created() {
+    on_create() {
 
     }
-    on_enabled() {
+    on_enable() {
         let renderer = this.find_component_of_type("Renderer")
 
 

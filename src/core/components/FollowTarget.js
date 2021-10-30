@@ -8,7 +8,7 @@ import * as THREE from 'three';
 
 class FollowTarget extends Component {
     offset = [0, 0, 0];
-    on_created() {
+    on_create() {
         this.log(`FollowTarget`, "component created");
     }
     on_tick(time_delta) {

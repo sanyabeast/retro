@@ -16,7 +16,7 @@ class MovieClipComponent extends MeshComponent {
     playing = true
     loop = true
     hide_stopped = true
-    on_created() {
+    on_create() {
         let geometry = AssetManager.create_geometry(
             "PlaneBufferGeometry",
             [1, 1, 1]

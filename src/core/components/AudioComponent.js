@@ -13,7 +13,7 @@ class AudioComponent extends Component {
     loop = false
     volume = 0.5
     autoplay = false
-    on_created() {
+    on_create() {
         // this.update_src()
         // if (this.autoplay) {
         //     this.play()

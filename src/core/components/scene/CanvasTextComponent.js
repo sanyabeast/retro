@@ -11,7 +11,7 @@ class CanvasTextComponent extends Component {
     offset = [0, 0, 0];
     inited = true
     tick_skip = 8
-    on_created() {
+    on_create() {
         this.canvas_text = new CanvasText({
             text: this.text,
             fill_style: this.fill_style,
@@ -57,14 +57,14 @@ class CanvasTextComponent extends Component {
             this.canvas_text.render_index = this.render_index
         }
     }
-    on_enabled() {
+    on_enable() {
         if (this.inited) {
             this.canvas_text.init()
             this.inited = true
         }
         this.object.add(this.canvas_text)
     }
-    on_disabled() {
+    on_disable() {
         this.object.remove(this.canvas_text)
     }
     set_text(t) {

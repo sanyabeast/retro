@@ -16,7 +16,7 @@ class MeshComponent extends SceneComponent {
     class = undefined
 
     tick_rate = 1
-    on_created() {
+    on_create() {
         let mesh = undefined
 
         /**readymade objects stored in /objects/ directory of both app and core */
@@ -96,11 +96,11 @@ class MeshComponent extends SceneComponent {
         })
     }
 
-    on_enabled() {
+    on_enable() {
         this.globals.need_update_render_list = true
     }
 
-    on_disabled() {
+    on_disable() {
         this.globals.need_update_render_list = true
     }
 

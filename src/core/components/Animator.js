@@ -68,8 +68,8 @@ class Animator extends Component {
     tick_skip = 2;
     active_animations = {};
     animations = {}
-    on_created() { }
-    on_enabled() {
+    on_create() { }
+    on_enable() {
         for (let k in this.animations) {
             if (this.animations[k].autoplay) {
                 this.animate(k, 1);

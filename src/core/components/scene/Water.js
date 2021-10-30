@@ -21,7 +21,7 @@ class Water extends SceneComponent {
     height = 1000
     water_type = 1
 
-    on_created() {
+    on_create() {
         this.meta.layers.normal = false
         let water = undefined
         switch (this.water_type) {

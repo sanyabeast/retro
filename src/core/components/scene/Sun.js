@@ -61,7 +61,7 @@ class Sun extends SceneComponent {
     get_light_color(){
         return this.light.color
     }
-    on_created() {
+    on_create() {
 
         /*dir light*/
         let light = this.light = new THREE.DirectionalLight()

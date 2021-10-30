@@ -32,7 +32,7 @@ class LightComponent extends SceneComponent {
             decay: this.decay,
         }
     }
-    on_created() {
+    on_create() {
         let light
 
         this.meta.layers.lights = true

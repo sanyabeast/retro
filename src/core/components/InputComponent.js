@@ -45,7 +45,7 @@ class InputComponent extends SceneComponent {
         this.pointer_position = new THREE.Vector2(0, 0)
         this.pointer_position_abs = new THREE.Vector2(0, 0)
     }
-    on_created() {
+    on_create() {
         this.handle_keydown = this.handle_keydown.bind(this)
         this.handle_keyup = this.handle_keyup.bind(this)
         this.handle_keypress = this.handle_keypress.bind(this)
@@ -117,7 +117,7 @@ class InputComponent extends SceneComponent {
     check_color_id(r, g, b) {
 
     }
-    on_enabled() {
+    on_enable() {
         window.addEventListener('keydown', this.handle_keydown)
         window.addEventListener('keyup', this.handle_keyup)
         window.addEventListener('keypress', this.handle_keypress)
@@ -128,7 +128,7 @@ class InputComponent extends SceneComponent {
         window.addEventListener('click', this.handle_click)
         window.addEventListener('mouseout', this.handle_mouseout)
     }
-    on_disabled() {
+    on_disable() {
         window.removeEventListener('keydown', this.handle_keydown)
         window.removeEventListener('keyup', this.handle_keyup)
         window.removeEventListener('keypress', this.handle_keypress)

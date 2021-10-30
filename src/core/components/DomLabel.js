@@ -56,16 +56,16 @@ class DomLabel extends Component {
         this.dom.appendChild(this.paragraph);
 
     }
-    on_created() {
+    on_create() {
         this.globals.dom.appendChild(this.dom)
     }
-    on_enabled() {
+    on_enable() {
         if (!this.in_dom) {
             this.dom.style.display = "flex"
         }
         this.in_dom = true;
     }
-    on_disabled() {
+    on_disable() {
         if (this.in_dom) {
             this.dom.style.display = "none"
         }

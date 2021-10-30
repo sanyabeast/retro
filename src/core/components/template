@@ -12,7 +12,7 @@ import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefin
 import Schema from "core/utils/Schema"
 
 class SomeComponent extends Component {
-    on_created() {
+    on_create() {
 
     }
     on_tick(time_delta) {
@@ -37,7 +37,7 @@ import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefin
 import Schema from "core/utils/Schema"
 
 class SomeSceneComponent extends SceneComponent {
-    on_created() {
+    on_create() {
 
     }
     on_tick(time_delta) {

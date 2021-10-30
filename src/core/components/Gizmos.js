@@ -19,7 +19,7 @@ class Gizmos extends SceneComponent {
             gizmo: true
         }
     }
-    on_created() {
+    on_create() {
         let zero_axes_helper_a = this.zero_axes_helper_a = new THREE.AxesHelper(99999)
 
         zero_axes_helper_a.material.depthWrite = false

@@ -29,7 +29,7 @@ class CameraComponent extends SceneComponent {
         super(...arguments)
         this.prev_camera_matrix = new THREE.Matrix4()
     }
-    on_created() {
+    on_create() {
         let o_camera = this.o_camera = new THREE.OrthographicCamera({
             fov: this.fov,
             aspect: this.aspect,

@@ -61,7 +61,7 @@ class Postprocessing extends Component {
         sun.matrixAutoUpdate = false;
 
     }
-    on_created() {
+    on_create() {
         this.postfx_render_function = this.postfx_render_function.bind(this)
         this.setup_postfx()
     }
@@ -322,7 +322,7 @@ class Postprocessing extends Component {
         ));
 
     }
-    on_enabled() {
+    on_enable() {
         let renderer = this.find_component_of_type("Renderer")
         if (renderer) {
             renderer.custom_render_function = this.postfx_render_function
@@ -330,7 +330,7 @@ class Postprocessing extends Component {
             renderer.clear_stencil = false
         }
     }
-    on_disabled() {
+    on_disable() {
         let renderer = this.find_component_of_type("Renderer")
         if (renderer) {
             renderer.custom_render_function = undefined

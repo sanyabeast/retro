@@ -37,7 +37,7 @@ class SpineAnimationPlayer extends SceneComponent {
     skeleton_scale = 1
     file_name = undefined
     z_offset = 0.001
-    async on_created() {
+    async on_create() {
         switch (SPINE_VERSION) {
             case 38: {
                 let base_url = `res/${this.asset_name}/`;

@@ -65,7 +65,7 @@ class Renderer extends Component {
     object_layers = undefined
     zero_object = new THREE.Object3D()
 
-    on_created() {
+    on_create() {
         this.resolution = new Vector2(1, 1)
         this.object_layers = {}
         this.rendering_layers = {
@@ -171,7 +171,7 @@ class Renderer extends Component {
             this.raf_loop.stop()
         }
     }
-    on_enabled() {
+    on_enable() {
         this.globals.dom.appendChild(this.renderer.domElement)
         let clock = this.find_component_of_type("ClockComponent")
         this.raf_loop = clock.create(this.render.bind(this))

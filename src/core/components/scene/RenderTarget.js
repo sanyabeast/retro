@@ -45,7 +45,7 @@ class RenderTarget extends SceneComponent {
     get texture() {
         return this.render_target_state.render_target.texture
     }
-    on_created() {
+    on_create() {
         log(`RenderTarget`, `created`)
 
 

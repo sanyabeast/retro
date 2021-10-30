@@ -108,20 +108,20 @@ class Component extends BasicObject {
                         this._on_start = params[k]
                         break
                     }
-                    case "on_enabled": {
-                        this._on_enabled = params[k]
+                    case "on_enable": {
+                        this._on_enable = params[k]
                         break
                     }
-                    case "on_disabled": {
-                        this._on_disabled = params[k]
+                    case "on_disable": {
+                        this._on_disable = params[k]
                         break
                     }
-                    case "on_created": {
-                        this._on_created = params[k]
+                    case "on_create": {
+                        this._on_create = params[k]
                         break
                     }
                     case "on_destroy": {
-                        this._on_created = params[k]
+                        this._on_create = params[k]
                         break
                     }
                     default: {
@@ -144,8 +144,8 @@ class Component extends BasicObject {
         }
     }
     on_update() { }
-    on_created() {
-        if (this._on_created) this._on_created(td)
+    on_create() {
+        if (this._on_create) this._on_create(td)
     }
     on_destroy() {
         if (this._on_destroy) this._on_destroy(td)
@@ -156,11 +156,11 @@ class Component extends BasicObject {
     on_start(td) {
         if (this._on_start) this._on_start(td)
     }
-    on_enabled() {
-        if (this._on_enabled) this._on_enabled(td)
+    on_enable() {
+        if (this._on_enable) this._on_enable(td)
     }
-    on_disabled() {
-        if (this._on_disabled) this._on_disabled(td)
+    on_disable() {
+        if (this._on_disable) this._on_disable(td)
     }
     get parent() {
         let r = null;
@@ -175,9 +175,9 @@ class Component extends BasicObject {
     set enabled(v) {
         if (v !== this.meta.enabled) {
             if (v) {
-                this.on_enabled();
+                this.on_enable();
             } else {
-                this.on_disabled();
+                this.on_disable();
             }
 
             this.meta.enabled = v;

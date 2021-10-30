@@ -46,7 +46,7 @@ class Fog extends Component {
             }
         })
     }
-    on_created() {
+    on_create() {
         this.fog_exp = new THREE.FogExp2()
         this.fog = new THREE.Fog()
 
@@ -60,7 +60,7 @@ class Fog extends Component {
         this.fog.near = this.near
         this.fog.far = this.far
     }
-    on_enabled() {
+    on_enable() {
         let scene = this.globals.app
         scene.background = scene.background || this.color
         scene.fog = this.fog_exp

@@ -343,8 +343,8 @@ class GameObject extends Group {
                 }
             }
             this.components.push(component)
-            component.on_created()
-            if (component.enabled) component.on_enabled()
+            component.on_create()
+            if (component.enabled) component.on_enable()
             AssetManager.components_base[component_name] = AssetManager.components_base[component_name] || {}
             AssetManager.components_base[component_name][component.id] = component
 

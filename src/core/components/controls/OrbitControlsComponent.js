@@ -54,11 +54,11 @@ class OrbitControlsComponent extends Component {
             "zoom_speed"
         ].concat(super.get_reactive_props())
     }
-    on_enabled(){
+    on_enable(){
         this.controls.enabled = true
         console.log(2)
     }
-    on_disabled(){
+    on_disable(){
         console.log(1)
         this.controls.enabled = false
     }
@@ -100,7 +100,7 @@ class OrbitControlsComponent extends Component {
             }
         })
     }
-    on_created() {
+    on_create() {
         let camera = this.find_component_of_type("CameraComponent")
         if (camera) {
             const controls = this.controls = new OrbitControls.OrbitControls(camera.subject, this.globals.dom);

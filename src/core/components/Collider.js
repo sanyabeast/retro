@@ -64,7 +64,7 @@ class Collider extends SceneComponent {
         this.meta.layers.normal = false
         this.meta.layers.rendering = false
     }
-    on_created() {
+    on_create() {
         let wireframe_mat = this.wireframe_mat = new THREE.MeshBasicMaterial({
             wireframe: true,
             color: COLLIDER_WIREFRAME_COLOR,

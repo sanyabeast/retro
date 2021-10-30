@@ -8,7 +8,7 @@ import * as THREE from 'three';
 
 class FollowPointer extends Component {
     offset = [0, 0, 0];
-    on_created() {
+    on_create() {
     }
     handle_pointermove(evt) {
         let global_pos = this.globals.camera.screen_to_world(evt.pointer_a);

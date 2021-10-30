@@ -23,7 +23,7 @@ class ClockComponent extends Component {
         fps: 60
     }
 
-    on_created() {
+    on_create() {
 
         this.handle_raf = this.handle_raf.bind(this)
         this.raf_cb_id = 0

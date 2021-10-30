@@ -11,7 +11,7 @@ import * as THREE from 'three';
 class SimpleRadialMovement extends Component {
     speed = 1;
     radius = 2
-    on_created() {
+    on_create() {
     }
     on_tick(time_delta) {
         this.object.position.x = Math.sin((+new Date()/1000) * this.speed) * this.radius

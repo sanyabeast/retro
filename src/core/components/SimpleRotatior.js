@@ -11,7 +11,7 @@ import * as THREE from 'three';
 class SimpleRotator extends Component {
     speed = 1;
     axis = new THREE.Vector3(0, 0, 1)
-    on_created() {
+    on_create() {
     }
     on_tick(time_delta) {
         this.object.rotation.x += this.axis.x * this.speed

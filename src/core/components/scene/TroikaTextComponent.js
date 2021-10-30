@@ -36,7 +36,7 @@ class TroikaTextComponent extends SceneComponent {
             parent: this.object
         }
     }
-    on_created() {
+    on_create() {
         const subject = this.subject = new Text();
 
         this.meta.layers.normal = false

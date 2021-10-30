@@ -143,7 +143,7 @@ class VueGUIComponent extends Component {
         return this.ui_wrapper.$children[0]
 
     }
-    on_created() {
+    on_create() {
         this.log("creating...", this.store, this.root_component.name)
         let store_config = this.store
 
@@ -174,7 +174,7 @@ class VueGUIComponent extends Component {
 
         ui_wrapper.gui_component = this
     }
-    on_enabled() {
+    on_enable() {
         this.dom = document.createElement("div")
         this.dom.style.width = "100%";
         this.dom.style.height = "100%";

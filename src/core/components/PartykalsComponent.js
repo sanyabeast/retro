@@ -126,7 +126,7 @@ class PartykalsComponent extends SceneComponent {
         return r
     }
 
-    on_created() {
+    on_create() {
         let ps = this.particle_system = new Partykals.ParticlesSystem({
             particles: {
                 globalSize: this.get_value(this.particles_global_size),
