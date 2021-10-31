@@ -139,6 +139,15 @@ class GameObject extends Group {
             this.remove_component(this.components[0], params)
         }
 
+        /**removing global variables registerd by this object */
+        if (isObject(AssetManager.defined_globals[this.uuid])) {
+            forEach(AssetManager.defined_globals[this.uuid], (v, key) => {
+                this.undefine_global_var(key)
+            })
+        }
+
+        delete AssetManager.defined_globals[this.uuid]
+
     }
     get_components(component_name) {
         let r = []
@@ -435,6 +444,39 @@ class GameObject extends Group {
     }
     on_start() { }
     on_tick() { }
+    /**globals vars definition */
+    define_global_var(name, getter, setter) {
+        if (!isFunction(getter) || !isString(name)) {
+            this.error("failed registering global variable: invalid params", name, getter)
+        }
+
+        AssetManager.defined_globals[this.uuid] = AssetManager.defined_globals[this.uuid] || {}
+        AssetManager.defined_globals[this.uuid][name] = {
+            getter,
+            setter
+        }
+
+        Object.defineProperty(this.globals, name, {
+            get: getter,
+            set: isFunction(setter) ? setter : undefined,
+            configurable: true
+        })
+    }
+    undefine_global_var(name) {
+        Object.defineProperty(this.globals, name, {
+            get: undefined,
+            set: undefined,
+            configurable: true
+        })
+        delete this.globals[name]
+    }
+    /**logging */
+    log() {
+        log(this.constructor.name, ...arguments);
+    }
+    error() {
+        error(this.constructor.name, ...arguments);
+    }
 }
 
 

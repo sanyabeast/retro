@@ -21,7 +21,7 @@ class CoreApp extends GameObject {
         });
 
         this.setup_app()
-        this.globals.app = this
+        this.define_global_var("app", a => this)
         this.load_prefab(AssetManager.load_prefab("core.scenes.persistent", {
             "components.renderer.params.pixel_ratio": Math.min(window.devicePixelRatio, 2),
             "components.devgui.params.root_component": DevGUI
@@ -35,7 +35,6 @@ class CoreApp extends GameObject {
     }
     setup_app() {
         this.globals = {
-            skeleton_scale: 0.001,
             stage: undefined,
             dom_rect: { left: 0, top: 0, width: 1, height: 1 },
             uniforms: {
@@ -46,8 +45,6 @@ class CoreApp extends GameObject {
                 mouse: { value: new THREE.Vector2(0, 0), type: "v2" },
                 camera_pos: { value: new THREE.Vector3(), type: "v3" },
             },
-            raycaster: new THREE.Raycaster(),
-            dom: null,
             get resolution() {
                 return this.uniforms.resolution.value;
             },
@@ -61,25 +58,13 @@ class CoreApp extends GameObject {
             log: this.log
         }
 
-        this.dom = this.globals.dom = document.createElement("div");
+        let dom = this.dom = document.createElement("div");
+        this.define_global_var("dom", a => dom)
         this.dom.style.width = "100%";
         this.dom.style.height = "100%";
         this.dom.style.position = "relative";
         this.dom.style.userSelect = "none"
         this.dom.classList.add("root-dom")
-
-
-        this.user_input_dom = this.globals.user_input_dom = document.createElement("div");
-        this.user_input_dom.style.width = "100%";
-        this.user_input_dom.style.height = "100%";
-        this.user_input_dom.style.position = "absolute";
-        this.user_input_dom.style.top = "0";
-        this.user_input_dom.style.left = "0";
-        this.user_input_dom.style.userSelect = "none"
-        this.user_input_dom.style.zIndex = " 1"
-        this.user_input_dom.classList.add("user-input-dom")
-
-        this.dom.appendChild(this.user_input_dom)
 
         F_GLOBAL_TICK_SKIP = new DataComputed(() => {
             return this.globals.tick_skip

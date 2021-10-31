@@ -105,7 +105,7 @@ class MeshComponent extends SceneComponent {
     }
 
     on_destroy() {
-        super.on_destroy()
+        super.on_destroy(...arguments)
         // this.object.remove(this.subject);
         // this.globals.need_update_render_list = true
     }

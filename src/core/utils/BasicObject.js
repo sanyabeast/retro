@@ -10,12 +10,6 @@ class BasicObject extends THREE.EventDispatcher {
             name: {}
         }
     }
-    log() {
-        return BasicObject.log(...arguments);
-    }
-    static log() {
-        log(...arguments);
-    }
     round(x, n) {
         if (x % 5 == 0) {
             return Math.floor(x / n) * n;

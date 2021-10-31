@@ -106,7 +106,7 @@ class SpineAnimationPlayer extends SceneComponent {
                 let atlas = this.asset_manager.get(this.atlas_file);
                 let atlas_loader = new spine.AtlasAttachmentLoader(atlas);
                 let skeleton_json = new spine.SkeletonJson(atlas_loader);
-                skeleton_json.scale = this.skeleton_scale * this.globals.skeleton_scale;
+                skeleton_json.scale = this.skeleton_scale * SpineAnimationPlayer.GLOBAL_SKELETONS_SCALE;
                 let skeleton_data = skeleton_json.readSkeletonData(this.asset_manager.get(this.skeleton_file));
                 let subject = this.subject = new spine.threejs.SkeletonMesh(skeleton_data, (parameters) => {
                     //parameters.depthTest = false;
@@ -118,7 +118,7 @@ class SpineAnimationPlayer extends SceneComponent {
                 let atlas = this.asset_manager.require(this.atlas_file);
                 let atlas_loader = new spine.AtlasAttachmentLoader(atlas);
                 let skeleton_json = new spine.SkeletonJson(atlas_loader);
-                skeleton_json.scale = this.skeleton_scale * this.globals.skeleton_scale;
+                skeleton_json.scale = this.skeleton_scale * SpineAnimationPlayer.GLOBAL_SKELETONS_SCALE;
                 let skeleton_data = skeleton_json.readSkeletonData(this.asset_manager.require(this.skeleton_file));
                 let subject = this.subject = new spine.SkeletonMesh(skeleton_data, (parameters) => {
                     //parameters.depthTest = false;
@@ -151,5 +151,7 @@ class SpineAnimationPlayer extends SceneComponent {
         });
     }
 }
+
+SpineAnimationPlayer.GLOBAL_SKELETONS_SCALE = 0.1;
 
 export default SpineAnimationPlayer;

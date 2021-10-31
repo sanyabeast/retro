@@ -125,7 +125,7 @@ class Collider extends SceneComponent {
         }, ...super.get_gizmo_render_data()]
     }
     on_destroy() {
-
+        super.on_destroy(...arguments);
     }
     on_update(props) {
         super.on_update(props)

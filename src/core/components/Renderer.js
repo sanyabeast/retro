@@ -167,6 +167,7 @@ class Renderer extends Component {
         // this.progressive_lightmap.showDebugLightmap( true );
     }
     on_destroy() {
+        super.on_destroy(...arguments)
         if (this.raf_loop) {
             this.raf_loop.stop()
         }

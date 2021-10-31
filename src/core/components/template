@@ -40,6 +40,9 @@ class SomeSceneComponent extends SceneComponent {
     on_create() {
 
     }
+    on_destroy() {
+        super.on_destroy(...arguments)
+    }
     on_tick(time_delta) {
 
     }

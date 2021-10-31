@@ -553,7 +553,8 @@ AssetManager.register_component = function (creator, name) {
     AssetManager.components_lib[name] = creator
 }
 
-
+/**components` defined globals */
+AssetManager.defined_globals = {}
 
 AssetManager.preload_components("core", require.context("core/components/", true, /\.js$/))
 AssetManager.preload_classes("core", require.context("core/materials/classes", true, /\.js$/), "materials")

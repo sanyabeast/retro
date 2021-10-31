@@ -33,6 +33,7 @@ class InputComponent extends SceneComponent {
     show_debug_layer = false
     /**private */
     prev_camera_matrix = undefined
+    user_input_dom = undefined
 
     /**colorid */
     colorid_changed = false
@@ -46,6 +47,22 @@ class InputComponent extends SceneComponent {
         this.pointer_position_abs = new THREE.Vector2(0, 0)
     }
     on_create() {
+        this.user_input_dom = this.globals.user_input_dom = document.createElement("div");
+        this.user_input_dom.style.width = "100%";
+        this.user_input_dom.style.height = "100%";
+        this.user_input_dom.style.position = "absolute";
+        this.user_input_dom.style.top = "0";
+        this.user_input_dom.style.left = "0";
+        this.user_input_dom.style.userSelect = "none"
+        this.user_input_dom.style.zIndex = " 1"
+        this.user_input_dom.classList.add("user-input-dom")
+
+
+
+        this.globals.dom.appendChild(this.user_input_dom)
+
+
+
         this.handle_keydown = this.handle_keydown.bind(this)
         this.handle_keyup = this.handle_keyup.bind(this)
         this.handle_keypress = this.handle_keypress.bind(this)
@@ -64,6 +81,10 @@ class InputComponent extends SceneComponent {
         }
 
         console.log(this)
+    }
+    on_destroy() {
+        super.on_destroy(...arguments)
+        this.globals.dom.removeChild(this.user_input_dom)
     }
     get_gizmo_render_data() {
         return [{

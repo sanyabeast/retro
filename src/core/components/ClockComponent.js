@@ -56,6 +56,7 @@ class ClockComponent extends Component {
         this.globals.uniforms.time.value += (1 / 60) * this.tick_delta;
     }
     on_destroy() {
+        super.on_destroy(...arguments)
         cancelAnimationFrame(this.loop_id)
     }
     add(cb) {

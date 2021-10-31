@@ -149,6 +149,12 @@ class Component extends BasicObject {
     }
     on_destroy() {
         if (this._on_destroy) this._on_destroy(td)
+        if (isObject(AssetManager.defined_globals[this.id])) {
+            forEach(AssetManager.defined_globals[this.id], (v, key) => {
+                this.undefine_global_var(key)
+            })
+        }
+        delete AssetManager.defined_globals[this.id]
     }
     on_tick(td) {
         if (this._on_tick) this._on_tick(td)
@@ -242,6 +248,32 @@ class Component extends BasicObject {
     }
     get_components(component_name) {
         return this.object.get_components(component_name);
+    }
+    /**global vars definition */
+    define_global_var(name, getter, setter) {
+        if (!isFunction(getter) || !isString(name)) {
+            this.error("failed registering global variable: invalid params", name, getter)
+        }
+
+        AssetManager.defined_globals[this.id] = AssetManager.defined_globals[this.id] || {}
+        AssetManager.defined_globals[this.id][name] = {
+            getter,
+            setter
+        }
+
+        Object.defineProperty(this.globals, name, {
+            get: getter,
+            set: isFunction(setter) ? setter : undefined,
+            configurable: true
+        })
+    }
+    undefine_global_var(name) {
+        Object.defineProperty(this.globals, name, {
+            get: undefined,
+            set: undefined,
+            configurable: true
+        })
+        delete this.globals[name]
     }
 }
 
