@@ -3,7 +3,7 @@
  *
  */
 
-import { log , console } from "core/utils/Tools";
+import { log, console } from "core/utils/Tools";
 import Component from "core/Component";
 import * as THREE from 'three';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';

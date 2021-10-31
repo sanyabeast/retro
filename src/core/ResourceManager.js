@@ -128,6 +128,7 @@ class ResourceManager extends BasicObject {
         this.Schema = Schema
         this.SCHEMA_CORE = SCHEMA_CORE
         this.SCHEMA_APP = SCHEMA_APP
+
         this.cached_textures = new CachedDataDict();
         this.cached_geometries = new CachedDataDict();
         this.cached_materials = new CachedDataDict();
@@ -141,6 +142,8 @@ class ResourceManager extends BasicObject {
         this.components_instances = new RmDict()
         this.classes_of_components = new ClassesDataDict()
         this.defined_globals = new RmDict()
+        /**vue */
+        this.vuex_stores = new RmDict()
 
         /**loading texture placeholder */
         let placeholder_texture = this.placeholder_texture = this.load_texture("res/core/uv_checker_b.jpg")

@@ -171,6 +171,8 @@ class VueGUIComponent extends Component {
 
 
         this.vuex_store = new Vuex.Store(store_config)
+        ResourceManager.vuex_stores[this.UUID] = this.vuex_store
+
         let ui_wrapper = this.ui_wrapper = new Vue({
             template: `<${this.root_component.name}/>`,
             components: {
@@ -186,6 +188,7 @@ class VueGUIComponent extends Component {
         super.on_destroy(...arguments)
         this.ui_wrapper.$destroy();
         this.el.remove()
+        delete ResourceManager.vuex_stores[this.UUID]
     }
     on_enable() {
         this.globals.dom.appendChild(this.dom)

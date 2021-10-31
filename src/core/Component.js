@@ -76,6 +76,12 @@ class Component extends BasicObject {
             }
         }
     }
+    get UUID() {
+        if (!this.meta.UUID) {
+            this.meta.UUID = `COMP_${this.component_name}_${this.id}`
+        }
+        return this.meta.UUID
+    }
     save_prefab() {
         let r = {
             enabled: this.enabled,
@@ -148,7 +154,7 @@ class Component extends BasicObject {
     }
     on_destroy() {
         if (this._on_destroy) this._on_destroy(td)
-        ResourceManager.undefine_all_global_vars(`COMP_${this.component_name}_${this.id}`)
+        ResourceManager.undefine_all_global_vars(this.UUID)
     }
     on_tick(td) {
         if (this._on_tick) this._on_tick(td)
@@ -242,10 +248,10 @@ class Component extends BasicObject {
     }
     /**global vars definition */
     define_global_var(name, getter, setter) {
-        ResourceManager.define_global_var(`COMP_${this.component_name}_${this.id}`, name, getter, setter)
+        ResourceManager.define_global_var(this.UUID, name, getter, setter)
     }
     undefine_global_var(name) {
-        ResourceManager.undefine_global_var(`COMP_${this.component_name}_${this.id}`, name)
+        ResourceManager.undefine_global_var(this.UUID, name)
     }
 }
 

@@ -9,7 +9,6 @@ import { error, get_most_suitable_dict_keys } from "core/utils/Tools"
 import Schema from "core/utils/Schema"
 import Component from "core/Component"
 
-
 class GameObject extends Group {
     tick_id = 0
     NodeConstructor = undefined
@@ -19,19 +18,22 @@ class GameObject extends Group {
         this.components = []
         this.states = new StateMachine(prefab && prefab.states ? prefab.states : {}, this)
         this.tasks = new TaskScheduler(prefab && prefab.tasks ? prefab.tasks : [])
-
         if (typeof window.F_THREE_PATCH_PROPS === "function") {
             window.F_THREE_PATCH_PROPS(this)
         }
-
         this.load_prefab(prefab)
-
     }
     get refs() {
-        if (ResourceManager.gameobject_refs[`GOBJ_${this.constructor.name}_${this.uuid}`] === undefined) {
-            ResourceManager.gameobject_refs[`GOBJ_${this.constructor.name}_${this.uuid}`] = {}
+        if (ResourceManager.gameobject_refs[this.UUID] === undefined) {
+            ResourceManager.gameobject_refs[this.UUID] = {}
         }
-        return ResourceManager.gameobject_refs[`GOBJ_${this.constructor.name}_${this.uuid}`]
+        return ResourceManager.gameobject_refs[this.UUID]
+    }
+    get UUID() {
+        if (!this.$UUID) {
+            this.$UUID = `GOBJ_${this.constructor.name}_${this.uuid}`
+        }
+        return this.$UUID
     }
     load_prefab(prefab) {
         if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]")) {
@@ -51,7 +53,6 @@ class GameObject extends Group {
                         this.add(node)
                     }
                 }
-
             }
             if (typeof prefab.on_tick === `function`) {
                 this.on_tick = prefab.on_tick
@@ -92,7 +93,6 @@ class GameObject extends Group {
                 }
             }
         }
-
     }
     set_prefab(prefab) {
         console.log(set_prefab)
@@ -102,19 +102,15 @@ class GameObject extends Group {
             components: [],
             children: []
         }
-
         this.components.forEach(component => {
             r.components.push(
                 component.save_prefab()
             )
         })
-
         this.children.forEach(child => {
             r.children.push(child.save_prefab())
         })
-
         return json ? JSON.stringify(r, null, '\t') : r
-
     }
     get_render_order() {
         let ro = (this.render_layer.valueOf() || 0) * 1000000 + (this.render_index.valueOf() || 0) * 1
@@ -125,7 +121,7 @@ class GameObject extends Group {
     leave_state(name, new_state) { }
     update_state(name) { }
     destroy(params) {
-        delete ResourceManager.gameobject_refs[`GOBJ_${this.constructor.name}_${this.uuid}`]
+        delete ResourceManager.gameobject_refs[this.UUID]
         if (this.geometry) {
             this.geometry.dispose()
         }
@@ -138,9 +134,8 @@ class GameObject extends Group {
         while (this.components.length > 0) {
             this.remove_component(this.components[0], params)
         }
-
         /**removing global variables registerd by this object */
-        ResourceManager.undefine_all_global_vars(`GOBJ_${this.constructor.name}_${this.uuid}`)
+        ResourceManager.undefine_all_global_vars(this.UUID)
     }
     get_components(component_name) {
         let r = []
@@ -205,7 +200,6 @@ class GameObject extends Group {
                 break
             }
         }
-
         if (isFunction(cb)) {
             if (r !== undefined) {
                 cb(r)
@@ -217,7 +211,6 @@ class GameObject extends Group {
             return r !== undefined
         } else {
             return r
-
         }
     }
     find_components_of_type(component_name, count) {
@@ -250,7 +243,6 @@ class GameObject extends Group {
             return r !== undefined
         } else {
             return r
-
         }
     }
     broadcast(event_name, payload) {
@@ -273,7 +265,7 @@ class GameObject extends Group {
     }
     listen(event_name) {
         GameObject.broadcasting[event_name] = GameObject.broadcasting[event_name] || {}
-        GameObject.broadcasting[event_name][`GOBJ_${this.constructor.name}_${this.uuid}`] = this
+        GameObject.broadcasting[event_name][this.UUID] = this
     }
     setup_components(comp_data) {
         if (comp_data !== undefined) {
@@ -288,7 +280,6 @@ class GameObject extends Group {
                     data.ref = data.ref || k
                     this.add_component(data)
                 }
-
             }
         }
     }
@@ -298,14 +289,12 @@ class GameObject extends Group {
         let enabled = typeof data.enabled === 'boolean' ? data.enabled : true
         let ref = typeof data.ref === 'string' ? data.ref : undefined
         let creator = undefined
-
         let suitable_creators = get_most_suitable_dict_keys(ResourceManager.classes_of_components, component_name)
         if (suitable_creators.length > 1) {
             error('GameObject', `ambiguity when tried to created component with alias "${component_name}". got multiple candidates: ${suitable_creators.join(", ")}`)
         } else if (suitable_creators.length === 1) {
             creator = ResourceManager.classes_of_components[suitable_creators[0]]
         }
-
         let component
         if (isFunction(creator)) {
             component = new creator(params)
@@ -318,9 +307,7 @@ class GameObject extends Group {
                     component = new creator(params)
                 }
             }
-
         }
-
         if (component !== undefined) {
             component.name = component_name
             reactivate_component(component)
@@ -328,10 +315,7 @@ class GameObject extends Group {
             /**meta params */
             if (Schema.validate(data.meta, ":COMPONENT_PARAMS_META")) {
                 let meta_params = component.meta = ResourceManager.mixin_object(component.meta, [data.meta])
-
             }
-
-
             component.apply_params()
             component._enabled = enabled
             if (ref !== undefined) {
@@ -348,7 +332,7 @@ class GameObject extends Group {
             component.on_create()
             if (component.enabled) component.on_enable()
             ResourceManager.components_instances[component_name] = ResourceManager.components_instances[component_name] || {}
-            ResourceManager.components_instances[component_name][component.id] = component
+            ResourceManager.components_instances[component_name][component.UUID] = component
 
             if (data.tag) {
                 component.tag = data.tag
@@ -369,13 +353,13 @@ class GameObject extends Group {
                 delete this.refs[data]
                 for (let a = 0; a < this.components.length; a++) {
                     let c = this.components[a]
-                    if (c.id === component.id) {
+                    if (c.UUID === component.UUID) {
                         this.components.splice(a, 1)
                         break
                     }
                 }
                 let component_name = component.name
-                delete ResourceManager.components_instances[component_name][component.id]
+                delete ResourceManager.components_instances[component_name][component.UUID]
                 delete ResourceManager.components_tags[component.tag]
             }
         } else if (typeof data === "object") {
@@ -386,13 +370,13 @@ class GameObject extends Group {
             delete this.refs[ref]
             for (let a = 0; a < this.components.length; a++) {
                 let c = this.components[a]
-                if (c.id === component.id) {
+                if (c.UUID === component.UUID) {
                     this.components.splice(a, 1)
                     break
                 }
             }
             let component_name = component.name
-            delete ResourceManager.components_instances[component_name][component.id]
+            delete ResourceManager.components_instances[component_name][component.UUID]
             delete ResourceManager.components_tags[component.tag]
         }
     }
@@ -440,10 +424,10 @@ class GameObject extends Group {
     on_tick() { }
     /**globals vars definition */
     define_global_var(name, getter, setter) {
-        ResourceManager.define_global_var(`GOBJ_${this.constructor.name}_${this.uuid}`, name, getter, setter)
+        ResourceManager.define_global_var(this.UUID, name, getter, setter)
     }
     undefine_global_var(name) {
-        ResourceManager.undefine_global_var(`GOBJ_${this.constructor.name}_${this.uuid}`, name)
+        ResourceManager.undefine_global_var(this.UUID, name)
     }
     /**logging */
     log() {

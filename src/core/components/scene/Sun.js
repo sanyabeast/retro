@@ -7,7 +7,7 @@
 import SceneComponent from "core/SceneComponent";
 import ResourceManager from "core/ResourceManager";
 import * as THREE from 'three';
-import { hex_to_hsl, hsl_to_rgb, hex_to_rgb , console } from "core/utils/Tools";
+import { hex_to_hsl, hsl_to_rgb, hex_to_rgb, console } from "core/utils/Tools";
 
 class Sun extends SceneComponent {
     time = 0.5
@@ -58,7 +58,7 @@ class Sun extends SceneComponent {
     tick_rate = 10
 
     gizmo_dirlight_helper = undefined
-    get_light_color(){
+    get_light_color() {
         return this.light.color
     }
     on_create() {
