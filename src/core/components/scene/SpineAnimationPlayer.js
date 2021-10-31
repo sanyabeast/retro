@@ -4,6 +4,7 @@
  */
 
 import SceneComponent from "core/SceneComponent";
+import { forEach, isUndefined, isArray } from "lodash-es";
 import * as THREE from 'three';
 const path = require("path")
 
@@ -27,7 +28,6 @@ switch (SPINE_VERSION) {
         break;
 }
 
-
 class SpineAnimationPlayer extends SceneComponent {
     src = "res/spine/raptor.json";
     animation_name = "idle";
@@ -41,7 +41,16 @@ class SpineAnimationPlayer extends SceneComponent {
     file_name = "raptor"
     spine_asset_manager = undefined
     tick_rate = 45
+    loop_playlist = true
+
+    /**private */
+    playlist = undefined
+    get current_playlist_item() {
+        return this.playlist[0] || undefined
+    }
+
     async on_create() {
+        this.playlist = isArray(this.playlist) ? this.playlist : []
         switch (SPINE_VERSION) {
             case 38: {
                 let base_url = this.base_url = `${path.dirname(this.src)}/`
@@ -87,11 +96,60 @@ class SpineAnimationPlayer extends SceneComponent {
                 break
             }
         }
+
+        this.log(`created...`, this)
     }
     on_tick(time_delta) {
+        this.update_queue()
         if (this.subject) {
             this.subject.update(1 / 60 * time_delta.delta)
         }
+    }
+    update_queue() {
+        if (!this.subject) {
+            return
+        }
+        let current_playlist_item = this.current_playlist_item
+
+        if (isUndefined(current_playlist_item)) {
+
+        } else {
+            if (isUndefined(current_playlist_item.is_new)) current_playlist_item.is_new = true
+            if (isUndefined(current_playlist_item.is_playing)) current_playlist_item.is_playing = true
+            if (isUndefined(current_playlist_item.repeat)) current_playlist_item.repeat = 1
+            if (isUndefined(current_playlist_item.played_times)) current_playlist_item.played_times = 0
+
+            if (current_playlist_item.repeat > 0 && current_playlist_item.repeat < Infinity) {
+                if (current_playlist_item.played_times >= current_playlist_item.repeat) {
+                    current_playlist_item = this.playlist.shift();
+                    if (this.loop_playlist === true) {
+                        this.add_to_queue({
+                            animation_name: current_playlist_item.animation_name,
+                            repeat: current_playlist_item.repeat
+                        })
+                    }
+                } else {
+                    if (current_playlist_item.is_playing === false) {
+                        this.subject.state.setAnimation(0, current_playlist_item.animation_name, false)
+                        current_playlist_item.is_playing = true
+                    }
+                }
+            } else {
+                if (current_playlist_item.is_playing === false) {
+                    this.subject.state.setAnimation(0, current_playlist_item.animation_name, false)
+                    current_playlist_item.is_playing = true
+                }
+            }
+
+
+            if (current_playlist_item.is_new === true) {
+                current_playlist_item.is_new = false
+                this.subject.state.setAnimation(0, current_playlist_item.animation_name, false)
+                current_playlist_item.is_playing = true
+            }
+        }
+
+        // console.log(current_playlist_item)
     }
     setup_view() {
         switch (SPINE_VERSION) {
@@ -121,7 +179,20 @@ class SpineAnimationPlayer extends SceneComponent {
             }
         }
 
-        this.subject.state.setAnimation(0, this.animation_name, true);
+        this.subject.state.addListener({
+            start: this.handle_animation_start.bind(this),
+            interrupt: this.handle_animation_interrupt.bind(this),
+            end: this.handle_animation_end.bind(this),
+            complete: this.handle_animation_complete.bind(this),
+            event: this.handle_animation_event.bind(this),
+        })
+
+        this.add_to_queue({
+            animation_name: this.animation_name,
+            repeat: Infinity
+        })
+
+        //this.subject.state.setAnimation(0, this.animation_name, true);
 
         this.on_update([
             "position",
@@ -142,6 +213,49 @@ class SpineAnimationPlayer extends SceneComponent {
                 }
             }, 100);
         });
+    }
+    /**playlisting */
+    add_to_queue(animation_params) {
+        this.playlist.push(animation_params)
+    }
+    /**spine animation state listener api*/
+    handle_animation_start(payload) {
+        // let animation_name = payload.
+        let animation = payload.animation
+        let animation_name = animation.name
+        this.log(`animation event: "start"`, animation_name)
+    }
+    handle_animation_interrupt(payload) {
+        let animation = payload.animation
+        let animation_name = animation.name
+        // this.log(`animation event: "interrupt"`, animation_name)
+    }
+    handle_animation_end(payload) {
+        let animation = payload.animation
+        let animation_name = animation.name
+        // let current_playlist_item = this.current_playlist_item
+        // if (current_playlist_item && current_playlist_item.animation_name === animation_name) {
+        //     if (!current_playlist_item.is_playing) return
+        //     current_playlist_item.is_playing = false
+        //     current_playlist_item.played_times++;
+        // }
+        // this.log(`animation event: "end"`, animation_name)
+    }
+    handle_animation_complete(payload) {
+        let animation = payload.animation
+        let animation_name = animation.name
+        let current_playlist_item = this.current_playlist_item
+        if (current_playlist_item && current_playlist_item.animation_name === animation_name) {
+            if (!current_playlist_item.is_playing) return
+            current_playlist_item.is_playing = false
+            current_playlist_item.played_times++;
+        }
+        this.log(`animation event: "complete"`, animation_name)
+    }
+    handle_animation_event(payload) {
+        let animation = payload.animation
+        let animation_name = animation.name
+        // this.log(`animation event: "event"`, animation_name)
     }
 }
 
