@@ -40,7 +40,7 @@ class SpineAnimationPlayer extends SceneComponent {
     base_url = "res/spine/"
     file_name = "raptor"
     spine_asset_manager = undefined
-    tick_rate = 30
+    tick_rate = 45
     async on_create() {
         switch (SPINE_VERSION) {
             case 38: {
@@ -90,7 +90,7 @@ class SpineAnimationPlayer extends SceneComponent {
     }
     on_tick(time_delta) {
         if (this.subject) {
-            this.subject.update(1 / 30 * time_delta.delta)
+            this.subject.update(1 / 60 * time_delta.delta)
         }
     }
     setup_view() {

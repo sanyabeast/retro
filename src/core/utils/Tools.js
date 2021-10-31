@@ -10,8 +10,8 @@ function get_random_color_for_string(tag) {
     let s = 100
     let l = 75
 
-    for (let a = 0; a < 10; a++) {
-        h += (tag.charCodeAt(a) || 0) / 3
+    for (let a = 0; a < 10; a+=2) {
+        h += ((tag.charCodeAt(a) || 0) % 18.5113 ) * 14.35546
     }
 
     h = Math.floor(h) % 360

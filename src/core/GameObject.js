@@ -92,6 +92,8 @@ class GameObject extends Group {
                     ...prefab.extra_data
                 }
             }
+        } else if (isString(prefab)){
+            return this.load_prefab(ResourceManager.load_prefab(prefab))
         }
     }
     set_prefab(prefab) {
@@ -282,6 +284,10 @@ class GameObject extends Group {
                 }
             }
         }
+    }
+    create_child(prefab){
+        let c = new GameObject(prefab)
+        this.add(c)
     }
     add_component(data) {
         let component_name = data.name;

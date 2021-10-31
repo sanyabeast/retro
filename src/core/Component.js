@@ -234,10 +234,12 @@ class Component extends BasicObject {
     load_prefab() {
         return this.object.load_prefab(...arguments)
     }
+    create_child() {
+        return this.object.create_child(...arguments)
+    }
     add_component(data) {
         if (isObject(data)) {
             return this.object.add_component(data)
-
         }
     }
     remove_component(data) {
