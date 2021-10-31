@@ -68,7 +68,7 @@ class Component extends BasicObject {
             let now = +new Date()
             if (now - this.meta.ticking.prev_time >= (1000 / this.meta.ticking.rate)) {
                 let d = now - this.meta.ticking.prev_time
-                let delta = d / (1000 / 60)
+                let delta = this.meta.ticking.delta = d / (1000)
                 this.meta.ticking.ticks++
                 this.meta.ticking.now = now
                 this.meta.ticking.prev_time = now

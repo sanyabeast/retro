@@ -1,6 +1,6 @@
 class StateMachine {
-	constructor(data, object) {
-		this.object = object
+	constructor(data, listener) {
+		this.listener = listener
 		this.list = data.list || []
 		this.handle = data.handle || {}
 	}
@@ -22,19 +22,22 @@ class StateMachine {
 		if (this.handle && typeof this.handle.enter_state === 'function') {
 			this.handle.enter_state(name, prev_state, data)
 		}
-		this.object.enter_state(name, prev_state, data)
+		this.listener.enter_state(name, prev_state, data)
 	}
 	leave_state(name, new_state) {
 		if (this.handle && typeof this.handle.leave_state === 'function') {
 			this.handle.leave_state(name, new_state)
 		}
-		this.object.leave_state(name, new_state)
+		this.listener.leave_state(name, new_state)
 	}
 	update_state(name) {
+		if (name === undefined){
+			name = this.current_state
+		}
 		if (this.handle && typeof this.handle.update_state === 'function') {
 			this.handle.update_state(name)
 		}
-		this.object.update_state(name)
+		this.listener.update_state(name)
 	}
 }
 

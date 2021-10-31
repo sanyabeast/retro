@@ -3,6 +3,25 @@ import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isN
 import DateTime from "datetime-js"
 import exp from "constants";
 
+const easings = {
+    linear: t => t,
+    ease_in_quad: t => t * t,
+    ease_out_quad: t => t * (2 - t),
+    ease_in_out_quad: t => t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+    ease_in_cubic: t => t * t * t,
+    ease_out_cubic: t => (--t) * t * t + 1,
+    ease_in_out_cubic: t => t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+    ease_in_quart: t => t * t * t * t,
+    ease_out_quart: t => 1 - (--t) * t * t * t,
+    ease_in_out_quart: t => t < .5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t,
+    ease_in_quint: t => t * t * t * t * t,
+    ease_out_quint: t => 1 + (--t) * t * t * t * t,
+    ease_in_out_quint: t => t < .5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t,
+    ease_in_back: t => t * t * ((2.5 + 1) * t - 2.5),
+    ease_out_back: t => --t * t * ((2.5 + 1) * t + 2.5) + 1,
+    ease_in_out_back: t => ((t *= 2) < 1 ? t * t * ((2.5 + 1) * t - 2.5) : (t -= 2) * t * ((2.5 + 1) * t + 2.5) + 2) / 2
+}
+
 const cached_tag_colors = {}
 function get_random_color_for_string(tag) {
     if (cached_tag_colors[tag]) return cached_tag_colors[tag]
@@ -10,8 +29,8 @@ function get_random_color_for_string(tag) {
     let s = 100
     let l = 75
 
-    for (let a = 0; a < 10; a+=2) {
-        h += ((tag.charCodeAt(a) || 0) % 18.5113 ) * 14.35546
+    for (let a = 0; a < 10; a += 2) {
+        h += ((tag.charCodeAt(a) || 0) % 18.5113) * 14.35546
     }
 
     h = Math.floor(h) % 360
@@ -281,5 +300,6 @@ export {
     error,
     get_random_color_for_string,
     get_most_suitable_dict_keys,
-    console
+    console,
+    easings
 }

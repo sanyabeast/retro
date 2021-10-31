@@ -1,5 +1,6 @@
 
 import { log, error, console } from "core/utils/Tools";
+import { isNumber, isArray, isString, isUndefined } from "lodash-es"
 import * as THREE from "three"
 class BasicObject extends THREE.EventDispatcher {
     constructor() {
@@ -25,7 +26,17 @@ class BasicObject extends THREE.EventDispatcher {
         });
     }
     lerp(start, end, amt) {
-        return (1 - amt) * start + amt * end;
+        if (isNumber(start) && isNumber(end)) {
+            return (1 - amt) * start + amt * end;
+        } else if (isArray(start) && isArray(end)) {
+            let r = []
+            start.forEach((v, i) => {
+                r[i] = this.lerp(start[i], end[i], amt)
+            })
+            return r
+        } else {
+            this.log(`cannot lerp: unknown type "${typeof start}"`, start, end)
+        }
     }
     clamp(v, min, max) {
         v = Math.max(min, v)

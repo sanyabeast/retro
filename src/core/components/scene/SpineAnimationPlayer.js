@@ -30,7 +30,7 @@ switch (SPINE_VERSION) {
 
 class SpineAnimationPlayer extends SceneComponent {
     src = "res/spine/raptor.json";
-    animation_name = "idle";
+    animation_name = undefined;
     inited = false
     skeleton_scale = 1
     z_offset = 0.001
@@ -40,7 +40,7 @@ class SpineAnimationPlayer extends SceneComponent {
     base_url = "res/spine/"
     file_name = "raptor"
     spine_asset_manager = undefined
-    tick_rate = 45
+    tick_rate = 30
     loop_playlist = true
 
     /**private */
@@ -102,7 +102,7 @@ class SpineAnimationPlayer extends SceneComponent {
     on_tick(time_delta) {
         this.update_queue()
         if (this.subject) {
-            this.subject.update(1 / 60 * time_delta.delta)
+            this.subject.update(time_delta.delta)
         }
     }
     update_queue() {
@@ -187,10 +187,13 @@ class SpineAnimationPlayer extends SceneComponent {
             event: this.handle_animation_event.bind(this),
         })
 
-        this.add_to_queue({
-            animation_name: this.animation_name,
-            repeat: Infinity
-        })
+        if (this.animation_name !== undefined) {
+            this.add_to_queue({
+                animation_name: this.animation_name,
+                repeat: Infinity
+            })
+        }
+
 
         //this.subject.state.setAnimation(0, this.animation_name, true);
 
