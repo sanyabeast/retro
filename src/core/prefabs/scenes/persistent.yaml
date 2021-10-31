@@ -9,8 +9,8 @@ components:
     name: "CameraComponent"
     params:
       position:
-        - 1
-        - 1
-        - 4
+        - 0
+        - 0
+        - 5
   devgui:
     name: VueGUIComponent

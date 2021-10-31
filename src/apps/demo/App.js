@@ -8,7 +8,7 @@ class App extends CoreApp {
             ...params,
         });
 
-        let stage = this.load_stage(ResourceManager.load_prefab("{app_name}.scenes.main"))
+        let stage = this.load_stage(ResourceManager.load_prefab("{{APP_NAME}}.scenes.main"))
 
         let renderer = this.find_component_of_type("Renderer")
         let camera = this.find_component_of_type("CameraComponent")

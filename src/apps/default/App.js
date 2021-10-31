@@ -6,12 +6,14 @@ class App extends CoreApp {
         super({
             ...params,
         });
-
-        let stage = this.load_stage(ResourceManager.load_prefab("{app_name}.scenes.main"))
-
+        let stage = this.load_stage(ResourceManager.load_prefab("{{APP_NAME}}.scenes.main"))
         let camera = this.find_component_of_type("CameraComponent")
+        camera.position = [
+            0,
+            2,
+            5
+        ]
         camera.fov = 60
-
         this.start()
     }
     on_tick() { }

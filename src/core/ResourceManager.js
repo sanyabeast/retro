@@ -252,6 +252,7 @@ class ResourceManager extends BasicObject {
                 break
             }
             case "string": {
+                data = this.resolve_string_placeholders(data)
                 if (is_inline_dict(data)) {
                     let inline_dict = parse_inline_dict(data)
                     r = this.mixin_object(inline_dict)
@@ -262,6 +263,9 @@ class ResourceManager extends BasicObject {
                 r = data
                 for (let a = merged_mixins.length - 1; a >= 0; a--) {
                     let mv = merged_mixins[a]
+                    if (isString(mv)) {
+                        mv = this.resolve_string_placeholders(mv)
+                    }
                     if (!is_none(mv)) {
                         r = mv
                         break
@@ -427,7 +431,7 @@ class ResourceManager extends BasicObject {
         })
     }
     resolve_string_placeholders(data) {
-        data = data.replace("{app_name}", process.env.APP_NAME)
+        data = data.replace("{{APP_NAME}}", process.env.APP_NAME)
         return data
     }
     load_prefab(id, params) {
