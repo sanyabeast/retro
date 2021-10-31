@@ -5,7 +5,7 @@
  */
 
 import SceneComponent from "core/SceneComponent";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import * as THREE from 'three';
 
 const LAMP_ICON_TEXTURE = new THREE.TextureLoader().load('res/core/gizmo/lamp_a.png');

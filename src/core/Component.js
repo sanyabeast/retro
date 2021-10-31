@@ -7,7 +7,7 @@ import { log, makeid, datetime, is_none, hex_to_hsl, hsl_to_rgb, hex_to_rgb, req
 import * as Tools from "core/utils/Tools";
 import BasicObject from "core/utils/BasicObject";
 import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, isFunction, isString, map, keys, values, forEach } from "lodash-es"
-import AssetManager from "core/utils/AssetManager"
+import ResourceManager from "core/utils/ResourceManager"
 import Schema from "core/utils/Schema"
 
 let id = 0
@@ -149,12 +149,12 @@ class Component extends BasicObject {
     }
     on_destroy() {
         if (this._on_destroy) this._on_destroy(td)
-        if (isObject(AssetManager.defined_globals[this.id])) {
-            forEach(AssetManager.defined_globals[this.id], (v, key) => {
+        if (isObject(ResourceManager.defined_globals[this.id])) {
+            forEach(ResourceManager.defined_globals[this.id], (v, key) => {
                 this.undefine_global_var(key)
             })
         }
-        delete AssetManager.defined_globals[this.id]
+        delete ResourceManager.defined_globals[this.id]
     }
     on_tick(td) {
         if (this._on_tick) this._on_tick(td)
@@ -255,8 +255,8 @@ class Component extends BasicObject {
             this.error("failed registering global variable: invalid params", name, getter)
         }
 
-        AssetManager.defined_globals[this.id] = AssetManager.defined_globals[this.id] || {}
-        AssetManager.defined_globals[this.id][name] = {
+        ResourceManager.defined_globals[this.id] = ResourceManager.defined_globals[this.id] || {}
+        ResourceManager.defined_globals[this.id][name] = {
             getter,
             setter
         }

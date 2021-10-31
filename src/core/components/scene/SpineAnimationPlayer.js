@@ -45,7 +45,7 @@ class SpineAnimationPlayer extends SceneComponent {
                 this.atlas_file = `${this.file_name}.atlas`;
 
 
-                this.asset_manager = new spine.threejs.AssetManager(base_url);
+                this.asset_manager = new spine.threejs.ResourceManager(base_url);
                 // this.asset_manager.loadText(this.skeleton_file);
                 // this.asset_manager.loadTextureAtlas(`res/${this.asset_name}/${this.atlas_file}`);
                 await this.load_assets();
@@ -71,7 +71,7 @@ class SpineAnimationPlayer extends SceneComponent {
                 }
 
 
-                let asset_manager = this.asset_manager = new spine.AssetManager(
+                let asset_manager = this.asset_manager = new spine.ResourceManager(
                     base_url
                 );
                 this.skeleton_file = `${this.file_name}.json`;

@@ -5,7 +5,7 @@
  */
 
 import Component from "core/Component";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import * as THREE from 'three';
 import MeshComponent from "core/components/scene/MeshComponent"
 import { Vector2 } from "spine-ts-threejs";
@@ -17,11 +17,11 @@ class MovieClipComponent extends MeshComponent {
     loop = true
     hide_stopped = true
     on_create() {
-        let geometry = AssetManager.create_geometry(
+        let geometry = ResourceManager.create_geometry(
             "PlaneBufferGeometry",
             [1, 1, 1]
         )
-        let material = AssetManager.create_material(
+        let material = ResourceManager.create_material(
             "@core.movieclip",
             {
                 "uniforms.grid.value": this.grid,

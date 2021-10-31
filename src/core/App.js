@@ -3,7 +3,7 @@
  *
  */
 
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import DevGUI from "core/gui/DevGUI.vue"
 import * as THREE from 'three';
 import DataComputed from "core/utils/DataComputed";
@@ -22,7 +22,7 @@ class CoreApp extends GameObject {
 
         this.setup_app()
         this.define_global_var("app", a => this)
-        this.load_prefab(AssetManager.load_prefab("core.scenes.persistent", {
+        this.load_prefab(ResourceManager.load_prefab("core.scenes.persistent", {
             "components.renderer.params.pixel_ratio": Math.min(window.devicePixelRatio, 2),
             "components.devgui.params.root_component": DevGUI
         }))

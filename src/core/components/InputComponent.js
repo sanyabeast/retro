@@ -5,7 +5,7 @@
  */
 
 import SceneComponent from "core/SceneComponent";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import * as THREE from 'three';
 import { map } from "lodash-es"
 import { makeid } from "core/utils/Tools"

@@ -109,7 +109,7 @@ function process_shader_code(code, uniforms, parts) {
     return code
 }
 
-class AssetManager {
+class ResourceManager {
     static Schema = Schema
     static SCHEMA_CORE = SCHEMA_CORE
     static SCHEMA_APP = SCHEMA_APP
@@ -119,11 +119,11 @@ class AssetManager {
     static get_asset_stats() { return asset_stats; }
     static create_material_with_template(template_name, params, id) {
         template_name = template_name.replace("@", "");
-        if (!AssetManager.material_templates[template_name]) {
+        if (!ResourceManager.material_templates[template_name]) {
         }
-        let template_data = AssetManager.material_templates[template_name]
+        let template_data = ResourceManager.material_templates[template_name]
 
-        template_data = AssetManager.mixin_object(template_data)
+        template_data = ResourceManager.mixin_object(template_data)
 
         if (params) {
             for (let k in params) {
@@ -169,30 +169,30 @@ class AssetManager {
                 r = {}
                 if (data.prefab) {
                     let prefab_id = data.prefab
-                    let prefab_template = AssetManager.load_prefab(prefab_id)
+                    let prefab_template = ResourceManager.load_prefab(prefab_id)
                     data = {
                         ...data,
                         prefab: undefined
                     }
-                    data = AssetManager.mixin_object(prefab_template, [data])
+                    data = ResourceManager.mixin_object(prefab_template, [data])
                     merged_mixins[0] = data
                 }
                 if (data.prefabs) {
                     let prefab_mixins = []
                     data.prefabs.forEach(prefab_id => {
-                        let prefab_template = AssetManager.load_prefab(prefab_id)
+                        let prefab_template = ResourceManager.load_prefab(prefab_id)
                         prefab_mixins.push(prefab_template)
                     })
                     data = {
                         ...data,
                         prefabs: undefined
                     }
-                    data = AssetManager.mixin_object(data, [...prefab_mixins, data])
+                    data = ResourceManager.mixin_object(data, [...prefab_mixins, data])
                     merged_mixins[0] = data
                 }
                 let keys = get_unique_props(merged_mixins)
                 keys.forEach(k => {
-                    r[k] = AssetManager.mixin_object(data[k], map(mixins, m => isObject(m) ? m[k] : undefined))
+                    r[k] = ResourceManager.mixin_object(data[k], map(mixins, m => isObject(m) ? m[k] : undefined))
                 })
 
                 break
@@ -200,14 +200,14 @@ class AssetManager {
             case "array": {
                 r = []
                 data.forEach((item, index) => {
-                    r[index] = AssetManager.mixin_object(item, map(mixins, m => isArray(m) ? m[index] : undefined))
+                    r[index] = ResourceManager.mixin_object(item, map(mixins, m => isArray(m) ? m[index] : undefined))
                 })
                 break
             }
             case "string": {
                 if (is_inline_dict(data)) {
                     let inline_dict = parse_inline_dict(data)
-                    r = AssetManager.mixin_object(inline_dict)
+                    r = ResourceManager.mixin_object(inline_dict)
                     break
                 }
             }
@@ -226,15 +226,15 @@ class AssetManager {
         return r
     }
     static slick_merge(a, b) {
-        AssetManager.for_each(b, (v, k) => (a[k] = v));
+        ResourceManager.for_each(b, (v, k) => (a[k] = v));
         return a;
     }
     static create_material(type, params, id) {
         if (typeof params === "object" && Array.isArray(params) && params.type && params.params) {
-            return AssetManager.create_material(type, [params.type, params.params], id);
+            return ResourceManager.create_material(type, [params.type, params.params], id);
         }
 
-        let mat = AssetManager.cached_materials[id];
+        let mat = ResourceManager.cached_materials[id];
         if (mat === undefined || id === undefined) {
             if (type.indexOf("@") === 0) {
                 mat = this.create_material_with_template(type, params, id);
@@ -247,7 +247,7 @@ class AssetManager {
             }
 
             if (id !== undefined) {
-                AssetManager.cached_materials[id] = mat;
+                ResourceManager.cached_materials[id] = mat;
             }
         }
         return mat;
@@ -255,10 +255,10 @@ class AssetManager {
     static load_type(type, ...args) {
         switch (type) {
             case "texture": {
-                return AssetManager.load_texture(...args)
+                return ResourceManager.load_texture(...args)
             }
             case "prefab": {
-                return AssetManager.load_prefab(...args)
+                return ResourceManager.load_prefab(...args)
             }
         }
     }
@@ -268,13 +268,13 @@ class AssetManager {
     }
     static create_geometry_with_template(type, params, id) {
         let template_name = type.replace("@", "");
-        let template_data = AssetManager.geometry_templates[template_name];
+        let template_data = ResourceManager.geometry_templates[template_name];
         let args = template_data?.params?.args ?? [];
         let scale = template_data?.params.scale ?? [1, 1, 1]
         params?.forEach((v, i) => {
             args[i] = v;
         });
-        let geometry = AssetManager.create_geometry(template_data.type, args, id);
+        let geometry = ResourceManager.create_geometry(template_data.type, args, id);
         geometry.scale(scale[0], scale[1], scale[2])
         return geometry;
     }
@@ -285,21 +285,21 @@ class AssetManager {
     }
     static create_geometry(type, params, id) {
         if (typeof params === "object" && params.type && params.params) {
-            return AssetManager.create_geometry(type, [params.type, params.params], id);
+            return ResourceManager.create_geometry(type, [params.type, params.params], id);
         }
-        let g = AssetManager.cached_geometries[id];
+        let g = ResourceManager.cached_geometries[id];
         if (g === undefined || id === undefined) {
             if (type.indexOf("@") === 0)
                 return this.create_geometry_with_template(type, params, id);
             if (type.indexOf("url:") === 0)
                 return this.create_obj_geometry(type, params, id);
             if (THREE.geometries[type] === undefined) {
-                console.error("AssetManager", `cannot find geometry class "${type}"`)
+                console.error("ResourceManager", `cannot find geometry class "${type}"`)
             } else {
                 g = new THREE.geometries[type](...params);
             }
             if (id !== undefined) {
-                AssetManager.cached_geometries[id] = g;
+                ResourceManager.cached_geometries[id] = g;
             }
         }
         return g;
@@ -319,12 +319,12 @@ class AssetManager {
         return texture
     }
     static load_texture(src, params) {
-        let texture = AssetManager.textures_cache[src];
+        let texture = ResourceManager.textures_cache[src];
         if (!texture) {
             if (src.indexOf("@") === 0) {
-                texture = AssetManager.textures_cache[src] = AssetManager.load_from_texture_lib(src, params)
+                texture = ResourceManager.textures_cache[src] = ResourceManager.load_from_texture_lib(src, params)
             } else {
-                texture = AssetManager.textures_cache[src] = new THREE.TextureLoader().load(src);
+                texture = ResourceManager.textures_cache[src] = new THREE.TextureLoader().load(src);
             }
         }
         if (!texture) {
@@ -361,14 +361,14 @@ class AssetManager {
                 return render_target_state.texture
             }
         } else {
-            texture = AssetManager.texture_stream_cache[url]
+            texture = ResourceManager.texture_stream_cache[url]
 
             if (!texture) {
                 let params = get_query_string_params(url.split("?")[1] || "")
                 let src = url.split("?")[0]
-                texture = AssetManager.load_texture(src, params)
+                texture = ResourceManager.load_texture(src, params)
                 if (texture.is_placeholder !== true) {
-                    AssetManager.texture_stream_cache[url] = texture
+                    ResourceManager.texture_stream_cache[url] = texture
                 }
             }
         }
@@ -383,14 +383,14 @@ class AssetManager {
     static images_cache = {}
     static load_image(src) {
         return new Promise((resolve) => {
-            let image = AssetManager.images_cache[src]
+            let image = ResourceManager.images_cache[src]
             if (image !== undefined) {
                 resolve(image)
             } else {
                 image = new Image()
                 image.src = src
                 image.onload = () => {
-                    AssetManager.images_cache[src] = image
+                    ResourceManager.images_cache[src] = image
                     resolve(image)
                 }
             }
@@ -402,21 +402,21 @@ class AssetManager {
         return data
     }
     static load_prefab(id, params) {
-        id = AssetManager.resolve_string_placeholders(id)
+        id = ResourceManager.resolve_string_placeholders(id)
 
-        let suitable_prefabs = get_most_suitable_dict_keys(AssetManager.prefab_lib, id)
+        let suitable_prefabs = get_most_suitable_dict_keys(ResourceManager.prefab_lib, id)
         if (suitable_prefabs.length > 1) {
-            error('AssetManager', `ambiguity when tried to load prefab with alias "${id}". got multiple candidates: ${suitable_prefabs.join(", ")}`)
+            error('ResourceManager', `ambiguity when tried to load prefab with alias "${id}". got multiple candidates: ${suitable_prefabs.join(", ")}`)
         } else if (suitable_prefabs.length === 1) {
             id = suitable_prefabs[0]
         }
 
-        if (AssetManager.prefab_lib[id] === undefined) {
+        if (ResourceManager.prefab_lib[id] === undefined) {
             throw new Error(`no prefab with id "${id} found"`)
         }
 
-        let prefab_template = AssetManager.prefab_lib[id]
-        let prefab = AssetManager.mixin_object(prefab_template)
+        let prefab_template = ResourceManager.prefab_lib[id]
+        let prefab = ResourceManager.mixin_object(prefab_template)
         for (let k in params) {
             set(prefab, k, params[k])
         }
@@ -433,32 +433,32 @@ class AssetManager {
         });
     }
     static preload_classes(ns, context, category) {
-        AssetManager.preload_context(context, (p, mod) => {
+        ResourceManager.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".js", "");
             THREE[category] = THREE[category] || {}
             THREE[category][name] = mod.default
         })
     }
     static preload_textures(ns, context) {
-        AssetManager.textures_lib = AssetManager.textures_lib || {}
-        AssetManager.preload_context(context, (p, mod) => {
+        ResourceManager.textures_lib = ResourceManager.textures_lib || {}
+        ResourceManager.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".png", "");
             let data = require(`base64-image-loader!../textures/${name}.png`)
-            AssetManager.textures_lib[name] = data = {
+            ResourceManager.textures_lib[name] = data = {
                 base64: data
             }
         }, false)
     }
     static preload_textures2(ns, context) {
-        AssetManager.textures_lib = AssetManager.textures_lib || {}
-        AssetManager.preload_context(context, (p, mod) => {
+        ResourceManager.textures_lib = ResourceManager.textures_lib || {}
+        ResourceManager.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".yaml", "").replace(/\//gm, ".");
             let data = mod
-            AssetManager.textures_lib[name] = data
+            ResourceManager.textures_lib[name] = data
         })
     }
     static preload_components(ns, context) {
-        AssetManager.preload_context(context, (p, mod) => {
+        ResourceManager.preload_context(context, (p, mod) => {
             asset_stats.components_count++;
 
             let name = p.replace("./", "").replace(".js", "").replace(/\//gm, ".");
@@ -476,28 +476,28 @@ class AssetManager {
                     }
                 }
 
-                AssetManager.register_prefab(`default.${name}`, default_prefab)
-                AssetManager.register_component(creator, name);
+                ResourceManager.register_prefab(`default.${name}`, default_prefab)
+                ResourceManager.register_component(creator, name);
             } else {
-                error(`AssetManager`, `failed to preload component "${ns}.${name}". Unknown type: "${typeof creator}"`)
+                error(`ResourceManager`, `failed to preload component "${ns}.${name}". Unknown type: "${typeof creator}"`)
             }
 
 
         })
     }
     static preload_shader_parts(ns, context) {
-        AssetManager.shader_parts = AssetManager.shader_parts || {}
+        ResourceManager.shader_parts = ResourceManager.shader_parts || {}
 
-        AssetManager.preload_context(context, (p, mod) => {
+        ResourceManager.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".yaml", "").replace(/\//gm, ".");
-            AssetManager.shader_parts[`${ns}.${name}`] = mod;
+            ResourceManager.shader_parts[`${ns}.${name}`] = mod;
         })
     }
     static preload_materials(ns, context) {
-        AssetManager.material_templates = AssetManager.material_templates || {}
-        let material_templates = AssetManager.material_templates
+        ResourceManager.material_templates = ResourceManager.material_templates || {}
+        let material_templates = ResourceManager.material_templates
 
-        AssetManager.preload_context(context, (p, mod) => {
+        ResourceManager.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".yaml", "").replace(/\//gm, ".");
             asset_stats.materials_count++
             material_templates[`${ns}.${name}`] = mod;
@@ -508,88 +508,88 @@ class AssetManager {
                     ...shader_lib_uniforms,
                     ...(material_templates[`${ns}.${name}`].params.uniforms || {}),
                 }
-                material_templates[`${ns}.${name}`].params.fragmentShader = process_shader_code(material_templates[`${ns}.${name}`].params.fragmentShader, uniforms, AssetManager.shader_parts)
-                material_templates[`${ns}.${name}`].params.vertexShader = process_shader_code(material_templates[`${ns}.${name}`].params.vertexShader, uniforms, AssetManager.shader_parts)
+                material_templates[`${ns}.${name}`].params.fragmentShader = process_shader_code(material_templates[`${ns}.${name}`].params.fragmentShader, uniforms, ResourceManager.shader_parts)
+                material_templates[`${ns}.${name}`].params.vertexShader = process_shader_code(material_templates[`${ns}.${name}`].params.vertexShader, uniforms, ResourceManager.shader_parts)
             }
         })
     }
     static preload_geometries(ns, context) {
-        AssetManager.geometry_templates = AssetManager.geometry_templates || {}
+        ResourceManager.geometry_templates = ResourceManager.geometry_templates || {}
 
-        AssetManager.preload_context(context, (p, mod) => {
+        ResourceManager.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".yaml", "").replace(/\//gm, ".");
             asset_stats.geometries_count++
-            AssetManager.geometry_templates[`${ns}.${name}`] = mod;
+            ResourceManager.geometry_templates[`${ns}.${name}`] = mod;
         })
     }
     static preload_prefabs(ns, context) {
-        AssetManager.prefab_lib = AssetManager.prefab_lib || { test: { test_prop1: 1, test_prop2: "hello" } }
-        AssetManager.preload_context(context, (p, mod) => {
+        ResourceManager.prefab_lib = ResourceManager.prefab_lib || { test: { test_prop1: 1, test_prop2: "hello" } }
+        ResourceManager.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".yaml", "").replace(/\//gm, ".");
             let data = mod
             asset_stats.prefabs_count++
-            AssetManager.register_prefab(`${ns}.${name}`, data)
+            ResourceManager.register_prefab(`${ns}.${name}`, data)
         })
     }
     static register_prefab(id, prefab) {
         let is_valid = Schema.validate(prefab, ":PREFAB", `[PREFAB:${id}]`)
         if (!is_valid) {
-            console.error(`[AssetManager] cannot register prefab. preloaded prefab "${id}" does not match "PREFAB" schema`)
+            console.error(`[ResourceManager] cannot register prefab. preloaded prefab "${id}" does not match "PREFAB" schema`)
         }
-        AssetManager.prefab_lib = AssetManager.prefab_lib || { test: { test_prop1: 1, test_prop2: "hello" } }
-        AssetManager.prefab_lib[id] = prefab
+        ResourceManager.prefab_lib = ResourceManager.prefab_lib || { test: { test_prop1: 1, test_prop2: "hello" } }
+        ResourceManager.prefab_lib[id] = prefab
     }
 
 }
 
 /**gameobject */
-AssetManager.gameobject_refs = {}
+ResourceManager.gameobject_refs = {}
 
 /**comps */
-AssetManager.components_lib = {}
-AssetManager.components_tags = {}
-AssetManager.components_base = {}
-AssetManager.register_component = function (creator, name) {
-    AssetManager.components_lib[name] = creator
+ResourceManager.components_lib = {}
+ResourceManager.components_tags = {}
+ResourceManager.components_base = {}
+ResourceManager.register_component = function (creator, name) {
+    ResourceManager.components_lib[name] = creator
 }
 
 /**components` defined globals */
-AssetManager.defined_globals = {}
+ResourceManager.defined_globals = {}
 
-AssetManager.preload_components("core", require.context("core/components/", true, /\.js$/))
-AssetManager.preload_classes("core", require.context("core/materials/classes", true, /\.js$/), "materials")
-AssetManager.preload_classes("core", require.context("core/geometry/classes", true, /\.js$/), "geometries")
-AssetManager.preload_classes("core", require.context("core/objects", true, /\.js$/), "objects")
-AssetManager.preload_textures("core", require.context("core/textures/", true, /\.png$/))
-AssetManager.preload_textures2("core", require.context("core/textures/", true, /\.yaml$/))
-AssetManager.preload_shader_parts("core", require.context("core/materials/lib/", true, /\.yaml$/))
-AssetManager.preload_materials("core", require.context("core/materials/", true, /\.yaml$/))
-AssetManager.preload_geometries("core", require.context("core/geometry/", true, /\.yaml$/))
-AssetManager.preload_prefabs("core", require.context("core/prefabs/", true, /\.yaml$/))
+ResourceManager.preload_components("core", require.context("core/components/", true, /\.js$/))
+ResourceManager.preload_classes("core", require.context("core/materials/classes", true, /\.js$/), "materials")
+ResourceManager.preload_classes("core", require.context("core/geometry/classes", true, /\.js$/), "geometries")
+ResourceManager.preload_classes("core", require.context("core/objects", true, /\.js$/), "objects")
+ResourceManager.preload_textures("core", require.context("core/textures/", true, /\.png$/))
+ResourceManager.preload_textures2("core", require.context("core/textures/", true, /\.yaml$/))
+ResourceManager.preload_shader_parts("core", require.context("core/materials/lib/", true, /\.yaml$/))
+ResourceManager.preload_materials("core", require.context("core/materials/", true, /\.yaml$/))
+ResourceManager.preload_geometries("core", require.context("core/geometry/", true, /\.yaml$/))
+ResourceManager.preload_prefabs("core", require.context("core/prefabs/", true, /\.yaml$/))
 
-window.F_TEXTURE_STREAMING_FUNCTION = AssetManager.texture_stream_function
+window.F_TEXTURE_STREAMING_FUNCTION = ResourceManager.texture_stream_function
 
 if (process.env.APP_NAME === undefined) {
 } else {
-    AssetManager.preload_components(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/components/`, true, /\.js$/))
-    AssetManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/classes`, true, /\.js$/), "materials")
-    AssetManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/classes`, true, /\.js$/), "geometries")
-    AssetManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/objects`, true, /\.js$/), "objects")
-    AssetManager.preload_textures(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/textures/`, true, /\.png$/))
-    AssetManager.preload_textures2(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/textures/`, true, /\.yaml$/))
-    AssetManager.preload_shader_parts(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/lib/`, true, /\.yaml$/))
-    AssetManager.preload_materials(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/`, true, /\.yaml$/))
-    AssetManager.preload_geometries(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/`, true, /\.yaml$/))
-    AssetManager.preload_prefabs(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/prefabs/`, true, /\.yaml$/))
+    ResourceManager.preload_components(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/components/`, true, /\.js$/))
+    ResourceManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/classes`, true, /\.js$/), "materials")
+    ResourceManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/classes`, true, /\.js$/), "geometries")
+    ResourceManager.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/objects`, true, /\.js$/), "objects")
+    ResourceManager.preload_textures(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/textures/`, true, /\.png$/))
+    ResourceManager.preload_textures2(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/textures/`, true, /\.yaml$/))
+    ResourceManager.preload_shader_parts(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/lib/`, true, /\.yaml$/))
+    ResourceManager.preload_materials(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/`, true, /\.yaml$/))
+    ResourceManager.preload_geometries(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/`, true, /\.yaml$/))
+    ResourceManager.preload_prefabs(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/prefabs/`, true, /\.yaml$/))
 }
 
-texture_placeholder = AssetManager.load_texture("res/core/uv_checker_b.jpg")
+texture_placeholder = ResourceManager.load_texture("res/core/uv_checker_b.jpg")
 texture_placeholder.is_placeholder = true
 
 log("AssetManaget", "initialized");
 
 if (process.env.NODE_ENV === "development") {
-    window.AssetManager = AssetManager
+    window.ResourceManager = ResourceManager
 }
 
-export default AssetManager;
+export default ResourceManager;

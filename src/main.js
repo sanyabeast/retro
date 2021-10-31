@@ -1,6 +1,6 @@
 
 import "./index.html";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import Frame from "core/utils/Frame";
 import { log, get_app_name, console } from "core/utils/Tools";
 

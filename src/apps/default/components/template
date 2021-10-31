@@ -5,7 +5,7 @@
  */
 
 import Component from "core/Component";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import * as THREE from 'three';
 import { log, error, is_none, console } from "core/utils/Tools"
 import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefined, isNull, map, filter, keys, values, set, get, unset } from "lodash-es"
@@ -30,7 +30,7 @@ export default SomeComponent;
  */
 
 import SceneComponent from "core/SceneComponent";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import * as THREE from 'three';
 import { log, error, is_none, console } from "core/utils/Tools"
 import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefined, isNull, map, filter, keys, values, set, get, unset } from "lodash-es"

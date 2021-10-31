@@ -5,7 +5,7 @@
  */
 
 import SceneComponent from "core/SceneComponent";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import * as THREE from 'three';
 import Tools from "core/utils/Tools"
 const Partykals = require("partykals")

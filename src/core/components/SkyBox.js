@@ -5,7 +5,7 @@
  */
 
 import Component from "core/Component";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import * as THREE from 'three';
 
 class SkyBox extends Component {
@@ -33,7 +33,7 @@ class SkyBox extends Component {
             return c
         } else {
             if (typeof cubemap === "string") {
-                let t = AssetManager.load_cubemap(this.cubemap, this.cubemap_format)
+                let t = ResourceManager.load_cubemap(this.cubemap, this.cubemap_format)
                 return t
             }
         }

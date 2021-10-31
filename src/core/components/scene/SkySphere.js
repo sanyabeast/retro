@@ -5,7 +5,7 @@
  */
 
 import SceneComponent from "core/SceneComponent";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import { union } from "lodash";
 import { Vector2 } from "spine-ts-threejs";
 import * as THREE from 'three';

@@ -4,7 +4,7 @@
  */
 
 import * as THREE from 'three';
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import SceneComponent from "core/SceneComponent";
 import { set, get, isString, isFunction } from "lodash-es"
 import { log, error, console } from "core/utils/Tools"
@@ -111,11 +111,11 @@ class MeshComponent extends SceneComponent {
     }
 
     static create_geometry(params, id) {
-        return AssetManager.create_geometry(params[0], params[1], id);
+        return ResourceManager.create_geometry(params[0], params[1], id);
     }
 
     static create_material(params, id) {
-        return AssetManager.create_material(params[0], params[1], id);
+        return ResourceManager.create_material(params[0], params[1], id);
     }
 
 

@@ -44,7 +44,7 @@
 <script>
 import { mapState } from "vuex";
 import * as THREE from "three";
-import AssetManager from "core/utils/AssetManager";
+import ResourceManager from "core/utils/ResourceManager";
 import Device from "core/utils/Device";
 
 export default {
@@ -67,7 +67,7 @@ export default {
   watch: {},
   mounted() {
     console.log(this.$store);
-    this.asset_stats = AssetManager.get_asset_stats();
+    this.asset_stats = ResourceManager.get_asset_stats();
   },
   methods: {
     on_tick() {

@@ -5,7 +5,7 @@
  */
 
 import Component from "core/Component";
-import AssetManager  from "core/utils/AssetManager";
+import ResourceManager  from "core/utils/ResourceManager";
 import * as THREE from 'three';
 
 class SimpleRadialMovement extends Component {
