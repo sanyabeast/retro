@@ -4,7 +4,7 @@
  */
 
 import * as THREE from 'three';
-import ResourceManager from "core/utils/ResourceManager";
+import ResourceManager from "core/ResourceManager";
 import SceneComponent from "core/SceneComponent";
 import { set, get, isString, isFunction } from "lodash-es"
 import { log, error, console } from "core/utils/Tools"

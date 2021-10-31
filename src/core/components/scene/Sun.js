@@ -5,7 +5,7 @@
  */
 
 import SceneComponent from "core/SceneComponent";
-import ResourceManager from "core/utils/ResourceManager";
+import ResourceManager from "core/ResourceManager";
 import * as THREE from 'three';
 import { hex_to_hsl, hsl_to_rgb, hex_to_rgb , console } from "core/utils/Tools";
 

@@ -5,7 +5,7 @@
  */
 
 import SceneComponent from "core/SceneComponent";
-import ResourceManager from "core/utils/ResourceManager";
+import ResourceManager from "core/ResourceManager";
 import * as THREE from 'three';
 
 const COLLIDER_WIREFRAME_COLOR = "#ff5722"

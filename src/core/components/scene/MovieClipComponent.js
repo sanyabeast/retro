@@ -5,7 +5,7 @@
  */
 
 import Component from "core/Component";
-import ResourceManager from "core/utils/ResourceManager";
+import ResourceManager from "core/ResourceManager";
 import * as THREE from 'three';
 import MeshComponent from "core/components/scene/MeshComponent"
 import { Vector2 } from "spine-ts-threejs";

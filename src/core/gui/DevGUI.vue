@@ -44,7 +44,7 @@
 <script>
 import { mapState } from "vuex";
 import * as THREE from "three";
-import ResourceManager from "core/utils/ResourceManager";
+import ResourceManager from "core/ResourceManager";
 import Device from "core/utils/Device";
 
 export default {

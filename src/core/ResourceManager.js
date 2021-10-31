@@ -9,8 +9,8 @@ import { isObject, isArray, merge, forEach, isString, isUndefined, isFunction, k
 import GameObject from 'core/GameObject';
 import Schema from "core/utils/Schema"
 import RenderTarget from "core/components/scene/RenderTarget"
-import BasicObject from "core/utils/BasicObject"
-import AssetBufferGeometry from '../geometry/classes/AssetBufferGeometry';
+import BasicObject from "core/BasicObject"
+import AssetBufferGeometry from 'core/geometry/classes/AssetBufferGeometry';
 import DataComputed from "core/utils/DataComputed";
 import SCHEMA_CORE from "core/SCHEMA.yaml"
 
@@ -474,7 +474,7 @@ class ResourceManager extends BasicObject {
         this.textures_lib = this.textures_lib || {}
         this.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".png", "");
-            let data = require(`base64-image-loader!../textures/${name}.png`)
+            let data = require(`base64-image-loader!./textures/${name}.png`)
             this.textures_lib[name] = data = {
                 base64: data
             }

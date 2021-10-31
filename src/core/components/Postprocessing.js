@@ -5,7 +5,7 @@
  */
 
 import Component from "core/Component";
-import ResourceManager from "core/utils/ResourceManager";
+import ResourceManager from "core/ResourceManager";
 import { render } from "less";
 import * as THREE from 'three';
 import Device from "core/utils/Device"

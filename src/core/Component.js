@@ -5,9 +5,9 @@
 
 import { log, makeid, datetime, is_none, hex_to_hsl, hsl_to_rgb, hex_to_rgb, request_text_sync, console, get_most_suitable_dict_keys } from "core/utils/Tools";
 import * as Tools from "core/utils/Tools";
-import BasicObject from "core/utils/BasicObject";
+import BasicObject from "core/BasicObject";
 import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, isFunction, isString, map, keys, values, forEach } from "lodash-es"
-import ResourceManager from "core/utils/ResourceManager"
+import ResourceManager from "core/ResourceManager"
 import Schema from "core/utils/Schema"
 
 let id = 0

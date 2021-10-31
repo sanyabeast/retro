@@ -1,7 +1,7 @@
 
 import * as THREE from 'three';
 import { Group } from 'three/src/objects/Group';
-import ResourceManager from 'core/utils/ResourceManager';
+import ResourceManager from 'core/ResourceManager';
 import { Task, TaskScheduler } from "core/utils/TaskScheduler"
 import StateMachine from "core/utils/StateMachine"
 import { isObject, isString, isFunction, isUndefined, forEach } from "lodash-es"

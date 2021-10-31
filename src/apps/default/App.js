@@ -1,5 +1,5 @@
 import CoreApp from "core/App"
-import ResourceManager from "core/utils/ResourceManager";
+import ResourceManager from "core/ResourceManager";
 
 class App extends CoreApp {
     constructor(params) {

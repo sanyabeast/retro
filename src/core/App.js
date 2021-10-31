@@ -3,7 +3,7 @@
  *
  */
 
-import ResourceManager from "core/utils/ResourceManager";
+import ResourceManager from "core/ResourceManager";
 import DevGUI from "core/gui/DevGUI.vue"
 import * as THREE from 'three';
 

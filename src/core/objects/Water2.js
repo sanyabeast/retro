@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Water as TWater } from 'three/examples/jsm/objects/Water2.js';
-import ResourceManager from "core/utils/ResourceManager"
+import ResourceManager from "core/ResourceManager"
 import { isNumber } from "lodash-es"
 
 class Water extends TWater {
