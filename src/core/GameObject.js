@@ -28,10 +28,10 @@ class GameObject extends Group {
 
     }
     get refs() {
-        if (ResourceManager.gameobject_refs[this.uuid] === undefined) {
-            ResourceManager.gameobject_refs[this.uuid] = {}
+        if (ResourceManager.gameobject_refs[`GOBJ_${this.constructor.name}_${this.uuid}`] === undefined) {
+            ResourceManager.gameobject_refs[`GOBJ_${this.constructor.name}_${this.uuid}`] = {}
         }
-        return ResourceManager.gameobject_refs[this.uuid]
+        return ResourceManager.gameobject_refs[`GOBJ_${this.constructor.name}_${this.uuid}`]
     }
     load_prefab(prefab) {
         if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]")) {
@@ -125,7 +125,7 @@ class GameObject extends Group {
     leave_state(name, new_state) { }
     update_state(name) { }
     destroy(params) {
-        delete ResourceManager.gameobject_refs[this.uuid]
+        delete ResourceManager.gameobject_refs[`GOBJ_${this.constructor.name}_${this.uuid}`]
         if (this.geometry) {
             this.geometry.dispose()
         }
@@ -140,14 +140,7 @@ class GameObject extends Group {
         }
 
         /**removing global variables registerd by this object */
-        if (isObject(ResourceManager.defined_globals[this.uuid])) {
-            forEach(ResourceManager.defined_globals[this.uuid], (v, key) => {
-                this.undefine_global_var(key)
-            })
-        }
-
-        delete ResourceManager.defined_globals[this.uuid]
-
+        ResourceManager.undefine_all_global_vars(`GOBJ_${this.constructor.name}_${this.uuid}`)
     }
     get_components(component_name) {
         let r = []
@@ -206,9 +199,9 @@ class GameObject extends Group {
     }
     find_component_of_type(component_name, cb, on_not_found) {
         let r = undefined
-        if (ResourceManager.components_base[component_name]) {
-            for (let k in ResourceManager.components_base[component_name]) {
-                r = ResourceManager.components_base[component_name][k]
+        if (ResourceManager.components_instances[component_name]) {
+            for (let k in ResourceManager.components_instances[component_name]) {
+                r = ResourceManager.components_instances[component_name][k]
                 break
             }
         }
@@ -230,10 +223,10 @@ class GameObject extends Group {
     find_components_of_type(component_name, count) {
         let c = 0
         let r = []
-        if (ResourceManager.components_base[component_name]) {
-            for (let k in ResourceManager.components_base[component_name]) {
+        if (ResourceManager.components_instances[component_name]) {
+            for (let k in ResourceManager.components_instances[component_name]) {
                 if (count === undefined || c < count) {
-                    r.push(ResourceManager.components_base[component_name][k])
+                    r.push(ResourceManager.components_instances[component_name][k])
                     c++
                     if (c >= count) {
                         break
@@ -280,7 +273,7 @@ class GameObject extends Group {
     }
     listen(event_name) {
         GameObject.broadcasting[event_name] = GameObject.broadcasting[event_name] || {}
-        GameObject.broadcasting[event_name][this.uuid] = this
+        GameObject.broadcasting[event_name][`GOBJ_${this.constructor.name}_${this.uuid}`] = this
     }
     setup_components(comp_data) {
         if (comp_data !== undefined) {
@@ -306,11 +299,11 @@ class GameObject extends Group {
         let ref = typeof data.ref === 'string' ? data.ref : undefined
         let creator = undefined
 
-        let suitable_creators = get_most_suitable_dict_keys(ResourceManager.components_lib, component_name)
+        let suitable_creators = get_most_suitable_dict_keys(ResourceManager.classes_of_components, component_name)
         if (suitable_creators.length > 1) {
             error('GameObject', `ambiguity when tried to created component with alias "${component_name}". got multiple candidates: ${suitable_creators.join(", ")}`)
         } else if (suitable_creators.length === 1) {
-            creator = ResourceManager.components_lib[suitable_creators[0]]
+            creator = ResourceManager.classes_of_components[suitable_creators[0]]
         }
 
         let component
@@ -354,8 +347,8 @@ class GameObject extends Group {
             this.components.push(component)
             component.on_create()
             if (component.enabled) component.on_enable()
-            ResourceManager.components_base[component_name] = ResourceManager.components_base[component_name] || {}
-            ResourceManager.components_base[component_name][component.id] = component
+            ResourceManager.components_instances[component_name] = ResourceManager.components_instances[component_name] || {}
+            ResourceManager.components_instances[component_name][component.id] = component
 
             if (data.tag) {
                 component.tag = data.tag
@@ -382,8 +375,8 @@ class GameObject extends Group {
                     }
                 }
                 let component_name = component.name
-                delete ResourceManager.components_base[component_name][component.id]
-                delete ResourceManager.components_tags[this.tag]
+                delete ResourceManager.components_instances[component_name][component.id]
+                delete ResourceManager.components_tags[component.tag]
             }
         } else if (typeof data === "object") {
             let component = data
@@ -399,7 +392,8 @@ class GameObject extends Group {
                 }
             }
             let component_name = component.name
-            delete ResourceManager.components_base[component_name][component.id]
+            delete ResourceManager.components_instances[component_name][component.id]
+            delete ResourceManager.components_tags[component.tag]
         }
     }
     update(data) {
@@ -446,29 +440,10 @@ class GameObject extends Group {
     on_tick() { }
     /**globals vars definition */
     define_global_var(name, getter, setter) {
-        if (!isFunction(getter) || !isString(name)) {
-            this.error("failed registering global variable: invalid params", name, getter)
-        }
-
-        ResourceManager.defined_globals[this.uuid] = ResourceManager.defined_globals[this.uuid] || {}
-        ResourceManager.defined_globals[this.uuid][name] = {
-            getter,
-            setter
-        }
-
-        Object.defineProperty(this.globals, name, {
-            get: getter,
-            set: isFunction(setter) ? setter : undefined,
-            configurable: true
-        })
+        ResourceManager.define_global_var(`GOBJ_${this.constructor.name}_${this.uuid}`, name, getter, setter)
     }
     undefine_global_var(name) {
-        Object.defineProperty(this.globals, name, {
-            get: undefined,
-            set: undefined,
-            configurable: true
-        })
-        delete this.globals[name]
+        ResourceManager.undefine_global_var(`GOBJ_${this.constructor.name}_${this.uuid}`, name)
     }
     /**logging */
     log() {
@@ -503,8 +478,5 @@ function reactivate_component(object) {
 }
 
 GameObject.broadcasting = {}
-
-
-window.F_GLOBAL_TICK_SKIP = 1
 
 export default GameObject

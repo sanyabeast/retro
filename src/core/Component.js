@@ -20,7 +20,6 @@ class Component extends BasicObject {
     tick_data = undefined
     object = null;
     subject = null;
-    globals = undefined
     tick_rate = 15
     tick_enabled = true
     debug_log_this = false
@@ -149,12 +148,7 @@ class Component extends BasicObject {
     }
     on_destroy() {
         if (this._on_destroy) this._on_destroy(td)
-        if (isObject(ResourceManager.defined_globals[this.id])) {
-            forEach(ResourceManager.defined_globals[this.id], (v, key) => {
-                this.undefine_global_var(key)
-            })
-        }
-        delete ResourceManager.defined_globals[this.id]
+        ResourceManager.undefine_all_global_vars(`COMP_${this.component_name}_${this.id}`)
     }
     on_tick(td) {
         if (this._on_tick) this._on_tick(td)
@@ -191,9 +185,6 @@ class Component extends BasicObject {
     }
     get refs() {
         return this.object.refs;
-    }
-    get camera() {
-        return this.globals.camera;
     }
     get children() {
         return this.object.children;
@@ -251,29 +242,10 @@ class Component extends BasicObject {
     }
     /**global vars definition */
     define_global_var(name, getter, setter) {
-        if (!isFunction(getter) || !isString(name)) {
-            this.error("failed registering global variable: invalid params", name, getter)
-        }
-
-        ResourceManager.defined_globals[this.id] = ResourceManager.defined_globals[this.id] || {}
-        ResourceManager.defined_globals[this.id][name] = {
-            getter,
-            setter
-        }
-
-        Object.defineProperty(this.globals, name, {
-            get: getter,
-            set: isFunction(setter) ? setter : undefined,
-            configurable: true
-        })
+        ResourceManager.define_global_var(`COMP_${this.component_name}_${this.id}`, name, getter, setter)
     }
     undefine_global_var(name) {
-        Object.defineProperty(this.globals, name, {
-            get: undefined,
-            set: undefined,
-            configurable: true
-        })
-        delete this.globals[name]
+        ResourceManager.undefine_global_var(`COMP_${this.component_name}_${this.id}`, name)
     }
 }
 

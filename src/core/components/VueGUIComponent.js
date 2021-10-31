@@ -145,6 +145,14 @@ class VueGUIComponent extends Component {
     }
     on_create() {
         this.log("creating...", this.store, this.root_component.name)
+        this.dom = document.createElement("div")
+        this.dom.style.width = "100%";
+        this.dom.style.height = "100%";
+        this.dom.style.overflow = "hidden";
+        this.dom.style.position = "relative";
+        this.dom.style.userSelect = "none";
+        this.dom.classList.add('gui-dom')
+
         let store_config = this.store
 
         if (typeof store_config !== "object" || store_config === null) {
@@ -174,14 +182,12 @@ class VueGUIComponent extends Component {
 
         ui_wrapper.gui_component = this
     }
+    on_destroy() {
+        super.on_destroy(...arguments)
+        this.ui_wrapper.$destroy();
+        this.el.remove()
+    }
     on_enable() {
-        this.dom = document.createElement("div")
-        this.dom.style.width = "100%";
-        this.dom.style.height = "100%";
-        this.dom.style.overflow = "hidden";
-        this.dom.style.position = "relative";
-        this.dom.style.userSelect = "none";
-        this.dom.classList.add('gui-dom')
         this.globals.dom.appendChild(this.dom)
         this.ui_wrapper.$mount(this.dom)
     }

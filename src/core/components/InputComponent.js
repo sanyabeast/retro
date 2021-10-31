@@ -47,7 +47,7 @@ class InputComponent extends SceneComponent {
         this.pointer_position_abs = new THREE.Vector2(0, 0)
     }
     on_create() {
-        this.user_input_dom = this.globals.user_input_dom = document.createElement("div");
+        this.user_input_dom = document.createElement("div");
         this.user_input_dom.style.width = "100%";
         this.user_input_dom.style.height = "100%";
         this.user_input_dom.style.position = "absolute";
@@ -57,11 +57,7 @@ class InputComponent extends SceneComponent {
         this.user_input_dom.style.zIndex = " 1"
         this.user_input_dom.classList.add("user-input-dom")
 
-
-
         this.globals.dom.appendChild(this.user_input_dom)
-
-
 
         this.handle_keydown = this.handle_keydown.bind(this)
         this.handle_keyup = this.handle_keyup.bind(this)
@@ -80,7 +76,7 @@ class InputComponent extends SceneComponent {
             }
         }
 
-        console.log(this)
+        this.define_global_var("input-dom", a => this.user_input_dom)
     }
     on_destroy() {
         super.on_destroy(...arguments)
