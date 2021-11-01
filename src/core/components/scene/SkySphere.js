@@ -68,10 +68,10 @@ class SkySphere extends SceneComponent {
     get_render_data() {
         return [{
             object: this.subject,
-            parent: this.object
+            parent: this.game_object
         }, {
             object: this.hemi_light,
-            parent: this.object,
+            parent: this.game_object,
             layers: {
                 ...this.meta.layers,
                 lights: true

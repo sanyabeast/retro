@@ -111,7 +111,7 @@ class Animator extends Component {
                     start_values[k] =
                         anim_params.from_values[k];
                 } else {
-                    let sv = get(this.object, k)
+                    let sv = get(this.game_object, k)
                     start_values[k] = typeof sv === "number" ? sv : 0;
                 }
             }
@@ -175,9 +175,9 @@ class Animator extends Component {
                     progress
                 );
 
-                if (a.object) {
-                    if (has(a.object, k)) {
-                        set(a.object, k, cv);
+                if (a.game_object) {
+                    if (has(a.game_object, k)) {
+                        set(a.game_object, k, cv);
                     }
                 } else {
                     new_values[k] = cv;
@@ -202,8 +202,8 @@ class Animator extends Component {
         }
 
         for (let k in new_values) {
-            if (has(this.object, k)) {
-                set(this.object, k, new_values[k]);
+            if (has(this.game_object, k)) {
+                set(this.game_object, k, new_values[k]);
             }
         }
     }

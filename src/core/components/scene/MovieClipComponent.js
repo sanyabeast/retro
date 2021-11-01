@@ -39,7 +39,7 @@ class MovieClipComponent extends MeshComponent {
     get_render_data() {
         return [{
             object: this.subject,
-            parent: this.object
+            parent: this.game_object
         }]
     }
 

@@ -117,10 +117,10 @@ class Collider extends SceneComponent {
     get_gizmo_render_data() {
         return [{
             object: this.subject,
-            parent: this.object
+            parent: this.game_object
         }, {
             object: this.colorid_subject,
-            parent: this.object,
+            parent: this.game_object,
             layers: { colorid: true }
         }, ...super.get_gizmo_render_data()]
     }

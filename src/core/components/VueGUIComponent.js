@@ -35,8 +35,8 @@ MyPlugin.install = function (Vue, options) {
             Object.defineProperty(this, "gui_component", {
                 get: () => gui_component
             })
-            Object.defineProperty(this, "object", {
-                get: () => gui_component.object
+            Object.defineProperty(this, "game_object", {
+                get: () => gui_component.game_object
             })
             Object.defineProperty(this, "globals", {
                 get: () => gui_component.globals
@@ -85,37 +85,37 @@ MyPlugin.install = function (Vue, options) {
             },
             /**CORE COMP COMPAT */
             listen(event_name) {
-                return this.object.listen(event_name);
+                return this.game_object.listen(event_name);
             },
             broadcast(event_name, payload) {
-                return this.object.broadcast(event_name, payload);
+                return this.game_object.broadcast(event_name, payload);
             },
             get_component(component_name) {
-                return this.object.get_component(component_name);
+                return this.game_object.get_component(component_name);
             },
             find_component_of_type(component_name) {
-                return this.object.find_component_of_type(component_name);
+                return this.game_object.find_component_of_type(component_name);
             },
             find_components_of_type(component_name) {
-                return this.object.find_components_of_type(component_name);
+                return this.game_object.find_components_of_type(component_name);
             },
             setup_components(data) {
                 if (Array.isArray(data)) {
-                    return this.object.setup_components(data)
+                    return this.game_object.setup_components(data)
 
                 }
             },
             add_component(data) {
                 if (typeof data === 'object') {
-                    return this.object.add_component(data)
+                    return this.game_object.add_component(data)
 
                 }
             },
             remove_component(data) {
-                return this.object.remove_component(data)
+                return this.game_object.remove_component(data)
             },
             get_components(component_name) {
-                return this.object.get_components(component_name);
+                return this.game_object.get_components(component_name);
             }
 
         }
@@ -143,13 +143,14 @@ class VueGUIComponent extends Component {
         return this.ui_wrapper.$children[0]
 
     }
-    get state(){
+    get state() {
         return this.vuex_store.state
     }
-    get getters(){
+    get getters() {
         return this.vuex_store.state
     }
     on_create() {
+        console.log(this.game_object)
         this.log("creating...", this.store, this.root_component.name)
         this.dom = document.createElement("div")
         this.dom.style.width = "100%";
@@ -174,7 +175,6 @@ class VueGUIComponent extends Component {
         store_config.state = store_config.state || {}
         store_config.actions = store_config.actions || {}
         store_config.mutations = store_config.mutations || {}
-
 
         this.vuex_store = new Vuex.Store(store_config)
         ResourceManager.vuex_stores[this.UUID] = this.vuex_store

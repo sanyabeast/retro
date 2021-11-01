@@ -189,10 +189,10 @@ class SceneComponent extends Component {
     }
 
     get_render_data() {
-        if (this.subject && this.object) {
+        if (this.subject && this.game_object) {
             return [{
                 object: this.subject,
-                parent: this.object
+                parent: this.game_object
             }]
         } else {
             return []

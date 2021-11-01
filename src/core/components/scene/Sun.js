@@ -111,17 +111,17 @@ class Sun extends SceneComponent {
     get_render_data() {
         return [{
             object: this.light,
-            parent: this.object,
+            parent: this.game_object,
             layers: {
                 ...this.meta.layers,
                 lights: true
             }
         }, {
             object: this.sphere,
-            parent: this.object
+            parent: this.game_object
         }, {
             object: this.amb_light,
-            parent: this.object,
+            parent: this.game_object,
             layers: {
                 ...this.meta.layers,
                 lights: true

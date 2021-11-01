@@ -120,10 +120,6 @@ class GameObject extends Group {
         let ro = (this.render_layer.valueOf() || 0) * 1000000 + (this.render_index.valueOf() || 0) * 1
         return ro
     }
-    /**patch state machine */
-    enter_state(name, prev_state, data) { }
-    leave_state(name, new_state) { }
-    update_state(name) { }
     destroy(params) {
         delete ResourceManager.gameobject_refs[this.UUID]
         if (this.geometry) {
@@ -374,17 +370,16 @@ class GameObject extends Group {
             }
         }
         if (component !== undefined) {
+            component._game_object = this
             component.init()
             component.name = component_name
-            // reactivate_component(component)
-            component.object = this
             /**meta params */
             if (Schema.validate(data.meta, ":COMPONENT_PARAMS_META")) {
                 let meta_params = component.meta = ResourceManager.mixin_object(component.meta, [data.meta])
             }
-            
+
             component.apply_params()
-            
+
             component._enabled = enabled
             if (ref !== undefined) {
                 component._ref = ref

@@ -178,7 +178,7 @@ class PartykalsComponent extends SceneComponent {
     get_render_data() {
         return {
             object: this.subject,
-            parent: this.object
+            parent: this.game_object
         }
     }
     on_tick(time_delta) {

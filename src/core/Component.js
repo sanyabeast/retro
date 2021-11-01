@@ -12,7 +12,6 @@ import Schema from "core/utils/Schema"
 
 
 class Component extends BasicObject {
-    object = null;
     subject = null;
     tick_rate = 30
     tick_enabled = true
@@ -53,76 +52,29 @@ class Component extends BasicObject {
     }
     get parent() {
         let r = null;
-        if (this.object && this.object.parent) {
-            r = this.object.parent;
+        if (this.game_object && this.game_object.parent) {
+            r = this.game_object.parent;
         }
         return r;
     }
     get refs() {
-        return this.object.refs;
+        return this.game_object.refs;
     }
     get children() {
-        return this.object.children;
+        return this.game_object.children;
     }
     get components() {
-        return this.object.components;
+        return this.game_object.components;
     }
     get states() {
-        return this.object.states;
+        return this.game_object.states;
     }
     get tasks() {
-        return this.object.tasks;
+        return this.game_object.tasks;
     }
     get component_name() {
         return this.constructor.component_name;
     }
-    listen(event_name) {
-        return this.object.listen(event_name);
-    }
-    broadcast(event_name, payload) {
-        return this.object.broadcast(event_name, payload);
-    }
-    get_component(component_name) {
-        return this.object.get_component(component_name);
-    }
-    find_component_of_type(component_name) {
-        return this.object.find_component_of_type(component_name);
-    }
-    find_child_component_of_type(component_name) {
-        return this.object.find_child_component_of_type(component_name);
-    }
-    find_component_with_tag(tag) {
-        return this.object.find_component_with_tag(tag);
-    }
-    find_components_of_type(component_name) {
-        return this.object.find_components_of_type(component_name);
-    }
-    setup_components(data) {
-        if (Array.isArray(data)) {
-            return this.object.setup_components(data)
-        }
-    }
-    load_prefab() {
-        return this.object.load_prefab(...arguments)
-    }
-    create_child() {
-        return this.object.create_child(...arguments)
-    }
-    remove_child() {
-        return this.object.remove_child(...arguments)
-    }
-    add_component(data) {
-        if (isObject(data)) {
-            return this.object.add_component(data)
-        }
-    }
-    remove_component(data) {
-        return this.object.remove_component(data)
-    }
-    get_components(component_name) {
-        return this.object.get_components(component_name);
-    }
-
 }
 
 

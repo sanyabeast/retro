@@ -47,7 +47,7 @@ class Water extends SceneComponent {
     get_render_data() {
         return [{
             object: this.subject,
-            parent: this.object
+            parent: this.game_object
         }]
     }
     get_reactive_props() {
