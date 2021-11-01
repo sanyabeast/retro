@@ -14,7 +14,7 @@ import { Vector2 } from "spine-ts-threejs";
 import { Vector3 } from "three";
 
 class PartykalsComponent extends SceneComponent {
-    particle_system = undefined
+    
     particles_global_size = 1
     particles_start_size = 1
     particles_end_size = 0
@@ -40,6 +40,9 @@ class PartykalsComponent extends SceneComponent {
     emitters = undefined
 
     tick_rate = 30
+
+    /**private */
+    particle_system = undefined
 
     constructor() {
         super(...arguments)

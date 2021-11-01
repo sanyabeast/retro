@@ -280,6 +280,10 @@ function get_most_suitable_dict_keys(dict, test_string, single_key = false) {
     return r
 }
 
+function random_in_range(min, max){
+    return Math.random() * (max - min) + min
+}
+
 let console = _console
 
 export {
@@ -300,6 +304,7 @@ export {
     error,
     get_random_color_for_string,
     get_most_suitable_dict_keys,
+    random_in_range,
     console,
     easings
 }

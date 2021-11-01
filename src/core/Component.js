@@ -20,7 +20,7 @@ class Component extends BasicObject {
     tick_data = undefined
     object = null;
     subject = null;
-    tick_rate = 15
+    tick_rate = 30
     tick_enabled = true
     debug_log_this = false
     constructor(params) {
@@ -219,6 +219,9 @@ class Component extends BasicObject {
     find_component_of_type(component_name) {
         return this.object.find_component_of_type(component_name);
     }
+    find_child_component_of_type(component_name) {
+        return this.object.find_child_component_of_type(component_name);
+    }
     find_component_with_tag(tag) {
         return this.object.find_component_with_tag(tag);
     }
@@ -236,6 +239,9 @@ class Component extends BasicObject {
     }
     create_child() {
         return this.object.create_child(...arguments)
+    }
+    remove_child() {
+        return this.object.remove_child(...arguments)
     }
     add_component(data) {
         if (isObject(data)) {

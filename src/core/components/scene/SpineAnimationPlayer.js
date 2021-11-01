@@ -99,6 +99,9 @@ class SpineAnimationPlayer extends SceneComponent {
 
         this.log(`created...`, this)
     }
+    on_destroy(){
+        super.on_destroy()
+    }
     on_tick(time_delta) {
         this.update_queue()
         if (this.subject) {

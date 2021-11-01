@@ -68,8 +68,8 @@ class BasicObject extends THREE.EventDispatcher {
     has_listener() {
         return this.hasEventListener(...arguments)
     }
-    emit(type, payoad) {
-        return this.dispatchEvent({ type: type, payoad })
+    emit(type, payload) {
+        return this.dispatchEvent({ type: type, payload })
     }
 }
 

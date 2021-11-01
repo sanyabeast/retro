@@ -4,8 +4,8 @@ import { Group } from 'three/src/objects/Group';
 import ResourceManager from 'core/ResourceManager';
 import { Task, TaskScheduler } from "core/utils/TaskScheduler"
 import StateMachine from "core/utils/StateMachine"
-import { isObject, isString, isFunction, isUndefined, forEach } from "lodash-es"
-import { error, get_most_suitable_dict_keys } from "core/utils/Tools"
+import { isObject, isString, isFunction, isUndefined, forEach, sortBy } from "lodash-es"
+import { log, error, get_most_suitable_dict_keys } from "core/utils/Tools"
 import Schema from "core/utils/Schema"
 import Component from "core/Component"
 
@@ -38,9 +38,6 @@ class GameObject extends Group {
     }
     load_prefab(prefab) {
         if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]")) {
-            if (prefab.components) {
-                this.setup_components(prefab.components)
-            }
             if (prefab.children) {
                 if (Array.isArray(prefab.children)) {
                     prefab.children.forEach(child => {
@@ -55,6 +52,10 @@ class GameObject extends Group {
                     }
                 }
             }
+            if (prefab.components) {
+                this.setup_components(prefab.components)
+            }
+
             if (typeof prefab.on_tick === `function`) {
                 this.on_tick = prefab.on_tick
             }
@@ -149,12 +150,14 @@ class GameObject extends Group {
         })
         return r
     }
-    traverse_components(cb, skip_disabled = true) {
-        for (let a = 0; a < this.components.length; a++) {
-            let comp = this.components[a]
-            if (skip_disabled && !comp.enabled) continue
-            if (cb(comp, this) === false) {
-                break
+    traverse_components(cb, skip_disabled = true, skip_root = false) {
+        if (skip_root === false) {
+            for (let a = 0; a < this.components.length; a++) {
+                let comp = this.components[a]
+                if (skip_disabled && !comp.enabled) continue
+                if (cb(comp, this) === false) {
+                    break
+                }
             }
         }
 
@@ -163,11 +166,11 @@ class GameObject extends Group {
     traverse_child_components(cb, skip_disabled) {
         if (this.children) {
             this.children.forEach(child => {
-                if (skip_disabled === true && !child.enabled){
+                if (skip_disabled === true && !child.enabled) {
                     return
                 }
                 if (child instanceof GameObject) {
-                    child.traverse_components(cb)
+                    child.traverse_components(cb, skip_disabled)
                 } else {
                     console.error(`Non-GameObject child added to`, this)
                 }
@@ -210,6 +213,49 @@ class GameObject extends Group {
         if (isFunction(cb)) {
             if (r !== undefined) {
                 cb(r)
+            } else {
+                if (isFunction(on_not_found)) {
+                    on_not_found(r)
+                }
+            }
+            return r !== undefined
+        } else {
+            return r
+        }
+    }
+    find_child_component_of_type(component_name, cb, on_not_found) {
+        let r = undefined
+        this.traverse_components((comp) => {
+            if (comp.name === component_name) {
+                r = comp
+                return false
+            }
+        }, false, true)
+
+        if (isFunction(cb)) {
+            if (r !== undefined) {
+                cb(r)
+            } else {
+                if (isFunction(on_not_found)) {
+                    on_not_found(r)
+                }
+            }
+            return r !== undefined
+        } else {
+            return r
+        }
+    }
+    find_child_components_of_type(component_name, cb, on_not_found) {
+        let r = []
+        this.traverse_components((comp) => {
+            if (comp.name === component_name) {
+                r.push(comp)
+            }
+        }, false, true)
+
+        if (isFunction(cb)) {
+            if (r.length > 0) {
+                r.forEach(v => cb(v))
             } else {
                 if (isFunction(on_not_found)) {
                     on_not_found(r)
@@ -275,25 +321,32 @@ class GameObject extends Group {
         GameObject.broadcasting[event_name][this.UUID] = this
     }
     setup_components(comp_data) {
+        let sorted_comp_list = []
         if (comp_data !== undefined) {
             if (Array.isArray(comp_data)) {
-                comp_data.forEach((data) => {
-
-                    this.add_component(data)
+                sorted_comp_list = comp_data
+                sorted_comp_list.forEach((data) => {
                 })
             } else {
                 for (let k in comp_data) {
                     let data = comp_data[k]
                     data.ref = data.ref || k
-                    this.add_component(data)
+                    sorted_comp_list.push(data)
                 }
             }
         }
+
+        sorted_comp_list = sortBy(sorted_comp_list, item => item.order || 0)
+        sorted_comp_list.forEach(comp_data => this.add_component(comp_data))
     }
     create_child(prefab) {
         let c = new GameObject(prefab)
         this.add(c)
         return c
+    }
+    remove_child(child) {
+        child.destroy();
+        this.remove(child)
     }
     add_component(data) {
         let component_name = data.name;
@@ -447,6 +500,13 @@ class GameObject extends Group {
     }
     error() {
         error(this.constructor.name, ...arguments);
+    }
+    /**world/local */
+    to_local_pos(pos) {
+        return this.worldToLocal(pos)
+    }
+    to_world_pos(pos) {
+        return this.localToWorld(pos)
     }
 }
 

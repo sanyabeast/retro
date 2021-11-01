@@ -42,6 +42,7 @@ COMPONENT:
     inline: ["none", :INLINE_COMPONENT]
     meta: ["none", :COMPONENT_PARAMS_META]
     name: string|none
+    order: number|none
     enabled: bool|none
     ref: string|none
     tag: string|none

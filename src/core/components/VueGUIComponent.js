@@ -143,6 +143,12 @@ class VueGUIComponent extends Component {
         return this.ui_wrapper.$children[0]
 
     }
+    get state(){
+        return this.vuex_store.state
+    }
+    get getters(){
+        return this.vuex_store.state
+    }
     on_create() {
         this.log("creating...", this.store, this.root_component.name)
         this.dom = document.createElement("div")
