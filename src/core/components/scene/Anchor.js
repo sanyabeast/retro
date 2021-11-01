@@ -19,7 +19,9 @@ class Anchor extends SceneComponent {
         return this.parent_object !== undefined
     }
     get world_position() {
-        return this.to_world_pos([0, 0, 0])
+        $v3.set(0, 0, 0)
+        let r = this.subject.localToWorld($v3)
+        return [r.x, r.y, r.z]
     }
     on_create() {
         this.meta.layers.rendering = false
