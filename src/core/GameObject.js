@@ -11,6 +11,7 @@ import Component from "core/Component"
 
 class GameObject extends Group {
     tick_id = 0
+    enabled = true
     NodeConstructor = undefined
     constructor(prefab) {
         super(...arguments)
@@ -92,7 +93,7 @@ class GameObject extends Group {
                     ...prefab.extra_data
                 }
             }
-        } else if (isString(prefab)){
+        } else if (isString(prefab)) {
             return this.load_prefab(ResourceManager.load_prefab(prefab))
         }
     }
@@ -148,19 +149,23 @@ class GameObject extends Group {
         })
         return r
     }
-    traverse_components(cb) {
+    traverse_components(cb, skip_disabled = true) {
         for (let a = 0; a < this.components.length; a++) {
             let comp = this.components[a]
+            if (skip_disabled && !comp.enabled) continue
             if (cb(comp, this) === false) {
                 break
             }
         }
 
-        this.traverse_child_components(cb)
+        this.traverse_child_components(cb, skip_disabled)
     }
-    traverse_child_components(cb) {
+    traverse_child_components(cb, skip_disabled) {
         if (this.children) {
             this.children.forEach(child => {
+                if (skip_disabled === true && !child.enabled){
+                    return
+                }
                 if (child instanceof GameObject) {
                     child.traverse_components(cb)
                 } else {
@@ -285,9 +290,10 @@ class GameObject extends Group {
             }
         }
     }
-    create_child(prefab){
+    create_child(prefab) {
         let c = new GameObject(prefab)
         this.add(c)
+        return c
     }
     add_component(data) {
         let component_name = data.name;
@@ -394,7 +400,7 @@ class GameObject extends Group {
     }
     on_update() { }
     tick(time_data) {
-        if (this.visible) {
+        if (this.enabled) {
             this.on_tick()
             this.components.forEach((component) => {
                 if (component.enabled) {

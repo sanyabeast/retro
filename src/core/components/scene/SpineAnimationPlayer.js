@@ -226,7 +226,7 @@ class SpineAnimationPlayer extends SceneComponent {
         // let animation_name = payload.
         let animation = payload.animation
         let animation_name = animation.name
-        this.log(`animation event: "start"`, animation_name)
+        // this.log(`animation event: "start"`, animation_name)
     }
     handle_animation_interrupt(payload) {
         let animation = payload.animation
@@ -253,7 +253,7 @@ class SpineAnimationPlayer extends SceneComponent {
             current_playlist_item.is_playing = false
             current_playlist_item.played_times++;
         }
-        this.log(`animation event: "complete"`, animation_name)
+        // this.log(`animation event: "complete"`, animation_name)
     }
     handle_animation_event(payload) {
         let animation = payload.animation

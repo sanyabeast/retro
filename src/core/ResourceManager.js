@@ -587,15 +587,11 @@ class ResourceManager extends BasicObject {
             this.error("failed registering global variable: invalid params", arguments)
             return
         }
-
         this.defined_globals[owner_id] = this.defined_globals[owner_id] || {}
         this.defined_globals[owner_id][name] = {
             getter,
             setter
         }
-
-        console.log(`defininf ${name} on `, this.globals)
-
         Object.defineProperty(this.globals, name, {
             get: getter,
             set: isFunction(setter) ? setter : undefined,
@@ -603,7 +599,6 @@ class ResourceManager extends BasicObject {
         })
     }
     undefine_global_var(owner_id, name) {
-        console.log(`undefininf ${name} on `, this.globals)
         if (!isString(owner_id)) {
             this.error(`failed to ndefine global variable. plz provied owner id`, arguments)
             return
