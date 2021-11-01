@@ -52,7 +52,7 @@ class CoreApp extends GameObject {
     }
     start() {
         let clock = this.find_component_of_type("ClockComponent")
-        this.handle_game_start()
+        this.start_game()
         if (clock) {
             log(`App`, `starting clock...`)
             clock.begin_tick()

@@ -4,25 +4,48 @@ import { Group } from 'three/src/objects/Group';
 import ResourceManager from 'core/ResourceManager';
 import { Task, TaskScheduler } from "core/utils/TaskScheduler"
 import StateMachine from "core/utils/StateMachine"
-import { isObject, isString, isFunction, isUndefined, forEach, sortBy } from "lodash-es"
+import { isBoolean, isArray, isObject, isString, isFunction, isUndefined, forEach, sortBy } from "lodash-es"
 import { log, error, get_most_suitable_dict_keys } from "core/utils/Tools"
 import Schema from "core/utils/Schema"
 import Component from "core/Component"
+import BasicObject from './BasicObject';
 
-class GameObject extends Group {
-    tick_id = 0
+const $v3 = new THREE.Vector3()
+
+
+class GameObject extends BasicObject {
+    is_game_object = true
+    position = undefined
+    rotation = undefined
+    scale = undefined
+    visible = -true
+    render_order = 0
+    frustum_culled = true
+    /**private */
     enabled = true
+    tick_id = 0
     NodeConstructor = undefined
+    transform = undefined
     constructor(prefab) {
         super(...arguments)
+        this.meta.ticking.non_stop = true
+        this.position = [0, 0, 0]
+        this.rotation = [0, 0, 0]
+        this.scale = [1, 1, 1]
+        this._game_object = this
+        this.transform = new THREE.Object3D()
         this.extra_data = {}
         this.components = []
+        this.children = []
         this.states = new StateMachine(prefab && prefab.states ? prefab.states : {}, this)
         this.tasks = new TaskScheduler(prefab && prefab.tasks ? prefab.tasks : [])
         if (typeof window.F_THREE_PATCH_PROPS === "function") {
             window.F_THREE_PATCH_PROPS(this)
         }
+        this.init()
+        this.apply_params()
         this.load_prefab(prefab)
+
     }
     get refs() {
         if (ResourceManager.gameobject_refs[this.UUID] === undefined) {
@@ -30,11 +53,82 @@ class GameObject extends Group {
         }
         return ResourceManager.gameobject_refs[this.UUID]
     }
-    get UUID() {
-        if (!this.$UUID) {
-            this.$UUID = `GOBJ_${this.constructor.name}_${this.uuid}`
+    tick(time_data) {
+        super.tick(time_data)
+        if (this.enabled) {
+            this.components.forEach((component) => {
+                if (component.enabled) {
+                    component.tick(time_data)
+                }
+            })
+            this.tasks.on_tick()
+            this.children.forEach((child) => {
+                child.tick(time_data)
+            })
         }
-        return this.$UUID
+
+        this.tick_id++
+    }
+    get_reactive_props() {
+        return [
+            "position",
+            "rotation",
+            "scale",
+            "visible",
+            "render_order",
+            "frustum_culled"
+        ].concat(super.get_reactive_props())
+    }
+    on_update(props) {
+        super.on_update(props)
+        props.forEach(prop => {
+            switch (prop) {
+                case "position": {
+                    this.transform.position.set(...this.position)
+                    break
+                }
+                case "rotation": {
+                    this.transform.rotation.set(...this.rotation)
+                    break
+                }
+                case "scale": {
+                    this.transform.scale.set(...this.scale)
+                    break
+                }
+                case "visible": {
+                    this.transform.visible = this.visible
+                    break
+                }
+                case "frustum_culled": {
+                    this.transform.frustumCulled = this.frustum_culled
+                    break
+                }
+                case "render_order": {
+                    this.transform.render_order = this.render_order
+                    break
+                }
+            }
+        })
+    }
+    update_transform() {
+        this.transform.updateMatrixWorld()
+    }
+    add(child) {
+        this.children.push(child)
+        this.transform.add(child.transform)
+    }
+    remove(child) {
+        let index = -1
+        for (let a = 0; a < this.children.length; a++) {
+            if (this.children[a].UUID === child.UUID) {
+                index = a
+            }
+        }
+
+        if (index >= 0) {
+            this.children.splice(index, 1)
+            this.transform.remove(child.transform)
+        }
     }
     load_prefab(prefab) {
         if (isObject(prefab) && Schema.validate(prefab, ":PREFAB", "[GAMEOBJECT.LOADPREFAB]")) {
@@ -56,43 +150,44 @@ class GameObject extends Group {
                 this.setup_components(prefab.components)
             }
 
-            if (typeof prefab.on_tick === `function`) {
-                this.on_tick = prefab.on_tick
+            if (isArray(prefab.position)) {
+                this.position = [
+                    prefab.position[0] || 0,
+                    prefab.position[1] || 0,
+                    prefab.position[2] || 0,
+                ]
             }
-            if (typeof prefab.position === `object`) {
-                if (Array.isArray(prefab.position)) {
-                    this.position.set(prefab.position[0], prefab.position[1], prefab.position[2])
-                } else {
-                    this.position.set(prefab.position.x, prefab.position.y, prefab.position.z)
-                }
+
+            if (isArray(prefab.scale)) {
+                this.scale = [
+                    typeof prefab.scale[0] === "number" ? prefab.scale[0] : 1,
+                    typeof prefab.scale[1] === "number" ? prefab.scale[1] : 1,
+                    typeof prefab.scale[2] === "number" ? prefab.scale[2] : 1,
+                ]
             }
-            if (typeof prefab.rotation === `object`) {
-                if (Array.isArray(prefab.position)) {
-                    this.rotation.set(prefab.rotation[0], prefab.rotation[1], prefab.rotation[2])
-                } else {
-                    this.rotation.set(prefab.rotation.x, prefab.rotation.y, prefab.rotation.z)
-                }
+
+            if (isArray(prefab.rotation)) {
+                this.rotation = [
+                    prefab.rotation[0] || 0,
+                    prefab.rotation[1] || 0,
+                    prefab.rotation[2] || 0,
+                ]
             }
-            if (typeof prefab.scale === `object`) {
-                if (Array.isArray(prefab.position)) {
-                    this.scale.set(prefab.scale[0], prefab.scale[1], prefab.scale[2])
-                } else {
-                    this.scale.set(prefab.scale.x, prefab.scale.y, prefab.scale.z)
-                }
+
+            if (isBoolean(prefab.visible)) {
+                this.visible = prefab.visible
             }
-            if (typeof prefab.visible !== `undefined`) {
-                this.visible = prefab.visible;
+
+            if (isBoolean(prefab.enabled)) {
+                this.enabled = prefab.enabled
             }
-            if (typeof prefab.parent === `object` && prefab.parent !== null) {
-                prefab.parent.add(this)
+
+            if (isBoolean(prefab.frustum_culled)) {
+                this.frustum_culled = prefab.frustum_culled
             }
-            if (Array.isArray(prefab.topics)) {
-                prefab.topics.forEach(event_name, this.listen(event_name))
-            }
-            if (prefab.extra_data) {
-                this.extra_data = {
-                    ...prefab.extra_data
-                }
+
+            if (isBoolean(prefab.render_order)) {
+                this.render_order = prefab.render_order
             }
         } else if (isString(prefab)) {
             return this.load_prefab(ResourceManager.load_prefab(prefab))
@@ -117,6 +212,7 @@ class GameObject extends Group {
         return json ? JSON.stringify(r, null, '\t') : r
     }
     destroy(params) {
+        super.destroy(parent);
         delete ResourceManager.gameobject_refs[this.UUID]
         if (this.geometry) {
             this.geometry.dispose()
@@ -130,8 +226,6 @@ class GameObject extends Group {
         while (this.components.length > 0) {
             this.remove_component(this.components[0], params)
         }
-        /**removing global variables registerd by this object */
-        ResourceManager.undefine_all_global_vars(this.UUID)
     }
     get_components(component_name) {
         let r = []
@@ -152,7 +246,6 @@ class GameObject extends Group {
                 }
             }
         }
-
         this.traverse_child_components(cb, skip_disabled)
     }
     traverse_child_components(cb, skip_disabled) {
@@ -177,7 +270,6 @@ class GameObject extends Group {
                 break
             }
         }
-
         if (isFunction(cb)) {
             if (r !== undefined) {
                 cb(r)
@@ -223,7 +315,6 @@ class GameObject extends Group {
                 return false
             }
         }, false, true)
-
         if (isFunction(cb)) {
             if (r !== undefined) {
                 cb(r)
@@ -276,7 +367,6 @@ class GameObject extends Group {
     }
     find_component_with_tag(tag, cb, on_not_found) {
         let r = ResourceManager.components_tags[tag]
-
         if (isFunction(cb)) {
             if (r !== undefined) {
                 cb(r)
@@ -289,28 +379,6 @@ class GameObject extends Group {
         } else {
             return r
         }
-    }
-    broadcast(event_name, payload) {
-        if (typeof window.F_BROADCAST_HOOK === "function") {
-            window.F_BROADCAST_HOOK(event_name, payload)
-        }
-        if (GameObject.broadcasting[event_name]) {
-            for (let k in GameObject.broadcasting[event_name]) {
-                let func_name = `handle_${event_name}`
-                if (typeof GameObject.broadcasting[event_name][k] === 'function') {
-                    typeof GameObject.broadcasting[event_name][k](payload)
-                }
-                GameObject.broadcasting[event_name][k].components.forEach((component) => {
-                    if (typeof component[func_name] === 'function') {
-                        typeof component[func_name](payload)
-                    }
-                })
-            }
-        }
-    }
-    listen(event_name) {
-        GameObject.broadcasting[event_name] = GameObject.broadcasting[event_name] || {}
-        GameObject.broadcasting[event_name][this.UUID] = this
     }
     setup_components(comp_data) {
         let sorted_comp_list = []
@@ -439,56 +507,30 @@ class GameObject extends Group {
             delete ResourceManager.components_tags[component.tag]
         }
     }
-    tick(time_data) {
-        if (this.enabled) {
-            this.on_tick()
-            this.components.forEach((component) => {
-                if (component.enabled) {
-                    component.tick(time_data)
-                }
-            })
-            this.tasks.on_tick()
-            this.children.forEach((child) => {
-                child.tick(time_data)
-            })
-        }
-
-        this.tick_id++
-    }
-    handle_game_start() {
+    start_game() {
         if (this.visible) {
             this.on_start()
             this.components.forEach((component) => {
                 component.on_start()
             })
             this.children.forEach((child) => {
-                child.handle_game_start()
+                child.start_game()
             })
         }
     }
-    on_start() {}
-    on_tick() {}
-    /**globals vars definition */
-    define_global_var(name, getter, setter) {
-        ResourceManager.define_global_var(this.UUID, name, getter, setter)
-    }
-    undefine_global_var(name) {
-        ResourceManager.undefine_global_var(this.UUID, name)
-    }
-    /**logging */
-    log() {
-        log(this.constructor.name, ...arguments);
-    }
-    error() {
-        error(this.constructor.name, ...arguments);
-    }
-    /**world/local */
     to_local_pos(pos) {
-        return this.worldToLocal(pos)
+        let game_object = this.game_object
+        $v3.set(...pos)
+        let r = game_object.transform.worldToLocal($v3)
+        return [r.x, r.y, r.z]
     }
     to_world_pos(pos) {
-        return this.localToWorld(pos)
+        let game_object = this.game_object
+        $v3.set(...pos)
+        let r = game_object.transform.localToWorld($v3)
+        return [r.x, r.y, r.z]
     }
+
 }
 
 

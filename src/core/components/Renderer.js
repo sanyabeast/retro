@@ -181,7 +181,7 @@ class Renderer extends Component {
     update_object_layers() {
         let scene = this.globals.app
         let object_layers = this.object_layers = {}
-        scene.updateMatrixWorld()
+        scene.update_transform()
 
         scene.traverse_components((comp, object) => {
             if (comp.is_scene_component && comp.enabled) {
@@ -202,8 +202,9 @@ class Renderer extends Component {
                             if (data.visible === false) continue
                             object_layers[layer_name] = object_layers[layer_name] || []
                             let parent = data.parent || this.zero_object
-
-
+                            if (parent.is_game_object) {
+                                parent = parent.transform
+                            }
                             data.object.parent_matrix_world = parent.matrixWorld
                             data.object.parent = this.render_scene
                             object_layers[layer_name].push(data)

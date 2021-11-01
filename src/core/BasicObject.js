@@ -11,7 +11,13 @@ const exclude_props = [
     "children"
 ]
 
+const $v3 = new THREE.Vector3()
+
 class BasicObject extends THREE.EventDispatcher {
+    tick_rate = 30
+    tick_enabled = true
+    debug_log_this = false
+    UUID = undefined
     constructor(params) {
         super(params)
         this.meta = {
@@ -30,6 +36,7 @@ class BasicObject extends THREE.EventDispatcher {
             params_applied: false,
             params: {},
             ticking: {
+                non_stop: false,
                 prev_time: +new Date(),
                 delta: 1,
                 ticks: 0,
@@ -37,16 +44,12 @@ class BasicObject extends THREE.EventDispatcher {
                 enabled: true
             }
         }
-
         this.id = id
         id++
-
         this.meta.params = params || this.meta.params;
-
         if (params && params.debug_log_this === true) {
             this.log(this)
         }
-
         /**common patch */
         if (window.F_PATCH_COMP_PROPS) {
             window.F_PATCH_COMP_PROPS(this)
@@ -121,25 +124,25 @@ class BasicObject extends THREE.EventDispatcher {
         }
     }
     tick(tick_data) {
-        if (this.need_reactive_update) {
-            let updated_props = [...this.meta.updated_reactive_props]
-            this.need_reactive_update = false
-            this.meta.updated_reactive_props.length = 0
-            this.on_update(updated_props)
-        }
-
-        this.meta.ticking.rate = this.tick_rate
-        this.meta.ticking.enabled = this.tick_enabled
-
-        if (this.meta.ticking.enabled) {
-            let now = +new Date()
-            if (now - this.meta.ticking.prev_time >= (1000 / this.meta.ticking.rate)) {
-                let d = now - this.meta.ticking.prev_time
-                let delta = this.meta.ticking.delta = d / (1000)
-                this.meta.ticking.ticks++
-                this.meta.ticking.now = now
-                this.meta.ticking.prev_time = now
-                this.on_tick(this.meta.ticking)
+        if (this.enabled) {
+            if (this.meta.need_reactive_update) {
+                let updated_props = [...this.meta.updated_reactive_props]
+                this.meta.need_reactive_update = false
+                this.meta.updated_reactive_props.length = 0
+                this.on_update(updated_props)
+            }
+            this.meta.ticking.rate = this.tick_rate
+            this.meta.ticking.enabled = this.tick_enabled
+            if (this.meta.ticking.enabled) {
+                let now = +new Date()
+                if (this.meta.ticking.non_stop === true || now - this.meta.ticking.prev_time >= (1000 / this.meta.ticking.rate)) {
+                    let d = now - this.meta.ticking.prev_time
+                    let delta = this.meta.ticking.delta = d / (1000)
+                    this.meta.ticking.ticks++
+                    this.meta.ticking.now = now
+                    this.meta.ticking.prev_time = now
+                    this.on_tick(this.meta.ticking)
+                }
             }
         }
     }
@@ -153,9 +156,12 @@ class BasicObject extends THREE.EventDispatcher {
             } else {
                 this.on_disable();
             }
-
             this.meta.enabled = v;
         }
+    }
+    destroy() {
+        /**removing global variables registerd by this object */
+        ResourceManager.undefine_all_global_vars(this.UUID)
     }
     /**global vars definition */
     define_global_var(name, getter, setter) {
@@ -169,7 +175,7 @@ class BasicObject extends THREE.EventDispatcher {
 
     }
     on_update(props) {
-        console.log(props)
+
     }
     on_create() {
         if (this._on_create) this._on_create(td)
@@ -251,262 +257,19 @@ class BasicObject extends THREE.EventDispatcher {
     emit(type, payload) {
         return this.dispatchEvent({ type: type, payload })
     }
-    /** */
-    get_components(component_name) {
-        let game_object = this.game_object
-        let r = []
-        game_object.components.forEach((component) => {
-            if (component.name === component_name) {
-                r.push(component)
-            }
-        })
-        return r
-    }
-    traverse_components(cb, skip_disabled = true, skip_root = false) {
-        let game_object = this.game_object
-        if (skip_root === false) {
-            for (let a = 0; a < game_object.components.length; a++) {
-                let comp = game_object.components[a]
-                if (skip_disabled && !comp.enabled) continue
-                if (cb(comp, game_object) === false) {
-                    break
-                }
-            }
-        }
+    /**unit conversion */
+    /**world/local */
 
-        game_object.traverse_child_components(cb, skip_disabled)
-    }
-    traverse_child_components(cb, skip_disabled) {
-        let game_object = this.game_object
-        if (game_object.children) {
-            game_object.children.forEach(child => {
-                if (skip_disabled === true && !child.enabled) {
-                    return
-                }
-                if (child instanceof GameObject) {
-                    child.traverse_components(cb, skip_disabled)
-                } else {
-                    console.error(`Non-GameObject child added to`, game_object)
-                }
-            })
-        }
-    }
-    get_component(component_name, cb, on_not_found) {
-        let game_object = this.game_object
-        let r = undefined
-        for (let a = 0; a < game_object.components.length; a++) {
-            if (game_object.components[a].name === component_name) {
-                r = game_object.components[a]
-                break
-            }
-        }
-
-        if (isFunction(cb)) {
-            if (r !== undefined) {
-                cb(r)
-            } else {
-                if (isFunction(on_not_found)) {
-                    on_not_found(r)
-                }
-            }
-            return r !== undefined
-        } else {
-            return r
-        }
-    }
-    find_component_of_type(component_name, cb, on_not_found) {
-        let game_object = this.game_object
-        let r = undefined
-        if (ResourceManager.components_instances[component_name]) {
-            for (let k in ResourceManager.components_instances[component_name]) {
-                r = ResourceManager.components_instances[component_name][k]
-                break
-            }
-        }
-        if (isFunction(cb)) {
-            if (r !== undefined) {
-                cb(r)
-            } else {
-                if (isFunction(on_not_found)) {
-                    on_not_found(r)
-                }
-            }
-            return r !== undefined
-        } else {
-            return r
-        }
-    }
-    find_child_component_of_type(component_name, cb, on_not_found) {
-        let game_object = this.game_object
-        let r = undefined
-        game_object.traverse_components((comp) => {
-            if (comp.name === component_name) {
-                r = comp
-                return false
-            }
-        }, false, true)
-
-        if (isFunction(cb)) {
-            if (r !== undefined) {
-                cb(r)
-            } else {
-                if (isFunction(on_not_found)) {
-                    on_not_found(r)
-                }
-            }
-            return r !== undefined
-        } else {
-            return r
-        }
-    }
-    find_child_components_of_type(component_name, cb, on_not_found) {
-        let game_object = this.game_object
-        let r = []
-        game_object.traverse_components((comp) => {
-            if (comp.name === component_name) {
-                r.push(comp)
-            }
-        }, false, true)
-
-        if (isFunction(cb)) {
-            if (r.length > 0) {
-                r.forEach(v => cb(v))
-            } else {
-                if (isFunction(on_not_found)) {
-                    on_not_found(r)
-                }
-            }
-            return r !== undefined
-        } else {
-            return r
-        }
-    }
-    find_components_of_type(component_name, count) {
-        let game_object = this.game_object
-        let c = 0
-        let r = []
-        if (ResourceManager.components_instances[component_name]) {
-            for (let k in ResourceManager.components_instances[component_name]) {
-                if (count === undefined || c < count) {
-                    r.push(ResourceManager.components_instances[component_name][k])
-                    c++
-                    if (c >= count) {
-                        break
-                    }
-                }
-            }
-        }
-        return r
-    }
-    find_component_with_tag(tag, cb, on_not_found) {
-        let game_object = this.game_object
-        let r = ResourceManager.components_tags[tag]
-
-        if (isFunction(cb)) {
-            if (r !== undefined) {
-                cb(r)
-            } else {
-                if (isFunction(on_not_found)) {
-                    on_not_found(r)
-                }
-            }
-            return r !== undefined
-        } else {
-            return r
-        }
-    }
-    broadcast(event_name, payload) {
-        let game_object = this.game_object
-        if (typeof window.F_BROADCAST_HOOK === "function") {
-            window.F_BROADCAST_HOOK(event_name, payload)
-        }
-        if (GameObject.broadcasting[event_name]) {
-            for (let k in GameObject.broadcasting[event_name]) {
-                let func_name = `handle_${event_name}`
-                if (typeof GameObject.broadcasting[event_name][k] === 'function') {
-                    typeof GameObject.broadcasting[event_name][k](payload)
-                }
-                GameObject.broadcasting[event_name][k].components.forEach((component) => {
-                    if (typeof component[func_name] === 'function') {
-                        typeof component[func_name](payload)
-                    }
-                })
-            }
-        }
-    }
-    listen(event_name) {
-        let game_object = this.game_object
-        GameObject.broadcasting[event_name] = GameObject.broadcasting[event_name] || {}
-        GameObject.broadcasting[event_name][game_object.UUID] = game_object
-    }
-    setup_components(comp_data) {
-        let game_object = this.game_object
-        if (this.game_object) {
-            return this.game_object.setup_components(...arguments)
-        }
-    }
-    create_child(prefab) {
-        let game_object = this.game_object
-        if (this.game_object) {
-            return this.game_object.create_child(...arguments)
-        }
-    }
-    remove_child(child) {
-        let game_object = this.game_object
-        if (this.game_object) {
-            return this.game_object.remove_child(...arguments)
-        }
-    }
-    add_component(data) {
-        let game_object = this.game_object
-        if (this.game_object) {
-            return this.game_object.add_component(...arguments)
-        }
-    }
-    remove_component(data, params) {
-        let game_object = this.game_object
-        if (typeof data === "string") {
-            let component = game_object.refs[data]
-            if (component) {
-                component.enabled = false
-                component.on_destroy(params)
-                delete game_object.refs[data]
-                for (let a = 0; a < game_object.components.length; a++) {
-                    let c = game_object.components[a]
-                    if (c.UUID === component.UUID) {
-                        game_object.components.splice(a, 1)
-                        break
-                    }
-                }
-                let component_name = component.name
-                delete ResourceManager.components_instances[component_name][component.UUID]
-                delete ResourceManager.components_tags[component.tag]
-            }
-        } else if (typeof data === "object") {
-            let component = data
-            component.enabled = false
-            component.on_destroy(params)
-            let ref = component._ref
-            delete game_object.refs[ref]
-            for (let a = 0; a < game_object.components.length; a++) {
-                let c = game_object.components[a]
-                if (c.UUID === component.UUID) {
-                    game_object.components.splice(a, 1)
-                    break
-                }
-            }
-            let component_name = component.name
-            delete ResourceManager.components_instances[component_name][component.UUID]
-            delete ResourceManager.components_tags[component.tag]
-        }
-    }
 
 }
 
 function reactivate(object) {
+    if (object.meta.reactivated) {
+        return
+    }
     let reactive_values = {}
     object.meta.updated_reactive_props = object.meta.updated_reactive_props || []
-    object.need_reactive_update = true
+    object.meta.need_reactive_update = true
     let reactive_props = object.get_reactive_props ? object.get_reactive_props() : []
     reactive_props.forEach((prop) => {
         reactive_values[prop] = object[prop]
@@ -515,7 +278,7 @@ function reactivate(object) {
                 return reactive_values[prop]
             },
             set: (v) => {
-                object.need_reactive_update = true
+                object.meta.need_reactive_update = true
                 if (object.meta.updated_reactive_props.indexOf(prop) < 0) {
                     object.meta.updated_reactive_props.push(prop)
                 }
@@ -523,6 +286,8 @@ function reactivate(object) {
             }
         })
     })
+
+    object.meta.reactivated = true
 }
 
 export default BasicObject

@@ -12,11 +12,11 @@ class FollowPointer extends Component {
     }
     handle_pointermove(evt) {
         let global_pos = this.globals.camera.screen_to_world(evt.pointer_a);
-        this.object.position.set(
+        this.object.position = [
             global_pos[0] + this.offset[0],
             global_pos[1] + this.offset[1],
             global_pos[2] + this.offset[2]
-        );
+        ]
     }
 }
 

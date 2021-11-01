@@ -14,9 +14,10 @@ class SimpleRotator extends Component {
     on_create() {
     }
     on_tick(time_delta) {
-        this.game_object.rotation.x += this.axis.x * this.speed
-        this.game_object.rotation.y += this.axis.y * this.speed
-        this.game_object.rotation.z += this.axis.z * this.speed
+        this.game_object.rotation[0] += this.axis.x * this.speed
+        this.game_object.rotation[1] += this.axis.y * this.speed
+        this.game_object.rotation[2] += this.axis.z * this.speed
+        this.game_object.rotation = this.game_object.rotation
     }
 }
 

@@ -9,14 +9,45 @@ import BasicObject from "core/BasicObject";
 import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, isFunction, isString, map, keys, values, forEach } from "lodash-es"
 import ResourceManager from "core/ResourceManager"
 import Schema from "core/utils/Schema"
+import GameObject from "./GameObject"
 
+const proxied_game_object_methods = [
+    "add",
+    "remove",
+    "load_prefab",
+    "set_prefab",
+    "save_prefab",
+    "destroy",
+    "get_components",
+    "traverse_components",
+    "traverse_child_components",
+    "get_component",
+    "find_child_component_of_type",
+    "find_component_of_type",
+    "find_child_component_of_type",
+    "find_child_components_of_type",
+    "find_components_of_type",
+    "find_component_with_tag",
+    "setup_components",
+    "create_child",
+    "remove_child",
+    "add_component",
+    "remove_component",
+    "to_local_pos",
+    "to_world_pos",
+]
+
+const proxied_game_object_props = [
+    "children",
+    "components",
+    "refs",
+    "states",
+    "tasks"
+]
 
 class Component extends BasicObject {
+    is_component = true
     subject = null;
-    tick_rate = 30
-    tick_enabled = true
-    debug_log_this = false
-    UUID = undefined
     constructor(params) {
         super(params);
         this.meta.object_type = "component"
@@ -50,28 +81,6 @@ class Component extends BasicObject {
     on_disable() {
         super.on_disable(...arguments);
     }
-    get parent() {
-        let r = null;
-        if (this.game_object && this.game_object.parent) {
-            r = this.game_object.parent;
-        }
-        return r;
-    }
-    get refs() {
-        return this.game_object.refs;
-    }
-    get children() {
-        return this.game_object.children;
-    }
-    get components() {
-        return this.game_object.components;
-    }
-    get states() {
-        return this.game_object.states;
-    }
-    get tasks() {
-        return this.game_object.tasks;
-    }
     get component_name() {
         return this.constructor.component_name;
     }
@@ -94,7 +103,6 @@ Component.create = (params, name) => {
     let is_array = isArray
     let is_undefined = isUndefined
     let schema = Schema
-
     if (isObject(params.props)) {
         reactive_props_list = map(keys(params.props), name => `"${name}"`).join(", ")
         forEach(params.props, (value, prop_name) => {
@@ -140,8 +148,26 @@ Component.create = (params, name) => {
     log("Component", `just created new inline component "${name}"`)
     return result
 }
+proxied_game_object_methods.forEach(method_name => {
+    Component.prototype[method_name] = function () {
+        let game_object = this.game_object
+        if (game_object) {
+            return game_object[method_name](...arguments)
+        }
+    }
+})
 
-
+proxied_game_object_props.forEach(prop_name => {
+    Object.defineProperty(Component.prototype, prop_name, {
+        get: function () {
+            let game_object = this.game_object
+            if (game_object) {
+                return game_object[prop_name]
+            } else {
+                return undefined
+            }
+        }
+    })
+})
 Component.component_name = "Component";
-
 export default Component;

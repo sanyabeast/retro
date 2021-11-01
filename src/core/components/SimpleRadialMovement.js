@@ -14,8 +14,9 @@ class SimpleRadialMovement extends Component {
     on_create() {
     }
     on_tick(time_delta) {
-        this.game_object.position.x = Math.sin((+new Date()/1000) * this.speed) * this.radius
-        this.game_object.position.y = Math.cos((+new Date()/1000) * this.speed) * this.radius
+        this.game_object.position[0] = Math.sin((+new Date()/1000) * this.speed) * this.radius
+        this.game_object.position[1] = Math.cos((+new Date()/1000) * this.speed) * this.radius
+        this.game_object.position = this.game_object.position
     }
 }
 

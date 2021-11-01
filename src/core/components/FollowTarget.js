@@ -13,9 +13,10 @@ class FollowTarget extends Component {
     }
     on_tick(time_delta) {
         if (this.target) {
-            this.game_object.position.x = this.target.position.x + this.offset[0];
-            this.game_object.position.y = this.target.position.y + this.offset[1];
-            this.game_object.position.z = this.target.position.z + this.offset[2];
+            this.game_object.position[0] = this.target.position.x + this.offset[0];
+            this.game_object.position[1] = this.target.position.y + this.offset[1];
+            this.game_object.position[2] = this.target.position.z + this.offset[2];
+            this.game_object.position = this.game_object.position
         }
     }
 }
