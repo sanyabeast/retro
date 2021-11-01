@@ -175,7 +175,6 @@ class BasicObject extends THREE.EventDispatcher {
         if (this._on_create) this._on_create(td)
     }
     on_destroy() {
-        super.on_destroy(...arguments);
         if (this._on_destroy) this._on_destroy(td)
         ResourceManager.undefine_all_global_vars(this.UUID)
     }
@@ -442,98 +441,27 @@ class BasicObject extends THREE.EventDispatcher {
     }
     setup_components(comp_data) {
         let game_object = this.game_object
-        let sorted_comp_list = []
-        if (comp_data !== undefined) {
-            if (Array.isArray(comp_data)) {
-                sorted_comp_list = comp_data
-                sorted_comp_list.forEach((data) => {
-                })
-            } else {
-                for (let k in comp_data) {
-                    let data = comp_data[k]
-                    data.ref = data.ref || k
-                    sorted_comp_list.push(data)
-                }
-            }
+        if (this.game_object) {
+            return this.game_object.setup_components(...arguments)
         }
-
-        sorted_comp_list = sortBy(sorted_comp_list, item => item.order || 0)
-        sorted_comp_list.forEach(comp_data => game_object.add_component(comp_data))
     }
     create_child(prefab) {
         let game_object = this.game_object
-        let c = new GameObject(prefab)
-        game_object.add(c)
-        return c
+        if (this.game_object) {
+            return this.game_object.create_child(...arguments)
+        }
     }
     remove_child(child) {
         let game_object = this.game_object
-        child.destroy();
-        game_object.remove(child)
+        if (this.game_object) {
+            return this.game_object.remove_child(...arguments)
+        }
     }
     add_component(data) {
         let game_object = this.game_object
-        let component_name = data.name;
-        let params = data.params
-        let enabled = typeof data.enabled === 'boolean' ? data.enabled : true
-        let ref = typeof data.ref === 'string' ? data.ref : undefined
-        let creator = undefined
-        let suitable_creators = get_most_suitable_dict_keys(ResourceManager.classes_of_components, component_name)
-        if (suitable_creators.length > 1) {
-            error('GameObject', `ambiguity when tried to created component with alias "${component_name}". got multiple candidates: ${suitable_creators.join(", ")}`)
-        } else if (suitable_creators.length === 1) {
-            creator = ResourceManager.classes_of_components[suitable_creators[0]]
+        if (this.game_object) {
+            return this.game_object.add_component(...arguments)
         }
-        let component
-        if (isFunction(creator)) {
-            component = new creator(params)
-        } else if (isObject(creator)) {
-            component = Object.assign({}, creator)
-        } else if (isUndefined(creator)) {
-            if (isObject(data.inline)) {
-                if (Schema.validate(data.inline, ":INLINE_COMPONENT")) {
-                    creator = Component.create(data.inline, component_name)
-                    component = new creator(params)
-                }
-            }
-        }
-        if (component !== undefined) {
-            component._game_object = game_object
-            component.init()
-            component.name = component_name
-            /**meta params */
-            if (Schema.validate(data.meta, ":COMPONENT_PARAMS_META")) {
-                let meta_params = component.meta = ResourceManager.mixin_object(component.meta, [data.meta])
-            }
-
-            component.apply_params()
-
-            component._enabled = enabled
-            if (ref !== undefined) {
-                component._ref = ref
-                game_object.refs[ref] = component
-            } else {
-                ref = component_name
-                component._ref = ref
-                if (game_object.refs[ref] === undefined) {
-                    game_object.refs[ref] = component
-                }
-            }
-            game_object.components.push(component)
-            component.on_create()
-            if (component.enabled) component.on_enable()
-            ResourceManager.components_instances[component_name] = ResourceManager.components_instances[component_name] || {}
-            ResourceManager.components_instances[component_name][component.UUID] = component
-
-            if (data.tag) {
-                component.tag = data.tag
-                ResourceManager.components_tags[data.tag] = component
-            }
-            // console.log(`creating component ${component_name}`, params, creator)
-        } else {
-            error(`GameObject`, `failed to create component: ${component_name}`, creator)
-        }
-        return component
     }
     remove_component(data, params) {
         let game_object = this.game_object

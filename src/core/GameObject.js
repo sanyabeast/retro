@@ -116,10 +116,6 @@ class GameObject extends Group {
         })
         return json ? JSON.stringify(r, null, '\t') : r
     }
-    get_render_order() {
-        let ro = (this.render_layer.valueOf() || 0) * 1000000 + (this.render_index.valueOf() || 0) * 1
-        return ro
-    }
     destroy(params) {
         delete ResourceManager.gameobject_refs[this.UUID]
         if (this.geometry) {
@@ -443,13 +439,6 @@ class GameObject extends Group {
             delete ResourceManager.components_tags[component.tag]
         }
     }
-    update(data) {
-        for (let k in data) {
-            this[k] = data[k]
-        }
-        this.on_update()
-    }
-    on_update() { }
     tick(time_data) {
         if (this.enabled) {
             this.on_tick()
@@ -477,8 +466,8 @@ class GameObject extends Group {
             })
         }
     }
-    on_start() { }
-    on_tick() { }
+    on_start() {}
+    on_tick() {}
     /**globals vars definition */
     define_global_var(name, getter, setter) {
         ResourceManager.define_global_var(this.UUID, name, getter, setter)
