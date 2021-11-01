@@ -374,14 +374,17 @@ class GameObject extends Group {
             }
         }
         if (component !== undefined) {
+            component.init()
             component.name = component_name
-            reactivate_component(component)
+            // reactivate_component(component)
             component.object = this
             /**meta params */
             if (Schema.validate(data.meta, ":COMPONENT_PARAMS_META")) {
                 let meta_params = component.meta = ResourceManager.mixin_object(component.meta, [data.meta])
             }
+            
             component.apply_params()
+            
             component._enabled = enabled
             if (ref !== undefined) {
                 component._ref = ref
@@ -458,12 +461,6 @@ class GameObject extends Group {
             this.components.forEach((component) => {
                 if (component.enabled) {
                     component.tick(time_data)
-                    if (component.need_reactive_update) {
-                        let updated_props = [...component.updated_props]
-                        component.need_reactive_update = false
-                        component.updated_props.length = 0
-                        component.on_update(updated_props)
-                    }
                 }
             })
             this.tasks.on_tick()
@@ -511,27 +508,7 @@ class GameObject extends Group {
 }
 
 
-function reactivate_component(object) {
-    let reactive_values = {}
-    object.updated_props = object.updated_props || []
-    object.need_reactive_update = true
-    let reactive_props = object.get_reactive_props ? object.get_reactive_props() : []
-    reactive_props.forEach((prop) => {
-        reactive_values[prop] = object[prop]
-        Object.defineProperty(object, prop, {
-            get: () => {
-                return reactive_values[prop]
-            },
-            set: (v) => {
-                object.need_reactive_update = true
-                if (object.updated_props.indexOf(prop) < 0) {
-                    object.updated_props.push(prop)
-                }
-                reactive_values[prop] = v
-            }
-        })
-    })
-}
+
 
 GameObject.broadcasting = {}
 

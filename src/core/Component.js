@@ -10,77 +10,17 @@ import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, 
 import ResourceManager from "core/ResourceManager"
 import Schema from "core/utils/Schema"
 
-let id = 0
-const exclude_props = [
-    "components",
-    "children"
-]
 
 class Component extends BasicObject {
-    tick_data = undefined
     object = null;
     subject = null;
     tick_rate = 30
     tick_enabled = true
     debug_log_this = false
+    UUID = undefined
     constructor(params) {
         super(params);
-        this.meta = {
-            enabled: true,
-            layers: {
-                rendering: true,
-                normal: true,
-                raycast: false,
-                collision: false,
-                gizmo: false,
-                lights: false
-            },
-            params_applied: false,
-            params: {},
-            ticking: {
-                prev_time: +new Date(),
-                delta: 1,
-                ticks: 0,
-                rate: 15,
-                enabled: true
-            }
-        }
-        /**common patch */
-        if (window.F_PATCH_COMP_PROPS) {
-            window.F_PATCH_COMP_PROPS(this)
-        }
-        this.id = id
-        id++
-        this.meta.params = params || this.meta.params;
-        if (this.topics) {
-            this.topics.forEach(event_name => this.listen(event_name))
-        }
-        if (params && params.debug_log_this === true) {
-            this.log(this)
-        }
-
-    }
-    tick(tick_data) {
-        this.meta.ticking.rate = this.tick_rate
-        this.meta.ticking.enabled = this.tick_enabled
-
-        if (this.meta.ticking.enabled) {
-            let now = +new Date()
-            if (now - this.meta.ticking.prev_time >= (1000 / this.meta.ticking.rate)) {
-                let d = now - this.meta.ticking.prev_time
-                let delta = this.meta.ticking.delta = d / (1000)
-                this.meta.ticking.ticks++
-                this.meta.ticking.now = now
-                this.meta.ticking.prev_time = now
-                this.on_tick(this.meta.ticking)
-            }
-        }
-    }
-    get UUID() {
-        if (!this.meta.UUID) {
-            this.meta.UUID = `COMP_${this.component_name}_${this.id}`
-        }
-        return this.meta.UUID
+        this.meta.object_type = "component"
     }
     save_prefab() {
         let r = {
@@ -90,83 +30,26 @@ class Component extends BasicObject {
         }
         return r
     }
-    get_reactive_props() {
-        return []
+    on_update() {
+        super.on_update(...arguments);
     }
-    force_update() {
-        let reactive_props = this.get_reactive_props()
-        reactive_props.forEach(prop => {
-            this[prop] = this[prop]
-        })
-    }
-    apply_params() {
-        let params = this.meta.params
-        if (!this.meta.params_applied) {
-            this.meta.params_applied = true;
-            for (let k in params) {
-                switch (k) {
-                    case "on_tick": {
-                        this._on_tick = params[k]
-                        break
-                    }
-                    case "on_start": {
-                        this._on_start = params[k]
-                        break
-                    }
-                    case "on_enable": {
-                        this._on_enable = params[k]
-                        break
-                    }
-                    case "on_disable": {
-                        this._on_disable = params[k]
-                        break
-                    }
-                    case "on_create": {
-                        this._on_create = params[k]
-                        break
-                    }
-                    case "on_destroy": {
-                        this._on_create = params[k]
-                        break
-                    }
-                    default: {
-                        if (exclude_props.indexOf(k) < 0) {
-                            this[k] = params[k]
-                        }
-                    }
-                }
-            }
-        }
-        if (isArray(this.meta.layers.include)) {
-            this.meta.layers.include.forEach(name => {
-                this.meta.layers[name] = true
-            })
-        }
-        if (isArray(this.meta.layers.exclude)) {
-            this.meta.layers.exclude.forEach(name => {
-                this.meta.layers[name] = true
-            })
-        }
-    }
-    on_update() { }
     on_create() {
-        if (this._on_create) this._on_create(td)
+        super.on_create(...arguments);
     }
     on_destroy() {
-        if (this._on_destroy) this._on_destroy(td)
-        ResourceManager.undefine_all_global_vars(this.UUID)
+        super.on_destroy(...arguments);
     }
     on_tick(td) {
-        if (this._on_tick) this._on_tick(td)
+        super.on_tick()
     }
     on_start(td) {
-        if (this._on_start) this._on_start(td)
+        super.on_start(...arguments);
     }
     on_enable() {
-        if (this._on_enable) this._on_enable(td)
+        super.on_enable(...arguments);
     }
     on_disable() {
-        if (this._on_disable) this._on_disable(td)
+        super.on_disable(...arguments);
     }
     get parent() {
         let r = null;
@@ -174,20 +57,6 @@ class Component extends BasicObject {
             r = this.object.parent;
         }
         return r;
-    }
-    get enabled() {
-        return this.meta.enabled;
-    }
-    set enabled(v) {
-        if (v !== this.meta.enabled) {
-            if (v) {
-                this.on_enable();
-            } else {
-                this.on_disable();
-            }
-
-            this.meta.enabled = v;
-        }
     }
     get refs() {
         return this.object.refs;
@@ -231,7 +100,6 @@ class Component extends BasicObject {
     setup_components(data) {
         if (Array.isArray(data)) {
             return this.object.setup_components(data)
-
         }
     }
     load_prefab() {
@@ -254,13 +122,7 @@ class Component extends BasicObject {
     get_components(component_name) {
         return this.object.get_components(component_name);
     }
-    /**global vars definition */
-    define_global_var(name, getter, setter) {
-        ResourceManager.define_global_var(this.UUID, name, getter, setter)
-    }
-    undefine_global_var(name) {
-        ResourceManager.undefine_global_var(this.UUID, name)
-    }
+
 }
 
 
