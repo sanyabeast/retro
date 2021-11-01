@@ -1,7 +1,7 @@
 prefabs:
   - default.Postprocessing
   - core.sound.default_ambient_audio_source
-  - default.controls.OrbitControlsComponent
+  - default.OrbitControlsComponent
 components:
   phone_light:
     enabled: true

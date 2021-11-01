@@ -112,7 +112,7 @@ class SkySphere extends SceneComponent {
                     // console.log(uniforms['opacity'].value)
 
                     if (this.use_sun_time === true) {
-                        let sun = this.find_component_of_type("scene.Sun")
+                        let sun = this.find_component_of_type("Sun")
                         uniforms['sun_position'].value.copy(sun.sphere.position);
                     } else {
                         const phi = THREE.MathUtils.degToRad(90 - c_elevation);
@@ -151,7 +151,7 @@ class SkySphere extends SceneComponent {
     }
     on_tick(time_delta) {
         if (this.use_sun_time) {
-            let sun = this.find_component_of_type("scene.Sun")
+            let sun = this.find_component_of_type("Sun")
             if (sun) {
                 this.time = sun.time
                 if (sun.show_sphere === true) {

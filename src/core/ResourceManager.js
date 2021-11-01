@@ -500,6 +500,7 @@ class ResourceManager extends BasicObject {
             this.asset_stats.components_count++;
 
             let name = p.replace("./", "").replace(".js", "").replace(/\//gm, ".");
+            name = name.split(".")[name.split(".").length - 1]
 
             let creator = mod.default
 
