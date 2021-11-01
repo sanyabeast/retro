@@ -129,6 +129,8 @@ class ResourceManager extends BasicObject {
         this.SCHEMA_CORE = SCHEMA_CORE
         this.SCHEMA_APP = SCHEMA_APP
 
+        this.cached_spine_data = new CachedDataDict()
+        this.cached_spine_skeleton_data = new CachedDataDict()
         this.cached_textures = new CachedDataDict();
         this.cached_geometries = new CachedDataDict();
         this.cached_materials = new CachedDataDict();

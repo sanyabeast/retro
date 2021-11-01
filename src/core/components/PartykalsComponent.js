@@ -14,8 +14,9 @@ import { Vector2 } from "spine-ts-threejs";
 import { Vector3 } from "three";
 
 class PartykalsComponent extends SceneComponent {
-    
+
     particles_global_size = 1
+    particles_size = 1
     particles_start_size = 1
     particles_end_size = 0
     particles_ttl = 10
@@ -83,6 +84,15 @@ class PartykalsComponent extends SceneComponent {
 
     on_update(props) {
         super.on_update(props)
+        try {
+            props.forEach(prop => {
+                switch (prop) {
+                    case "particles_velocity": this.particle_system.options.particles.velocity.set(...this.particles_velocity); break;
+                }
+            })
+        } catch (err) {
+            this.error(err)
+        }
     }
 
     get_value(d) {
@@ -99,7 +109,7 @@ class PartykalsComponent extends SceneComponent {
                 } else {
                     params = []
                 }
-                
+
                 return new Partykals.Randomizers[rand_name](...map(params, (p) => {
                     return this.get_value(p)
                 }))
@@ -132,6 +142,7 @@ class PartykalsComponent extends SceneComponent {
     on_create() {
         let ps = this.particle_system = new Partykals.ParticlesSystem({
             particles: {
+                size: this.get_value(this.particles_size),
                 globalSize: this.get_value(this.particles_global_size),
                 startSize: this.get_value(this.particles_start_size),
                 endSize: this.get_value(this.particles_end_size),
