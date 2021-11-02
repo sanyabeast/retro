@@ -30,7 +30,9 @@ class AssetMaterial extends THREE.Material {
                 // r.push(new THREE.MeshStandardMaterial({color: "#ff0000"}))
                 let mtl_data = request_text_sync(params.src)
                 let materials = this.parse_mtl(mtl_data, src)
+                console.log(src, materials)
                 materials.forEach(m => r.push(m))
+                materials.sorted = false
                 break;
             }
         }
@@ -40,9 +42,7 @@ class AssetMaterial extends THREE.Material {
         } else {
             return r
         }
-
     }
-
     parse_mtl(data, asset_src) {
         let r = []
         let asset_dir = path.dirname(asset_src)
@@ -67,6 +67,8 @@ class AssetMaterial extends THREE.Material {
             })
             return parsed_data
         }
+
+
         function parse_line(line_data) {
             if (typeof line_data === "string") {
                 let r = line_data.split(" ")
@@ -86,102 +88,83 @@ class AssetMaterial extends THREE.Material {
         }
         blocks.forEach(b => {
             let block_data = parse_block(b)
-
             // console.log(block_data)
-
             let material_params = {}
-
+            if (block_data.newmtl) {
+                material_params.name = block_data.newmtl[0]
+            }
             if (block_data.map_Ka) {
                 let map_Ka = block_data.map_Ka[block_data.map_Ka.length - 1]
                 let src = path.basename(map_Ka.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
-                material_params.map = src
+                material_params.map = `${src}?wrapS=1000&wrapT=1000`
             }
-
             if (block_data.map_Kd) {
                 let map_Kd = block_data.map_Kd[block_data.map_Kd.length - 1]
                 let src = path.basename(map_Kd.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
-                material_params.map = src
+                material_params.map = `${src}?wrapS=1000&wrapT=1000`
             }
-
             if (this.doubleside) {
                 material_params.side = THREE.DoubleSide
             }
-
             if (block_data.map_Ns) {
                 let map_Ns = block_data.map_Ns[block_data.map_Ns.length - 1]
                 let src = path.basename(map_Ns.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
-                material_params.specularMap = src
-                material_params.roughnessMap = src
+                material_params.specularMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.roughnessMap = `${src}?wrapS=1000&wrapT=1000`
             }
-
             if (block_data.refl) {
                 let refl = block_data.refl[block_data.refl.length - 1]
                 let src = path.basename(refl.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
-                material_params.metallnessMap = src
+                material_params.metallnessMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.metallness = 0.1
             }
-
             if (block_data.map_d) {
                 let map_d = block_data.map_d[block_data.map_d.length - 1]
                 let src = path.basename(map_d.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
-                material_params.alphaMap = src
+                material_params.alphaMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.transparent = true
                 material_params.side = THREE.DoubleSide
             }
-
             if (block_data.map_Bump) {
                 let map_Bump = block_data.map_Bump[block_data.map_Bump.length - 1]
                 let src = path.basename(map_Bump.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
-                material_params.normalMap = src
-                material_params.displacementMap = src
+                material_params.normalMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.displacementMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.displacementScale = -1 * Math.abs(this.displacement_scale)
-                material_params.bumpMap = src
+                material_params.bumpMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.bumpScale = this.bump_scale
             }
-
             if (block_data.map_Kd) {
                 let map_Kd = block_data.map_Kd[block_data.map_Kd.length - 1]
                 let src = path.basename(map_Kd.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
-                material_params.map = src
+                material_params.map = `${src}?wrapS=1000&wrapT=1000`
             }
-
-
-
             if (block_data.Ka) {
                 material_params.color = new THREE.Color(Number(block_data.Ka[0] || 0), Number(block_data.Ka[1] || 0), Number(block_data.Ka[2] || 0))
             }
-
             if (block_data.Kd) {
                 material_params.color = new THREE.Color(Number(block_data.Kd[0] || 0), Number(block_data.Kd[1] || 0), Number(block_data.Kd[2] || 0))
             }
-
             if (block_data.Ke) {
                 material_params.emissive = new THREE.Color(Number(block_data.Ke[0] || 0), Number(block_data.Ke[1] || 0), Number(block_data.Ke[2] || 0))
             }
-
             if (block_data.Ks) {
                 material_params.specular = new THREE.Color(Number(block_data.Ks[0] || 0), Number(block_data.Ks[1] || 0), Number(block_data.Ks[2] || 0))
             }
-
             if (block_data.Ns) {
                 material_params.shininess = Number(block_data.Ns[0]) * (this.shininess / 1000)
             }
-
             if (block_data.Ni) {
                 material_params.refractionRatio = Number(block_data.Ni[0] || 0)
             }
-
-
-
             let mat = new THREE.materials[Device.is_mobile ? LQ_MAT : HQ_MAT](material_params)
-
             r.push(mat)
         })
 

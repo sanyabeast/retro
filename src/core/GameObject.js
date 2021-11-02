@@ -9,6 +9,7 @@ import { log, error, get_most_suitable_dict_keys } from "core/utils/Tools"
 import Schema from "core/utils/Schema"
 import Component from "core/Component"
 import BasicObject from './BasicObject';
+import Transform from "core/Transform"
 
 const $v3 = new THREE.Vector3()
 
@@ -33,7 +34,7 @@ class GameObject extends BasicObject {
         this.rotation = [0, 0, 0]
         this.scale = [1, 1, 1]
         this._game_object = this
-        this.transform = new THREE.Object3D()
+        this.transform = new Transform()
         this.extra_data = {}
         this.components = []
         this.children = []

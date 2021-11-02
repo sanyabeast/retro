@@ -20,6 +20,8 @@ class LightComponent extends SceneComponent {
     sky_color = "#ffaaaa"
     ground_color = "#aaaaff"
     shadows_enabled = false
+    rect_width = 1
+    rect_height = 2
     /**private */
     gizmo_lamp_icon = undefined
     save_prefab() {
@@ -33,8 +35,8 @@ class LightComponent extends SceneComponent {
         }
     }
     on_create() {
+        super.on_create()
         let light
-
         this.meta.layers.lights = true
 
         switch (this.type) {
@@ -54,6 +56,12 @@ class LightComponent extends SceneComponent {
             }
             case "PointLight": {
                 light = this.subject = new THREE.PointLight(this.color, this.intensity, this.distance, this.decay)
+                console.log(this)
+                break
+            }
+            case "RectAreaLight": {
+                light = this.subject = new THREE.RectAreaLight(this.color, this.intensity, this.rect_width, this.rect_height)
+               
                 break
             }
             case "SpotLight": {

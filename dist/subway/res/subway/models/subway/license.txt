@@ -1,0 +1,11 @@
+Model Information:
+* title:	Metro / Subway Station
+* source:	https://sketchfab.com/3d-models/metro-subway-station-b975322ae1ca417c82641cbc7e172ff6
+* author:	jimbogies (https://sketchfab.com/jimbogies)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Metro / Subway Station" (https://sketchfab.com/3d-models/metro-subway-station-b975322ae1ca417c82641cbc7e172ff6) by jimbogies (https://sketchfab.com/jimbogies) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

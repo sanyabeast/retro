@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import { forEach } from "lodash-es";
+import { forEach, map, isArray } from "lodash-es";
 import OBJLoader from 'three/examples/js/loaders/OBJLoader.js';
 import FBXLoader from "three/examples/js/loaders/FBXLoader.js"
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 let obj_loader = new OBJLoader()
 let fbx_loader = new FBXLoader()
@@ -15,40 +16,67 @@ class AssetBufferGeometry extends THREE.BufferGeometry {
         type = type[type.length - 1]
         switch (type) {
             case "obj": {
+                let g = new THREE.BoxBufferGeometry()
                 if (obj_cache[src]) {
-                    let g = obj_cache[src].clone()
-                    for (let k in g) {
-                        this[k] = g[k]
-                    }
-
-                }
-                obj_loader.load(
-                    src,
-                    (object) => {
-
-                        let g
-                        if (object instanceof THREE.Group) {
-                            if (object.children && object.children[0] && object.children[0] instanceof THREE.Mesh) {
-                                g = obj_cache[src] = object.children[0].geometry.clone()
-
+                    g = obj_cache[src].clone()
+                } else {
+                    obj_loader.load(
+                        src,
+                        (object) => {
+                            console.log(object)
+                            let g = new THREE.BufferGeometry()
+                            if (object instanceof THREE.Group) {
+                                if (object.children.length > 1) {
+                                    let geometries = []
+                                    object.children.forEach(child => {
+                                        if (child instanceof THREE.Mesh) {
+                                            let position_attr = child.geometry.getAttribute("position")
+                                            let count = position_attr.count
+                                            if (child.geometry.attributes["uv"] === undefined) {
+                                                child.geometry.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(count * 2), 2))
+                                            }
+                                            if (child.geometry.attributes["normal"] === undefined) {
+                                                child.geometry.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(count * 3), 3))
+                                            }
+                                            geometries.push(child.geometry)
+                                        }
+                                    })
+                                    let merged_geometry = BufferGeometryUtils.mergeBufferGeometries(geometries, true)
+                                    for (let k in merged_geometry) {
+                                        g[k] = merged_geometry[k]
+                                    }
+                                } else {
+                                    g = object.children[0].geometry
+                                    let materials_order = undefined
+                                    if (isArray(object.children[0].material)) {
+                                        materials_order = map(object.children[0].material, (mat) => {
+                                            return mat.name
+                                        })
+                                    }
+                                    g.materials_order = materials_order
+                                }
+                            } else if (object instanceof THREE.Mesh) {
+                                g = object.geometry.clone()
                             }
-                        } else if (object instanceof THREE.Mesh) {
-                            g = obj_cache[src] = object.geometry.clone()
+
+                            obj_cache[src] = g
+
                             for (let k in g) {
                                 this[k] = g[k]
                             }
+
+                            setTimeout(() => {
+                                this.scale(scale, scale, scale)
+                            })
+
                         }
+                    );
+                }
 
-                        for (let k in g) {
-                            this[k] = g[k]
-                        }
+                for (let k in g) {
+                    this[k] = g[k]
+                }
 
-                        // console.log(src, object, g)
-
-                        this.scale(scale, scale, scale)
-
-                    }
-                );
                 break;
             }
             case "fbx": {

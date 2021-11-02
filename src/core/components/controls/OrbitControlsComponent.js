@@ -19,10 +19,13 @@ class OrbitControlsComponent extends Component {
     enable_zoom = true
     enable_rotate = true
     keypan_speed = 7
-    max_distance = Infinity
     max_polar_angle = Math.PI
+    min_polar_angle = 0
+    min_azimuth_angle = -Infinity
+    max_azimuth_angle = Infinity
     max_zoom = Infinity
     min_distance = 0.1
+    max_distance = Infinity
     min_zoom = 0.01
     pan_speed = 1
     rotate_speed = 1
@@ -32,7 +35,6 @@ class OrbitControlsComponent extends Component {
     /**private */
     controls = undefined
     get_reactive_props() {
-
         return [
             "auto_rotate",
             "auto_rotate_speed",
@@ -44,6 +46,9 @@ class OrbitControlsComponent extends Component {
             "keypan_speed",
             "max_distance",
             "max_polar_angle",
+            "min_polar_angle",
+            "max_azimuth_angle",
+            "min_azimuth_angle",
             "max_zoom",
             "min_distance",
             "min_zoom",
@@ -54,15 +59,16 @@ class OrbitControlsComponent extends Component {
             "zoom_speed"
         ].concat(super.get_reactive_props())
     }
-    on_enable(){
+    on_enable() {
         this.controls.enabled = true
         console.log(2)
     }
-    on_disable(){
+    on_disable() {
         console.log(1)
         this.controls.enabled = false
     }
     on_update(props) {
+        super.on_update(props)
         let controls = this.controls
         props.forEach(prop => {
             switch (prop) {
@@ -90,6 +96,9 @@ class OrbitControlsComponent extends Component {
                     controls.keypanSpeed = this.keypan_speed
                     controls.maxDistance = this.max_distance
                     controls.maxPolarAngle = this.max_polar_angle
+                    controls.minPolarAngle = this.min_polar_angle
+                    controls.maxAzimuthAngle = this.max_azimuth_angle
+                    controls.minAzimuthAngle = this.min_azimuth_angle
                     controls.maxZoom = this.max_zoom
                     controls.minDistance = this.min_distance
                     controls.minZoom = this.min_zoom

@@ -3,7 +3,9 @@ npm-debug.log
 src/apps/*
 !src/apps/demo/
 !src/apps/default/
+!src/apps/subway/
 dist/*
 !dist/demo
 !dist/default
+!dist/subway
 .DS_Store
