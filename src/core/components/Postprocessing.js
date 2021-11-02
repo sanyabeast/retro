@@ -14,43 +14,47 @@ import { ShaderPass } from "core/lib/postprocessing/build/postprocessing.esm";
 const BLOOM_TYPE = "default"
 const postfx = require("core/lib/postprocessing").default
 
+/* BLEND MODES
+BlendFunction.SKIP
+BlendFunction.ADD
+BlendFunction.ALPHA
+BlendFunction.AVERAGE
+BlendFunction.COLOR_BURN
+BlendFunction.COLOR_DODGE
+BlendFunction.DARKEN
+BlendFunction.DIFFERENCE
+BlendFunction.EXCLUSION
+BlendFunction.LIGHTEN
+BlendFunction.MULTIPLY
+BlendFunction.DIVIDE
+BlendFunction.NEGATION
+BlendFunction.NORMAL
+BlendFunction.OVERLAY
+BlendFunction.REFLECT
+BlendFunction.SCREEN
+BlendFunction.SOFT_LIGHT
+BlendFunction.SUBTRACT
+*/
 
 class FFXEffect extends postfx.Effect {
-
-    /**
-     * Constructs a new hue/saturation effect.
-     *
-     * @param {Object} [options] - The options.
-     * @param {BlendFunction} [options.blendFunction=BlendFunction.NORMAL] - The blend function of this effect.
-     * @param {Number} [options.hue=0.0] - The hue in radians.
-     * @param {Number} [options.saturation=0.0] - The saturation factor, ranging from -1 to 1, where 0 means no change.
-     */
-
     constructor({
         blendFunction = postfx.BlendFunction.NORMAL,
         hue = 0.0,
         saturation = 0.0
     } = {}) {
-
         super("HueSaturationEffect", `
             #ifdef FRAMEBUFFER_PRECISION_HIGH
-
                 uniform highp sampler2D map;
-
             #else
-
                 uniform lowp sampler2D map;
 
             #endif
-
             uniform float sharpness_scale;
             uniform float contrast_detection_scale;
             uniform float effect_power;
-
             vec4 get_texel(sampler2D map, vec2 uv, float step, float x, float y){
                 return texture2D(map, vec2(uv.x + step * x, uv.y + step * y));
             }
-
             vec4 get_sharpen_color(vec2 uv, float scale){
                 float step = 0.00015 * sharpness_scale * scale;
                 return 
@@ -65,7 +69,6 @@ class FFXEffect extends postfx.Effect {
                     get_texel(map, uv, step,  0.,   1.) * -1. +
                     get_texel(map, uv, step,  1.,   1.) * -1.;
             }
-            
             vec4 get_local_contrast(vec2 uv){
                 float step = 0.00015 * contrast_detection_scale;
                 float cl_00 = length(get_texel(map, uv, step,  0.,   0.)) / 3.;
@@ -106,11 +109,8 @@ class FFXEffect extends postfx.Effect {
                 outputColor     = mix(sharpen_color, albedo_color, 1. -local_contrast.a * power);
             
             }
-        
         `, {
-
             blendFunction,
-
             uniforms: new Map([
                 ["sharpness_scale", new THREE.Uniform(1)],
                 ["contrast_detection_scale", new THREE.Uniform(1)],
@@ -119,8 +119,6 @@ class FFXEffect extends postfx.Effect {
 
         });
     }
-
-
 }
 
 class Postprocessing extends Component {
@@ -139,31 +137,22 @@ class Postprocessing extends Component {
     use_grain = true
     use_vignette = true
     use_gc = true
-
     chromatic_abberation_offset_x = 0.4
     chromatic_abberation_offset_y = 0.4
-
     godrays_autodetect_sun = true
-
     grain_power = 0.025
-
     vignette_power = 0.2
     vignette_offset = 0.5
-
     bloom_smoothing = 0.4
     bloom_threshold = 0.7
-
     gc_gamma = 1
-
     hue = 0
     saturation = 0.25
     brightness = 0.025
     contrast = -0.025
-
     /**private */
     local_sun = undefined
     outline_selection = []
-
     constructor() {
         super(...arguments)
         let sun = this.local_sun = new THREE.Mesh(new THREE.BufferGeometry(0.1, 32, 32), new THREE.MeshBasicMaterial())
@@ -239,12 +228,12 @@ class Postprocessing extends Component {
                 }
 
                 default: {
-                    if (this.hs_effect){
+                    if (this.hs_effect) {
                         this.hs_effect.uniforms.get("saturation").value = this.saturation
                         this.hs_effect.uniforms.get("hue").value = this.hue
                     }
 
-                    if (this.bc_effect){
+                    if (this.bc_effect) {
                         this.bc_effect.uniforms.get("brightness").value = this.brightness
                     }
                 }
@@ -442,23 +431,23 @@ class Postprocessing extends Component {
         });
         const normal_depth_buffer = this.normal_depth_buffer = renderer.capabilities.isWebGL2 ? depth_downsampling_pass.texture : null;
         const ssao_effect = this.ssao_effect = new postfx.SSAOEffect(camera, normal_pass.texture, {
-            blendFunction: postfx.BlendFunction.SUBTRACT,
-            distanceScaling: false,
+            blendFunction: postfx.BlendFunction.MULTIPLY,
+            distanceScaling: true,
             depthAwareUpsampling: true,
             // normal_depth_buffer,
             samples: 16,
             rings: 7,
-            distanceThreshold: 0.02,	// Render up to a distance of ~20 world units
-            distanceFalloff: 0.0025,	// with an additional ~2.5 units of falloff.
+            distanceThreshold: 0.1,	// Render up to a distance of ~20 world units
+            distanceFalloff: 0.01,	// with an additional ~2.5 units of falloff.
             rangeThreshold: 0.0003,		// Occlusion proximity of ~0.3 world units
             rangeFalloff: 0.0001,			// with ~0.1 units of falloff.
-            luminanceInfluence: 0.7,
-            minRadiusScale: 0.33,
+            luminanceInfluence: 1,
+            minRadiusScale: 32,
             radius: 0.1,
-            intensity: 5,
-            bias: 0.1,
-            fade: 0.1,
-            color: 0x000000,
+            intensity: 32,
+            bias: 0.25,
+            fade: 0.25,
+            color: 0x101010,
             resolutionScale: 1
         });
         const texture_effect = this.ssao_texture_effect = new postfx.TextureEffect({
@@ -466,11 +455,11 @@ class Postprocessing extends Component {
             texture: depth_downsampling_pass.texture
         });
         composer.addPass(normal_pass)
-        composer.addPass(new postfx.EffectPass(camera,
-            ssao_effect,
+        this.ssao_pass = new postfx.EffectPass(camera,
             texture_effect,
-        ));
-
+            ssao_effect,
+        )
+        composer.addPass(this.ssao_pass);
     }
     on_enable() {
         let renderer = this.find_component_of_type("Renderer")

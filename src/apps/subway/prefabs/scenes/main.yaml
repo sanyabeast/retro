@@ -50,6 +50,8 @@ children:
             - AssetMaterial
             - color: "#ffffff"
               src: "res/subway/models/subway/subway.mtl"
+              bump_scale: 2
+              displacement_scale: 0.005
     children:
       rect_light_a:
         components:

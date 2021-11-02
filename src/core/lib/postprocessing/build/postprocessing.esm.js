@@ -2427,7 +2427,7 @@ var EffectPass = class extends Pass {
   }
   render(renderer, inputBuffer, outputBuffer, deltaTime, stencilTest) {
     const material = this.getFullscreenMaterial();
-    const time = material.uniforms.time.value + deltaTime;
+    const time = (+material.uniforms.time.value) + deltaTime;
     if (this.needsUpdate) {
       this.recompile(renderer);
     }
@@ -2436,7 +2436,7 @@ var EffectPass = class extends Pass {
     }
     if (!this.skipRendering || this.renderToScreen) {
       material.uniforms.inputBuffer.value = inputBuffer.texture;
-      material.uniforms.time.value = time <= this.maxTime ? time : this.minTime;
+     // material.uniforms.time.value = time <= this.maxTime ? time : this.minTime;
       renderer.setRenderTarget(this.renderToScreen ? null : outputBuffer);
       renderer.render(this.scene, this.camera);
     }
@@ -5278,7 +5278,7 @@ var SSAOEffect = class extends Effect {
     this.r = 1;
     this.camera = camera;
     this.ssaoPass = new ShaderPass((() => {
-      const noiseTexture = new NoiseTexture(NOISE_TEXTURE_SIZE, NOISE_TEXTURE_SIZE);
+      const noiseTexture = new NoiseTexture(NOISE_TEXTURE_SIZE * 2, NOISE_TEXTURE_SIZE * 2, RGBFormat8);
       noiseTexture.wrapS = noiseTexture.wrapT = RepeatWrapping3;
       const material = new SSAOMaterial(camera);
       material.uniforms.noiseTexture.value = noiseTexture;

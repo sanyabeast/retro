@@ -156,6 +156,9 @@ function allocTexUnits( textures, n ) {
 // Single scalar
 
 function setValueV1f( gl, v ) {
+	/**PATCH PATCH PATCH */
+	v = (v === undefined || v === null) ? v : v.valueOf()
+	/**!PATCH !PATCH !PATCH */
 
 	const cache = this.cache;
 
