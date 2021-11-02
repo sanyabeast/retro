@@ -9,9 +9,119 @@ import ResourceManager from "core/ResourceManager";
 import { render } from "less";
 import * as THREE from 'three';
 import Device from "core/utils/Device"
+import { ShaderPass } from "core/lib/postprocessing/build/postprocessing.esm";
 
 const BLOOM_TYPE = "default"
 const postfx = require("core/lib/postprocessing").default
+
+
+class FFXEffect extends postfx.Effect {
+
+    /**
+     * Constructs a new hue/saturation effect.
+     *
+     * @param {Object} [options] - The options.
+     * @param {BlendFunction} [options.blendFunction=BlendFunction.NORMAL] - The blend function of this effect.
+     * @param {Number} [options.hue=0.0] - The hue in radians.
+     * @param {Number} [options.saturation=0.0] - The saturation factor, ranging from -1 to 1, where 0 means no change.
+     */
+
+    constructor({
+        blendFunction = postfx.BlendFunction.NORMAL,
+        hue = 0.0,
+        saturation = 0.0
+    } = {}) {
+
+        super("HueSaturationEffect", `
+            #ifdef FRAMEBUFFER_PRECISION_HIGH
+
+                uniform highp sampler2D map;
+
+            #else
+
+                uniform lowp sampler2D map;
+
+            #endif
+
+            uniform float sharpness_scale;
+            uniform float contrast_detection_scale;
+            uniform float effect_power;
+
+            vec4 get_texel(sampler2D map, vec2 uv, float step, float x, float y){
+                return texture2D(map, vec2(uv.x + step * x, uv.y + step * y));
+            }
+
+            vec4 get_sharpen_color(vec2 uv, float scale){
+                float step = 0.00015 * sharpness_scale * scale;
+                return 
+                    get_texel(map, uv, step,  0.,   0.) * 12. +
+                    get_texel(map, uv, step, -1.,  -1.) * -1. +
+                    get_texel(map, uv, step,  0.,  -1.) * -1. +
+                    get_texel(map, uv, step,  1.,  -1.) * -1. +
+                    get_texel(map, uv, step, -1.,   0.) * -1. +
+                    get_texel(map, uv, step,  0.,   0.) * -1. +
+                    get_texel(map, uv, step,  1.,   0.) * -1. +
+                    get_texel(map, uv, step, -1.,   1.) * -1. +
+                    get_texel(map, uv, step,  0.,   1.) * -1. +
+                    get_texel(map, uv, step,  1.,   1.) * -1.;
+            }
+            
+            vec4 get_local_contrast(vec2 uv){
+                float step = 0.00015 * contrast_detection_scale;
+                float cl_00 = length(get_texel(map, uv, step,  0.,   0.)) / 3.;
+                float cl_tl = length(get_texel(map, uv, step, -1.,  -1.)) / 3.;
+                float cl_tc = length(get_texel(map, uv, step,  0.,  -1.)) / 3.;
+                float cl_tr = length(get_texel(map, uv, step,  1.,  -1.)) / 3.;
+                float cl_cl = length(get_texel(map, uv, step, -1.,   0.)) / 3.;
+                float cl_cc = length(get_texel(map, uv, step,  0.,   0.)) / 3.;
+                float cl_cr = length(get_texel(map, uv, step,  1.,   0.)) / 3.;
+                float cl_bl = length(get_texel(map, uv, step, -1.,   1.)) / 3.;
+                float cl_bc = length(get_texel(map, uv, step,  0.,   1.)) / 3.;
+                float cl_br = length(get_texel(map, uv, step,  1.,   1.)) / 3.;
+                
+                float max_color = max(max(max(max(max(max(max(max(max(cl_00, cl_tl), cl_tc), cl_tr), cl_cl), cl_cc), cl_cr), cl_bl), cl_bc), cl_br);
+                float min_color = min(min(min(min(min(min(min(min(min(cl_00, cl_tl), cl_tc), cl_tr), cl_cl), cl_cc), cl_cr), cl_bl), cl_bc), cl_br);
+                float average_color =
+                    (cl_00 +
+                    cl_tl +
+                    cl_tc +
+                    cl_tr +
+                    cl_cl +
+                    cl_cc +
+                    cl_cr +
+                    cl_bl +
+                    cl_bc ) / 9.;
+
+                float local_contrast = pow(1.- ((abs(min_color - average_color)) + (abs(average_color - max_color))), 3.);
+                return vec4(min_color, average_color, max_color, local_contrast);
+            }
+
+            void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+                float power = 0.333 * effect_power;
+                vec4 local_contrast = get_local_contrast(uv);
+                vec4 albedo_color = texture2D(map, uv);
+                vec4 sharpen_color = get_sharpen_color(uv, 1.);
+                // outputColor = sharpen_color;
+                // outputColor = vec4(local_contrast.a, local_contrast.a, local_contrast.a, 1.);
+                outputColor     = mix(sharpen_color, albedo_color, 1. -local_contrast.a * power);
+            
+            }
+        
+        `, {
+
+            blendFunction,
+
+            uniforms: new Map([
+                ["sharpness_scale", new THREE.Uniform(1)],
+                ["contrast_detection_scale", new THREE.Uniform(1)],
+                ["effect_power", new THREE.Uniform(1)]
+            ])
+
+        });
+    }
+
+
+}
 
 class Postprocessing extends Component {
     outline_selection = []
@@ -83,16 +193,22 @@ class Postprocessing extends Component {
             let postfx_rendering_list = renderer.get_rendering_list()
             this.render_pass.scene.children = postfx_rendering_list
         }
+
     }
     get_reactive_props() {
         return [
             "outline_selection",
             "grain_power",
             "bloom_smoothing",
-            "bloom_threshold"
+            "bloom_threshold",
+            "saturation",
+            "brightness",
+            "contrast",
+            "hue",
         ].concat(super.get_reactive_props())
     }
     on_update(props) {
+        console.log(props)
         props.forEach(prop => {
             switch (prop) {
                 case "outline_selection": {
@@ -111,6 +227,26 @@ class Postprocessing extends Component {
                 case "bloom_threshold": {
                     if (this.bloom_effect) this.bloom_effect.luminanceMaterial.uniforms.threshold.value = this.bloom_threshold
                     break
+                }
+
+                case "chromatic_abberation_offset_x": {
+                    console.log(this.chromatic_abberation_effect)
+                    break
+                }
+                case "chromatic_abberation_offset_y": {
+                    console.log(this.chromatic_abberation_effect)
+                    break
+                }
+
+                default: {
+                    if (this.hs_effect){
+                        this.hs_effect.uniforms.get("saturation").value = this.saturation
+                        this.hs_effect.uniforms.get("hue").value = this.hue
+                    }
+
+                    if (this.bc_effect){
+                        this.bc_effect.uniforms.get("brightness").value = this.brightness
+                    }
                 }
             }
         })
@@ -136,7 +272,10 @@ class Postprocessing extends Component {
             this.use_vignette = enabled
             this.use_gc = enabled
 
+
+
             if (this.use_ssao) this.setup_ssao(renderer, scene, camera, composer)
+
             if (this.use_hs) this.setup_hs(renderer, scene, camera, composer)
             if (this.use_bc) this.setup_bc(renderer, scene, camera, composer)
             if (this.use_tonemapping) this.setup_tonemapping(renderer, scene, camera, composer)
@@ -147,6 +286,12 @@ class Postprocessing extends Component {
             if (this.use_grain) this.setup_grain(renderer, scene, camera, composer)
             if (this.use_vignette) this.setup_vignette(renderer, scene, camera, composer)
             if (this.use_gc) this.setup_gc(renderer, scene, camera, composer)
+
+
+            composer.addPass(new postfx.EffectPass(camera, new FFXEffect({
+
+            })))
+
         } else {
             this.log("Renderer not found")
         }
@@ -178,32 +323,37 @@ class Postprocessing extends Component {
         composer.addPass(new postfx.EffectPass(camera, grain_effect));
     }
     setup_bc(renderer, scene, camera, composer) {
-        const bc_effect = new postfx.BrightnessContrastEffect({
+        const bc_effect = this.bc_effect = new postfx.BrightnessContrastEffect({
             // blendFunction: postfx.BlendFunction.COLOR,
             brightness: this.brightness,
             contrast: this.contrast
         });
 
-        composer.addPass(new postfx.EffectPass(camera, bc_effect));
+        this.bc_pass = new postfx.EffectPass(camera, bc_effect)
+
+        composer.addPass(this.bc_pass);
     }
     setup_hs(renderer, scene, camera, composer) {
-        const hs_effect = new postfx.HueSaturationEffect({
+        const hs_effect = this.hs_effect = new postfx.HueSaturationEffect({
             // blendFunction: postfx.BlendFunction.COLOR,
             saturation: this.saturation,
             hue: this.hue
         });
 
-        composer.addPass(new postfx.EffectPass(camera, hs_effect));
+        this.hs_pass = new postfx.EffectPass(camera, hs_effect)
+
+        composer.addPass(this.hs_pass);
     }
     setup_chromatic_abberation(renderer, scene, camera, composer) {
-        let chromatic_abberation_effect = new postfx.ChromaticAberrationEffect({
+        let chromatic_abberation_effect = this.chromatic_abberation_effect = new postfx.ChromaticAberrationEffect({
             blendFunction: postfx.BlendFunction.ADD,
             offset: new THREE.Vector2(
                 this.chromatic_abberation_offset_x / 1000,
                 this.chromatic_abberation_offset_y / 1000
             )
         });
-        composer.addPass(new postfx.EffectPass(camera, chromatic_abberation_effect))
+        this.chromatic_abberation_pass = new postfx.EffectPass(camera, chromatic_abberation_effect)
+        composer.addPass(this.chromatic_abberation_pass)
     }
     setup_tonemapping(renderer, scene, camera, composer) {
         const tonemapping_effect = this.tonemapping_effect = new postfx.ToneMappingEffect({
@@ -296,7 +446,7 @@ class Postprocessing extends Component {
             distanceScaling: false,
             depthAwareUpsampling: true,
             // normal_depth_buffer,
-            samples: 12,
+            samples: 16,
             rings: 7,
             distanceThreshold: 0.02,	// Render up to a distance of ~20 world units
             distanceFalloff: 0.0025,	// with an additional ~2.5 units of falloff.

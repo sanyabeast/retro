@@ -184,9 +184,9 @@ class Renderer extends Component {
         scene.update_transform()
 
         scene.traverse_components((comp, object) => {
-            if (comp.is_scene_component && comp.enabled) {
+            if (comp.enabled) {
                 let local_render_list = []
-                let render_data = comp.get_render_data()
+                let render_data = comp.is_scene_component ? comp.get_render_data() : []
                 let gizmo_render_data = comp.get_gizmo_render_data()
 
 

@@ -101,13 +101,6 @@ Original licenses apply:
  */
 
 /**
- * postprocessing v6.22.5 build Tue Aug 31 2021
- * https://github.com/vanruesc/postprocessing
- * Copyright 2021 Raoul van Rüschen
- * @license Zlib
- */
-
-/**
  * potpack - by [@mourner](https://github.com/mourner)
  * 
  * A tiny JavaScript function for packing 2D rectangles into a near-square container, 

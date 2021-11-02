@@ -4,6 +4,12 @@ prefabs:
   - default.OrbitControlsComponent
   - default.SkyBox
 components:
+  sun: 
+    name: Sun
+    params:
+      cycling: 0
+      time: 0.7
+      global_intensity: 0.15
   point_light:
     enabled: true
     name: LightComponent
@@ -21,6 +27,13 @@ children:
   fog: ??prefab=default.Fog
   subway_scene:
     components:
+      ambient_audio_source:
+        name: AudioComponent
+        params:
+          src: "res/subway/sound/200314__tim-kahn__underground-train-station"
+          autoplay: true
+          loop: true
+          volume: 1
       subway:
         name: MeshComponent
         tag: subway

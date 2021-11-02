@@ -12,6 +12,8 @@ import { hex_to_hsl, hsl_to_rgb, hex_to_rgb, console } from "core/utils/Tools";
 class Sun extends SceneComponent {
     time = 0.5
 
+    global_intensity = 1;
+    
     n_distance = 500
     d_distance = 50
     n_intensity = 0.25
@@ -154,7 +156,7 @@ class Sun extends SceneComponent {
                     this.position[2] = pos_z
 
                     let intensity = this.lerp(this.n_intensity, this.d_intensity, Math.pow(p, 0.2))
-                    this.light.intensity = intensity
+                    this.light.intensity = intensity * this.global_intensity
 
                     let emissive = this.lerp(this.n_emissive, this.d_emissive, p)
                     this.sphere.material.emissiveIntensity = emissive
@@ -173,7 +175,7 @@ class Sun extends SceneComponent {
 
 
                     /**ambinet */
-                    let amb_intensity = this.lerp(this.n_amb_intensity, this.d_amb_intensity, Math.pow(p, 0.2))
+                    let amb_intensity = this.lerp(this.n_amb_intensity, this.d_amb_intensity, Math.pow(p, 0.2)) * this.global_intensity
 
                     let d_amb_color = hex_to_rgb(this.d_amb_color)
                     let n_amb_color = hex_to_rgb(this.n_amb_color)
@@ -185,7 +187,7 @@ class Sun extends SceneComponent {
                     ]
 
                     this.amb_light.color.set_any(c_amb_color)
-                    this.amb_light.intensity = amb_intensity
+                    this.amb_light.intensity = amb_intensity * this.global_intensity
 
                     if (this.use_postfx) {
                         let postfx = this.find_component_of_type("Postprocessing")

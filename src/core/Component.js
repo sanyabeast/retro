@@ -60,6 +60,9 @@ class Component extends BasicObject {
         }
         return r
     }
+    get_gizmo_render_data() {
+        return []
+    }
     on_update() {
         super.on_update(...arguments);
     }
