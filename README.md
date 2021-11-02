@@ -5,4 +5,4 @@ Game Engine -like setup built on top of THREEjs.
 
 [DEMO #2](https://sanyabeast.github.io/gamecorejs/dist/default/) (default app template)
 
-[Subway](https://sanyabeast.github.io/gamecorejs/dist/subway/) (default app template)
+[SUBWAY](https://sanyabeast.github.io/gamecorejs/dist/subway/)
