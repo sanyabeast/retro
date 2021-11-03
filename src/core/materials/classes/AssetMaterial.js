@@ -93,6 +93,8 @@ class AssetMaterial extends THREE.Material {
             if (block_data.newmtl) {
                 material_params.name = block_data.newmtl[0]
             }
+
+            console.log(b, block_data)
             if (block_data.map_Ka) {
                 let map_Ka = block_data.map_Ka[block_data.map_Ka.length - 1]
                 let src = path.basename(map_Ka.replace(/\\\\/gm, "/"))
@@ -166,7 +168,10 @@ class AssetMaterial extends THREE.Material {
             }
             let mat = new THREE.materials[Device.is_mobile ? LQ_MAT : HQ_MAT](material_params)
             r.push(mat)
+            
         })
+
+        
 
 
         return r

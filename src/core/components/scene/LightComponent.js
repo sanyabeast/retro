@@ -7,6 +7,7 @@
 import SceneComponent from "core/SceneComponent";
 import ResourceManager from "core/ResourceManager";
 import * as THREE from 'three';
+import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 
 const LAMP_ICON_TEXTURE = new THREE.TextureLoader().load('res/core/gizmo/lamp_a.png');
 const LAMP_ICON_MATERIAL = new THREE.SpriteMaterial({ map: LAMP_ICON_TEXTURE });
@@ -24,6 +25,11 @@ class LightComponent extends SceneComponent {
     rect_height = 2
     /**private */
     gizmo_lamp_icon = undefined
+    extra_gizmos = undefined
+    constructor() {
+        super(...arguments)
+        this.extra_gizmos = []
+    }
     save_prefab() {
         return {
             ...super.save_prefab(),
@@ -61,7 +67,16 @@ class LightComponent extends SceneComponent {
             }
             case "RectAreaLight": {
                 light = this.subject = new THREE.RectAreaLight(this.color, this.intensity, this.rect_width, this.rect_height)
-               
+
+                /**gizmo */
+                let rect_area_helper = this.rect_area_helper = new RectAreaLightHelper(this.subject)
+
+                this.extra_gizmos.push({
+                    object: rect_area_helper,
+                    parent: this.subject,
+                    layers: { gizmo: true }
+                })
+
                 break
             }
             case "SpotLight": {
@@ -113,7 +128,7 @@ class LightComponent extends SceneComponent {
             object: this.gizmo_lamp_icon,
             parent: this.subject,
             layers: { gizmo: true }
-        }]
+        }].concat(this.extra_gizmos)
     }
     get_reactive_props() {
         return [
