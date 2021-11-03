@@ -445,7 +445,7 @@ class GameObject extends BasicObject {
 
             component.apply_params()
 
-            component._enabled = enabled
+            
             if (ref !== undefined) {
                 component._ref = ref
                 this.refs[ref] = component
@@ -458,7 +458,7 @@ class GameObject extends BasicObject {
             }
             this.components.push(component)
             component.on_create()
-            if (component.enabled) component.on_enable()
+            component.enabled = enabled
             ResourceManager.components_instances[component_name] = ResourceManager.components_instances[component_name] || {}
             ResourceManager.components_instances[component_name][component.UUID] = component
 

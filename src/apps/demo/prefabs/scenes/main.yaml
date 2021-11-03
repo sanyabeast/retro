@@ -49,7 +49,7 @@ children:
           rotation: [0, -2, 0]
           geometry:
             - "url:res/core/models/rest_chalkboard_1/chalkboard.obj"
-            - 0.3
+            - 1
           material:
             - AssetMaterial
             - src: "res/core/models/rest_chalkboard_1/chalkboard.mtl"

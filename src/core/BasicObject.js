@@ -24,6 +24,9 @@ class BasicObject extends THREE.EventDispatcher {
             game_object: undefined,
             object_type: "",
             enabled: true,
+            lifecycle: {
+                never_enabled: true
+            },
             reactivated: false,
             layers: {
                 rendering: true,
@@ -104,6 +107,9 @@ class BasicObject extends THREE.EventDispatcher {
                         this._on_create = params[k]
                         break
                     }
+                    case "enabled": {
+                        break
+                    }
                     default: {
                         if (exclude_props.indexOf(k) < 0) {
                             this[k] = params[k]
@@ -150,13 +156,14 @@ class BasicObject extends THREE.EventDispatcher {
         return this.meta.enabled;
     }
     set enabled(v) {
-        if (v !== this.meta.enabled) {
+        if (v !== this.meta.enabled || this.meta.lifecycle.never_enabled === true) {
+            this.meta.lifecycle.never_enabled = false
+            this.meta.enabled = v;
             if (v) {
                 this.on_enable();
             } else {
                 this.on_disable();
             }
-            this.meta.enabled = v;
         }
     }
     destroy() {

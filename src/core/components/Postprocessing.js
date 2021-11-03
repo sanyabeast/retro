@@ -197,7 +197,6 @@ class Postprocessing extends Component {
         ].concat(super.get_reactive_props())
     }
     on_update(props) {
-        console.log(props)
         props.forEach(prop => {
             switch (prop) {
                 case "outline_selection": {
