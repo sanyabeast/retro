@@ -54,6 +54,40 @@ class GameObject extends BasicObject {
         }
         return ResourceManager.gameobject_refs[this.UUID]
     }
+    /**calls */
+    call_down(method_name, ...args) {
+        let game_object = this
+        for (let a = 0; a < game_object.components.length; a++) {
+            let comp = game_object.components[a]
+            if (!isFunction(comp[method_name])) continue
+            comp[method_name](...args)
+        }
+
+        if (isFunction(game_object[method_name])) {
+            game_object[method_name](...args)
+        }
+
+        if (isArray(game_object.children)) {
+            this.children.forEach(child => child.call_down(method_name, ...args))
+        }
+    }
+    call_up(method_name, ...args) {
+        let game_object = this
+        for (let a = 0; a < game_object.components.length; a++) {
+            let comp = game_object.components[a]
+            if (!isFunction(comp[method_name])) continue
+            comp[method_name](...args)
+        }
+
+        if (isFunction(game_object[method_name])) {
+            game_object[method_name](...args)
+        }
+
+        if (game_object.parent !== undefined) {
+            game_object.parent.call_up(method_name, ...args);
+        }
+
+    }
     tick(time_data) {
         super.tick(time_data)
         if (this.enabled) {
@@ -115,6 +149,7 @@ class GameObject extends BasicObject {
         this.transform.updateMatrixWorld()
     }
     add(child) {
+        child.parent = this
         this.children.push(child)
         this.transform.add(child.transform)
     }
@@ -127,6 +162,7 @@ class GameObject extends BasicObject {
         }
 
         if (index >= 0) {
+            child.parent = undefined
             this.children.splice(index, 1)
             this.transform.remove(child.transform)
         }
@@ -445,7 +481,7 @@ class GameObject extends BasicObject {
 
             component.apply_params()
 
-            
+
             if (ref !== undefined) {
                 component._ref = ref
                 this.refs[ref] = component
@@ -531,12 +567,5 @@ class GameObject extends BasicObject {
         let r = game_object.transform.localToWorld($v3)
         return [r.x, r.y, r.z]
     }
-
 }
-
-
-
-
-GameObject.broadcasting = {}
-
 export default GameObject

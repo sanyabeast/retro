@@ -33,7 +33,7 @@ children:
           src: "res/subway/sound/200314__tim-kahn__underground-train-station"
           autoplay: true
           loop: true
-          volume: 1
+          volume: 0.1
       subway:
         name: MeshComponent
         tag: subway

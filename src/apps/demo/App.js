@@ -1,6 +1,7 @@
 import CoreApp from "core/App"
 import ResourceManager from "core/ResourceManager";
 import Device from "core/utils/Device"
+import { map } from "lodash-es"
 
 class App extends CoreApp {
     constructor(params) {
@@ -14,7 +15,7 @@ class App extends CoreApp {
         let camera = this.find_component_of_type("CameraComponent")
         let postfx = this.find_component_of_type("Postprocessing")
 
-        renderer.target_fps = 45
+        renderer.target_fps = 60
         // postfx.enabled = Device.device_type === "desktop"
         camera.fov = 60
 
@@ -25,20 +26,12 @@ class App extends CoreApp {
         let camera = this.find_component_of_type("CameraComponent")
         let input = this.refs.input_component
         let postfx = this.find_component_of_type("Postprocessing")
-
-
         if (input && postfx) {
-            // if (input.intersected_objects_changed && input.intersected_objects.length > 0) {
-            //     postfx.outline_selection = input.intersected_objects
-            // }
-
-            if (input.colorid_changed){
-                if (input.colorid_current_collider){
-                    postfx.outline_selection = [input.colorid_current_collider.get_component("MeshComponent").subject]
-
-                }
+            if (input.intersected_renderables_changed) {
+                postfx.outline_selection = map(input.intersected_colliders, collider => {
+                    return collider.get_component("MeshComponent").subject
+                })
             }
-
         }
     }
 }

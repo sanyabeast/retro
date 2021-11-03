@@ -7,7 +7,7 @@
 import SceneComponent from "core/SceneComponent";
 import ResourceManager from "core/ResourceManager";
 import * as THREE from 'three';
-import { map } from "lodash-es"
+import { map, forEach } from "lodash-es"
 import { makeid } from "core/utils/Tools"
 import RenderTarget from "core/components/scene/RenderTarget";
 import Collider from "core/components/Collider";
@@ -15,34 +15,33 @@ import Collider from "core/components/Collider";
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-
 class InputComponent extends SceneComponent {
-    detection_mode = "colorid"
+    detection_mode = "raycast"
     raycasting = true
     pointer_position = undefined
     pointer_position_abs = undefined
-    raycasting_intersects = []
-    intersected_objects = []
-    intersected_objects_ids = {}
-    intersected_objects_changed = false
+    intersected_renderables_changed = false
     pointer_position_changed = true
-
-    tick_rate = 30
-
+    tick_rate = 60
     /**debug */
     show_debug_layer = false
     /**private */
     prev_camera_matrix = undefined
     user_input_dom = undefined
-
     /**colorid */
     colorid_changed = false
     colorid_current_collider = undefined
     colorid_render_target_state = undefined
     colorid_debug_plane = undefined
     colorid_resolution = 0.25
+    colliders_state = undefined
+    intersected_renderables = undefined
+    intersected_colliders = undefined
     constructor() {
         super(...arguments)
+        this.colliders_state = {}
+        this.intersected_renderables = []
+        this.intersect_colliders = []
         this.pointer_position = new THREE.Vector2(0, 0)
         this.pointer_position_abs = new THREE.Vector2(0, 0)
     }
@@ -73,6 +72,9 @@ class InputComponent extends SceneComponent {
             case "colorid": {
                 this.setup_colorid()
                 break
+            }
+            case "raycast": {
+                this.update_raycast()
             }
         }
 
@@ -131,8 +133,65 @@ class InputComponent extends SceneComponent {
             }
         }
     }
-    check_color_id(r, g, b) {
+    update_raycast(event_type) {
+        let camera = this.find_component_of_type("CameraComponent");
+        let renderer = this.find_component_of_type("Renderer")
 
+        if (camera && renderer) {
+            if (camera.moved || this.pointer_position_changed) {
+                let changed = false
+                let raycasted_objects_list = renderer.get_object_layer_list({ raycast: true })
+                mouse.x = this.pointer_position.x
+                mouse.y = -this.pointer_position.y
+                raycaster.setFromCamera(mouse, camera.subject);
+                let intersect_data = []
+                intersect_data = raycaster.intersectObjects(raycasted_objects_list, true)
+                forEach(this.colliders_state, state => state.changed = false)
+
+                this.intersected_renderables = map(intersect_data, data => data.object)
+                this.intersected_colliders = map(intersect_data, data => data.object.collider)
+                let uuids = []
+
+                forEach(intersect_data, intersection => {
+                    let object = intersection.object
+                    let collider = object.collider
+                    let UUID = collider.UUID
+                    this.colliders_state[UUID] = this.colliders_state[UUID] || { hovered: false, pressed: false }
+                    let state = this.colliders_state[UUID]
+                    if (!state.hovered) {
+                        state.UUID = UUID
+                        changed = true
+                        state.changed = true
+                        state.hovered = true
+                    }
+                })
+                forEach(this.colliders_state, (state, UUID) => {
+                    if (uuids.indexOf(UUID) < 0) {
+                        if (state.hovered) {
+                            changed = true
+                            state.changed = true
+                            state.hovered = false
+                        }
+                    }
+
+                    if (state.changed) {
+                        let collider = ResourceManager.get_component_instance("Collider", state.UUID)
+                        if (collider) {
+                            if (state.hovered) {
+                                collider.game_object.call_down("handle_pointerover", {
+                                    collider: collider
+                                })
+                            } else {
+                                collider.game_object.call_down("handle_pointerout", {
+                                    collider: collider
+                                })
+                            }
+                        }
+                    }
+                })
+                this.intersected_renderables_changed = changed
+            }
+        }
     }
     on_enable() {
         window.addEventListener('keydown', this.handle_keydown)
@@ -162,13 +221,11 @@ class InputComponent extends SceneComponent {
                 this.update_colorid()
                 break
             }
+            case "raycast": {
+                this.update_raycast()
+                break
+            }
         }
-
-        if (this.raycasting) {
-            this.update_raycasting_state();
-        }
-
-
         this.pointer_position_changed = false
     }
     handle_keydown(evt) {
@@ -211,43 +268,7 @@ class InputComponent extends SceneComponent {
     handle_mouseout(evt) {
         // console.log(`mouseout`, evt)
     }
-    update_raycasting_state(event_type) {
 
-
-        let camera = this.find_component_of_type("CameraComponent");
-        let renderer = this.find_component_of_type("Renderer")
-
-        if (camera && renderer) {
-            if (camera.moved || this.pointer_position_changed) {
-                // console.log(`cheking intersects... (pointer moved: ${this.pointer_position_changed}, camera moved: ${camera.moved})`)
-                let changed = false
-                let new_intersected_object_ids = {}
-                let raycasted_objects_list = renderer.get_object_layer_list({ raycast: true })
-                mouse.x = this.pointer_position.x
-                mouse.y = this.pointer_position.y
-                raycaster.setFromCamera(mouse, camera.subject);
-                const intersects = this.raycasting_intersects = raycaster.intersect_objects(raycasted_objects_list)
-                const intersected_objects = this.intersected_objects = map(intersects, data => {
-                    new_intersected_object_ids[data.object.uuid] = true
-                    if (this.intersected_objects_ids[data.object.uuid] !== new_intersected_object_ids[data.object.uuid]) {
-                        changed = true
-                    }
-
-                    return data.object
-                })
-
-                this.intersected_objects_ids = new_intersected_object_ids
-                this.intersected_objects_changed = changed
-            }
-        } else {
-            this.raycasting_intersects = []
-            this.intersect_objects = []
-        }
-
-        // if (this.raycasting_intersects.length > 0) {
-        //     console.log(this.raycasting_intersects[0])
-        // }
-    }
 }
 
 export default InputComponent;

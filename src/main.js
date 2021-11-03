@@ -81,6 +81,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 app.refs.renderer.use_postfx = !app.refs.renderer.use_postfx
             }, "#cddc39")
 
+            frame.add_button("FFX", "Postprocessing toggle", () => {
+                let postfx = app.find_component_of_type("Postprocessing")
+                postfx.use_ffx = !postfx.use_ffx
+            }, "#cddc39")
+
             frame.add_button("FOG", "Toggle Fog", () => {
                 app.refs.renderer.use_fog = !app.refs.renderer.use_fog
             }, "#6fdc39")

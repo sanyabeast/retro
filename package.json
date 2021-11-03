@@ -69,6 +69,7 @@
         "core-js": "^3.17.3",
         "datetime-js": "^4.0.0",
         "device-detector-js": "^2.2.10",
+        "directory-tree": "^3.0.0",
         "extract-zip": "^2.0.1",
         "fflate": "^0.7.1",
         "howler": "^2.2.3",

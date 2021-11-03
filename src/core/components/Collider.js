@@ -165,8 +165,6 @@ class Collider extends SceneComponent {
                 }
             }
         })
-
-
     }
     on_tick(time_delta) {
         if (this.use_mesh_position) {
@@ -204,11 +202,13 @@ class Collider extends SceneComponent {
     update_collider() {
         switch (this.collider_type) {
             case "sphere": {
+                this.sphere_mesh.collider = this
                 this.subject = this.sphere_mesh
                 this.colorid_subject = this.colorid_sphere_mesh
                 break
             }
             case "box": {
+                this.box_mesh.collider = this
                 this.subject = this.box_mesh
                 this.colorid_subject = this.colorid_box_mesh
                 break

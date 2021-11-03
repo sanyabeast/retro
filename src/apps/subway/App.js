@@ -11,6 +11,10 @@ class App extends CoreApp {
         let orbit_controls = this.find_component_of_type("OrbitControlsComponent")
         let postfx = this.find_component_of_type("Postprocessing")
 
+        let renderer = this.find_component_of_type("Renderer")
+
+        renderer.target_fps = 60
+
         orbit_controls.max_polar_angle = Math.PI / 3 + Math.PI / 8
         orbit_controls.min_polar_angle = Math.PI / 3
         orbit_controls.min_azimuth_angle = -Math.PI / 32

@@ -7,7 +7,7 @@ const { VueLoaderPlugin } = require('vue-loader');
 const { webpack, DefinePlugin } = require("webpack");
 const package_data = require("../package.json")
 const CopyPlugin = require("copy-webpack-plugin");
-
+const dir_tree = require("directory-tree");
 
 
 module.exports = (env) => {
@@ -15,7 +15,7 @@ module.exports = (env) => {
     console.log(`APP_NAME: ${APP_NAME}`)
     let define_plugin_params = {}
 
-    for (let k in process.env){
+    for (let k in process.env) {
         define_plugin_params[`process.env.${k}`] = JSON.stringify(process.env[k])
     }
 

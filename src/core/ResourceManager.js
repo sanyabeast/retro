@@ -548,8 +548,8 @@ class ResourceManager extends BasicObject {
                     ...shader_lib_uniforms,
                     ...(templates_of_materials[`${ns}.${name}`].params.uniforms || {}),
                 }
-                templates_of_materials[`${ns}.${name}`].params.fragmentShader = this.preprocess_shader_code(templates_of_materials[`${ns}.${name}`].params.fragmentShader, uniforms, this.templates_of_shader_parts)
-                templates_of_materials[`${ns}.${name}`].params.vertexShader = this.preprocess_shader_code(templates_of_materials[`${ns}.${name}`].params.vertexShader, uniforms, this.templates_of_shader_parts)
+                templates_of_materials[`${ns}.${name}`].params.fragmentShader = this.preprocess_shader_code(templates_of_materials[`${ns}.${name}`].params.fragmentShader, uniforms)
+                templates_of_materials[`${ns}.${name}`].params.vertexShader = this.preprocess_shader_code(templates_of_materials[`${ns}.${name}`].params.vertexShader, uniforms)
             }
         })
     }
@@ -628,7 +628,8 @@ class ResourceManager extends BasicObject {
         }
     }
     /**extras */
-    preprocess_shader_code(code, uniforms, parts) {
+    preprocess_shader_code(code, uniforms) {
+        let parts = this.templates_of_shader_parts
         if (typeof code === "string") {
             for (let k in parts) {
                 code = code.replace(`#import ${k}`, parts[k].code)
@@ -645,6 +646,10 @@ class ResourceManager extends BasicObject {
             }
         }
         return code
+    }
+
+    get_component_instance(type, UUID) {
+        return this.components_instances[type] ? this.components_instances[type][UUID] : undefined
     }
 }
 

@@ -36,87 +36,136 @@ BlendFunction.SOFT_LIGHT
 BlendFunction.SUBTRACT
 */
 
+
+
 class FFXEffect extends postfx.Effect {
     constructor({
         blendFunction = postfx.BlendFunction.NORMAL,
         hue = 0.0,
         saturation = 0.0
     } = {}) {
-        super("HueSaturationEffect", `
-            #ifdef FRAMEBUFFER_PRECISION_HIGH
-                uniform highp sampler2D map;
-            #else
-                uniform lowp sampler2D map;
-
-            #endif
-            uniform float sharpness_scale;
-            uniform float contrast_detection_scale;
-            uniform float effect_power;
-            vec4 get_texel(sampler2D map, vec2 uv, float step, float x, float y){
-                return texture2D(map, vec2(uv.x + step * x, uv.y + step * y));
-            }
-            vec4 get_sharpen_color(vec2 uv, float scale){
-                float step = 0.00015 * sharpness_scale * scale;
-                return 
-                    get_texel(map, uv, step,  0.,   0.) * 12. +
-                    get_texel(map, uv, step, -1.,  -1.) * -1. +
-                    get_texel(map, uv, step,  0.,  -1.) * -1. +
-                    get_texel(map, uv, step,  1.,  -1.) * -1. +
-                    get_texel(map, uv, step, -1.,   0.) * -1. +
-                    get_texel(map, uv, step,  0.,   0.) * -1. +
-                    get_texel(map, uv, step,  1.,   0.) * -1. +
-                    get_texel(map, uv, step, -1.,   1.) * -1. +
-                    get_texel(map, uv, step,  0.,   1.) * -1. +
-                    get_texel(map, uv, step,  1.,   1.) * -1.;
-            }
-            vec4 get_local_contrast(vec2 uv){
-                float step = 0.00015 * contrast_detection_scale;
-                float cl_00 = length(get_texel(map, uv, step,  0.,   0.)) / 3.;
-                float cl_tl = length(get_texel(map, uv, step, -1.,  -1.)) / 3.;
-                float cl_tc = length(get_texel(map, uv, step,  0.,  -1.)) / 3.;
-                float cl_tr = length(get_texel(map, uv, step,  1.,  -1.)) / 3.;
-                float cl_cl = length(get_texel(map, uv, step, -1.,   0.)) / 3.;
-                float cl_cc = length(get_texel(map, uv, step,  0.,   0.)) / 3.;
-                float cl_cr = length(get_texel(map, uv, step,  1.,   0.)) / 3.;
-                float cl_bl = length(get_texel(map, uv, step, -1.,   1.)) / 3.;
-                float cl_bc = length(get_texel(map, uv, step,  0.,   1.)) / 3.;
-                float cl_br = length(get_texel(map, uv, step,  1.,   1.)) / 3.;
+        let shader_code = ResourceManager.preprocess_shader_code(
+            `
                 
-                float max_color = max(max(max(max(max(max(max(max(max(cl_00, cl_tl), cl_tc), cl_tr), cl_cl), cl_cc), cl_cr), cl_bl), cl_bc), cl_br);
-                float min_color = min(min(min(min(min(min(min(min(min(cl_00, cl_tl), cl_tc), cl_tr), cl_cl), cl_cc), cl_cr), cl_bl), cl_bc), cl_br);
-                float average_color =
-                    (cl_00 +
-                    cl_tl +
-                    cl_tc +
-                    cl_tr +
-                    cl_cl +
-                    cl_cc +
-                    cl_cr +
-                    cl_bl +
-                    cl_bc ) / 9.;
+                #ifdef FRAMEBUFFER_PRECISION_HIGH
+                    uniform highp sampler2D map;
+                #else
+                    uniform lowp sampler2D map;
+                #endif
+                uniform float sharpness_scale;
+                uniform float contrast_kernel_radius;
+                uniform float sharpness_kernel_radius;
+                uniform float effect_power;
+                uniform int contrast_kernel_azimuth_steps;
+                uniform int contrast_kernel_polar_steps;
+                
 
-                float local_contrast = pow(1.- ((abs(min_color - average_color)) + (abs(average_color - max_color))), 3.);
-                return vec4(min_color, average_color, max_color, local_contrast);
-            }
+                #import core.blending
 
-            void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
-                float power = 0.333 * effect_power;
-                vec4 local_contrast = get_local_contrast(uv);
-                vec4 albedo_color = texture2D(map, uv);
-                vec4 sharpen_color = get_sharpen_color(uv, 1.);
-                // outputColor = sharpen_color;
-                // outputColor = vec4(local_contrast.a, local_contrast.a, local_contrast.a, 1.);
-                outputColor     = mix(sharpen_color, albedo_color, 1. -local_contrast.a * power);
-            
-            }
-        `, {
+                vec4 get_texel(sampler2D map, vec2 uv, float step, float x, float y){
+                    return texture2D(map, vec2(uv.x + step * x, uv.y + step * y));
+                }
+                vec4 get_sharpen_color2(vec2 uv, float scale){
+                    int steps_i = contrast_kernel_azimuth_steps;
+                    int steps_k = contrast_kernel_polar_steps;
+                    float radius = 0.1 * sharpness_kernel_radius * scale;
+                    vec4 sib_color = vec4(0., 0., 0., 0.);
+
+                    for (int k = 0; k < steps_k; k++){
+                        for (int i = 0; i < steps_i * (k + 1); i++){
+                            float cp = float(i)/float(steps_i * (k + 1)) * 2. * 3.14;
+                            float x = sin(cp) * (float(k)/float(steps_k)) * radius;
+                            float y = cos(cp) * (float(k)/float(steps_k)) * radius;
+                            vec4 col = get_texel(map, uv, 0.001, x, y);
+                            float p = (col.x + col.y + col.z) / 3.;
+                            sib_color += col * -2.;
+                        }
+                    }
+                    float total_steps = float(steps_i * steps_k * steps_k);
+                    vec4 albedo_color = get_texel(map, uv, 0.001, 0., 0.);
+                    sib_color += albedo_color * total_steps * 1.27;
+
+                    albedo_color.xyz = sib_color.xyz;
+                    return albedo_color;
+                }
+                vec4 get_local_contrast2(vec2 uv){
+                    int steps_i = contrast_kernel_azimuth_steps;
+                    int steps_k = contrast_kernel_polar_steps;
+                    float radius = 40. * contrast_kernel_radius;
+                    float min_color = 1.;
+                    float max_color = 0.;
+                    float total_color = 0.;
+                    for (int k = 0; k < steps_k; k++){
+                        for (int i = 0; i < steps_i * (k + 1); i++){
+                            float cp = float(i)/float(steps_i * (k + 1)) * 2. * 3.14;
+                            float x = sin(cp) * (float(k)/float(steps_k)) * radius;
+                            float y = cos(cp) * (float(k)/float(steps_k)) * radius;
+                            vec4 col = get_texel(map, uv, 0.001, x, y);
+                            float p = (col.x + col.y + col.z) / 3.;
+                            min_color = min(min_color, p);
+                            max_color = max(max_color, p);
+                            total_color += p;
+                        }
+                    }
+                    float average_color = total_color / float(steps_i * steps_k * steps_k);
+                    float local_contrast = abs(min_color - average_color) +  abs(average_color - max_color);
+                    local_contrast = clamp(local_contrast, 0., 1.);
+                    return vec4(
+                        min_color,
+                        average_color,
+                        max_color,
+                        local_contrast
+                    );
+                }
+
+                vec4 get_local_contrast(vec2 uv){
+                    int steps_i = 2;
+                    int steps_k = 2;
+                    float radius = 40. * contrast_kernel_radius;
+                    float total = 0.;
+                    for (int k = 0; k < steps_k; k++){
+                        for (int i = 0; i < steps_i * (k + 1); i++){
+                            float cp = float(i)/float(steps_i * (k + 1)) * 2. * 3.14;
+                            float x = sin(cp) * (float(k)/float(steps_k)) * radius;
+                            float y = cos(cp) * (float(k)/float(steps_k)) * radius;
+                            vec4 ctrst = get_local_contrast2(vec2(uv.x + 0.001 * x, uv.y + 0.001 * y));
+                            total += ctrst.a;
+                        }
+                    }
+                    float average_contrast = total / float(steps_i * steps_k * steps_k);
+                    return vec4(
+                        pow(clamp(average_contrast * 2., 0., 1.), 0.5),
+                        pow(clamp(average_contrast * 2., 0., 1.), 0.5),
+                        pow(clamp(average_contrast * 2., 0., 1.), 0.5),
+                        pow(clamp(average_contrast * 2., 0., 1.), 0.5)
+                    );
+                }
+
+                void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+                    float power = 1. * effect_power;
+                    vec4 local_contrast = get_local_contrast(uv);
+                    vec4 albedo_color = texture2D(map, uv);
+                    vec4 sharpen_color = get_sharpen_color2(uv, 1.);
+                    float alpha = (1. - local_contrast.a) * power;
+                    outputColor = albedo_color;
+                    outputColor.xyz = mix(outputColor.xyz, BlendLuminosity(outputColor.xyz, sharpen_color.xyz), clamp(alpha * 1., 0., 1.));
+
+                    if (uv.x > 0.5){
+                        outputColor = albedo_color;
+                    }
+                }
+            `
+            , {})
+        super("HueSaturationEffect", shader_code, {
             blendFunction,
             uniforms: new Map([
                 ["sharpness_scale", new THREE.Uniform(1)],
-                ["contrast_detection_scale", new THREE.Uniform(1)],
+                ["contrast_kernel_polar_steps", new THREE.Uniform(4)],
+                ["contrast_kernel_azimuth_steps", new THREE.Uniform(3)],
+                ["contrast_kernel_radius", new THREE.Uniform(1)],
+                ["sharpness_kernel_radius", new THREE.Uniform(1)],
                 ["effect_power", new THREE.Uniform(1)]
             ])
-
         });
     }
 }
@@ -126,6 +175,7 @@ class Postprocessing extends Component {
     /**private */
     composer = undefined
     outline_effect = undefined
+    use_ffx = true
     use_ssao = true
     use_bloom = true
     use_outline = true
@@ -160,6 +210,30 @@ class Postprocessing extends Component {
         sun.matrixAutoUpdate = false;
 
     }
+    get_reactive_props() {
+        return [
+            "use_ffx",
+            "use_ssao",
+            "use_bloom",
+            "use_outline",
+            "use_godrays",
+            "use_tonemapping",
+            "use_chromatic_abberation",
+            "use_hs",
+            "use_bc",
+            "use_grain",
+            "use_vignette",
+            "use_gc",
+            "outline_selection",
+            "grain_power",
+            "bloom_smoothing",
+            "bloom_threshold",
+            "saturation",
+            "brightness",
+            "contrast",
+            "hue"
+        ].concat(super.get_reactive_props())
+    }
     on_create() {
         this.postfx_render_function = this.postfx_render_function.bind(this)
         this.setup_postfx()
@@ -184,18 +258,7 @@ class Postprocessing extends Component {
         }
 
     }
-    get_reactive_props() {
-        return [
-            "outline_selection",
-            "grain_power",
-            "bloom_smoothing",
-            "bloom_threshold",
-            "saturation",
-            "brightness",
-            "contrast",
-            "hue",
-        ].concat(super.get_reactive_props())
-    }
+    
     on_update(props) {
         props.forEach(prop => {
             switch (prop) {
@@ -211,12 +274,10 @@ class Postprocessing extends Component {
                     if (this.bloom_effect) this.bloom_effect.luminanceMaterial.uniforms.smoothing.value = this.bloom_smoothing
                     break
                 }
-
                 case "bloom_threshold": {
                     if (this.bloom_effect) this.bloom_effect.luminanceMaterial.uniforms.threshold.value = this.bloom_threshold
                     break
                 }
-
                 case "chromatic_abberation_offset_x": {
                     console.log(this.chromatic_abberation_effect)
                     break
@@ -225,7 +286,6 @@ class Postprocessing extends Component {
                     console.log(this.chromatic_abberation_effect)
                     break
                 }
-
                 default: {
                     if (this.hs_effect) {
                         this.hs_effect.uniforms.get("saturation").value = this.saturation
@@ -251,39 +311,39 @@ class Postprocessing extends Component {
 
             let enabled = !Device.is_mobile
 
-            this.use_godrays = enabled
-            this.use_tonemapping = enabled
-            this.use_hs = enabled
-            this.use_bc = enabled
-            this.use_chromatic_abberation = enabled
-            this.use_grain = enabled
-            this.use_vignette = enabled
-            this.use_gc = enabled
-
-
+           
 
             if (this.use_ssao) this.setup_ssao(renderer, scene, camera, composer)
-
+            
             if (this.use_hs) this.setup_hs(renderer, scene, camera, composer)
             if (this.use_bc) this.setup_bc(renderer, scene, camera, composer)
             if (this.use_tonemapping) this.setup_tonemapping(renderer, scene, camera, composer)
             if (this.use_chromatic_abberation) this.setup_chromatic_abberation(renderer, scene, camera, composer)
             if (this.use_godrays) this.setup_godrays(renderer, scene, camera, composer)
             if (this.use_bloom) this.setup_bloom(renderer, scene, camera, composer)
+            if (this.use_ffx) this.setup_ffx(renderer, scene, camera, composer)
+            
             if (this.use_outline) this.setup_outline(renderer, scene, camera, composer)
             if (this.use_grain) this.setup_grain(renderer, scene, camera, composer)
             if (this.use_vignette) this.setup_vignette(renderer, scene, camera, composer)
             if (this.use_gc) this.setup_gc(renderer, scene, camera, composer)
 
-
-            composer.addPass(new postfx.EffectPass(camera, new FFXEffect({
-
-            })))
-
+            // this.use_godrays = enabled
+            // this.use_tonemapping = enabled
+            // this.use_hs = enabled
+            // this.use_bc = enabled
+            // this.use_chromatic_abberation = enabled
+            // this.use_grain = enabled
+            // this.use_vignette = enabled
+            // this.use_gc = enabled
         } else {
             this.log("Renderer not found")
         }
 
+    }
+    setup_ffx(renderer, scene, camera, composer){
+        let ffx_effect = this.ffx_effect = new FFXEffect();
+        composer.addPass(new postfx.EffectPass(camera, this.ffx_effect))
     }
     setup_gc(renderer, scene, camera, composer) {
         const gc_effect = new postfx.GammaCorrectionEffect({
