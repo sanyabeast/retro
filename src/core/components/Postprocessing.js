@@ -150,9 +150,9 @@ class FFXEffect extends postfx.Effect {
                     outputColor = albedo_color;
                     outputColor.xyz = mix(outputColor.xyz, BlendLuminosity(outputColor.xyz, sharpen_color.xyz), clamp(alpha * 1., 0., 1.));
 
-                    if (uv.x > 0.5){
-                        outputColor = albedo_color;
-                    }
+                    // if (uv.x > 0.5){
+                    //     outputColor = albedo_color;
+                    // }
                 }
             `
             , {})
@@ -190,17 +190,21 @@ class Postprocessing extends Component {
     chromatic_abberation_offset_x = 0.4
     chromatic_abberation_offset_y = 0.4
     godrays_autodetect_sun = true
-    grain_power = 0.025
-    vignette_power = 0.2
+    grain_power = 0.015
+    vignette_power = 0.1
     vignette_offset = 0.5
     bloom_smoothing = 0.4
     bloom_threshold = 0.7
     gc_gamma = 1
     hue = 0
-    saturation = 0.25
-    brightness = 0.025
-    contrast = -0.025
+    saturation = 0
+    brightness = 0
+    contrast = 0
     /**private */
+    ffx_effect = undefined
+    ffx_pass = undefined
+    ssao_effect = undefined
+    ssao_pass = undefined
     local_sun = undefined
     outline_selection = []
     constructor() {
@@ -258,8 +262,9 @@ class Postprocessing extends Component {
         }
 
     }
-    
+
     on_update(props) {
+        super.on_update(props)
         props.forEach(prop => {
             switch (prop) {
                 case "outline_selection": {
@@ -286,10 +291,12 @@ class Postprocessing extends Component {
                     console.log(this.chromatic_abberation_effect)
                     break
                 }
+                case "use_ssao": this.ssao_pass.enabled = this.use_ssao; break;
+                case "use_ffx": this.ffx_pass.enabled = this.use_ffx; break;
                 default: {
                     if (this.hs_effect) {
                         this.hs_effect.uniforms.get("saturation").value = this.saturation
-                        this.hs_effect.uniforms.get("hue").value = this.hue
+                        // this.hs_effect.uniforms.get("hue").value.x = this.hue
                     }
 
                     if (this.bc_effect) {
@@ -311,10 +318,10 @@ class Postprocessing extends Component {
 
             let enabled = !Device.is_mobile
 
-           
+
 
             if (this.use_ssao) this.setup_ssao(renderer, scene, camera, composer)
-            
+
             if (this.use_hs) this.setup_hs(renderer, scene, camera, composer)
             if (this.use_bc) this.setup_bc(renderer, scene, camera, composer)
             if (this.use_tonemapping) this.setup_tonemapping(renderer, scene, camera, composer)
@@ -322,7 +329,7 @@ class Postprocessing extends Component {
             if (this.use_godrays) this.setup_godrays(renderer, scene, camera, composer)
             if (this.use_bloom) this.setup_bloom(renderer, scene, camera, composer)
             if (this.use_ffx) this.setup_ffx(renderer, scene, camera, composer)
-            
+
             if (this.use_outline) this.setup_outline(renderer, scene, camera, composer)
             if (this.use_grain) this.setup_grain(renderer, scene, camera, composer)
             if (this.use_vignette) this.setup_vignette(renderer, scene, camera, composer)
@@ -341,9 +348,10 @@ class Postprocessing extends Component {
         }
 
     }
-    setup_ffx(renderer, scene, camera, composer){
+    setup_ffx(renderer, scene, camera, composer) {
         let ffx_effect = this.ffx_effect = new FFXEffect();
-        composer.addPass(new postfx.EffectPass(camera, this.ffx_effect))
+        let ffx_pass = this.ffx_pass = new postfx.EffectPass(camera, this.ffx_effect);
+        composer.addPass(ffx_pass)
     }
     setup_gc(renderer, scene, camera, composer) {
         const gc_effect = new postfx.GammaCorrectionEffect({

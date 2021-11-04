@@ -1,9 +1,52 @@
+class ButtonController {
+    constructor(caption, title, callback, color) {
+        this.caption = caption
+        this.is_active = false
+        this.color = color
+        this.title = title
+        this.callback = callback
 
+        let div = this.dom = document.createElement("div")
+        let p = document.createElement("p")
+        p.innerHTML = caption
+        p.setAttribute("title", title)
+        div.appendChild(p)
+        this.set_styles(div, {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            cursor: "pointer",
+            fontWeight: "900",
+            border: "1px solid black",
+            minWidth: "16px",
+            height: "16px",
+            borderRadius: "5px",
+            background: "transparent",
+            fontSize: "14px",
+            margin: "0 4px",
+            padding: "2px"
+        })
+
+        div.addEventListener("mousedown", (evt) => {
+            evt.stopPropagation()
+            callback(this)
+        })
+    }
+    set_active(is_active) {
+        this.is_active = is_active
+        this.dom.style.background = is_active ? this.color : "transparent"
+    }
+    set_styles(el, style) {
+        for (let k in style) {
+            el.style[k] = style[k];
+        }
+    }
+}
 
 class Frame {
     constructor() {
         this.dom = document.createElement("div");
-        
+
         this.set_styles(this.dom, {
             position: "absolute",
             top: 0,
@@ -156,33 +199,8 @@ class Frame {
         });
     }
     add_button(caption, title, callback, color = "#eee") {
-        let div = document.createElement("div")
-        let p = document.createElement("p")
-        p.innerHTML = caption
-        p.setAttribute("title", title)
-        div.appendChild(p)
-        this.set_styles(div, {
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            cursor: "pointer",
-            fontWeight: "900",
-            border: "1px solid black",
-            minWidth: "16px",
-            height: "16px",
-            borderRadius: "5px",
-            background: color,
-            fontSize: "14px",
-            margin: "0 4px",
-            padding: "2px"
-        })
-
-        div.addEventListener("mousedown", (evt) => {
-            evt.stopPropagation()
-            callback()
-        })
-
-        this.header_toolbar_node.appendChild(div)
+        const button = new ButtonController(caption, title, callback, color)
+        this.header_toolbar_node.appendChild(button.dom)
     }
 }
 

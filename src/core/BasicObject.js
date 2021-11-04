@@ -274,7 +274,7 @@ function reactivate(object) {
     if (object.meta.reactivated) {
         return
     }
-    let reactive_values = {}
+    let reactive_values = object.meta.reactive_values = {}
     object.meta.updated_reactive_props = object.meta.updated_reactive_props || []
     object.meta.need_reactive_update = true
     let reactive_props = object.get_reactive_props ? object.get_reactive_props() : []

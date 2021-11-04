@@ -4,11 +4,11 @@ prefabs:
   - default.OrbitControlsComponent
   - default.SkyBox
 components:
-  # sun:
-  #   name: Sun
-  #   params:
-  #     cycling: 2
-  #     time: 0.3
+  sun:
+    name: Sun
+    params:
+      cycling: 2
+      time: 0.4
   lamp_a:
     name: LightComponent
     enabled: true
