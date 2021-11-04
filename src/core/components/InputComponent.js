@@ -56,8 +56,6 @@ class InputComponent extends SceneComponent {
         this.user_input_dom.style.zIndex = " 1"
         this.user_input_dom.classList.add("user-input-dom")
 
-        this.globals.dom.appendChild(this.user_input_dom)
-
         this.handle_keydown = this.handle_keydown.bind(this)
         this.handle_keyup = this.handle_keyup.bind(this)
         this.handle_keypress = this.handle_keypress.bind(this)

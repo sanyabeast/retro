@@ -238,7 +238,6 @@ RenderTarget.get_render_target = ({ id = "", resolution_scale = 0.5, camera_para
     let render_target_size = new THREE.Vector2(2, 2)
     let canvas2d = document.createElement("canvas")
     let canvas2d_context = canvas2d.getContext("2d")
-    document.body.appendChild(canvas2d)
 
     if (id === "") {
         id = `RT_${makeid(8)}`
