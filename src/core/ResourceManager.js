@@ -45,6 +45,7 @@ class ResourceManager extends BasicObject {
                 bc: { value: new THREE.Vector2(0, 1), type: "v2" },
                 time: { value: 0, type: "f" },
                 resolution: { value: new THREE.Vector2(1, 1), type: "v2" },
+                resolution2: { value: new THREE.Vector2(0.001, 0.001), type: "v2" },
                 pixel_ratio: { value: window.devicePixelRatio, type: "f" },
                 mouse: { value: new THREE.Vector2(0, 0), type: "v2" },
                 camera_pos: { value: new THREE.Vector3(), type: "v3" },

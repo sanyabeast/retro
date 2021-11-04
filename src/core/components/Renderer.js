@@ -373,6 +373,7 @@ class Renderer extends Component {
             this.renderer.setPixelRatio(this.pixel_ratio)
             this.renderer.setSize(new_rect.width, new_rect.height);
             this.renderer.getSize(this.globals.uniforms.resolution.value);
+            this.globals.uniforms.resolution2.value.set(1 / new_rect.width * window.devicePixelRatio, 1 / new_rect.height * window.devicePixelRatio)
             this.globals.need_render = true
             this.resolution.set(new_rect.width, new_rect.height)
             camera.aspect = this.globals.uniforms.resolution.value.x / this.globals.uniforms.resolution.value.y

@@ -49,11 +49,11 @@ params:
         }
         float total_steps = float(steps_i * steps_k * steps_k);
         vec4 albedo_color = get_texel(map, uv, TEXEL_SIZE, 0., 0.);
-        sib_color += albedo_color * total_steps * 1.3;
+        sib_color += albedo_color * total_steps * 1.275;
 
         albedo_color.xyz = sib_color.xyz;
         vec3 hsl = RGBToHSL(albedo_color.xyz);
-        hsl.y = 0.;
+        hsl.y = 0.25;
         albedo_color.xyz = HSLToRGB(hsl);
         return albedo_color;
     }
@@ -112,16 +112,16 @@ params:
         float power = 1. * effect_power;
         vec4 local_contrast = get_local_contrast(uv);
         vec4 albedo_color = texture2D(map, uv);
-        vec4 sharpen_color = get_sharpen_color2(uv, 1.);
+        vec4 sharpen_color = get_sharpen_color2(uv, 1. - local_contrast.a);
         float alpha = (1. - local_contrast.a) * power;
         outputColor = albedo_color;
-        outputColor.xyz = mix(outputColor.xyz, BlendOverlay(outputColor.xyz, sharpen_color.xyz), clamp(alpha * 0.6666, 0., 1.));
+        outputColor.xyz = mix(outputColor.xyz, BlendLuminosity(outputColor.xyz, sharpen_color.xyz), clamp(alpha * 0.6666, 0., 1.));
 
         //if (uv.x>0.33){
         //  outputColor.xyz = albedo_color.xyz;
         //}
         //if (uv.x>0.66){
-        //  outputColor.xyz = BlendOverlay(outputColor.xyz, sharpen_color.xyz);
+        //  outputColor.xyz = BlendLuminosity(outputColor.xyz, sharpen_color.xyz);
         //}
     }
   uniforms:

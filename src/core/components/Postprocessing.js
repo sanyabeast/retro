@@ -11,6 +11,7 @@ import * as THREE from 'three';
 import Device from "core/utils/Device"
 import { ShaderPass } from "core/lib/postprocessing/build/postprocessing.esm";
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+import { TAARenderPass } from 'three/examples/jsm/postprocessing/TAARenderPass.js';
 import { map } from "lodash-es"
 
 const BLOOM_TYPE = "default"
@@ -42,12 +43,15 @@ class FXAAEffect extends postfx.Effect {
     constructor({
         blendFunction = postfx.BlendFunction.NORMAL
     } = {}) {
-        super("FXAA", FXAAShader.fragmentShader, {
+        let material_template = ResourceManager.get_material_template("core.fxaa")
+        super("FidelityFX", material_template.params.fragmentShader, {
             blendFunction,
-            uniforms: new Map(map(FXAAShader.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)]))
+            uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)])),
+            vertexShader: material_template.vertexShader
         });
     }
 }
+
 
 class FFXEffect extends postfx.Effect {
     constructor({
@@ -68,6 +72,8 @@ class Postprocessing extends Component {
     outline_effect = undefined
     use_ffx = true
     use_fxaa = true
+    use_smaa = false
+    use_taa = false
     use_ssao = true
     use_bloom = true
     use_outline = true
@@ -215,17 +221,22 @@ class Postprocessing extends Component {
 
             if (this.use_hs) this.setup_hs(renderer, scene, camera, composer)
             if (this.use_bc) this.setup_bc(renderer, scene, camera, composer)
+            if (this.use_fxaa) this.setup_fxaa(renderer, scene, camera, composer)
             if (this.use_tonemapping) this.setup_tonemapping(renderer, scene, camera, composer)
             if (this.use_chromatic_abberation) this.setup_chromatic_abberation(renderer, scene, camera, composer)
             if (this.use_godrays) this.setup_godrays(renderer, scene, camera, composer)
             if (this.use_bloom) this.setup_bloom(renderer, scene, camera, composer)
             if (this.use_ffx) this.setup_ffx(renderer, scene, camera, composer)
-            // if (this.use_fxaa) this.setup_fxaa(renderer, scene, camera, composer)
+
 
             if (this.use_outline) this.setup_outline(renderer, scene, camera, composer)
             if (this.use_grain) this.setup_grain(renderer, scene, camera, composer)
             if (this.use_vignette) this.setup_vignette(renderer, scene, camera, composer)
             if (this.use_gc) this.setup_gc(renderer, scene, camera, composer)
+
+            
+            if (this.use_smaa) this.setup_smaa(renderer, scene, camera, composer)
+            if (this.use_taa) this.setup_taa(renderer, scene, camera, composer)
 
             // this.use_godrays = enabled
             // this.use_tonemapping = enabled
@@ -240,9 +251,21 @@ class Postprocessing extends Component {
         }
 
     }
+    setup_taa(renderer, scene, camera, composer) {
+        let taa_effect = this.taa_effect = new postfx.EffectPass(camera, new TAARenderPass(scene, camera));
+        let taa_pass = this.taa_pass = new postfx.EffectPass(camera, this.taa_effect);
+        composer.addPass(taa_pass)
+    }
+    setup_smaa(renderer, scene, camera, composer) {
+        let smaa_effect = this.smaa_effect = new FXAAEffect();
+        let smaa_pass = this.smaa_pass = new postfx.EffectPass(camera, this.smaa_effect);
+        composer.addPass(smaa_pass)
+    }
     setup_fxaa(renderer, scene, camera, composer) {
         let fxaa_effect = this.fxaa_effect = new FXAAEffect();
         let fxaa_pass = this.fxaa_pass = new postfx.EffectPass(camera, this.fxaa_effect);
+        // console.log(fxaa_effect.uniforms.get("resolution2"   ).value)
+        fxaa_effect.uniforms.get("resolution2").value = this.globals.uniforms.resolution2.value
         composer.addPass(fxaa_pass)
     }
     setup_ffx(renderer, scene, camera, composer) {
