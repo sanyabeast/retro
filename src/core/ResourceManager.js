@@ -180,6 +180,9 @@ class ResourceManager extends BasicObject {
         this.log("created");
     }
     get_asset_stats() { return this.asset_stats; }
+    get_material_template(template_name) {
+        return this.templates_of_materials[template_name]
+    }
     create_material_with_template(template_name, params, id) {
         template_name = template_name.replace("@", "");
         if (!this.templates_of_materials[template_name]) {
@@ -540,16 +543,17 @@ class ResourceManager extends BasicObject {
         this.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".yaml", "").replace(/\//gm, ".");
             this.asset_stats.materials_count++
-            templates_of_materials[`${ns}.${name}`] = mod;
-            if (templates_of_materials[`${ns}.${name}`].params) {
-                let shader_lib_uniforms = THREE.ShaderLib[templates_of_materials[`${ns}.${name}`].params.extend]
+            let template = templates_of_materials[`${ns}.${name}`] = mod;
+            if (template.params) {
+                let shader_lib_uniforms = THREE.ShaderLib[template.params.extend]
                 shader_lib_uniforms = shader_lib_uniforms !== undefined ? shader_lib_uniforms.uniforms : {}
                 let uniforms = {
                     ...shader_lib_uniforms,
-                    ...(templates_of_materials[`${ns}.${name}`].params.uniforms || {}),
+                    ...(template.params.uniforms || {}),
                 }
-                templates_of_materials[`${ns}.${name}`].params.fragmentShader = this.preprocess_shader_code(templates_of_materials[`${ns}.${name}`].params.fragmentShader, uniforms)
-                templates_of_materials[`${ns}.${name}`].params.vertexShader = this.preprocess_shader_code(templates_of_materials[`${ns}.${name}`].params.vertexShader, uniforms)
+                
+                template.params.fragmentShader = this.preprocess_shader_code(template.params.fragmentShader, uniforms)
+                template.params.vertexShader = this.preprocess_shader_code(template.params.vertexShader, uniforms)
             }
         })
     }

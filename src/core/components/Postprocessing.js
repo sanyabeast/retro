@@ -10,6 +10,8 @@ import { render } from "less";
 import * as THREE from 'three';
 import Device from "core/utils/Device"
 import { ShaderPass } from "core/lib/postprocessing/build/postprocessing.esm";
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+import { map } from "lodash-es"
 
 const BLOOM_TYPE = "default"
 const postfx = require("core/lib/postprocessing").default
@@ -36,136 +38,25 @@ BlendFunction.SOFT_LIGHT
 BlendFunction.SUBTRACT
 */
 
-
+class FXAAEffect extends postfx.Effect {
+    constructor({
+        blendFunction = postfx.BlendFunction.NORMAL
+    } = {}) {
+        super("FXAA", FXAAShader.fragmentShader, {
+            blendFunction,
+            uniforms: new Map(map(FXAAShader.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)]))
+        });
+    }
+}
 
 class FFXEffect extends postfx.Effect {
     constructor({
-        blendFunction = postfx.BlendFunction.NORMAL,
-        hue = 0.0,
-        saturation = 0.0
+        blendFunction = postfx.BlendFunction.NORMAL
     } = {}) {
-        let shader_code = ResourceManager.preprocess_shader_code(
-            `
-                
-                #ifdef FRAMEBUFFER_PRECISION_HIGH
-                    uniform highp sampler2D map;
-                #else
-                    uniform lowp sampler2D map;
-                #endif
-                uniform float sharpness_scale;
-                uniform float contrast_kernel_radius;
-                uniform float sharpness_kernel_radius;
-                uniform float effect_power;
-                uniform int contrast_kernel_azimuth_steps;
-                uniform int contrast_kernel_polar_steps;
-                
-
-                #import core.blending
-
-                vec4 get_texel(sampler2D map, vec2 uv, float step, float x, float y){
-                    return texture2D(map, vec2(uv.x + step * x, uv.y + step * y));
-                }
-                vec4 get_sharpen_color2(vec2 uv, float scale){
-                    int steps_i = contrast_kernel_azimuth_steps;
-                    int steps_k = contrast_kernel_polar_steps;
-                    float radius = 0.1 * sharpness_kernel_radius * scale;
-                    vec4 sib_color = vec4(0., 0., 0., 0.);
-
-                    for (int k = 0; k < steps_k; k++){
-                        for (int i = 0; i < steps_i * (k + 1); i++){
-                            float cp = float(i)/float(steps_i * (k + 1)) * 2. * 3.14;
-                            float x = sin(cp) * (float(k)/float(steps_k)) * radius;
-                            float y = cos(cp) * (float(k)/float(steps_k)) * radius;
-                            vec4 col = get_texel(map, uv, 0.001, x, y);
-                            float p = (col.x + col.y + col.z) / 3.;
-                            sib_color += col * -2.;
-                        }
-                    }
-                    float total_steps = float(steps_i * steps_k * steps_k);
-                    vec4 albedo_color = get_texel(map, uv, 0.001, 0., 0.);
-                    sib_color += albedo_color * total_steps * 1.27;
-
-                    albedo_color.xyz = sib_color.xyz;
-                    return albedo_color;
-                }
-                vec4 get_local_contrast2(vec2 uv){
-                    int steps_i = contrast_kernel_azimuth_steps;
-                    int steps_k = contrast_kernel_polar_steps;
-                    float radius = 40. * contrast_kernel_radius;
-                    float min_color = 1.;
-                    float max_color = 0.;
-                    float total_color = 0.;
-                    for (int k = 0; k < steps_k; k++){
-                        for (int i = 0; i < steps_i * (k + 1); i++){
-                            float cp = float(i)/float(steps_i * (k + 1)) * 2. * 3.14;
-                            float x = sin(cp) * (float(k)/float(steps_k)) * radius;
-                            float y = cos(cp) * (float(k)/float(steps_k)) * radius;
-                            vec4 col = get_texel(map, uv, 0.001, x, y);
-                            float p = (col.x + col.y + col.z) / 3.;
-                            min_color = min(min_color, p);
-                            max_color = max(max_color, p);
-                            total_color += p;
-                        }
-                    }
-                    float average_color = total_color / float(steps_i * steps_k * steps_k);
-                    float local_contrast = abs(min_color - average_color) +  abs(average_color - max_color);
-                    local_contrast = clamp(local_contrast, 0., 1.);
-                    return vec4(
-                        min_color,
-                        average_color,
-                        max_color,
-                        local_contrast
-                    );
-                }
-
-                vec4 get_local_contrast(vec2 uv){
-                    int steps_i = 2;
-                    int steps_k = 2;
-                    float radius = 40. * contrast_kernel_radius;
-                    float total = 0.;
-                    for (int k = 0; k < steps_k; k++){
-                        for (int i = 0; i < steps_i * (k + 1); i++){
-                            float cp = float(i)/float(steps_i * (k + 1)) * 2. * 3.14;
-                            float x = sin(cp) * (float(k)/float(steps_k)) * radius;
-                            float y = cos(cp) * (float(k)/float(steps_k)) * radius;
-                            vec4 ctrst = get_local_contrast2(vec2(uv.x + 0.001 * x, uv.y + 0.001 * y));
-                            total += ctrst.a;
-                        }
-                    }
-                    float average_contrast = total / float(steps_i * steps_k * steps_k);
-                    return vec4(
-                        pow(clamp(average_contrast * 2., 0., 1.), 0.5),
-                        pow(clamp(average_contrast * 2., 0., 1.), 0.5),
-                        pow(clamp(average_contrast * 2., 0., 1.), 0.5),
-                        pow(clamp(average_contrast * 2., 0., 1.), 0.5)
-                    );
-                }
-
-                void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
-                    float power = 1. * effect_power;
-                    vec4 local_contrast = get_local_contrast(uv);
-                    vec4 albedo_color = texture2D(map, uv);
-                    vec4 sharpen_color = get_sharpen_color2(uv, 1.);
-                    float alpha = (1. - local_contrast.a) * power;
-                    outputColor = albedo_color;
-                    outputColor.xyz = mix(outputColor.xyz, BlendLuminosity(outputColor.xyz, sharpen_color.xyz), clamp(alpha * 1., 0., 1.));
-
-                    // if (uv.x > 0.5){
-                    //     outputColor = albedo_color;
-                    // }
-                }
-            `
-            , {})
-        super("HueSaturationEffect", shader_code, {
+        let material_template = ResourceManager.get_material_template("core.fidelityfx")
+        super("FidelityFX", material_template.params.fragmentShader, {
             blendFunction,
-            uniforms: new Map([
-                ["sharpness_scale", new THREE.Uniform(1)],
-                ["contrast_kernel_polar_steps", new THREE.Uniform(4)],
-                ["contrast_kernel_azimuth_steps", new THREE.Uniform(3)],
-                ["contrast_kernel_radius", new THREE.Uniform(1)],
-                ["sharpness_kernel_radius", new THREE.Uniform(1)],
-                ["effect_power", new THREE.Uniform(1)]
-            ])
+            uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)]))
         });
     }
 }
@@ -176,6 +67,7 @@ class Postprocessing extends Component {
     composer = undefined
     outline_effect = undefined
     use_ffx = true
+    use_fxaa = true
     use_ssao = true
     use_bloom = true
     use_outline = true
@@ -217,6 +109,7 @@ class Postprocessing extends Component {
     get_reactive_props() {
         return [
             "use_ffx",
+            "use_fxaa",
             "use_ssao",
             "use_bloom",
             "use_outline",
@@ -284,11 +177,9 @@ class Postprocessing extends Component {
                     break
                 }
                 case "chromatic_abberation_offset_x": {
-                    console.log(this.chromatic_abberation_effect)
                     break
                 }
                 case "chromatic_abberation_offset_y": {
-                    console.log(this.chromatic_abberation_effect)
                     break
                 }
                 case "use_ssao": this.ssao_pass.enabled = this.use_ssao; break;
@@ -329,6 +220,7 @@ class Postprocessing extends Component {
             if (this.use_godrays) this.setup_godrays(renderer, scene, camera, composer)
             if (this.use_bloom) this.setup_bloom(renderer, scene, camera, composer)
             if (this.use_ffx) this.setup_ffx(renderer, scene, camera, composer)
+            // if (this.use_fxaa) this.setup_fxaa(renderer, scene, camera, composer)
 
             if (this.use_outline) this.setup_outline(renderer, scene, camera, composer)
             if (this.use_grain) this.setup_grain(renderer, scene, camera, composer)
@@ -347,6 +239,11 @@ class Postprocessing extends Component {
             this.log("Renderer not found")
         }
 
+    }
+    setup_fxaa(renderer, scene, camera, composer) {
+        let fxaa_effect = this.fxaa_effect = new FXAAEffect();
+        let fxaa_pass = this.fxaa_pass = new postfx.EffectPass(camera, this.fxaa_effect);
+        composer.addPass(fxaa_pass)
     }
     setup_ffx(renderer, scene, camera, composer) {
         let ffx_effect = this.ffx_effect = new FFXEffect();
