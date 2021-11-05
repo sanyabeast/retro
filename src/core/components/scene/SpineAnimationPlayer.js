@@ -40,6 +40,8 @@ class SpineAnimationPlayer extends SceneComponent {
     tick_rate = 30
     loop_playlist = true
     disable_cache = false
+    depth_test = false
+    transparent = true
     /**private */
     playlist = undefined
     get current_playlist_item() {
@@ -58,7 +60,9 @@ class SpineAnimationPlayer extends SceneComponent {
                 await this.load_assets();
                 await this.setup_view();
 
+                console.log(this.subject)
                 let mesh = this.subject
+                this.subject.asset_src = this.src
                 if (typeof this.visibility_rule === "function") {
                     Object.defineProperty(mesh, "visible", {
                         get: () => {
@@ -209,7 +213,8 @@ class SpineAnimationPlayer extends SceneComponent {
                     ResourceManager.cached_spine_skeleton_data[this.src] = skeleton_data
                 }
                 let subject = this.subject = new spine.threejs.SkeletonMesh(skeleton_data, (parameters) => {
-                    //parameters.depthTest = false;
+                    parameters.depthTest = this.depth_test;
+                    parameters.transparent = this.transparent
                 });
                 subject.zOffset = this.z_offset
                 break
@@ -226,7 +231,8 @@ class SpineAnimationPlayer extends SceneComponent {
                 }
 
                 let subject = this.subject = new spine.SkeletonMesh(skeleton_data, (parameters) => {
-                    //parameters.depthTest = false;
+                    parameters.depthTest = this.depth_test;
+                    parameters.transparent = this.transparent
                 });
                 subject.zOffset = this.z_offset
                 break
