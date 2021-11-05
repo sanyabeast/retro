@@ -199,6 +199,7 @@ class VueGUIComponent extends Component {
     on_enable() {
         this.globals.dom.appendChild(this.dom)
         this.ui_wrapper.$mount(this.dom)
+        this.el.style.transform = "translate(0, 0)"
     }
     on_tick(time_delta) {
         this.ui_wrapper.tick(time_delta)

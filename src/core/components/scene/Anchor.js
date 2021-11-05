@@ -24,19 +24,27 @@ class Anchor extends SceneComponent {
         return [r.x, r.y, r.z]
     }
     on_create() {
-        this.meta.layers.rendering = false
-        this.meta.layers.gizmo = true
-
-        this.subject = new THREE.Mesh(
-            new THREE.BoxBufferGeometry(0.1, 0.1, 0.1, 1),
-            new THREE.MeshBasicMaterial({ wireframe: true, color: "#00bcd4" })
+        this.subject = new THREE.Object3D()
+        this.anchor_gizmo = new THREE.Mesh(
+            new THREE.SphereBufferGeometry(0.05, 2, 2),
+            new THREE.MeshBasicMaterial({ wireframe: true, color: "#ff00ff" })
         )
     }
     get_render_data() {
         return [
             {
                 object: this.subject,
-                parent: this.parent_object
+                parent: this.parent_object,
+                layers: { rendering: true }
+            }
+        ]
+    }
+    get_gizmo_render_data() {
+        return [
+            {
+                object: this.anchor_gizmo,
+                parent: this.subject,
+                layers: { gizmo: true }
             }
         ]
     }

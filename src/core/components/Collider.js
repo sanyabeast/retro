@@ -8,7 +8,7 @@ import SceneComponent from "core/SceneComponent";
 import ResourceManager from "core/ResourceManager";
 import * as THREE from 'three';
 
-const COLLIDER_WIREFRAME_COLOR = "#ff5722"
+const COLLIDER_WIREFRAME_COLOR = "#8bc34a"
 
 let collider_id = 0
 function get_collider_color(collider_id) {

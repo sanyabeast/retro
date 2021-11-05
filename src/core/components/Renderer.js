@@ -10,7 +10,7 @@ import { Vector2 } from "spine-ts-threejs";
 import * as THREE from 'three';
 import Device from "core/utils/Device";
 import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
-import { isArray, isObject, map } from "lodash-es"
+import { isArray, isObject, map, debounce, throttle } from "lodash-es"
 import Schema from "core/utils/Schema"
 
 class RenderScene extends THREE.Scene { }
@@ -65,6 +65,11 @@ class Renderer extends Component {
     object_layers = undefined
     zero_object = new THREE.Object3D()
 
+    constructor(){
+        super(...arguments)
+        this.check_size = throttle(this.check_size.bind(this), 250)
+    }
+
     on_create() {
         this.resolution = new Vector2(1, 1)
         this.object_layers = {}
@@ -74,7 +79,7 @@ class Renderer extends Component {
         }
         let render_scene = this.render_scene = new RenderScene()
         let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({
-            antialias: true,
+            antialias: false,
             alpha: true,
             // preserveDrawingBuffer: true,
             stencil: this.clear_stencil,
@@ -163,6 +168,7 @@ class Renderer extends Component {
         this.update_object_layers()
         this.update_render_scene()
         if (this.use_progressive_lightmap) this.update_progressive_lightmap()
+        this.check_size()
 
         // this.progressive_lightmap.showDebugLightmap( true );
     }
@@ -179,10 +185,9 @@ class Renderer extends Component {
         // this.raf_cb_id = clock.add(this.render.bind(this))
     }
     update_object_layers() {
-        let scene = this.globals.app
         let object_layers = this.object_layers = {}
-        scene.update_transform()
-
+        let scene = this.globals.app
+        
         scene.traverse_components((comp, object) => {
             if (comp.enabled) {
                 let local_render_list = []
@@ -299,10 +304,12 @@ class Renderer extends Component {
     render() {
         let now = +new Date()
         if (now - this.prev_frame_time >= 1000 / this.target_fps) {
+            let scene = this.globals.app
+            scene.update_transform()
             this.prev_frame_time = now
             let camera = this.find_component_of_type("CameraComponent")
             if (camera && camera.subject) {
-                this.check_size()
+                
                 if (this.custom_render_function === undefined || this.use_postfx === false) {
                     this.renderer.render(this.render_scene, camera.subject)
                     // this.renderer.clear(true, true, true)   
