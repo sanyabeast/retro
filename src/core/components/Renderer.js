@@ -75,7 +75,7 @@ class Renderer extends Component {
         this.object_layers = {}
         this.rendering_layers = {
             rendering: true,
-            gizmo: true
+            gizmo: process.env.NODE_ENV === "development"
         }
         let render_scene = this.render_scene = new RenderScene()
         let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({

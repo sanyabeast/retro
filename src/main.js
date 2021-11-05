@@ -55,9 +55,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             frame.add_button("RNDR", "View Final Render", () => {
                 app.refs.renderer.set_render_layer_name("rendering")
             }, "#9c27b0")
-            frame.add_button("GZMO", "Toggle Gizmos", () => {
+            frame.add_button("GZMO", "Toggle Gizmos", (button) => {
                 app.refs.renderer.rendering_layers.gizmo = !app.refs.renderer.rendering_layers.gizmo
-            }, "#d1e7e4")
+                button.set_active(app.refs.renderer.rendering_layers.gizmo)
+            }, "#f44336", a => app.refs.renderer.rendering_layers.gizmo)
             frame.add_button("NRML", "View Normals", () => {
                 app.refs.renderer.set_render_layer_name("normal")
             }, "#7e6ae5")
@@ -77,15 +78,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             frame.add_button("|", "", i => i, "#ffffff")
 
-            frame.add_button("PSFX", "Postprocessing toggle", () => {
+            frame.add_button("PSFX", "Postprocessing toggle", (button) => {
                 app.refs.renderer.use_postfx = !app.refs.renderer.use_postfx
-            }, "#cddc39")
+                button.set_active(app.refs.renderer.use_postfx)
+            }, "#cddc39", a => app.refs.renderer.use_postfx)
 
             frame.add_button("FFX", "Fidelity FX toggls", (button) => {
                 let postfx = app.find_component_of_type("Postprocessing")
                 postfx.use_ffx = !postfx.use_ffx
                 button.set_active(postfx.use_ffx)
-            }, "#cddc39")
+            }, "#cddc39", a => app.find_component_of_type("Postprocessing").use_ffx)
 
             frame.add_button("FOG", "Toggle Fog", () => {
                 app.refs.renderer.use_fog = !app.refs.renderer.use_fog

@@ -1,5 +1,5 @@
 class ButtonController {
-    constructor(caption, title, callback, color) {
+    constructor(caption, title, callback, color, on_create_state) {
         this.caption = caption
         this.is_active = false
         this.color = color
@@ -31,6 +31,16 @@ class ButtonController {
             evt.stopPropagation()
             callback(this)
         })
+
+        if (on_create_state) {
+            try {
+                setTimeout(() => {
+                    this.set_active(on_create_state())
+                }, 1500)
+            } catch (err) {
+                console.log(err)
+            }
+        }
     }
     set_active(is_active) {
         this.is_active = is_active
@@ -198,8 +208,8 @@ class Frame {
             transform: `translate(${this.x}px, ${this.y}px)`,
         });
     }
-    add_button(caption, title, callback, color = "#eee") {
-        const button = new ButtonController(caption, title, callback, color)
+    add_button(caption, title, callback, color = "#eee", on_create_state) {
+        const button = new ButtonController(caption, title, callback, color, on_create_state)
         this.header_toolbar_node.appendChild(button.dom)
     }
 }
