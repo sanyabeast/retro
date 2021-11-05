@@ -1072,7 +1072,7 @@ params:
         map,
         map,
         map,
-        resolution2 * 1.1,
+        resolution2,
         vec4(0.0),
         vec4(0.0),
         vec4(0.0),

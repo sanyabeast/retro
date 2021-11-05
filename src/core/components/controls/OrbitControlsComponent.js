@@ -31,6 +31,8 @@ class OrbitControlsComponent extends Component {
     rotate_speed = 1
     zoom_speed = 0.2
     target = [0, 0, 0]
+    position = [0, 0, 0]
+    zoom = 1
     keys = ["a", "w", "d", "s"]
     /**private */
     controls = undefined
@@ -56,16 +58,23 @@ class OrbitControlsComponent extends Component {
             "rotate_speed",
             "target",
             "keys",
-            "zoom_speed"
+            "zoom_speed",
+            "zoom",
+            "position"
         ].concat(super.get_reactive_props())
     }
     on_enable() {
         this.controls.enabled = true
-        console.log(2)
     }
     on_disable() {
-        console.log(1)
         this.controls.enabled = false
+    }
+    get_controls_state() {
+        return {
+            target: this.controls.target,
+            position: this.controls.object.position,
+            zoom: this.controls.object.zoom
+        }
     }
     on_update(props) {
         super.on_update(props)
@@ -83,6 +92,14 @@ class OrbitControlsComponent extends Component {
                 }
                 case "target": {
                     controls.target = new THREE.Vector3(...this.target)
+                    break
+                }
+                case "position": {
+                    controls.object.position.set(...this.position)
+                    break
+                }
+                case "zoom": {
+                    controls.object.zoom = this.zoom
                     break
                 }
                 default: {

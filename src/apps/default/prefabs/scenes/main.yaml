@@ -9,36 +9,7 @@ components:
     params:
       cycling: 2
       time: 0.4
-  lamp_a:
-    name: LightComponent
-    enabled: true
-    params:
-      position:
-        - 0
-        - 4
-        - -1
-      rotation: [-1.57, 0, 0]
-      type: RectAreaLight
-      intensity: 100
-      distance: 20
-      rect_width: 2
-      rect_height: 0.2
-      color: "#ffffff"
-  lamp_b:
-    name: LightComponent
-    enabled: true
-    params:
-      position:
-        - 0
-        - 4
-        - 1
-      rotation: [-1.57, 0, 0]
-      type: RectAreaLight
-      intensity: 100
-      distance: 20
-      rect_width: 2
-      rect_height: 0.2
-      color: "#ffffff"
+  
 children:
   fog: ??prefab=default.Fog
   scene: ??prefab=core.scenes.cafe
