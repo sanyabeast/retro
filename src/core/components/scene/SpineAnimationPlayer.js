@@ -12,6 +12,10 @@ const SPINE_VERSION = 38
 let spine = undefined
 
 // import spine from "spine/spine-threejs.js";
+
+/**TODO. Clearing */
+const POOL = {}
+
 switch (SPINE_VERSION) {
     case 38: {
         spine = require("spine/spine-threejs-38.js").default
@@ -40,6 +44,7 @@ class SpineAnimationPlayer extends SceneComponent {
     tick_rate = 30
     loop_playlist = true
     disable_cache = false
+    disable_pool = false
     depth_test = false
     transparent = true
     /**private */
@@ -57,10 +62,15 @@ class SpineAnimationPlayer extends SceneComponent {
                 let data_file = this.data_file = `${this.file_name}.json`
                 this.patch_spine_asset_manager()
                 this.spine_asset_manager = new spine.threejs.AssetManager(base_url);
-                await this.load_assets();
-                await this.setup_view();
 
-                console.log(this.subject)
+                let from_pool = this.get_from_pool()
+                if (from_pool) {
+                    this.subject = from_pool
+                } else {
+                    this.log(`creating new ${this.src}`)
+                    await this.load_assets();
+                    await this.setup_view();
+                }
                 let mesh = this.subject
                 this.subject.asset_src = this.src
                 if (typeof this.visibility_rule === "function") {
@@ -78,8 +88,14 @@ class SpineAnimationPlayer extends SceneComponent {
                 let atlas_file = this.atlas_file = `${this.file_name}.atlas`;
                 let data_file = this.data_file = `${this.file_name}.json`
                 let spine_asset_manager = this.spine_asset_manager = new spine.AssetManager(base_url);
-                await this.load_assets();
-                await this.setup_view();
+                let from_pool = this.get_from_pool()
+                if (from_pool) {
+                    this.subject = from_pool
+                } else {
+                    this.log(`creating new ${this.src}`)
+                    await this.load_assets();
+                    await this.setup_view();
+                }
                 let mesh = this.subject
                 if (typeof this.visibility_rule === "function") {
                     Object.defineProperty(mesh, "visible", {
@@ -109,7 +125,6 @@ class SpineAnimationPlayer extends SceneComponent {
             "rotation",
             "scale"
         ])
-        this.log(`created...`, this)
     }
     patch_spine_asset_manager() {
         if (spine.threejs.AssetManager.prototype.$is_patched) {
@@ -153,7 +168,19 @@ class SpineAnimationPlayer extends SceneComponent {
 
         spine.threejs.AssetManager.prototype.$is_patched = true
     }
+    get_from_pool() {
+        POOL[this.src] = POOL[this.src] || []
+        let mesh = POOL[this.src].pop()
+        this.log(`${this.src}. pool size: ${POOL[this.src].length}`)
+        return mesh
+    }
     on_destroy() {
+        if (this.disable_pool === false) {
+            let mesh = this.subject
+            delete this.subject
+            POOL[this.src] = POOL[this.src] || []
+            POOL[this.src].push(mesh)
+        }
         super.on_destroy()
     }
     on_tick(time_delta) {
