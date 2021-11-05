@@ -1,6 +1,21 @@
 children:
   table:
     components:
+      metal_cabinet:
+        name: MeshComponent
+        params:
+          debug_transform: false
+          position: [-6, 0, 1]
+          rotation: [0, 1.57, 0]
+          geometry:
+            - "url:res/core/models/metal_cabinet_a1/metal_cabinet_a1.obj"
+            - 0.3
+          material:
+            - AssetMaterial
+            - src: "res/core/models/metal_cabinet_a1/metal_cabinet_a1.mtl"
+              transparent: false
+              doubleside: true
+
       lamp_a:
         name: LightComponent
         enabled: true
