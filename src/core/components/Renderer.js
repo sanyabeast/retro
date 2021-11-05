@@ -18,7 +18,7 @@ class RenderScene extends THREE.Scene { }
 const renderer_presets = {
     desktop: {
         antialias: true,
-        alpha: true,
+        alpha: false,
         stencil: true,
         depth: true
     },
@@ -80,7 +80,7 @@ class Renderer extends Component {
         let render_scene = this.render_scene = new RenderScene()
         let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({
             antialias: false,
-            alpha: true,
+            alpha: false,
             // preserveDrawingBuffer: true,
             stencil: this.clear_stencil,
             depth: this.clear_depth,

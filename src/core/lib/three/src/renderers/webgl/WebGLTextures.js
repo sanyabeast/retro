@@ -345,12 +345,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const image = texture.image;
 
 			if ( image === undefined ) {
-
-				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined' );
+				/**PATCH PATCH PATCH */
+				// console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined' );
 
 			} else if ( image.complete === false ) {
-
-				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete' );
+				/**PATCH PATCH PATCH */
+				// console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete' );
 
 			} else {
 
