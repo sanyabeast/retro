@@ -368,7 +368,13 @@ class ResourceManager extends BasicObject {
             if (src.indexOf("@") === 0) {
                 texture = this.cached_textures[src] = this.load_from_texture_lib(src, params)
             } else {
+                let webgl_capabilities = this.globals.webgl_capabilities
+                let aniso = 1
+                if (webgl_capabilities) {
+                    aniso = webgl_capabilities.getMaxAnisotropy()
+                }
                 texture = this.cached_textures[src] = new THREE.TextureLoader().load(src);
+                texture.anisotropy = aniso
             }
         }
         if (!texture) {
@@ -379,6 +385,8 @@ class ResourceManager extends BasicObject {
             }
             texture.needsUpdate = true;
         }
+
+
         return texture;
     }
     load_cubemap(src, type = "jpg") {
@@ -419,7 +427,6 @@ class ResourceManager extends BasicObject {
         if (!texture) {
             texture = this.placeholder_texture
         }
-
         return texture
 
     }
@@ -552,7 +559,7 @@ class ResourceManager extends BasicObject {
                     ...shader_lib_uniforms,
                     ...(template.params.uniforms || {}),
                 }
-                
+
                 template.params.fragmentShader = this.preprocess_shader_code(template.params.fragmentShader, uniforms)
                 template.params.vertexShader = this.preprocess_shader_code(template.params.vertexShader, uniforms)
             }

@@ -95,9 +95,9 @@ class Postprocessing extends Component {
     bloom_threshold = 0.7
     gc_gamma = 1
     hue = 0
-    saturation = 0
-    brightness = 0
-    contrast = 0
+    saturation = 0.5
+    brightness = 0.05
+    contrast = -0.2
     /**private */
     ffx_effect = undefined
     ffx_pass = undefined
@@ -198,6 +198,7 @@ class Postprocessing extends Component {
 
                     if (this.bc_effect) {
                         this.bc_effect.uniforms.get("brightness").value = this.brightness
+                        this.bc_effect.uniforms.get("contrast").value = this.contrast
                     }
                 }
             }

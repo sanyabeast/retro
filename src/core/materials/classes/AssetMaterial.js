@@ -4,7 +4,7 @@ import Device from 'core/utils/Device';
 const path = require("path")
 
 const LQ_MAT = "MeshLambertMaterial"
-const HQ_MAT = "MeshPhysicalMaterial"
+const HQ_MAT = "MeshPhongMaterial"
 
 
 class AssetMaterial extends THREE.Material {
@@ -121,8 +121,8 @@ class AssetMaterial extends THREE.Material {
                 let refl = block_data.refl[block_data.refl.length - 1]
                 let src = path.basename(refl.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
-                material_params.metallnessMap = `${src}?wrapS=1000&wrapT=1000`
-                material_params.metallness = 0.1
+                material_params.metalnessMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.metalness = 1
             }
             if (block_data.map_d) {
                 let map_d = block_data.map_d[block_data.map_d.length - 1]
@@ -166,12 +166,15 @@ class AssetMaterial extends THREE.Material {
             if (block_data.Ni) {
                 material_params.refractionRatio = Number(block_data.Ni[0] || 0)
             }
+
+            material_params.reflectivity = 1
+            // material_params.normalMapType = THREE.ObjectSpaceNormalMap
             let mat = new THREE.materials[Device.is_mobile ? LQ_MAT : HQ_MAT](material_params)
             r.push(mat)
-            
+
         })
 
-        
+
 
 
         return r

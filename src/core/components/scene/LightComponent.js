@@ -95,10 +95,10 @@ class LightComponent extends SceneComponent {
 
         if (this.shadows_enabled) {
             if (light.shadow) {
-                light.shadow.mapSize.width = 512;
-                light.shadow.mapSize.height = 512;
+                light.shadow.mapSize.width = 128;
+                light.shadow.mapSize.height = 128;
                 light.shadow.camera.near = 0.5;
-                light.shadow.camera.far = 1000
+                light.shadow.camera.far = 10000
             }
             light.castShadow = true
         }

@@ -65,7 +65,7 @@ class Renderer extends Component {
     object_layers = undefined
     zero_object = new THREE.Object3D()
 
-    constructor(){
+    constructor() {
         super(...arguments)
         this.check_size = throttle(this.check_size.bind(this), 250)
     }
@@ -89,6 +89,7 @@ class Renderer extends Component {
 
         /**lightmap */
         this.setup_progressive_lightmap()
+        this.define_global_var("webgl_capabilities", a => renderer.capabilities)
 
 
         /**shadowmap */
@@ -187,7 +188,7 @@ class Renderer extends Component {
     update_object_layers() {
         let object_layers = this.object_layers = {}
         let scene = this.globals.app
-        
+
         scene.traverse_components((comp, object) => {
             if (comp.enabled) {
                 let local_render_list = []
@@ -309,7 +310,7 @@ class Renderer extends Component {
             this.prev_frame_time = now
             let camera = this.find_component_of_type("CameraComponent")
             if (camera && camera.subject) {
-                
+
                 if (this.custom_render_function === undefined || this.use_postfx === false) {
                     this.renderer.render(this.render_scene, camera.subject)
                     // this.renderer.clear(true, true, true)   

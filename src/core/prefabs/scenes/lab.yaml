@@ -1,5 +1,20 @@
 children:
-  table:
+  floor:
+    components:
+      body:
+        name: MeshComponent
+        params:
+          rotation: [-1.5707, 0, 0]
+          geometry: 
+            - PlaneBufferGeometry
+            - [20, 20, 1]
+          material:
+            - PBRMaterial
+            - pbr: "res/core/pbr/angled_tile_floor_a1/a"
+              file_format: jpg
+              tiling: [6, 6]
+              color: "#b9c1ce"
+  deco:
     components:
       metal_cabinet:
         name: MeshComponent
@@ -15,7 +30,6 @@ children:
             - src: "res/core/models/metal_cabinet_a1/metal_cabinet_a1.mtl"
               transparent: false
               doubleside: true
-
       lamp_a:
         name: LightComponent
         enabled: true

@@ -2,14 +2,17 @@ prefabs:
   - default.Postprocessing
   - core.sound.default_ambient_audio_source
   - default.OrbitControlsComponent
-  - default.SkyBox
 components:
+  skybox:
+    name: SkyBox
+    params:
+      cubemap: res/core/cubemaps/nalovardo_1
+      cubemap_format: jpg
   sun:
     name: Sun
     params:
-      cycling: 2
+      cycling: 10
       time: 0.4
-  
 children:
   fog: ??prefab=default.Fog
-  scene: ??prefab=core.scenes.cafe
+  scene: ??prefab=core.scenes.lab

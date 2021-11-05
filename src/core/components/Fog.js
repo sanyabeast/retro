@@ -72,7 +72,7 @@ class Fog extends Component {
 
 Fog.DEFAULT = {
     color: "#1f3556",
-    density: 0.055
+    density: 0.035
 }
 
 export default Fog;
