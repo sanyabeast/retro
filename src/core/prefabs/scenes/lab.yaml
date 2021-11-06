@@ -45,36 +45,6 @@ children:
               transparent: false
               doubleside: true
               color: "#8fafba"
-      lamp_a:
-        name: LightComponent
-        enabled: true
-        params:
-          position:
-            - 0
-            - 2.8
-            - -1
-          rotation: [-1.57, 0, 0]
-          type: RectAreaLight
-          intensity: 150
-          distance: 5
-          rect_width: 1
-          rect_height: 0.1
-          color: "#eee0e5"
-      lamp_b:
-        name: LightComponent
-        enabled: true
-        params:
-          position:
-            - 0
-            - 2.8
-            - 1
-          rotation: [-1.57, 0, 0]
-          type: RectAreaLight
-          intensity: 150
-          distance: 5
-          rect_width: 1
-          rect_height: 0.1
-          color: "#e0ecee"
       table:
         name: MeshComponent
         params:
@@ -118,3 +88,57 @@ children:
             - src: "res/core/models/bio_chamber_unit_a1/bio_chamber_unit_a1.mtl"
               transparent: false
               doubleside: true
+  lights:
+    components:
+      lamp_a:
+        name: LightComponent
+        enabled: true
+        params:
+          position:
+            - 0
+            - 2.8
+            - -1
+          rotation: [-1.57, 0, 0]
+          type: RectAreaLight
+          intensity: 150
+          distance: 5
+          rect_width: 1
+          rect_height: 0.1
+          color: "#eee0e5"
+      lamp_b:
+        name: LightComponent
+        enabled: true
+        params:
+          position:
+            - 0
+            - 2.8
+            - 1
+          rotation: [-1.57, 0, 0]
+          type: RectAreaLight
+          intensity: 150
+          distance: 5
+          rect_width: 1
+          rect_height: 0.1
+          color: "#e0ecee"
+      lambs_controller:
+        order: 1
+        params:
+          tick_rate: 6
+          max_intensity: 155
+          min_intensity: 145
+        inline:
+          methods:
+            on_create:
+              body: |
+                let lights = this.get_components("LightComponent");
+                this.lights = lights
+            on_tick: 
+              body: |
+                this.lights.forEach((light)=>{
+                  light.intensity = Math.random() * (this.max_intensity - this.min_intensity) + this.min_intensity;
+                  if (Math.random() > 0.97){
+                    light.enabled = false
+                  } else {
+                    light.enabled = true
+                  }
+                });
