@@ -71,8 +71,8 @@ class OrbitControlsComponent extends Component {
     }
     get_controls_state() {
         return {
-            target: this.controls.target,
-            position: this.controls.object.position,
+            target: [this.controls.target.x, this.controls.target.y, this.controls.target.z],
+            position: [this.controls.object.position.x, this.controls.object.position.y, this.controls.object.position.z],
             zoom: this.controls.object.zoom
         }
     }

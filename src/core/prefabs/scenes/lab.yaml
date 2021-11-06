@@ -7,43 +7,58 @@ children:
           rotation: [-1.5707, 0, 0]
           geometry: 
             - PlaneBufferGeometry
-            - [20, 20, 1]
+            - [5, 5, 1]
           material:
             - PBRMaterial
             - pbr: "res/core/pbr/angled_tile_floor_a1/a"
               file_format: jpg
-              tiling: [6, 6]
-              color: "#b9c1ce"
+              tiling: [4, 4]
+              color: "#979798"
   deco:
     components:
-      metal_cabinet:
+      metal_cabinet_1:
         name: MeshComponent
         params:
           debug_transform: false
-          position: [-6, 0, 1]
+          position: [-2, 0, 1]
           rotation: [0, 1.57, 0]
           geometry:
             - "url:res/core/models/metal_cabinet_a1/metal_cabinet_a1.obj"
-            - 0.3
+            - 0.125
           material:
             - AssetMaterial
             - src: "res/core/models/metal_cabinet_a1/metal_cabinet_a1.mtl"
               transparent: false
               doubleside: true
+      metal_cabinet_2:
+        name: MeshComponent
+        params:
+          debug_transform: false
+          position: [1, 0, -2]
+          rotation: [0, 0, 0]
+          geometry:
+            - "url:res/core/models/metal_cabinet_a1/metal_cabinet_a1.obj"
+            - 0.125
+          material:
+            - AssetMaterial
+            - src: "res/core/models/metal_cabinet_a1/metal_cabinet_a1.mtl"
+              transparent: false
+              doubleside: true
+              color: "#8fafba"
       lamp_a:
         name: LightComponent
         enabled: true
         params:
           position:
             - 0
-            - 6
+            - 2.8
             - -1
           rotation: [-1.57, 0, 0]
           type: RectAreaLight
-          intensity: 212
-          distance: 40
-          rect_width: 2
-          rect_height: 0.2
+          intensity: 150
+          distance: 5
+          rect_width: 1
+          rect_height: 0.1
           color: "#eee0e5"
       lamp_b:
         name: LightComponent
@@ -51,39 +66,53 @@ children:
         params:
           position:
             - 0
-            - 6
+            - 2.8
             - 1
           rotation: [-1.57, 0, 0]
           type: RectAreaLight
-          intensity: 212
-          distance: 40
-          rect_width: 2
-          rect_height: 0.2
+          intensity: 150
+          distance: 5
+          rect_width: 1
+          rect_height: 0.1
           color: "#e0ecee"
       table:
         name: MeshComponent
         params:
           debug_transform: false
-          position: [0, 0, 0]
-          rotation: [0, 0, 0]
+          position: [-0.2, 0, 0.2]
+          rotation: [0, 0.2, 0]
           scale: [1.2, 1.2, 1.2]
           geometry:
             - "url:res/core/models/wooden-table/Wooden_Table.obj"
-            - 0.3
+            - 0.1
           material:
             - AssetMaterial
             - src: "res/core/models/wooden-table/Wooden_Table.mtl"
               transparent: false
               doubleside: true
+      glasses_1:
+        name: MeshComponent
+        params:
+          debug_transform: false
+          position: [0, 0.664, -0.3]
+          rotation: [0, 1, 0]
+          geometry:
+            - "url:res/core/models/free_sunglasses_set_a1/vogue_1.obj"
+            - 1
+          material:
+            - AssetMaterial
+            - src: "res/core/models/free_sunglasses_set_a1/vogue_1.mtl"
+              transparent: true
+              doubleside: true
       bio_chamber:
         name: MeshComponent
         params:
           debug_transform: false
-          position: [-0.1, 2.015, -0.6]
+          position: [-0.2, 0.672, 0.4]
           rotation: [0, 0.1, 0]
           geometry:
             - "url:res/core/models/bio_chamber_unit_a1/bio_chamber_unit_a1.obj"
-            - 0.3
+            - 0.1
           material:
             - AssetMaterial
             - src: "res/core/models/bio_chamber_unit_a1/bio_chamber_unit_a1.mtl"

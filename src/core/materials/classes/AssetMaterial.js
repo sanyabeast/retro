@@ -4,7 +4,7 @@ import Device from 'core/utils/Device';
 const path = require("path")
 
 const LQ_MAT = "MeshLambertMaterial"
-const HQ_MAT = "MeshPhongMaterial"
+const HQ_MAT = "MeshStandardMaterial"
 
 
 class AssetMaterial extends THREE.Material {
@@ -20,6 +20,7 @@ class AssetMaterial extends THREE.Material {
         this.displacement_scale = params.displacement_scale || 0.01
         this.shininess = params.shininess || 16
         this.doubleside = params.doubleside || false
+        this.color = params.color || "#ffffff"
         let r = []
 
 
@@ -124,6 +125,12 @@ class AssetMaterial extends THREE.Material {
                 material_params.metalnessMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.metalness = 1
             }
+            if (block_data.map_Ke) {
+                let map_Ke = block_data.map_Ke[block_data.map_Ke.length - 1]
+                let src = path.basename(map_Ke.replace(/\\\\/gm, "/"))
+                src = `${asset_dir}/maps/${src}`
+                material_params.emissiveMap = `${src}?wrapS=1000&wrapT=1000`
+            }
             if (block_data.map_d) {
                 let map_d = block_data.map_d[block_data.map_d.length - 1]
                 let src = path.basename(map_d.replace(/\\\\/gm, "/"))
@@ -137,8 +144,6 @@ class AssetMaterial extends THREE.Material {
                 let src = path.basename(map_Bump.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
                 material_params.normalMap = `${src}?wrapS=1000&wrapT=1000`
-                material_params.displacementMap = `${src}?wrapS=1000&wrapT=1000`
-                material_params.displacementScale = -1 * Math.abs(this.displacement_scale)
                 material_params.bumpMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.bumpScale = this.bump_scale
             }
@@ -167,6 +172,8 @@ class AssetMaterial extends THREE.Material {
                 material_params.refractionRatio = Number(block_data.Ni[0] || 0)
             }
 
+
+            material_params.color = this.color
             material_params.reflectivity = 1
             // material_params.normalMapType = THREE.ObjectSpaceNormalMap
             let mat = new THREE.materials[Device.is_mobile ? LQ_MAT : HQ_MAT](material_params)

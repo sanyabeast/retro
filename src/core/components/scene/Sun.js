@@ -16,8 +16,8 @@ class Sun extends SceneComponent {
     
     n_distance = 500
     d_distance = 50
-    n_intensity = 0.25
-    d_intensity = 5
+    n_intensity = 0.2
+    d_intensity = 3.5
     n_height = -50
     d_height = 100
     n_emissive = 1.25

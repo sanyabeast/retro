@@ -14,24 +14,16 @@ class App extends CoreApp {
             5
         ]
         camera.fov = 60
-        
+
 
         let controls = this.find_component_of_type("OrbitControlsComponent")
-        controls.target = [
-            -0.4937,
-            1.1269,
-            0.0785
-        ]
 
-        controls.position = [
-            4.3608,
-            2.7077,
-            -3.2424
-        ]
+        controls.target = [-0.3274459053651773, 0.5307513889037137, 0.18259720921051698]
+        controls.position = [1.9621248184333282, 0.9075206629556949, 1.2771517050514491]
         controls.zoom = 1
-       
-       
-        
+
+
+
         this.start()
     }
     on_tick() { }

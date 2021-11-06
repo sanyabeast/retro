@@ -3,6 +3,10 @@ prefabs:
   - core.sound.default_ambient_audio_source
   - default.OrbitControlsComponent
 components:
+  fog:
+    name: Fog
+    params: 
+      density: 0.005
   skybox:
     name: SkyBox
     params:
@@ -12,7 +16,7 @@ components:
     name: Sun
     params:
       cycling: 10
-      time: 0.4
+      time: 0.1
+      global_intensity: 1
 children:
-  fog: ??prefab=default.Fog
   scene: ??prefab=core.scenes.lab
