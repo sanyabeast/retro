@@ -1,11 +1,19 @@
 import * as THREE from 'three';
 import { request_text_sync } from 'core/utils/Tools';
 import Device from 'core/utils/Device';
+import { isNumber, isBoolean, map } from "lodash-es"
 const path = require("path")
 
 const LQ_MAT = "MeshLambertMaterial"
 const HQ_MAT = "MeshStandardMaterial"
 
+function num(v) {
+    return Number(v) || 0
+}
+
+function v3(arr) {
+    return map(arr, v => num(v))
+}
 
 class AssetMaterial extends THREE.Material {
     src = ""
@@ -16,11 +24,15 @@ class AssetMaterial extends THREE.Material {
     constructor(params) {
         super(params)
         let src = this.src = params.src
-        this.bump_scale = params.bump_scale || 0.001
-        this.displacement_scale = params.displacement_scale || 0.01
-        this.shininess = params.shininess || 16
+        this.bump_scale = isNumber(params.bump_scale) ? params.bump_scale : 0.001
+        this.displacement_scale = isNumber(params.displacement_scale) ? params.displacement_scale : 0.01
+        this.shininess = isNumber(params.shininess) ? params.shininess : 16
         this.doubleside = params.doubleside || false
         this.color = params.color || "#ffffff"
+        this.allow_transparency = isBoolean(params.allow_transparency) ? params.allow_transparency : true
+        this.emissive_color = params.emissive_color || undefined
+
+        this.emissive_intensity = isNumber(params.emissive_intensity) ? params.emissive_intensity : 1
         let r = []
 
 
@@ -60,7 +72,7 @@ class AssetMaterial extends THREE.Material {
         })
 
         function parse_block(block_data) {
-            let parsed_props = ['newmtl', "Ns", "Ka", "Kd", "Ks", "Ke", "Ni", "d", "illum", "map_Bump", "map_Kd", "map_d", "map_Ns", "refl"]
+            let parsed_props = ['newmtl', "Ns", "Ka", "Kd", "Ks", "Ke", "Ni", "d", "illum", "map_Bump", "map_Kd", "map_d", "map_Ns", "map_Ke", "refl"]
             let parsed_data = {}
             parsed_props.forEach(p => {
                 let parsed_line = parse_line(chunk_line(p, block_data))
@@ -136,7 +148,7 @@ class AssetMaterial extends THREE.Material {
                 let src = path.basename(map_d.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
                 material_params.alphaMap = `${src}?wrapS=1000&wrapT=1000`
-                material_params.transparent = true
+                material_params.transparent = this.allow_transparency === false ? false : true
                 material_params.side = THREE.DoubleSide
             }
             if (block_data.map_Bump) {
@@ -154,25 +166,44 @@ class AssetMaterial extends THREE.Material {
                 material_params.map = `${src}?wrapS=1000&wrapT=1000`
             }
             if (block_data.Ka) {
-                material_params.color = new THREE.Color(Number(block_data.Ka[0] || 0), Number(block_data.Ka[1] || 0), Number(block_data.Ka[2] || 0))
+                material_params.color = new THREE.Color(...v3(block_data.Ka))
             }
             if (block_data.Kd) {
-                material_params.color = new THREE.Color(Number(block_data.Kd[0] || 0), Number(block_data.Kd[1] || 0), Number(block_data.Kd[2] || 0))
+                material_params.color = new THREE.Color(...v3(block_data.Kd))
             }
-            if (block_data.Ke) {
-                material_params.emissive = new THREE.Color(Number(block_data.Ke[0] || 0), Number(block_data.Ke[1] || 0), Number(block_data.Ke[2] || 0))
+            if (block_data.Ke && this.emissive_color === undefined) {
+                let ke_color = v3(block_data.Ke)
+                console.log(ke_color, Math.max.apply(Math, ke_color))
+                if (block_data.map_Ke) {
+                    if (Math.max.apply(Math, ke_color) === 0) {
+                        //@TODO: fix black emission color issue
+                        material_params.emissive = new THREE.Color(1, 1, 1)
+                    } else {
+                        material_params.emissive = new THREE.Color(...ke_color)
+                    }
+
+                } else {
+                    material_params.emissive = new THREE.Color(...ke_color)
+                }
             }
+
+            if (this.emissive_color !== undefined) {
+                material_params.emissive = new THREE.Color()
+                material_params.emissive.set_any(this.emissive_color)
+            }
+
             if (block_data.Ks) {
-                material_params.specular = new THREE.Color(Number(block_data.Ks[0] || 0), Number(block_data.Ks[1] || 0), Number(block_data.Ks[2] || 0))
+                material_params.specular = new THREE.Color(...v3(block_data.Ks))
             }
             if (block_data.Ns) {
-                material_params.shininess = Number(block_data.Ns[0]) * (this.shininess / 1000)
+                material_params.shininess = num(block_data.Ns[0]) * (this.shininess / 1000)
             }
             if (block_data.Ni) {
-                material_params.refractionRatio = Number(block_data.Ni[0] || 0)
+                material_params.refractionRatio = num(block_data.Ni[0])
             }
 
 
+            material_params.emissiveIntensity = this.emissive_intensity
             material_params.color = this.color
             material_params.reflectivity = 1
             // material_params.normalMapType = THREE.ObjectSpaceNormalMap

@@ -11,7 +11,7 @@ import { log, error, console } from "core/utils/Tools"
 
 class MeshComponent extends SceneComponent {
     mesh = null;
-    drop_shadow = true
+    cast_shadow = true
     recieve_shadow = true
     class = undefined
     tick_rate = 5
@@ -37,7 +37,7 @@ class MeshComponent extends SceneComponent {
             this.error(`Cannot create mesh with provided options`, this.meta.params)
         } else {
 
-            mesh.castShadow = this.drop_shadow
+            mesh.castShadow = this.cast_shadow
             mesh.receiveShadow = this.recieve_shadow
         }
 
@@ -86,7 +86,7 @@ class MeshComponent extends SceneComponent {
     }
     get_reactive_props() {
         return [
-            "drop_shadow",
+            "cast_shadow",
             "recieve_shadow"
         ].concat(super.get_reactive_props())
     }
@@ -94,8 +94,8 @@ class MeshComponent extends SceneComponent {
         super.on_update(...arguments)
         props.forEach(prop => {
             switch (prop) {
-                case "drop_shadow": {
-                    this.subject.castShadow = this.drop_shadow
+                case "cast_shadow": {
+                    this.subject.castShadow = this.cast_shadow
                     break
                 }
                 case "recieve_shadow": {

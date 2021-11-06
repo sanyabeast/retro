@@ -9,7 +9,7 @@ children:
         tag: ground_mesh
         params:
           recieve_shadow: true
-          drop_shadow: false
+          cast_shadow: false
           position:
             - 0
             - 0

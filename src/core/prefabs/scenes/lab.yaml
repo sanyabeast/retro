@@ -1,11 +1,44 @@
 children:
-  floor:
+  sound:
     components:
-      body:
+      room_ambience:
+        name: AudioComponent
+        params:
+          position: [2, 1.5, 2]
+          src: "res/core/ambient_sound/house_ambience_a1"
+          autoplay: true
+          max_distance: 6
+          loop: true
+          volume: 0.5
+      suburb_ambience:
+        name: AudioComponent
+        params:
+          src: "res/core/ambient_sound/suburban_night_a1"
+          autoplay: true
+          spatial: false
+          loop: true
+          volume: 0.5
+  room:
+    components:
+      floor:
         name: MeshComponent
         params:
           rotation: [-1.5707, 0, 0]
-          geometry: 
+          geometry:
+            - PlaneBufferGeometry
+            - [5, 5, 1]
+          material:
+            - PBRMaterial
+            - pbr: "res/core/pbr/angled_tile_floor_a1/a"
+              file_format: jpg
+              tiling: [4, 4]
+              color: "#979798"
+      ceil:
+        name: MeshComponent
+        params:
+          rotation: [1.5707, 0, 0]
+          position: [0, 3, 0]
+          geometry:
             - PlaneBufferGeometry
             - [5, 5, 1]
           material:
@@ -89,37 +122,20 @@ children:
               transparent: false
               doubleside: true
   lights:
-    components:
+    children:
       lamp_a:
-        name: LightComponent
-        enabled: true
-        params:
-          position:
-            - 0
-            - 2.8
-            - -1
-          rotation: [-1.57, 0, 0]
-          type: RectAreaLight
-          intensity: 150
-          distance: 5
-          rect_width: 1
-          rect_height: 0.1
-          color: "#eee0e5"
+        prefab: core.examples.fluorescent_lamp
+        position:
+          - 0
+          - 2.8
+          - -1
       lamp_b:
-        name: LightComponent
-        enabled: true
-        params:
-          position:
-            - 0
-            - 2.8
-            - 1
-          rotation: [-1.57, 0, 0]
-          type: RectAreaLight
-          intensity: 150
-          distance: 5
-          rect_width: 1
-          rect_height: 0.1
-          color: "#e0ecee"
+        prefab: core.examples.fluorescent_lamp
+        position:
+          - 0
+          - 2.8
+          - 1
+    components:
       lambs_controller:
         order: 1
         params:
@@ -130,9 +146,9 @@ children:
           methods:
             on_create:
               body: |
-                let lights = this.get_components("LightComponent");
+                let lights = this.find_child_components_of_type("LightComponent");
                 this.lights = lights
-            on_tick: 
+            on_tick:
               body: |
                 this.lights.forEach((light)=>{
                   light.intensity = Math.random() * (this.max_intensity - this.min_intensity) + this.min_intensity;
