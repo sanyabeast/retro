@@ -7,6 +7,8 @@ class App extends CoreApp {
             ...params,
         });
         let stage = this.load_stage(ResourceManager.load_prefab("{{APP_NAME}}.scenes.main"))
+        let renderer = this.find_component_of_type("Renderer")
+        renderer.target_fps = 60
         let camera = this.find_component_of_type("CameraComponent")
         camera.position = [
             0,

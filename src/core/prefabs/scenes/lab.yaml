@@ -200,8 +200,8 @@ children:
         order: 1
         params:
           tick_rate: 6
-          max_intensity: 120
-          min_intensity: 100
+          max_intensity: 95
+          min_intensity: 80
         inline:
           methods:
             on_create:
