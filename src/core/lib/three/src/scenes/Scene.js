@@ -15,8 +15,8 @@ class Scene extends Object3D {
 		this.overrideMaterial = null;
 
 		/**PATCH PATCH PATCH */
-		this.autoUpdate = true; // checked by the renderer
-		// this.autoUpdate = false; 
+		// this.autoUpdate = true; // checked by the renderer
+		this.autoUpdate = false; 
 		/**!PATCH !PATCH !PATCH */
 
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {

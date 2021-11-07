@@ -15,6 +15,8 @@ const SPEAKER_ICON_MATERIAL_SPATIAL = new THREE.SpriteMaterial({ map: SPEAKER_IC
 const $v3_1 = new THREE.Vector3()
 const $v3_2 = new THREE.Vector3()
 
+let global_volume = 0.5;
+
 class AudioComponent extends SceneComponent {
     src = undefined
     playing = false
@@ -65,7 +67,7 @@ class AudioComponent extends SceneComponent {
         }
 
         sound.setLoop(this.loop)
-        sound.setVolume(this.volume)
+        sound.setVolume(this.volume * global_volume)
     }
     get_reactive_props() {
         return [
@@ -143,7 +145,7 @@ class AudioComponent extends SceneComponent {
                 }
                 case "volume": {
                     if (this.sound) {
-                        this.sound.setVolume(this.volume)
+                        this.sound.setVolume(this.volume * global_volume)
                     }
                     break
                 }
@@ -166,6 +168,10 @@ class AudioComponent extends SceneComponent {
         this.log("start playing...")
         this.playing = true
     }
+}
+
+AudioComponent.set_volume = function (v) {
+    global_volume = v
 }
 
 export default AudioComponent;

@@ -33,7 +33,7 @@ children:
             - pbr: "res/core/pbr/angled_tile_floor_a1/a"
               file_format: jpg
               tiling: [4, 4]
-              color: "#979798"
+              color: "#ffffff"
       ceil:
         name: MeshComponent
         params:
@@ -44,10 +44,10 @@ children:
             - [5, 5, 1]
           material:
             - PBRMaterial
-            - pbr: "res/core/pbr/smooth_stucco_a1/smooth_stucco"
+            - pbr: "res/core/pbr/sprayed_wall_a1/sprayed_wall"
               file_format: jpg
-              tiling: [4, 4]
-              color: "#979798"
+              tiling: [12, 12]
+              color: "#ffffff"
       wall_a:
         name: MeshComponent
         params:
@@ -62,7 +62,7 @@ children:
               file_format: jpg
               tiling: [12, 7.2]
               reflectivity: 0.1
-              color: "#979798"
+              color: "#ffffff"
       wall_b:
         name: MeshComponent
         params:
@@ -77,7 +77,7 @@ children:
               file_format: jpg
               tiling: [12, 7.2]
               reflectivity: 0.1
-              color: "#979798"
+              color: "#ffffff"
   deco:
     components:
       metal_cabinet_1:
@@ -200,8 +200,8 @@ children:
         order: 1
         params:
           tick_rate: 6
-          max_intensity: 155
-          min_intensity: 145
+          max_intensity: 120
+          min_intensity: 100
         inline:
           methods:
             on_create:

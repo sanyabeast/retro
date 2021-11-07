@@ -12,6 +12,42 @@ import Device from "core/utils/Device";
 import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
 import { isArray, isObject, map, debounce, throttle } from "lodash-es"
 import Schema from "core/utils/Schema"
+import { Object3D } from "../lib/three/src/core/Object3D";
+
+// THREE.Object3D.DefaultMatrixAutoUpdate = false
+
+/**Object3D patch */
+Object3D.matrix_cache = {}
+Object3D.prototype.updateMatrix = function () {
+    let cache_id = [this.position.x, this.position.y, this.position.z, this.rotation.x, this.rotation.y, this.rotation.z, this.scale.x, this.scale.y, this.scale.z].join("|")
+    let needs_update = Object3D.matrix_cache[this.id] !== cache_id
+    if (needs_update) {
+        this.matrix.compose(this.position, this.quaternion, this.scale);
+        Object3D.matrix_cache[this.id] = cache_id
+    }
+
+    this.matrixWorldNeedsUpdate = true;
+}
+Object3D.prototype.updateMatrixWorld = function (force) {
+    if (this.matrixAutoUpdate) this.updateMatrix();
+    if (this.matrixWorldNeedsUpdate || force) {
+        let self_matrix = this.matrix
+        let parent_matrix = undefined
+        if (this.parent_matrix_world) {
+            parent_matrix = this.parent_matrix_world
+        } else {
+            if (this.parent) parent_matrix = this.parent.matrixWorld
+        }
+        if (parent_matrix) {
+            this.matrixWorld.multiplyMatrices(parent_matrix, self_matrix);
+        } else {
+            this.matrixWorld.copy(self_matrix)
+        }
+        this.matrixWorldNeedsUpdate = false;
+        force = true;
+    }
+    this.children.forEach(child => child.updateMatrixWorld(force))
+}
 
 class RenderScene extends THREE.Scene { }
 
@@ -167,7 +203,6 @@ class Renderer extends Component {
     }
     on_tick(time_delta) {
         this.update_object_layers()
-        this.update_render_scene()
         if (this.use_progressive_lightmap) this.update_progressive_lightmap()
         this.check_size()
 
@@ -306,6 +341,7 @@ class Renderer extends Component {
     render() {
         let now = +new Date()
         if (now - this.prev_frame_time >= 1000 / this.target_fps) {
+            this.update_render_scene()
             let scene = this.globals.app
             scene.update_transform()
             this.prev_frame_time = now
