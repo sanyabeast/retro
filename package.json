@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "gamecore",
-    "version": "1.0.94",
+    "version": "1.0.97",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
@@ -65,6 +65,7 @@
         "@babel/eslint-parser": "^7.15.8",
         "@esotericsoftware/spine-core": "^4.0.14",
         "@esotericsoftware/spine-threejs": "^4.0.14",
+        "color-blend": "^3.0.1",
         "command-line-args": "^5.2.0",
         "core-js": "^3.17.3",
         "datetime-js": "^4.0.0",

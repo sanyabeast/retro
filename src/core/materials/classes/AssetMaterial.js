@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { request_text_sync } from 'core/utils/Tools';
+import { request_text_sync, blend_colors } from 'core/utils/Tools';
 import Device from 'core/utils/Device';
 import { isNumber, isBoolean, map } from "lodash-es"
 const path = require("path")
@@ -40,10 +40,8 @@ class AssetMaterial extends THREE.Material {
         type = type[type.length - 1]
         switch (type) {
             case "mtl": {
-                // r.push(new THREE.MeshStandardMaterial({color: "#ff0000"}))
                 let mtl_data = request_text_sync(params.src)
                 let materials = this.parse_mtl(mtl_data, src)
-                // console.log(src, materials)
                 materials.forEach(m => r.push(m))
                 materials.sorted = false
                 break;
@@ -100,6 +98,7 @@ class AssetMaterial extends THREE.Material {
             }
         }
         blocks.forEach(b => {
+            let material_type = Device.is_mobile ? LQ_MAT : HQ_MAT
             let block_data = parse_block(b)
             // console.log(block_data)
             let material_params = {}
@@ -107,7 +106,9 @@ class AssetMaterial extends THREE.Material {
                 material_params.name = block_data.newmtl[0]
             }
 
-            // console.log(b, block_data)
+            material_params.color = new THREE.Color()
+
+
             if (block_data.map_Ka) {
                 let map_Ka = block_data.map_Ka[block_data.map_Ka.length - 1]
                 let src = path.basename(map_Ka.replace(/\\\\/gm, "/"))
@@ -127,8 +128,9 @@ class AssetMaterial extends THREE.Material {
                 let map_Ns = block_data.map_Ns[block_data.map_Ns.length - 1]
                 let src = path.basename(map_Ns.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
-                material_params.specularMap = `${src}?wrapS=1000&wrapT=1000`
+                // material_params.specularMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.roughnessMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.roughness = 1
             }
             if (block_data.refl) {
                 let refl = block_data.refl[block_data.refl.length - 1]
@@ -169,7 +171,20 @@ class AssetMaterial extends THREE.Material {
                 material_params.color = new THREE.Color(...v3(block_data.Ka))
             }
             if (block_data.Kd) {
-                material_params.color = new THREE.Color(...v3(block_data.Kd))
+                if (block_data.Ka) {
+
+                    material_params.color.set_any(
+                        blend_colors(
+                            "softLight",
+                            v3(block_data.Kd),
+                            v3(block_data.Ka),
+                            "array"
+                        )
+                    )
+                } else {
+                    material_params.color = new THREE.Color(...v3(block_data.Kd))
+                }
+
             }
             if (block_data.Ke && this.emissive_color === undefined) {
                 let ke_color = v3(block_data.Ke)
@@ -199,21 +214,22 @@ class AssetMaterial extends THREE.Material {
                 material_params.shininess = num(block_data.Ns[0]) * (this.shininess / 1000)
             }
             if (block_data.Ni) {
-                material_params.refractionRatio = num(block_data.Ni[0])
+                material_params.refractionRatio = 1
             }
 
+            material_params.refractionRatio = 0.5
+            material_params.reflectivity = 1
+            material_params.ior = 0.5
 
             material_params.emissiveIntensity = this.emissive_intensity
-            material_params.color = this.color
-            material_params.reflectivity = 1
-            // material_params.normalMapType = THREE.ObjectSpaceNormalMap
-            let mat = new THREE.materials[Device.is_mobile ? LQ_MAT : HQ_MAT](material_params)
+            material_params.color.set_any(blend_colors("multiply", material_params.color, this.color, "array"))
+            let mat = new THREE.materials[material_type](material_params)
+            // mat.material_layers = [
+            //     new THREE.MeshPhongMaterial({transparent: true, reflectivity: 0.4, refractionRatio: 0.8, ior: 0.5, blending: 2, opacity: 0.5, metalness: 0.5, roughness: 0, r})
+            // ]
             r.push(mat)
 
         })
-
-
-
 
         return r
     }

@@ -98,7 +98,7 @@ class Renderer extends Component {
     current_matcap_id = 1
     shadows_enabled = true
     tick_rate = 15
-    shadowmap_fps = 5
+    shadowmap_fps = 15
     //** private*/
 
     canvas = null

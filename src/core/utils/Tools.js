@@ -2,6 +2,28 @@
 import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRightvv } from "lodash-es"
 import DateTime from "datetime-js"
 import exp from "constants";
+import { Color, Vector2, Vector3 } from "three"
+const color_blend = require("color-blend")
+/**blend modes*/
+/*  color: (…)
+    colorBurn: (…)
+    colorDodge: (…)
+    darken: (…)
+    difference: (…)
+    exclusion: (…)
+    hardLight: (…)
+    hue: (…)
+    lighten: (…)
+    luminosity: (…)
+    multiply: (…)
+    normal: (…)
+    overlay: (…)
+    saturation: (…)
+    screen: (…)
+    softLight: (…)
+*/
+
+
 
 const easings = {
     linear: t => t,
@@ -189,21 +211,33 @@ function hsl_to_rgb(h, s, l) {
 
 function hex_to_rgb(h) {
     let r = 0, g = 0, b = 0;
-
     // 3 digits
     if (h.length == 4) {
         r = "0x" + h[1] + h[1];
         g = "0x" + h[2] + h[2];
         b = "0x" + h[3] + h[3];
-
         // 6 digits
     } else if (h.length == 7) {
         r = "0x" + h[1] + h[2];
         g = "0x" + h[3] + h[4];
         b = "0x" + h[5] + h[6];
     }
-
     return [(+r) / 255, (+g) / 255, (+b) / 255]
+}
+
+function rgb_to_hex(r, g, b) {
+    r = (+r * 255).toString(16);
+    g = (+g * 255).toString(16);
+    b = (+b * 255).toString(16);
+
+    if (r.length == 1)
+        r = "0" + r;
+    if (g.length == 1)
+        g = "0" + g;
+    if (b.length == 1)
+        b = "0" + b;
+
+    return "#" + r + g + b;
 }
 
 function is_none(v) {
@@ -280,11 +314,52 @@ function get_most_suitable_dict_keys(dict, test_string, single_key = false) {
     return r
 }
 
-function random_in_range(min, max){
+function random_in_range(min, max) {
     return Math.random() * (max - min) + min
 }
 
 let console = _console
+
+let $color1 = new Color()
+let $color2 = new Color()
+let $color3 = new Color()
+let $v3 = new Vector3()
+function blend_colors(mode, color_a, color_b, output_type = "rgb") {
+    $color1.set_any(color_a)
+    $color2.set_any(color_b)
+    let { r, g, b, a } = color_blend[mode](
+        { r: $color1.r * 255, g: $color1.g * 255, b: $color1.b * 255, a: 1 },
+        { r: $color2.r * 255, g: $color2.g * 255, b: $color2.b * 255, a: 1 }
+    )
+
+    switch (output_type) {
+        case "rgb": {
+            $color3.set(r / 255, g / 255, b / 255)
+            return $color3
+        }
+        case "hex": {
+            return rgb_to_hex(r / 255, g / 255, b / 255)
+        }
+        case "0hex": {
+            return parseInt(rgb_to_hex(r / 255, g / 255, b / 255).replace("#", ""), 16)
+        }
+        case "array": {
+            return [r / 255, g / 255, b / 255]
+        }
+        case "v3": {
+            $v3.set(r / 255, g / 255, b / 255)
+            return
+        }
+        default: {
+            $color3.set(r / 255, g / 255, b / 255)
+            return $color3
+        }
+    }
+}
+
+
+
+window.blend_colors = blend_colors
 
 export {
     log,
@@ -294,6 +369,7 @@ export {
     hex_to_hsl,
     hsl_to_rgb,
     hex_to_rgb,
+    rgb_to_hex,
     get_unique_props,
     is_none,
     camel_to_snake,
@@ -305,6 +381,7 @@ export {
     get_random_color_for_string,
     get_most_suitable_dict_keys,
     random_in_range,
+    blend_colors,
     console,
     easings
 }
