@@ -43,7 +43,7 @@ class AssetMaterial extends THREE.Material {
                 // r.push(new THREE.MeshStandardMaterial({color: "#ff0000"}))
                 let mtl_data = request_text_sync(params.src)
                 let materials = this.parse_mtl(mtl_data, src)
-                console.log(src, materials)
+                // console.log(src, materials)
                 materials.forEach(m => r.push(m))
                 materials.sorted = false
                 break;
@@ -107,7 +107,7 @@ class AssetMaterial extends THREE.Material {
                 material_params.name = block_data.newmtl[0]
             }
 
-            console.log(b, block_data)
+            // console.log(b, block_data)
             if (block_data.map_Ka) {
                 let map_Ka = block_data.map_Ka[block_data.map_Ka.length - 1]
                 let src = path.basename(map_Ka.replace(/\\\\/gm, "/"))
@@ -173,7 +173,7 @@ class AssetMaterial extends THREE.Material {
             }
             if (block_data.Ke && this.emissive_color === undefined) {
                 let ke_color = v3(block_data.Ke)
-                console.log(ke_color, Math.max.apply(Math, ke_color))
+                // console.log(ke_color, Math.max.apply(Math, ke_color))
                 if (block_data.map_Ke) {
                     if (Math.max.apply(Math, ke_color) === 0) {
                         //@TODO: fix black emission color issue

@@ -5,8 +5,8 @@
  */
 
 import SceneComponent from "core/SceneComponent";
-import { Howl, Howler } from 'howler';
 import * as THREE from "three"
+import ResourceManager from "core/ResourceManager"
 
 const SPEAKER_ICON_TEXTURE = new THREE.TextureLoader().load('res/core/gizmo/speaker_a.png');
 const SPEAKER_ICON_MATERIAL = new THREE.SpriteMaterial({ map: SPEAKER_ICON_TEXTURE });
@@ -20,16 +20,22 @@ class AudioComponent extends SceneComponent {
     playing = false
     loop = false
     volume = 0.5
-    spatial_volume = 1
-    spatial_distance = 10
-    spatial_fade_power = 2
+    ref_distance = 2
+    max_distance = 10
+    rolloff = 1
     autoplay = false
     spatial = true
-    tick_rate = 15
+    tick_rate = 5
     paused = false;
     /**private */
     current_distance_to_camera = 0
+    extra_gizmo_render_data = undefined
+    constructor() {
+        super(...arguments)
+        this.extra_gizmo_render_data = []
+    }
     on_create() {
+        console.log(ResourceManager)
         this.subject = new THREE.Object3D()
         /**gizmo */
         const gizmo_speaker_icon = this.gizmo_speaker_icon = new THREE.Sprite(this.spatial ? SPEAKER_ICON_MATERIAL_SPATIAL : SPEAKER_ICON_MATERIAL);
@@ -40,25 +46,38 @@ class AudioComponent extends SceneComponent {
         gizmo_speaker_icon.renderOrder = 1
 
     }
-    update_src() {
-        if (this.sound) {
-            this.sound.stop()
+    async update_src() {
+        let sound = this.sound = await ResourceManager.load_audio(this.src, this.spatial, this.autoplay)
+        if (sound.helper) {
+            this.extra_gizmo_render_data = [{
+                object: sound.helper,
+                parent: this.subject,
+                layers: { gizmo: true }
+            }]
+        } else {
+            this.extra_gizmo_render_data = []
         }
-        this.sound = new Howl({
-            src: [`${this.src}.ogg`, `${this.src}.mp3`,],
-            loop: this.loop,
-            volume: this.volume
-        });
+
+        if (this.spatial) {
+            sound.setRefDistance(this.ref_distance)
+            sound.setRolloffFactor(this.rolloff)
+            sound.setMaxDistance(this.max_distance)
+        }
+
+        sound.setLoop(this.loop)
+        sound.setVolume(this.volume)
     }
     get_reactive_props() {
         return [
-            "spatial",
             "src",
             "playing",
             "loop",
             "volume",
             "autoplay",
-            "spatial_volume"
+            "spatial_volume",
+            "ref_distance",
+            "max_distance",
+            "rolloff"
         ].concat(super.get_reactive_props())
     }
     get_render_data() {
@@ -66,6 +85,10 @@ class AudioComponent extends SceneComponent {
             {
                 object: this.subject,
                 parent: this.game_object
+            },
+            {
+                object: this.sound,
+                parent: this.subject
             }
         ]
     }
@@ -74,26 +97,33 @@ class AudioComponent extends SceneComponent {
             object: this.gizmo_speaker_icon,
             parent: this.subject,
             layers: { gizmo: true }
-        }]
+        }, ...this.extra_gizmo_render_data]
     }
     on_update(props) {
         super.on_update(props)
         props.forEach(prop => {
             switch (prop) {
-                case "spatial": {
-                    if (this.spatial) {
-                        this.gizmo_speaker_icon.material = SPEAKER_ICON_MATERIAL_SPATIAL
-                    } else {
-                        this.gizmo_speaker_icon.material = SPEAKER_ICON_MATERIAL
-                    }
-                    break
-                }
                 case "src": {
                     this.update_src()
-                    if (this.autoplay || this.playing) {
+                    if (this.sound && (this.autoplay || this.playing)) {
                         this.sound.play()
                     }
                     break
+                }
+                case "ref_distance": {
+                    if (this.sound && this.spatial) {
+                        this.sound.setRefDistance(this.ref_distance)
+                    }
+                }
+                case "rolloff": {
+                    if (this.sound && this.spatial) {
+                        this.sound.setRolloffFactor(this.rolloff)
+                    }
+                }
+                case "max_distance": {
+                    if (this.sound && this.spatial) {
+                        this.sound.setMaxDistance(this.max_distance)
+                    }
                 }
                 case "playing": {
                     if (this.sound) {
@@ -106,19 +136,19 @@ class AudioComponent extends SceneComponent {
                     break
                 }
                 case "loop": {
-                    this.sound.loop(this.loop)
+                    if (this.sound) {
+                        this.sound.setLoop(this.loop)
+                    }
                     break
                 }
                 case "volume": {
-                    this.sound.volume(this.volume * this.spatial_volume)
-                    break
-                }
-                case "spatial_volume": {
-                    this.sound.volume(this.volume * this.spatial_volume)
+                    if (this.sound) {
+                        this.sound.setVolume(this.volume)
+                    }
                     break
                 }
                 case "autoplay": {
-                    if (this.autoplay) {
+                    if (this.sound && this.autoplay) {
                         this.play()
                     }
 
@@ -130,31 +160,7 @@ class AudioComponent extends SceneComponent {
         })
     }
     on_tick(time_delta) {
-        if (this.spatial === true) {
-            this.update_spatial()
-        }
-    }
-    update_spatial() {
-        let camera = this.globals.camera
-        camera.getWorldPosition($v3_1)
-        this.subject.getWorldPosition($v3_2)
-        let distance = this.current_distance_to_camera = $v3_1.distanceTo($v3_2)
-        let fade_progress = distance / this.spatial_distance
-        this.spatial_volume = Math.pow(1 - this.clamp(fade_progress, 0, 1), this.spatial_fade_power)
 
-        if (fade_progress > 1) {
-            if (!this.paused) {
-                this.log(`spatial sound paused ${this.src}`, fade_progress)
-                this.paused = true
-                this.sound.pause()
-            }
-        } else if (fade_progress <= 1) {
-            if (this.paused && this.playing) {
-                this.log(`spatial sound resumed ${this.src}`, fade_progress)
-                this.paused = false
-                this.sound.play()
-            }
-        }
     }
     play() {
         this.log("start playing...")

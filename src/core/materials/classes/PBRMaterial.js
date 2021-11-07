@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Device from 'core/utils/Device';
+import { isNumber } from "lodash-es"
 
 const LQ_MAT = "MeshLambertMaterial"
 const HQ_MAT = "MeshStandardMaterial"
@@ -27,7 +28,7 @@ function setup_pbr(params) {
     this.bumpMap = `${this.pbr}_h.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.emissiveMap = `${this.pbr}_e.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.bumpScale = typeof params.bumpScale === "number" ? params.bumpScale : 1
-    this.reflectivity = 1
+    this.reflectivity = isNumber(params.reflectivity) ? params.reflectivity : 0.5
     this.displacementScale = -0.001
 }
 

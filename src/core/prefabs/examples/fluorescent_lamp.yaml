@@ -27,6 +27,18 @@ components:
       rect_width: 1
       rect_height: 0.1
       color: "#eee0e5"
+  light2:
+    name: LightComponent
+    enabled: true
+    params:
+      position: [0, -0.1, 0]
+      rotation: [-1.5707, 0, 0]
+      type: PointLight
+      intensity: 0.8
+      distance: 2.5
+      rect_width: 1
+      rect_height: 0.1
+      color: "#eee0e5"
   sfx_ambient:
     name: AudioComponent
     params:

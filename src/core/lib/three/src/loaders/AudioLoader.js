@@ -13,7 +13,6 @@ class AudioLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
-
 		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( this.path );
@@ -35,7 +34,7 @@ class AudioLoader extends Loader {
 				} );
 
 			} catch ( e ) {
-
+				console.log(e)
 				if ( onError ) {
 
 					onError( e );

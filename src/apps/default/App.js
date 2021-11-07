@@ -18,8 +18,8 @@ class App extends CoreApp {
 
         let controls = this.find_component_of_type("OrbitControlsComponent")
 
-        controls.target = [-0.3274459053651773, 0.5307513889037137, 0.18259720921051698]
-        controls.position = [1.4164453079802426, 1.111746722422387, 1.2211212057234149]
+        controls.target = [-0.31197005211327, 0.974915058541094, 0.2336922765009091]
+        controls.position = [1.1388548774665392, 1.3167798096294043, 2.5525204666527]
         controls.zoom = 1
 
 

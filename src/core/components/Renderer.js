@@ -242,6 +242,7 @@ class Renderer extends Component {
         return map(this.get_object_layer(layers), render_data => render_data.object)
     }
     get_rendering_list() {
+        //@TODO: audio_listener
         return this.get_object_layer_list(this.rendering_layers)
     }
     update_render_scene() {

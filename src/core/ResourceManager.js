@@ -13,9 +13,14 @@ import BasicObject from "core/BasicObject"
 import AssetBufferGeometry from 'core/geometry/classes/AssetBufferGeometry';
 import DataComputed from "core/utils/DataComputed";
 import SCHEMA_CORE from "core/SCHEMA.yaml"
+import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js';
+
+
 
 
 const SCHEMA_APP = require(`apps/${process.env.APP_NAME}/SCHEMA.yaml`)
+const audio_loader = new THREE.AudioLoader();
+const audio_listener = new THREE.AudioListener();
 
 class RmDict {
     constructor(data) {
@@ -39,6 +44,7 @@ class ResourceManager extends BasicObject {
             return ResourceManager.singleton
         }
         this.globals = new GlobalsDict({
+            audio_listener,
             stage: undefined,
             dom_rect: { left: 0, top: 0, width: 1, height: 1 },
             uniforms: {
@@ -445,6 +451,31 @@ class ResourceManager extends BasicObject {
             }
 
         })
+    }
+    load_audio_buffer(src) {
+        return new Promise((resolve) => {
+            console.log(src)
+            audio_loader.load(`${src}.ogg`, (buffer) => {
+                resolve(buffer)
+            });
+        })
+    }
+    async load_audio(src, spatial = true, autoplay = false) {
+        let sound = undefined
+        if (spatial === true) {
+            sound = new THREE.PositionalAudio(audio_listener)
+            // const helper = new PositionalAudioHelper(sound);
+            // sound.helper = helper
+        } else {
+            sound = new THREE.Audio(audio_listener)
+        }
+
+        sound.autoplay = autoplay
+        sound.frustumCulled = false
+        let buffer = await this.load_audio_buffer(src)
+        sound.setBuffer(buffer)
+
+        return sound
     }
     resolve_string_placeholders(data) {
         data = data.replace("{{APP_NAME}}", process.env.APP_NAME)

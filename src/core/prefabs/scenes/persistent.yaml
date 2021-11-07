@@ -4,6 +4,7 @@ prefabs:
   - default.ClockComponent
   - default.Renderer
   - default.Animator
+  - default.AudioListener
 components:
   camera:
     name: "CameraComponent"
