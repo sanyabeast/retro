@@ -111,3 +111,5 @@ Original licenses apply:
 /**!PATCH !PATCH !PATCH */
 
 /**!PATCH PATCH PATCH */
+
+/**!THREEJS PATCHES */
