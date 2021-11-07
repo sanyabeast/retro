@@ -205,13 +205,13 @@ class VueGUIComponent extends Component {
         this.ui_wrapper.tick(time_delta)
     }
     store_set(key, value) {
-        return this.vuex_store.state[key] = value
+        setTimeout(a => this.vuex_store.state[key] = value)
     }
     store_commit(mutation_name, payload) {
-        return this.vuex_store.commit(mutation_name, payload)
+        setTimeout(a => this.vuex_store.commit(mutation_name, payload))
     }
     store_dispatch(action_name, payload) {
-        return this.vuex_store.dispatch(action_name, payload)
+        setTimeout(a => this.vuex_store.dispatch(action_name, payload))
     }
     run_method(method_name, ...payload) {
         let root_comp = this.ui
@@ -223,30 +223,36 @@ class VueGUIComponent extends Component {
         this._run_method_on(root_comp, method_name, ...payload)
     }
     _run_method_on(object, method_name, ...payload) {
-        if (isObject(object) && isFunction(object[method_name])) {
-            object[method](...payload)
-        }
+        setTimeout(() => {
+            if (isObject(object) && isFunction(object[method_name])) {
+                object[method](...payload)
+            }
+        })
     }
     run_nested_methods(method_name, ...payload) {
-        let root_comp = this.ui
-        if (!root_comp) {
-            this.error(`cannot run nested methods: no root`)
-            return
-        }
-        this._run_nested_methods_on_comp(root_comp, method_name, ...payload)
+        setTimeout(() => {
+            let root_comp = this.ui
+            if (!root_comp) {
+                this.error(`cannot run nested methods: no root`)
+                return
+            }
+            this._run_nested_methods_on_comp(root_comp, method_name, ...payload)
+        })
     }
     _run_nested_methods_on_comp(comp, method_name, ...payload) {
-        comp = comp || this.ui
-        if (!comp) {
-            this.error(`cannot run nested methods: no comp`)
-            return
-        }
-        if (isFunction(comp[method_name])) {
-            comp[method_name](...payload)
-        }
-        if (isArray(comp.$children)) {
-            comp.$children.forEach(child => this._run_nested_methods_on_comp(child, method_name, ...payload))
-        }
+        setTimeout(() => {
+            comp = comp || this.ui
+            if (!comp) {
+                this.error(`cannot run nested methods: no comp`)
+                return
+            }
+            if (isFunction(comp[method_name])) {
+                comp[method_name](...payload)
+            }
+            if (isArray(comp.$children)) {
+                comp.$children.forEach(child => this._run_nested_methods_on_comp(child, method_name, ...payload))
+            }
+        })
     }
 }
 
