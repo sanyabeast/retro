@@ -62,3 +62,8 @@
   type: sound
   source: https://freesound.org/people/thaighaudio/sounds/349687/
   license: "Creative Commons 0 License."
+- author: MADE.COM
+  name: "Boone Dining Table, Concrete Resin Top"
+  type: 3d-model
+  source: https://sketchfab.com/3d-models/boone-dining-table-concrete-resin-top-489067163b944f9c8a39c6693bfbaf82
+  license: "CC Attribution-NonCommercial"

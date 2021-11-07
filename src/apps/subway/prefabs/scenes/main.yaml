@@ -22,7 +22,7 @@ components:
       type: PointLight
       intensity: 10
       distance: 7
-      color: "#ff5722"
+      color: "#dbb8ad"
 children:
   fog: ??prefab=default.Fog
   subway_scene:

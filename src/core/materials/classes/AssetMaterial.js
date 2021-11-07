@@ -129,7 +129,9 @@ class AssetMaterial extends THREE.Material {
                 let src = path.basename(map_Ns.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
                 // material_params.specularMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.specularMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.roughnessMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.specular = 1
                 material_params.roughness = 1
             }
             if (block_data.refl) {
@@ -160,12 +162,6 @@ class AssetMaterial extends THREE.Material {
                 material_params.normalMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.bumpMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.bumpScale = this.bump_scale
-            }
-            if (block_data.map_Kd) {
-                let map_Kd = block_data.map_Kd[block_data.map_Kd.length - 1]
-                let src = path.basename(map_Kd.replace(/\\\\/gm, "/"))
-                src = `${asset_dir}/maps/${src}`
-                material_params.map = `${src}?wrapS=1000&wrapT=1000`
             }
             if (block_data.Ka) {
                 material_params.color = new THREE.Color(...v3(block_data.Ka))
@@ -220,7 +216,7 @@ class AssetMaterial extends THREE.Material {
             material_params.refractionRatio = 0.5
             material_params.reflectivity = 1
             material_params.ior = 0.5
-
+            
             material_params.emissiveIntensity = this.emissive_intensity
             material_params.color.set_any(blend_colors("multiply", material_params.color, this.color, "array"))
             let mat = new THREE.materials[material_type](material_params)
