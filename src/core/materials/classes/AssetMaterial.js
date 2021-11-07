@@ -5,7 +5,7 @@ import { isNumber, isBoolean, map } from "lodash-es"
 const path = require("path")
 
 const LQ_MAT = "MeshLambertMaterial"
-const HQ_MAT = "MeshStandardMaterial"
+const HQ_MAT = "MeshPhysicalMaterial"
 
 function num(v) {
     return Number(v) || 0
@@ -107,6 +107,7 @@ class AssetMaterial extends THREE.Material {
             }
 
             material_params.color = new THREE.Color()
+            material_params.clearcoatRoughness = 0.385
 
 
             if (block_data.map_Ka) {
@@ -129,15 +130,21 @@ class AssetMaterial extends THREE.Material {
                 let src = path.basename(map_Ns.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
                 // material_params.specularMap = `${src}?wrapS=1000&wrapT=1000`
-                material_params.specularMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.clearcoat = true
                 material_params.roughnessMap = `${src}?wrapS=1000&wrapT=1000`
-                material_params.specular = 1
                 material_params.roughness = 1
+                material_params.clearcoatRoughnessMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.sheenRoughnessMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.clearcoatMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.sheenMap = `${src}?wrapS=1000&wrapT=1000`
+                material_params.sheen  = 1
+                material_params.sheenRoughness = 0.5
             }
             if (block_data.refl) {
                 let refl = block_data.refl[block_data.refl.length - 1]
                 let src = path.basename(refl.replace(/\\\\/gm, "/"))
                 src = `${asset_dir}/maps/${src}`
+                material_params.clearcoat = true
                 material_params.metalnessMap = `${src}?wrapS=1000&wrapT=1000`
                 material_params.metalness = 1
             }
@@ -216,14 +223,17 @@ class AssetMaterial extends THREE.Material {
             material_params.refractionRatio = 0.5
             material_params.reflectivity = 1
             material_params.ior = 0.5
+
             
-            material_params.emissiveIntensity = this.emissive_intensity
+            
+            material_params.emissiveIntensity = this.emissive_intensity * 100
             material_params.color.set_any(blend_colors("multiply", material_params.color, this.color, "array"))
             let mat = new THREE.materials[material_type](material_params)
             // mat.material_layers = [
             //     new THREE.MeshPhongMaterial({transparent: true, reflectivity: 0.4, refractionRatio: 0.8, ior: 0.5, blending: 2, opacity: 0.5, metalness: 0.5, roughness: 0, r})
             // ]
             r.push(mat)
+            console.log(mat)
 
         })
 

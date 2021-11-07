@@ -1303,8 +1303,7 @@ function WebGLRenderer(parameters = {}) {
 		/**PATCH !PATCH !PATCH */
 		if (material.isMeshStandardMaterial || materialProperties.isMeshPhongMaterial || materialProperties.isMeshPhysicalMaterial || materialProperties.isMeshBasicMaterial) {
 			materialProperties.envMap = scene.background
-			materialProperties.lightMap = scene.background
-			materialProperties.envMapIntensity = 100
+			materialProperties.envMapIntensity = 1
 		}
 		/**PATCH !PATCH !PATCH */
 
