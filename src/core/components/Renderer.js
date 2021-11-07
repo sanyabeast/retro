@@ -12,11 +12,12 @@ import Device from "core/utils/Device";
 import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
 import { isArray, isObject, map, debounce, throttle } from "lodash-es"
 import Schema from "core/utils/Schema"
-import { Object3D } from "../lib/three/src/core/Object3D";
+import { Object3D } from "three/src/core/Object3D";
+import { WebGLShadowMap } from "three/src/renderers/webgl/WebGLShadowMap"
 
 // THREE.Object3D.DefaultMatrixAutoUpdate = false
 
-/**Object3D patch */
+/**THREEJS PATCHES*/
 Object3D.matrix_cache = {}
 Object3D.prototype.updateMatrix = function () {
     let cache_id = [this.position.x, this.position.y, this.position.z, this.rotation.x, this.rotation.y, this.rotation.z, this.scale.x, this.scale.y, this.scale.z].join("|")
@@ -49,6 +50,24 @@ Object3D.prototype.updateMatrixWorld = function (force) {
     this.children.forEach(child => child.updateMatrixWorld(force))
 }
 
+let shadowmap_fps = 10
+let original_threejs_webgl_shadowmap_render = WebGLShadowMap.prototype.render
+WebGLShadowMap.prototype.render = function (lights, scene, camera) {
+    let now = +new Date
+    this.prev_render_time = this.prev_render_time || now
+    let delta = now - this.prev_render_time
+    if (delta > (1000 / shadowmap_fps)) {
+        console.log(`r`)
+        this.prev_render_time = now
+        original_threejs_webgl_shadowmap_render.call(this, lights, scene, camera)
+    }
+
+}
+
+
+/**!THREEJS PATCHES */
+
+/** */
 class RenderScene extends THREE.Scene { }
 
 const renderer_presets = {
@@ -79,6 +98,7 @@ class Renderer extends Component {
     current_matcap_id = 1
     shadows_enabled = true
     tick_rate = 15
+    shadowmap_fps = 5
     //** private*/
 
     canvas = null
@@ -100,6 +120,9 @@ class Renderer extends Component {
 
     object_layers = undefined
     zero_object = new THREE.Object3D()
+
+    original_threejs_webgl_shadowmap_render = undefined
+    prev_shadowmap_render_time = +new Date
 
     constructor() {
         super(...arguments)
@@ -127,10 +150,6 @@ class Renderer extends Component {
         this.setup_progressive_lightmap()
         this.define_global_var("webgl_capabilities", a => renderer.capabilities)
 
-
-        /**shadowmap */
-        renderer.shadowMap.enabled = this.shadows_enabled && !Device.is_mobile
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap
         renderer.toneMappingExposure = 2
         renderer.setClearAlpha(1)
         renderer.setSize(1000, 1000);
@@ -139,6 +158,16 @@ class Renderer extends Component {
         if (this.globals.transparent_background) {
             renderer.setClearColor(0x000000, 0);
         }
+
+        /**shadowmap */
+        renderer.shadowMap.enabled = this.shadows_enabled && !Device.is_mobile
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap
+        renderer.shadowMap.autoUpdate = false
+
+        /**@TODO:move shadowmap patch to prototype of WebGLShadowMap class ? */
+        let original_threejs_webgl_shadowmap_render = this.original_threejs_webgl_shadowmap_render = renderer.shadowMap.render
+        renderer.shadowMap.render = this.render_shadowmap.bind(this)
+
 
         this.globals.uniforms.pixel_ratio.value = this.pixel_ratio
         renderer.setPixelRatio(this.pixel_ratio)
@@ -424,6 +453,15 @@ class Renderer extends Component {
             camera.aspect = this.globals.uniforms.resolution.value.x / this.globals.uniforms.resolution.value.y
         }
         this.globals.dom_rect = new_rect;
+    }
+    render_shadowmap(lights, scene, camera) {
+        let now = +new Date
+        let delta = now - this.prev_shadowmap_render_time
+        if (delta > (1000 / this.shadowmap_fps)) {
+            this.prev_shadowmap_render_time = now
+            this.original_threejs_webgl_shadowmap_render.call(this.renderer.shadowMap, lights, scene, camera)
+            this.renderer.shadowMap.needsUpdate = true
+        }
     }
 }
 export default Renderer;

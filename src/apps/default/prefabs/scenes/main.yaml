@@ -14,7 +14,7 @@ components:
   sun:
     name: Sun
     params:
-      cycling: 10
+      cycling: 100
       time: 0.1
       global_intensity: 1
 children:
