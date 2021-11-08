@@ -16,13 +16,13 @@ children:
             - 0
           geometry:
             - CircleGeometry
-            - - 9
+            - - 3
               - 6
           rotation: [-1.5707, 0, 0]
           material:
             - PBRMaterial
             - color: "#daefe5"
-              pbr: "res/core/pbr/rocks-hexagon-1/t"
+              pbr: "res/core/pbr/dusty_groun_gravel_a1/t"
               file_format: jpg
               tiling: 6
       caption_a:

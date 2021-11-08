@@ -15,7 +15,7 @@ function setup_pbr(params) {
     } else if (typeof params.tiling === "object" && typeof params.tiling.y === "number") {
         repeat.set(params.tiling.x, repeat.tiling.y)
     }
-    this.file_format = params.file_format || "png"
+    this.file_format = params.file_format || "jpg"
     this.color = new THREE.Color(params.color)
     this.pbr = params.pbr || ""
     this.map = `${this.pbr}_c.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
