@@ -4,8 +4,10 @@ src/apps/*
 !src/apps/demo/
 !src/apps/default/
 !src/apps/subway/
+!src/apps/lab/
 dist/*
 !dist/demo
 !dist/default
 !dist/subway
+!dist/lab
 .DS_Store
