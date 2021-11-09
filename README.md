@@ -1,8 +1,13 @@
 # @sanyabeast/gamecorejs
-Game Engine -like setup built on top of THREEjs.
+ETC Game Engine built on top of THREEjs graphics library
 
-[DEMO #1](https://sanyabeast.github.io/gamecorejs/dist/demo/)
+# Examples
+## Basic Demos
+[Default Project Scene](https://sanyabeast.github.io/gamecorejs/dist/default/)
 
-[DEMO #2](https://sanyabeast.github.io/gamecorejs/dist/default/) (default app template)
+[Lab #3 Scene](https://sanyabeast.github.io/gamecorejs/dist/lab/)
 
-[SUBWAY](https://sanyabeast.github.io/gamecorejs/dist/subway/)
+[Subway Scene](https://sanyabeast.github.io/gamecorejs/dist/subway/)
+
+[PBR Testing Scene](https://sanyabeast.github.io/gamecorejs/dist/pbr/)
+
