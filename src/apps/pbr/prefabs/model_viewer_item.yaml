@@ -5,9 +5,14 @@ components:
   #     collider_type: "sphere"
   #     sphere_radius: 2
   controller:
+    params:
+      tick_rate: 15
+      item_rotation_enabled: true
+      item_rotation_speed: 20
     inline:
       methods:
         on_tick:
+          args: ["time_data"]
           body: |
             let input = this.find_component_of_type("InputComponent");
             let model_viewer = this.find_component_of_type("ModelViewerController");
@@ -15,4 +20,12 @@ components:
               model_viewer.prev_model();
             } else if (input.is_keypress("d") || input.is_keypress("arrowright")){
               model_viewer.next_model();
+            }
+
+            if (this.item_rotation_enabled){
+              this.game_object.rotation = [
+                this.game_object.rotation[0],
+                this.game_object.rotation[1] + (this.item_rotation_speed/1000) * time_data.delta,
+                this.game_object.rotation[2]
+              ];
             }

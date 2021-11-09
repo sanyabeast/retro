@@ -65,21 +65,21 @@ children:
         params:
           position: [0, 4, 0]
           type: PointLight
-          intensity: 3
-          distance: 12
+          intensity: 1.8
+          distance: 8
       light_2:
         name: LightComponent
         params:
           position: [0, 2, 0]
           type: PointLight
-          intensity: 2
-          distance: 12
+          intensity: 1.2
+          distance: 10
       light_3:
         name: LightComponent
         params:
           position: [0, 0.5, 0]
           type: PointLight
-          intensity: 1
+          intensity: 0.6
           distance: 12
       controller:
         order: 1
@@ -96,9 +96,9 @@ children:
                 let date = +new Date / 1000;
                 this.lights.forEach((light, index)=>{
                   light.position = [
-                    Math.sin((date + index) * (this.speed / (index + 1))) * (this.radius + index),
+                    Math.sin((date + index) * (this.speed / (index + 1))) * (this.radius + index * 2),
                     light.position[1],
-                    Math.cos((date + index) * (this.speed / (index + 1))) * (this.radius + index)
+                    Math.cos((date + index) * (this.speed / (index + 1))) * (this.radius + index * 3)
 
                   ]
                 })
@@ -161,40 +161,21 @@ children:
                 - src: "res/pbr/models/magic_stone_a1/magic_stone_a1.mtl"
                   allow_transparency: false
                   doubleside: false
-                  emissive_intensity: 10
       model_3:
         prefab: "pbr.model_viewer_item"
         components:
           body:
             name: MeshComponent
             params:
-              debug_transform: false
               rotation: [0, 1.5707, 0]
               recieve_shadow: false
               cast_shadow: false
               geometry:
-                - "url:res/pbr/models/jerrycan/jerrycan_a1.obj"
-                - 0.125
+                - "url:res/pbr/models/vintage_radio_a1/vintage_radio_a1.obj"
+                - 0.3
               material:
                 - AssetMaterial
-                - src: "res/pbr/models/jerrycan/jerrycan_a1.mtl"
-                  allow_transparency: false
-                  doubleside: false
-                  emissive_intensity: 10
-          body2:
-            name: MeshComponent
-            params:
-              debug_transform: false
-              position: [1, 0, 0]
-              rotation: [0, 0, 0]
-              recieve_shadow: false
-              cast_shadow: false
-              geometry:
-                - "url:res/pbr/models/jerrycan/jerrycan_a1.obj"
-                - 0.125
-              material:
-                - AssetMaterial
-                - src: "res/pbr/models/jerrycan/jerrycan_a1.mtl"
+                - src: "res/pbr/models/vintage_radio_a1/vintage_radio_a1.mtl"
                   allow_transparency: false
                   doubleside: false
                   emissive_intensity: 10

@@ -107,7 +107,7 @@ class AssetMaterial extends THREE.Material {
                     } else if (v.length === 3) {
                         switch (key) {
                             case "Ka": {
-                                v = num(v[0]) / 2
+                                v = num(v[0]) / 3
                                 break
                             }
                             case "d": {
@@ -135,7 +135,12 @@ class AssetMaterial extends THREE.Material {
                 }
 
                 result.bumpScale = 0.0005
-                result.emissiveIntensity = 100
+                result.emissiveIntensity = 200
+                if (result.emissiveMap !== undefined){
+                    result.emissive.set(1, 1, 1)
+                }
+
+
                 forEach(pbr_props, (prop_name) => {
                     result[prop_name] = v
                 })
@@ -169,6 +174,7 @@ class AssetMaterial extends THREE.Material {
             let material_layers = []
             let material_type = Device.is_mobile ? LQ_MAT : HQ_MAT
             let block_data = parse_block(b)
+            console.log(block_data)
 
 
             if (block_data.shininess !== undefined ||
@@ -178,7 +184,7 @@ class AssetMaterial extends THREE.Material {
                 block_data.reflectivity !== undefined) {
                 let rmat = new THREE.MeshPhongMaterial({
                     ...block_data,
-                    emissiveIntensity: 0,
+                    // emissiveIntensity: 0,
                     userData: {
                         layer_name: "phong"
                     }

@@ -1136,7 +1136,7 @@ function WebGLRenderer(parameters = {}) {
 
 								currentRenderList.push(object, geometry, groupMaterial, groupOrder, _vector3.z, group);
 								/**PATCH PATCH PATCH */
-								if (Array.isArray(groupMaterial.material_layers)) {
+								if (Array.isArray(groupMaterial.material_layers) && window.TR3_MATERIALS_LAYERS_DISABLED !== true) {
 									groupMaterial.material_layers.forEach(mat => {
 										currentRenderList.push(object, geometry, mat, groupOrder + 1, _vector3.z, group);
 									})
@@ -1151,7 +1151,7 @@ function WebGLRenderer(parameters = {}) {
 						currentRenderList.push(object, geometry, material, groupOrder, _vector3.z, null);
 
 						/**PATCH PATCH PATCH */
-						if (Array.isArray(material.material_layers)) {
+						if (Array.isArray(material.material_layers) && window.TR3_MATERIALS_LAYERS_DISABLED !== true) {
 							material.material_layers.forEach(mat => {
 								currentRenderList.push(object, geometry, mat, groupOrder + 1, _vector3.z, null);
 							})

@@ -1,12 +1,9 @@
 const extract = require('extract-zip')
 const path = require("path")
 const cmd_args = require('command-line-args')
-
-const ops_definitions = [
+const options = cmd_args([
     { name: 'name', alias: 'n', type: String }
-]
-
-const options = cmd_args(ops_definitions)
+])
 console.log(options)
 
 async function main() {
