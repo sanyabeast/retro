@@ -16,9 +16,8 @@ const exclude_props = [
 
 const ANCHOR_GIZMO_GEOMETRY = new THREE.SphereBufferGeometry(0.0125, 8, 8)
 const ANCHOR_GIZMO_MATERIAL = new THREE.MeshNormalMaterial({
-    color: "#ff0000",
     opacity: 0.5,
-    ransparent: true,
+    transparent: true,
     depthWrite: false,
     depthTest: false,
     fog: false

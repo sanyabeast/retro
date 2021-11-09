@@ -35,9 +35,7 @@ components:
       rotation: [-1.5707, 0, 0]
       type: PointLight
       intensity: 0.8
-      distance: 2.5
-      rect_width: 1
-      rect_height: 0.1
+      distance: 4
       color: "#eee0e5"
   sfx_ambient:
     name: AudioComponent

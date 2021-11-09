@@ -16,17 +16,24 @@ class SkyBox extends Component {
     texture = undefined
     /**private */
     scene_background = undefined
+    refraction_map = undefined
     on_create() {
         let scene = this.globals.app
         scene.background = this.scene_background = scene.environment = this.create_background(
             this.color,
             this.cubemap,
-            this.texture
+            this.texture,
+            THREE.CubeRefractionMapping
         )
 
-        console.log(scene.background)
+        scene.refraction_map = this.refraction_map = scene.environment = this.create_background(
+            this.color,
+            this.cubemap,
+            this.texture,
+            THREE.CubeRefractionMapping
+        )
     }
-    create_background(color = "#ffffff", cubemap = undefined, texture = undefined) {
+    create_background(color = "#ffffff", cubemap = undefined, texture = undefined, mapping = THREE.UVMapping) {
         if (cubemap === undefined && texture === undefined) {
             let c = new THREE.Color()
             c.set_any(color)
@@ -34,6 +41,7 @@ class SkyBox extends Component {
         } else {
             if (typeof cubemap === "string") {
                 let t = ResourceManager.load_cubemap(this.cubemap, this.cubemap_format)
+                t.mapping = mapping
                 return t
             }
         }

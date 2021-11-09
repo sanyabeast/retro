@@ -517,6 +517,9 @@ class ResourceManager extends BasicObject {
             let name = p.replace("./", "").replace(".js", "");
             THREE[category] = THREE[category] || {}
             THREE[category][name] = mod.default
+            if (isObject(THREE[category][name])){
+                THREE[category][name].ResourceManager = this
+            }
             this[`classes_of_${category}`] = this[`classes_of_${category}`] || {}
             this[`classes_of_${category}`][name] = mod.default
         })

@@ -321,6 +321,7 @@ class Renderer extends Component {
         }
 
         this.render_scene.background = scene.background
+        this.render_scene.refraction_map = scene.refraction_map
         this.render_scene.environment = scene.environment
         this.render_scene.children = render_list
         this.render_items_count = render_list.length

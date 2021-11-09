@@ -16,8 +16,8 @@ class Sun extends SceneComponent {
     
     n_distance = 500
     d_distance = 50
-    n_intensity = 0.2
-    d_intensity = 3.5
+    n_intensity = 0.01
+    d_intensity = 2
     n_height = -50
     d_height = 100
     n_emissive = 1.25
@@ -26,11 +26,11 @@ class Sun extends SceneComponent {
     d_color = "#e9c28a"
     sun_size = 3
 
-    d_amb_color = "#f9e9e5"
-    n_amb_color = "#0000ff"
+    d_amb_color = "#f5f3f0"
+    n_amb_color = "#4b4554"
 
-    d_amb_intensity = 1.5
-    n_amb_intensity = 0.05
+    d_amb_intensity = 1.1
+    n_amb_intensity = 0.01
 
     /**common */
     shadows_enabled = true

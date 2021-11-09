@@ -1136,9 +1136,9 @@ function WebGLRenderer(parameters = {}) {
 
 								currentRenderList.push(object, geometry, groupMaterial, groupOrder, _vector3.z, group);
 								/**PATCH PATCH PATCH */
-								if (Array.isArray(groupMaterial.material_layers)){
-									groupMaterial.material_layers.forEach(mat=>{
-										currentRenderList.push(object, geometry, mat, groupOrder, _vector3.z, group);
+								if (Array.isArray(groupMaterial.material_layers)) {
+									groupMaterial.material_layers.forEach(mat => {
+										currentRenderList.push(object, geometry, mat, groupOrder + 1, _vector3.z, group);
 									})
 								}
 
@@ -1149,6 +1149,13 @@ function WebGLRenderer(parameters = {}) {
 					} else if (material.visible) {
 
 						currentRenderList.push(object, geometry, material, groupOrder, _vector3.z, null);
+
+						/**PATCH PATCH PATCH */
+						if (Array.isArray(material.material_layers)) {
+							material.material_layers.forEach(mat => {
+								currentRenderList.push(object, geometry, mat, groupOrder + 1, _vector3.z, null);
+							})
+						}
 
 					}
 
@@ -1302,8 +1309,19 @@ function WebGLRenderer(parameters = {}) {
 
 		/**PATCH !PATCH !PATCH */
 		if (material.isMeshStandardMaterial || materialProperties.isMeshPhongMaterial || materialProperties.isMeshPhysicalMaterial || materialProperties.isMeshBasicMaterial) {
-			materialProperties.envMap = scene.background
 			materialProperties.envMapIntensity = 1
+		}
+
+		if (material.material_layers) {
+			material.material_layers.forEach(mat => {
+				let user_data = mat.userData
+				switch (user_data.layer_name) {
+					case "phong": {
+						mat.envMap = scene.refraction_map
+						break
+					}
+				}
+			})
 		}
 		/**PATCH !PATCH !PATCH */
 
