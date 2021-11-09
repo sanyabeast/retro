@@ -210,38 +210,71 @@ class InputComponent extends SceneComponent {
         }
         this.pointer_position_changed = false
     }
+    get_alias(code) {
+        return code.toLowerCase().replace(/key|digit/gmi, "")
+    }
+    has_combination(key, ...s_keys) {
+        let r = true
+        let data = get(this.keys, `${key.toLowerCase()}`)
+        if (data) {
+            s_keys.forEach(s_keys => {
+                if (data[s_keys] !== true) {
+                    r = false
+                }
+            })
+        } else {
+            r = false
+        }
+
+        return r
+    }
     is_keydown(key) {
-        return get(this.keys, `key_${key.toLowerCase(0)}.down`) || false
+        return get(this.keys, `${key.toLowerCase()}.down`) || false
     }
     is_keyup(key) {
-        return get(this.keys, `key_${key.toLowerCase(0)}.up`) || false
+        return get(this.keys, `${key.toLowerCase()}.up`) || false
     }
     is_keypress(key) {
-        return get(this.keys, `key_${key.toLowerCase(0)}.press`) || false
+        return get(this.keys, `${key.toLowerCase()}.press`) || false
     }
     handle_keydown(evt) {
-        let key = evt.key.toLowerCase(0)
+        let key = this.get_alias(evt.code)
         if (this.keys_prevent_default) evt.preventDefault()
         if (this.keys_stop_propagation) evt.stopPropagation();
-        set(this.keys, `key_${key}.press`, false)
-        set(this.keys, `key_${key}.up`, false)
-        set(this.keys, `key_${key}.down`, true)
+        set(this.keys, `${key}.press`, false)
+        set(this.keys, `${key}.up`, false)
+        set(this.keys, `${key}.down`, true)
+
+        set(this.keys, `${key}.shift`, evt.shiftKey)
+        set(this.keys, `${key}.alt`, evt.altKey)
+        set(this.keys, `${key}.ctrl`, evt.ctrlKey)
+        set(this.keys, `${key}.meta`, evt.metaKey)
     }
     handle_keyup(evt) {
-        let key = evt.key.toLowerCase(0)
+        let key = this.get_alias(evt.code)
         if (this.keys_prevent_default) evt.preventDefault()
         if (this.keys_stop_propagation) evt.stopPropagation();
-        set(this.keys, `key_${key}.press`, false)
-        set(this.keys, `key_${key}.down`, false)
-        set(this.keys, `key_${key}.up`, true)
+        set(this.keys, `${key}.press`, false)
+        set(this.keys, `${key}.down`, false)
+        set(this.keys, `${key}.up`, true)
+
+        set(this.keys, `${key}.shift`, evt.shiftKey)
+        set(this.keys, `${key}.alt`, evt.altKey)
+        set(this.keys, `${key}.ctrl`, evt.ctrlKey)
+        set(this.keys, `${key}.meta`, evt.metaKey)
     }
     handle_keypress(evt) {
-        let key = evt.key.toLowerCase(0)
+        let key = this.get_alias(evt.code)
         if (this.keys_prevent_default) evt.preventDefault()
         if (this.keys_stop_propagation) evt.stopPropagation();
-        set(this.keys, `key_${key}.up`, false)
-        set(this.keys, `key_${key}.down`, false)
-        set(this.keys, `key_${key}.press`, true)
+        set(this.keys, `${key}.up`, false)
+        set(this.keys, `${key}.down`, false)
+        set(this.keys, `${key}.press`, true)
+
+        set(this.keys, `${key}.shift`, evt.shiftKey)
+        set(this.keys, `${key}.alt`, evt.altKey)
+        set(this.keys, `${key}.ctrl`, evt.ctrlKey)
+        set(this.keys, `${key}.meta`, evt.metaKey)
     }
     equal_with_precise(a, b, prec) {
         return parseFloat(a.toFixed(prec)) === parseFloat(b.toFixed(prec))

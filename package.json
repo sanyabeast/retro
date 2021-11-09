@@ -75,6 +75,7 @@
         "extract-zip": "^2.0.1",
         "fflate": "^0.7.1",
         "image-pixels": "^2.2.2",
+        "keycode": "^2.2.0",
         "regenerator-runtime": "^0.13.9",
         "save-pixels": "^2.3.6",
         "spine-ts-threejs": "^1.1.7",
