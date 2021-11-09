@@ -1,0 +1,18 @@
+components:
+  # collider:
+  #   name: Collider
+  #   params:
+  #     collider_type: "sphere"
+  #     sphere_radius: 2
+  controller:
+    inline:
+      methods:
+        on_tick:
+          body: |
+            let input = this.find_component_of_type("InputComponent");
+            let model_viewer = this.find_component_of_type("ModelViewerController");
+            if (input.is_keypress("a") || input.is_keypress("arrowleft")){
+              model_viewer.prev_model();
+            } else if (input.is_keypress("d") || input.is_keypress("arrowright")){
+              model_viewer.next_model();
+            }

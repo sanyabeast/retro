@@ -1,0 +1,200 @@
+prefabs:
+  - default.Postprocessing
+  - default.OrbitControlsComponent
+components:
+  fog:
+    name: Fog
+    params:
+      density: 0.005
+  skybox:
+    name: SkyBox
+    params:
+      cubemap: res/core/cubemaps/cntower_1
+      cubemap_format: jpg
+  sun:
+    name: Sun
+    params:
+      cycling: 5
+      time: 0.51
+      global_intensity: 1
+children:
+  infostand:
+    components:
+      title:
+        name: TroikaTextComponent
+        params:
+          position: [0, 4, -3]
+          font_size: 0.333
+          anchor_x: 1.85
+          text: "USE `A` & `D` TO NAVIGATE"
+          color: "#ffc107"
+      current_model_title:
+        name: TroikaTextComponent
+        tag: current_model_title
+        params:
+          position: [0, 3.55, -3]
+          font_size: 0.5
+          anchor_x: 1.85
+          text: "#1"
+      current_time:
+        name: TroikaTextComponent
+        tag: current_time
+        params:
+          text: " "
+          position: [0, 2.95, -3]
+          font_size: 0.25
+          color: "#9e9e9e"
+          anchor_x: 1.85
+      time_component:
+        inline: 
+          methods:
+            on_tick:
+              body: >
+                let caption = this.find_component_with_tag("current_time");
+                let sun = this.find_component_of_type("Sun");
+                if (caption && sun){
+                  caption.text = `IN-GAME TIME: ${sun.get_time_string()}`
+                }
+                
+        params:
+          tick_rate: 1
+  lighting:
+    components:
+      light_1:
+        name: LightComponent
+        params:
+          position: [0, 4, 0]
+          type: PointLight
+          intensity: 3
+          distance: 12
+      light_2:
+        name: LightComponent
+        params:
+          position: [0, 2, 0]
+          type: PointLight
+          intensity: 2
+          distance: 12
+      light_3:
+        name: LightComponent
+        params:
+          position: [0, 0.5, 0]
+          type: PointLight
+          intensity: 1
+          distance: 12
+      controller:
+        order: 1
+        params:
+          radius: 4
+          speed: 0.4
+        inline:
+          methods:
+            on_create:
+              body: |
+                let lights = this.lights = this.get_components("LightComponent");
+            on_tick:
+              body: |
+                let date = +new Date / 1000;
+                this.lights.forEach((light, index)=>{
+                  light.position = [
+                    Math.sin((date + index) * (this.speed / (index + 1))) * (this.radius + index),
+                    light.position[1],
+                    Math.cos((date + index) * (this.speed / (index + 1))) * (this.radius + index)
+
+                  ]
+                })
+  model_viewer:
+    components:
+      controller:
+        name: ModelViewerController
+    children:
+      model_1:
+        prefab: "pbr.model_viewer_item"
+        components:
+          body:
+            name: MeshComponent
+            params:
+              debug_transform: false
+              rotation: [0, 1.5707, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/jerrycan/jerrycan_a1.obj"
+                - 0.125
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/jerrycan/jerrycan_a1.mtl"
+                  allow_transparency: false
+                  doubleside: false
+                  emissive_intensity: 10
+          body2:
+            name: MeshComponent
+            params:
+              debug_transform: false
+              position: [1, 0, 0]
+              rotation: [0, 0, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/jerrycan/jerrycan_a1.obj"
+                - 0.125
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/jerrycan/jerrycan_a1.mtl"
+                  allow_transparency: false
+                  doubleside: false
+                  emissive_intensity: 10
+      model_2:
+        prefab: "pbr.model_viewer_item"
+        components:
+          body:
+            name: MeshComponent
+            params:
+              debug_transform: false
+              rotation: [0, 1.5707, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/magic_stone_a1/magic_stone_a1.obj"
+                - 0.47
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/magic_stone_a1/magic_stone_a1.mtl"
+                  allow_transparency: false
+                  doubleside: false
+                  emissive_intensity: 10
+      model_3:
+        prefab: "pbr.model_viewer_item"
+        components:
+          body:
+            name: MeshComponent
+            params:
+              debug_transform: false
+              rotation: [0, 1.5707, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/jerrycan/jerrycan_a1.obj"
+                - 0.125
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/jerrycan/jerrycan_a1.mtl"
+                  allow_transparency: false
+                  doubleside: false
+                  emissive_intensity: 10
+          body2:
+            name: MeshComponent
+            params:
+              debug_transform: false
+              position: [1, 0, 0]
+              rotation: [0, 0, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/jerrycan/jerrycan_a1.obj"
+                - 0.125
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/jerrycan/jerrycan_a1.mtl"
+                  allow_transparency: false
+                  doubleside: false
+                  emissive_intensity: 10

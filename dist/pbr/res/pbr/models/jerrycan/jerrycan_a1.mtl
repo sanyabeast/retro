@@ -1,0 +1,16 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl Jerrycan
+Ns 556.531027
+Ka 0.840909 0.840909 0.840909
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump W:\\Users\\agvrn\\Downloads\\jerrycan\\source\\maps\\jerrycan_low_Default_Normal.png
+map_Kd W:\\Users\\agvrn\\Downloads\\jerrycan\\source\\maps\\jerrycan_low_Default_AlbedoTransparency.png
+map_Ks W:\\Users\\agvrn\\Downloads\\jerrycan\\source\\maps\\jerrycan_low_Default_SpecularSmoothness.png
+map_Ns W:\\Users\\agvrn\\Downloads\\jerrycan\\source\\maps\\jerrycan_low_Default_R.jpg

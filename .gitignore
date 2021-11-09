@@ -5,9 +5,11 @@ src/apps/*
 !src/apps/default/
 !src/apps/subway/
 !src/apps/lab/
+!src/apps/pbr/
 dist/*
 !dist/demo
 !dist/default
 !dist/subway
 !dist/lab
+!dist/pbr
 .DS_Store
