@@ -13,7 +13,7 @@ class Sun extends SceneComponent {
     time = 0.5
 
     global_intensity = 1;
-    
+
     n_distance = 500
     d_distance = 50
     n_intensity = 0.01
@@ -236,6 +236,17 @@ class Sun extends SceneComponent {
             "shadows_enabled",
             "show_sphere"
         ].concat(super.get_reactive_props())
+    }
+    get_time_string() {
+        let r = "00:00";
+        let total_mins = 60 * 24;
+        let current_mins = Math.floor(total_mins * this.time);
+        let h = Math.floor(current_mins / 60).toString();
+        let m = (current_mins % 60).toString();
+        if (h.length === 1) h = "0" + h;
+        if (m.length === 1) m = "0" + m;
+
+        return `${h}:${m}`;
     }
 }
 

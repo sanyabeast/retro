@@ -61,6 +61,40 @@ class BasicObject extends THREE.EventDispatcher {
     get game_object() {
         return this._game_object
     }
+    /**calls */
+    call_down(method_name, ...args) {
+        let game_object = this.game_object
+        for (let a = 0; a < game_object.components.length; a++) {
+            let comp = game_object.components[a]
+            if (!isFunction(comp[method_name])) continue
+            comp[method_name](...args)
+        }
+
+        if (isFunction(game_object[method_name])) {
+            game_object[method_name](...args)
+        }
+
+        if (isArray(game_object.children)) {
+            this.children.forEach(child => child.call_down(method_name, ...args))
+        }
+    }
+    call_up(method_name, ...args) {
+        let game_object = this.game_object
+        for (let a = 0; a < game_object.components.length; a++) {
+            let comp = game_object.components[a]
+            if (!isFunction(comp[method_name])) continue
+            comp[method_name](...args)
+        }
+
+        if (isFunction(game_object[method_name])) {
+            game_object[method_name](...args)
+        }
+
+        if (game_object.parent !== undefined) {
+            game_object.parent.call_up(method_name, ...args);
+        }
+
+    }
     is(object_type) {
         return this.meta.object_type === object_type
     }

@@ -51,6 +51,9 @@ class Collider extends SceneComponent {
     colorid_material = undefined
     colorid_id = undefined
 
+    prev_pointerhover = false
+    pointer_hovered = false
+
 
     constructor() {
         super(...arguments)
@@ -68,7 +71,7 @@ class Collider extends SceneComponent {
         let wireframe_mat = this.wireframe_mat = new THREE.MeshBasicMaterial({
             wireframe: true,
             color: COLLIDER_WIREFRAME_COLOR,
-            opacity: 0.33,
+            opacity: 0.1,
             transparent: true
         })
 
@@ -109,6 +112,7 @@ class Collider extends SceneComponent {
             "collider_type",
             "sphere_radius",
             "box_size",
+            "pointer_hovered"
         ].concat(super.get_reactive_props())
     }
     get_render_data() {
@@ -163,6 +167,19 @@ class Collider extends SceneComponent {
                     this.sphere_mesh.scale.set(this.sphere_radius, this.sphere_radius, this.sphere_radius)
                     break
                 }
+                case "pointer_hovered": {
+                    let changed = this.prev_pointerhover === this.pointer_hovered
+                    if (this.pointer_hovered === true && changed) {
+                        this.call_down("handle_pointerover", this)
+                    }
+
+                    else if (!this.pointer_hovered && changed) {
+                        this.call_down("handle_pointerout", this)
+                    }
+
+                    this.prev_pointerhover = this.pointer_hovered
+                    break
+                }
             }
         })
     }
@@ -212,6 +229,9 @@ class Collider extends SceneComponent {
                 this.subject = this.box_mesh
                 this.colorid_subject = this.colorid_box_mesh
                 break
+            }
+            default: {
+                this.error(`unknown collider type: ${this.collider_type}`)
             }
         }
     }

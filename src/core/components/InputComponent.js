@@ -7,7 +7,7 @@
 import SceneComponent from "core/SceneComponent";
 import ResourceManager from "core/ResourceManager";
 import * as THREE from 'three';
-import { map, forEach } from "lodash-es"
+import { map, forEach, set, get } from "lodash-es"
 import { makeid } from "core/utils/Tools"
 import RenderTarget from "core/components/scene/RenderTarget";
 import Collider from "core/components/Collider";
@@ -23,6 +23,8 @@ class InputComponent extends SceneComponent {
     intersected_renderables_changed = false
     pointer_position_changed = true
     tick_rate = 60
+    keys_prevent_default = false
+    keys_stop_propagation = false
     /**debug */
     show_debug_layer = false
     /**private */
@@ -37,8 +39,10 @@ class InputComponent extends SceneComponent {
     colliders_state = undefined
     intersected_renderables = undefined
     intersected_colliders = undefined
+    keys = undefined
     constructor() {
         super(...arguments)
+        this.keys = {}
         this.colliders_state = {}
         this.intersected_renderables = []
         this.intersect_colliders = []
@@ -154,40 +158,20 @@ class InputComponent extends SceneComponent {
                     let object = intersection.object
                     let collider = object.collider
                     let UUID = collider.UUID
-                    this.colliders_state[UUID] = this.colliders_state[UUID] || { hovered: false, pressed: false }
-                    let state = this.colliders_state[UUID]
-                    if (!state.hovered) {
-                        state.UUID = UUID
-                        changed = true
-                        state.changed = true
-                        state.hovered = true
+                    collider.pointer_hovered = true
+                    uuids.push(UUID)
+                    this.colliders_state[UUID] = {
+                        hovered: true
                     }
                 })
-                forEach(this.colliders_state, (state, UUID) => {
-                    if (uuids.indexOf(UUID) < 0) {
-                        if (state.hovered) {
-                            changed = true
-                            state.changed = true
-                            state.hovered = false
-                        }
-                    }
 
-                    if (state.changed) {
-                        let collider = ResourceManager.get_component_instance("Collider", state.UUID)
-                        if (collider) {
-                            if (state.hovered) {
-                                collider.game_object.call_down("handle_pointerover", {
-                                    collider: collider
-                                })
-                            } else {
-                                collider.game_object.call_down("handle_pointerout", {
-                                    collider: collider
-                                })
-                            }
-                        }
+                forEach(this.colliders_state, (data, UUID) => {
+                    let collider = ResourceManager.components_instances.Collider[UUID]
+                    if (collider && uuids.indexOf(UUID) < 0) {
+                        collider.pointer_hovered = false
+                        this.colliders_state[UUID].hovered = false
                     }
                 })
-                this.intersected_renderables_changed = changed
             }
         }
     }
@@ -226,14 +210,38 @@ class InputComponent extends SceneComponent {
         }
         this.pointer_position_changed = false
     }
+    is_keydown(key) {
+        return get(this.keys, `key_${key.toLowerCase(0)}.down`) || false
+    }
+    is_keyup(key) {
+        return get(this.keys, `key_${key.toLowerCase(0)}.up`) || false
+    }
+    is_keypress(key) {
+        return get(this.keys, `key_${key.toLowerCase(0)}.press`) || false
+    }
     handle_keydown(evt) {
-        // console.log(`keydown`, evt)
+        let key = evt.key.toLowerCase(0)
+        if (this.keys_prevent_default) evt.preventDefault()
+        if (this.keys_stop_propagation) evt.stopPropagation();
+        set(this.keys, `key_${key}.press`, false)
+        set(this.keys, `key_${key}.up`, false)
+        set(this.keys, `key_${key}.down`, true)
     }
     handle_keyup(evt) {
-        // console.log(`keyup`, evt)
+        let key = evt.key.toLowerCase(0)
+        if (this.keys_prevent_default) evt.preventDefault()
+        if (this.keys_stop_propagation) evt.stopPropagation();
+        set(this.keys, `key_${key}.press`, false)
+        set(this.keys, `key_${key}.down`, false)
+        set(this.keys, `key_${key}.up`, true)
     }
     handle_keypress(evt) {
-        // console.log(`keypress`, evt)
+        let key = evt.key.toLowerCase(0)
+        if (this.keys_prevent_default) evt.preventDefault()
+        if (this.keys_stop_propagation) evt.stopPropagation();
+        set(this.keys, `key_${key}.up`, false)
+        set(this.keys, `key_${key}.down`, false)
+        set(this.keys, `key_${key}.press`, true)
     }
     equal_with_precise(a, b, prec) {
         return parseFloat(a.toFixed(prec)) === parseFloat(b.toFixed(prec))

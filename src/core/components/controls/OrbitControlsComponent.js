@@ -29,7 +29,7 @@ class OrbitControlsComponent extends Component {
     min_zoom = 0.01
     pan_speed = 1
     rotate_speed = 1
-    zoom_speed = 0.2
+    zoom_speed = 1
     target = [0, 0, 0]
     position = [0, 0, 0]
     zoom = 1
@@ -75,6 +75,11 @@ class OrbitControlsComponent extends Component {
             position: [this.controls.object.position.x, this.controls.object.position.y, this.controls.object.position.z],
             zoom: this.controls.object.zoom
         }
+    }
+    set_controls_state (data){
+        this.target = data.target || [0, 0, 0]
+        this.position = data.position || [0, 1, -4]
+        this.zoom = data.zoom || 1
     }
     on_update(props) {
         super.on_update(props)
@@ -157,9 +162,8 @@ OrbitControlsComponent.DEFAULT = {
     max_zoom: Infinity,
     min_distance: 0.1,
     min_zoom: 0.01,
-    pan_speed: 0.1,
-    rotate_speed: 0.5,
-
+    pan_speed: 1,
+    rotate_speed: 1,
     target: [0, 0, 0],
     keys: ["a", "w", "d", "s"],
 }
