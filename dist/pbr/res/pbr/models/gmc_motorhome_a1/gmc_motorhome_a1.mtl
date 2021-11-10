@@ -1,0 +1,52 @@
+# Blender MTL File: 'None'
+# Material Count: 4
+
+newmtl clay.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\clay_baseColor.png
+map_Ke textures\\clay_emissive.jpeg
+map_Ns textures\\clay_metallicRoughness_channel_GREEN.jpg
+refl textures\\clay_metallicRoughness_channel_BLUE.jpg
+
+newmtl clay.003
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\clay.001_baseColor.jpeg
+map_Ns textures\\clay.001_metallicRoughness_channel_GREEN.jpg
+refl textures\\clay.001_metallicRoughness_channel_BLUE.jpg
+
+newmtl interior.001
+Ns 13.555786
+Ka 1.000000 1.000000 1.000000
+Kd 0.128437 0.128437 0.128437
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl windows.001
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.863636
+illum 9
+map_Kd textures\\windows_baseColor.jpeg
+map_Ns textures\\windows_metallicRoughness_channel_GREEN.jpg
+refl textures\\windows_metallicRoughness_channel_BLUE.jpg
