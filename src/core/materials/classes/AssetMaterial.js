@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { request_text_sync, blend_colors } from 'core/utils/Tools';
 import Device from 'core/utils/Device';
-import { isNumber, isBoolean, map, keys, values, forEach, isString, isArray } from "lodash-es"
+import { isNumber, isBoolean, map, keys, values, forEach, isString, isArray, isUndefined } from "lodash-es"
 import ResourceManager from "core/ResourceManager"
 
 const path = require("path")
@@ -56,10 +56,15 @@ class AssetMaterial extends THREE.Material {
         this.bump_scale = isNumber(params.bump_scale) ? params.bump_scale : 0.0001
         this.displacement_scale = isNumber(params.displacement_scale) ? params.displacement_scale : 0.01
         this.shininess = isNumber(params.shininess) ? params.shininess : 16
+        this.roughness = isNumber(params.roughness) ? params.roughness : 1
+        this.metalness = isNumber(params.metalness) ? params.metalness : 0
+        this.reflectivity = isNumber(params.reflectivity) ? params.reflectivity : 0
         this.doubleside = params.doubleside || false
         this.color = params.color || "#ffffff"
         this.allow_transparency = isBoolean(params.allow_transparency) ? params.allow_transparency : true
         this.emissive_color = params.emissive_color || undefined
+        this.add_clearcoat = isBoolean(params.add_clearcoat) ? params.add_clearcoat : false
+        this.add_sheen = isBoolean(params.add_sheen) ? params.add_sheen : false
 
         this.emissive_intensity = isNumber(params.emissive_intensity) ? params.emissive_intensity : 1
         let r = []
@@ -157,7 +162,7 @@ class AssetMaterial extends THREE.Material {
                     delete result[k]
                 }
             })
-            console.log(asset_dir, result)
+
             return result
         }
         function parse_line(line_data) {
@@ -202,6 +207,44 @@ class AssetMaterial extends THREE.Material {
                 block_data.transparent = true
             }
 
+
+            if (isNumber(block_data.roughness)) {
+                block_data.roughness *= this.roughness
+            } else {
+                block_data.roughness = this.roughness
+            }
+
+            if (isNumber(block_data.metalness)) {
+                block_data.metalness *= this.metalness
+            } else {
+                block_data.metalness = this.metalness
+            }
+
+            if (isNumber(block_data.reflectivity)) {
+                block_data.reflectivity *= this.reflectivity
+            } else {
+                block_data.reflectivity = this.reflectivity
+            }
+
+
+
+            if (this.add_clearcoat) {
+                block_data.clearcoat = isNumber(block_data.reflectivity) ? block_data.reflectivity : 1
+                block_data.clearcoatRoughness = isNumber(block_data.roughness) ? block_data.roughness : 1
+                if (isString(block_data.metalnessMap)) block_data.clearcoatMap = block_data.metalnessMap
+                if (isString(block_data.normalMap)) block_data.clearcoatNormalMap = block_data.normalMap
+                if (isString(block_data.roughnessMap)) block_data.clearcoatRoughnessMap = block_data.roughnessMap
+            }
+
+            if (this.add_sheen) {
+                block_data.sheen = !isUndefined(block_data.specular) ? block_data.specular.r : 1
+                block_data.sheenRoughness = isNumber(block_data.roughness) ? block_data.roughness : 1
+                if (isString(block_data.roughnessMap)) block_data.sheenRoughnessMap = block_data.specularMap
+                if (!isUndefined(block_data.specularMap)) block_data.sheenColorMap = block_data.specularMap
+                if (!isUndefined(block_data.specular)) block_data.sheenColor = new THREE.Color(block_data.specular.r, block_data.specular.g, block_data.specular.b)
+            }
+
+
             block_data.bumpScale = 0.0005
             if (block_data.shininess !== undefined ||
                 block_data.specular !== undefined ||
@@ -218,6 +261,8 @@ class AssetMaterial extends THREE.Material {
                 rmat.blending = 2;
                 material_layers.push(rmat)
             }
+
+            console.log(asset_dir, b, block_data)
             let mat = new THREE.materials[material_type](block_data)
             if (material_layers.length > 0) {
                 mat.material_layers = material_layers

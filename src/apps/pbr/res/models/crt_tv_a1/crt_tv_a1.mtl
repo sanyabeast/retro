@@ -1,0 +1,44 @@
+# Blender MTL File: 'None'
+# Material Count: 3
+
+newmtl TVScreen
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 0.000000
+d 1.000000
+illum 2
+map_Bump textures\\TVScreen_normal.png
+map_Kd textures\\TVScreen_baseColor.jpeg
+map_Ns textures\\TVScreen_metallicRoughness_channel_GREEN.jpg
+refl textures\\TVScreen_metallicRoughness_channel_BLUE.jpg
+
+newmtl TVback
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\TVback_normal.png
+map_Kd textures\\TVback_baseColor.jpeg
+map_Ns textures\\TVback_metallicRoughness_channel_GREEN.jpg
+refl textures\\TVback_metallicRoughness_channel_BLUE.jpg
+
+newmtl TVfront
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\TVfront_normal.png
+map_Kd textures\\TVfront_baseColor.jpeg
+map_Ns textures\\TVfront_metallicRoughness_channel_GREEN.jpg
+refl textures\\TVfront_metallicRoughness_channel_BLUE.jpg

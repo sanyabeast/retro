@@ -2,6 +2,11 @@ prefabs:
   - default.Postprocessing
   - default.OrbitControlsComponent
 components:
+  lantern:
+    name: Lantern
+    params:
+      intensity: 2
+      distance: 20
   fog:
     name: Fog
     params:
@@ -60,13 +65,14 @@ components:
             }
             this.current = new_skybox;
             skybox.cubemap = `res/core/cubemaps/${this.maps[new_skybox]}`
-        on_start: 
+        on_start:
           body: |
             //this.switch_skybox();
         on_tick:
-          body: let input = this.find_component_of_type("InputComponent");
+          body: |
+            let input = this.find_component_of_type("InputComponent");
             if (input.is_keypress("space")){
-            this.switch_skybox();
+              this.switch_skybox();
             }
 children:
   infostand:
@@ -99,6 +105,14 @@ children:
           font_size: 0.12
           anchor_x: 1.85
           text: "USE `SPACE` TO SWITCH SKYBOX"
+          color: "#ffc107"
+      title3:
+        name: TroikaTextComponent
+        params:
+          position: [0, 0.8, 0]
+          font_size: 0.12
+          anchor_x: 1.85
+          text: "USE `Q` TO TOGGLE LANTERN"
           color: "#ffc107"
       current_model_title:
         name: TroikaTextComponent
@@ -137,7 +151,7 @@ children:
         params:
           position: [0, 4, 0]
           type: PointLight
-          intensity: 2.2
+          intensity: 1.3
           distance: 18
           color: "#fccdca"
       light_2:
@@ -145,7 +159,7 @@ children:
         params:
           position: [0, 3, 0]
           type: PointLight
-          intensity: 1.5
+          intensity: 0.8
           distance: 25
           color: "#e4fcca"
       light_3:
@@ -153,7 +167,7 @@ children:
         params:
           position: [0, 5, 0]
           type: PointLight
-          intensity: 0.8
+          intensity: 0.3
           distance: 30
           color: "#cad0fc"
       controller:
@@ -217,6 +231,7 @@ children:
                 - src: "res/pbr/models/jerrycan/jerrycan_a1.mtl"
                   allow_transparency: false
                   doubleside: false
+                  add_sheen: true
                   emissive_intensity: 1
       model_2:
         prefab: "pbr.model_viewer_item"
@@ -236,7 +251,8 @@ children:
                 - src: "res/pbr/models/magic_stone_a1/magic_stone_a1.mtl"
                   allow_transparency: false
                   doubleside: false
-                  emissive_intensity: 0.333
+                  emissive_intensity: 0.7
+                  emissive_color: "#03a9f4"
       model_3:
         prefab: "pbr.model_viewer_item"
         components:
@@ -291,3 +307,25 @@ children:
                   allow_transparency: false
                   doubleside: false
                   emissive_intensity: 5
+      model_6:
+        prefab: "pbr.model_viewer_item"
+        components:
+          body:
+            name: MeshComponent
+            params:
+              rotation: [0, 1.5707, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/crt_tv_a1/crt_tv_a1.obj"
+                - 1
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/crt_tv_a1/crt_tv_a1.mtl"
+                  allow_transparency: false
+                  doubleside: false
+                  emissive_intensity: 5
+                  add_clearcoat: true
+                  roughness: 2
+                  metalness: 0.5
+                  reflectivity: 0.5
