@@ -6,10 +6,12 @@ src/apps/*
 !src/apps/subway/
 !src/apps/lab/
 !src/apps/pbr/
+!src/apps/gizmos/
 dist/*
 !dist/demo
 !dist/default
 !dist/subway
 !dist/lab
 !dist/pbr
+!dist/gizmos
 .DS_Store

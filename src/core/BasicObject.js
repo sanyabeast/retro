@@ -300,8 +300,46 @@ class BasicObject extends THREE.EventDispatcher {
     }
     /**unit conversion */
     /**world/local */
+}
 
+BasicObject.add_traversal_method = function (context_name = "component", method_name) {
+    let callback_name = `on_${method_name}`
+    BasicObject.prototype[callback_name] = function () {
+        // this.log(`traversal function ${method_name} is not implemented`)
+    }
+    BasicObject.prototype[method_name] = function (collected = []) {
+        let game_object = this.game_object
+        if (game_object) {
+            switch (context_name) {
+                case "component": {
+                    game_object.components.forEach((comp, index) => {
+                        let data = comp[callback_name]()
+                        data !== undefined && collected.push(data)
+                    })
+                    game_object.children.forEach(child => {
+                        child[method_name](collected)
+                    })
+                    break
+                }
+                case "game_object": {
+                    let data = game_object[callback_name]()
+                    data !== undefined && collected.push(data)
+                    game_object.children.forEach(child => {
+                        child[method_name](collected)
+                    })
+                    break
+                }
+            }
+        } else {
+            console.log(`fail`)
+        }
 
+        return collected
+    }
+}
+
+if (process.env.NODE_ENV === "development") {
+    window.BasicObject = BasicObject
 }
 
 function reactivate(object) {

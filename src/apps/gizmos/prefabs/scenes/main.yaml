@@ -1,0 +1,56 @@
+prefabs:
+  - default.Postprocessing
+  - default.OrbitControlsComponent
+components:
+  fog:
+    name: Fog
+    params:
+      density: 0.005
+  skybox:
+    name: SkyBox
+    params:
+      cubemap: res/core/cubemaps/cntower_1
+      cubemap_format: jpg
+  sun:
+    name: Sun
+    params:
+      cycling: 10
+      time: 0.65
+      global_intensity: 1
+children:
+  box:
+    components:
+      body:
+        name: MeshComponent
+        params:
+          geometry:
+            - BoxBufferGeometry
+            - [1, 1, 1]
+          material:
+            - PBRMaterial
+            - color: "#ffffff"
+              pbr: "res/core/pbr/storage-container2-bl/storage-container2"
+      some_controller:
+        inline:
+          methods:
+            on_gizmo_draw:
+              body: |
+                return [
+                  {
+                    type: "sphere",
+                    radius: 0.5,
+                    wireframe: true,
+                    opacity: 0.5,
+                    position: [0, 1, 0],
+                    color: "#ffffff"
+                  },
+                  {
+                    type: "box",
+                    width: 0.4,
+                    height: 0.1,
+                    depth: 1,
+                    opacity: 0.5,
+                    position: [-2, Math.sin(+new Date() / 1000), 0],
+                    color: "#00ff00"
+                  }
+                ];
