@@ -34,6 +34,16 @@ const mtl_props = {
     "refl": ["metalnessMap"]
 }
 
+const mtl_map_props = [
+    "map_d",
+    "map_Bump",
+    "map_Kd",
+    "map_Ns",
+    "map_Ke",
+    "map_Ks",
+    "refl"
+]
+
 class AssetMaterial extends THREE.Material {
     src = ""
     bump_scale = 0.001
@@ -51,7 +61,7 @@ class AssetMaterial extends THREE.Material {
         this.allow_transparency = isBoolean(params.allow_transparency) ? params.allow_transparency : true
         this.emissive_color = params.emissive_color || undefined
 
-        this.emissive_intensity = isNumber(params.emissive_intensity) ? params.emissive_intensity : 1
+        this.emissive_intensity = isNumber(params.emissive_intensity) ? params.emissive_intensity : 10
         let r = []
 
         let type = src.split(".")
@@ -107,7 +117,7 @@ class AssetMaterial extends THREE.Material {
                     } else if (v.length === 3) {
                         switch (key) {
                             case "Ka": {
-                                v = num(v[0]) / 3
+                                v = num(v[0]) / 2
                                 break
                             }
                             case "d": {
@@ -122,9 +132,14 @@ class AssetMaterial extends THREE.Material {
                     }
                 }
 
-                if (isString(v) && key.toLowerCase().indexOf("map") > -1) {
+                if (isString(v) && mtl_map_props.indexOf(key) > -1) {
                     v = path.basename(v.replace(/\\\\/gm, "/"))
-                    v = `${asset_dir}/maps/${v}?wrapS=1000&wrapT=1000`
+                    v = `${asset_dir}/maps/${v}`
+                    if (v.indexOf("?") > -1) {
+                        v += "&wrapS=1000&wrapT=1000"
+                    } else {
+                        v += "?wrapS=1000&wrapT=1000"
+                    }
                 }
 
                 if (result.opacity && result.opacity < 1 || result.alphaMap !== undefined) {
@@ -134,22 +149,23 @@ class AssetMaterial extends THREE.Material {
                     }
                 }
 
-                result.bumpScale = 0.0005
-                result.emissiveIntensity = 200
-                if (result.emissiveMap !== undefined){
-                    result.emissive.set(1, 1, 1)
-                }
-
-
                 forEach(pbr_props, (prop_name) => {
                     result[prop_name] = v
                 })
+
+                result.bumpScale = 0.0005
+                result.emissiveIntensity = 200
+                if (result.emissiveMap !== undefined) {
+                    result.emissive.set(1, 1, 1)
+                }
             })
             forEach(result, (v, k) => {
                 if (v === undefined) {
                     delete result[k]
                 }
             })
+
+            console.log(result)
             return result
         }
         function parse_line(line_data) {
@@ -163,7 +179,6 @@ class AssetMaterial extends THREE.Material {
         }
         function chunk_line(id, block_data) {
             let r = block_data.match(new RegExp(`^${id}.*`, "gm"))
-            // console.log(block_data, r, id)
             if (Array.isArray(r)) {
                 return r[0]
             } else {
@@ -174,9 +189,6 @@ class AssetMaterial extends THREE.Material {
             let material_layers = []
             let material_type = Device.is_mobile ? LQ_MAT : HQ_MAT
             let block_data = parse_block(b)
-            console.log(block_data)
-
-
             if (block_data.shininess !== undefined ||
                 block_data.specular !== undefined ||
                 block_data.specularMap !== undefined ||
@@ -184,7 +196,6 @@ class AssetMaterial extends THREE.Material {
                 block_data.reflectivity !== undefined) {
                 let rmat = new THREE.MeshPhongMaterial({
                     ...block_data,
-                    // emissiveIntensity: 0,
                     userData: {
                         layer_name: "phong"
                     }
@@ -202,7 +213,6 @@ class AssetMaterial extends THREE.Material {
             }
 
             let mat = new THREE.materials[material_type](block_data)
-            console.log(material_layers)
             if (material_layers.length > 0) {
                 mat.material_layers = material_layers
             }

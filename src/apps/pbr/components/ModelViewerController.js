@@ -93,7 +93,7 @@ class ModelViewerController extends Component {
         this.game_object.rotation = this.lerp(
             this.game_object.rotation,
             this.target_rotation,
-            0.8 * time_delta.delta
+            0.1
         )
     }
 }

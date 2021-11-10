@@ -14,6 +14,7 @@ import AssetBufferGeometry from 'core/geometry/classes/AssetBufferGeometry';
 import DataComputed from "core/utils/DataComputed";
 import SCHEMA_CORE from "core/SCHEMA.yaml"
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js';
+import ImageFilter from "core/utils/ImageFilter"
 
 
 
@@ -21,6 +22,7 @@ import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudi
 const SCHEMA_APP = require(`apps/${process.env.APP_NAME}/SCHEMA.yaml`)
 const audio_loader = new THREE.AudioLoader();
 const audio_listener = new THREE.AudioListener();
+const image_filter = new ImageFilter()
 
 class RmDict {
     constructor(data) {
@@ -374,18 +376,29 @@ class ResourceManager extends BasicObject {
             if (src.indexOf("@") === 0) {
                 texture = this.cached_textures[src] = this.load_from_texture_lib(src, params)
             } else {
-                let webgl_capabilities = this.globals.webgl_capabilities
-                let aniso = 1
-                if (webgl_capabilities) {
-                    aniso = webgl_capabilities.getMaxAnisotropy()
+                let image_src = src
+                if (src.indexOf("?") > -1) {
+                    params = get_query_string_params(src.split("?")[1] || "")
+                    image_src = src.split("?")[0]
                 }
-                texture = this.cached_textures[src] = new THREE.TextureLoader().load(src);
-                texture.anisotropy = aniso
+
+                console.log(src, params)
+                if (params && (params.filter !== undefined || params.maxsize !== undefined)) {
+                    texture = image_filter.get_texture(src, params.filter || "", params.maxsize || 1024)
+                } else {
+                    texture = this.cached_textures[src] = new THREE.TextureLoader().load(image_src);
+                }
             }
         }
         if (!texture) {
             texture = this.placeholder_texture
         } else {
+            let webgl_capabilities = this.globals.webgl_capabilities
+            let aniso = 1
+            if (webgl_capabilities) {
+                aniso = webgl_capabilities.getMaxAnisotropy()
+            }
+            texture.anisotropy = aniso
             for (let k in params) {
                 set(texture, k, params[k])
             }
@@ -421,9 +434,8 @@ class ResourceManager extends BasicObject {
             texture = this.cached_streamed_textures[url]
 
             if (!texture) {
-                let params = get_query_string_params(url.split("?")[1] || "")
-                let src = url.split("?")[0]
-                texture = this.load_texture(src, params)
+
+                texture = this.load_texture(url)
                 if (texture.is_placeholder !== true) {
                     this.cached_streamed_textures[url] = texture
                 }
@@ -517,7 +529,7 @@ class ResourceManager extends BasicObject {
             let name = p.replace("./", "").replace(".js", "");
             THREE[category] = THREE[category] || {}
             THREE[category][name] = mod.default
-            if (isObject(THREE[category][name])){
+            if (isObject(THREE[category][name])) {
                 THREE[category][name].ResourceManager = this
             }
             this[`classes_of_${category}`] = this[`classes_of_${category}`] || {}

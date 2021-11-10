@@ -176,12 +176,51 @@ function hex_to_hsl(H) {
     s = +(s * 100).toFixed(1);
     l = +(l * 100).toFixed(1);
 
-    return [h, s, l]
+    return [h / 360, s / 100, l / 100]
+}
+
+function rgb_to_hsl(r, g, b) {
+
+    // Find greatest and smallest channel values
+    let cmin = Math.min(r, g, b),
+        cmax = Math.max(r, g, b),
+        delta = cmax - cmin,
+        h = 0,
+        s = 0,
+        l = 0;
+    if (delta == 0)
+        h = 0;
+    // Red is max
+    else if (cmax == r)
+        h = ((g - b) / delta) % 6;
+    // Green is max
+    else if (cmax == g)
+        h = (b - r) / delta + 2;
+    // Blue is max
+    else
+        h = (r - g) / delta + 4;
+
+    h = Math.round(h * 60);
+
+    // Make negative hues positive behind 360°
+    if (h < 0)
+        h += 360;
+
+    l = (cmax + cmin) / 2;
+
+    // Calculate saturation
+    s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+
+    // Multiply l and s by 100
+    s = +(s * 100).toFixed(1);
+    l = +(l * 100).toFixed(1);
+
+    return [h / 360, s / 100, l / 100];
 }
 
 function hsl_to_rgb(h, s, l) {
-    s /= 100;
-    l /= 100;
+    // Must be fractions of 1
+    h *= 360
 
     let c = (1 - Math.abs(2 * l - 1)) * s,
         x = c * (1 - Math.abs((h / 60) % 2 - 1)),
@@ -189,6 +228,7 @@ function hsl_to_rgb(h, s, l) {
         r = 0,
         g = 0,
         b = 0;
+
     if (0 <= h && h < 60) {
         r = c; g = x; b = 0;
     } else if (60 <= h && h < 120) {
@@ -202,9 +242,9 @@ function hsl_to_rgb(h, s, l) {
     } else if (300 <= h && h < 360) {
         r = c; g = 0; b = x;
     }
-    r = Math.round((r + m));
-    g = Math.round((g + m));
-    b = Math.round((b + m));
+    r = Math.round((r + m) * 255) / 255;
+    g = Math.round((g + m) * 255) / 255;
+    b = Math.round((b + m) * 255) / 255;
 
     return [r, g, b]
 }
@@ -359,7 +399,15 @@ function blend_colors(mode, color_a, color_b, output_type = "rgb") {
 
 
 
-window.blend_colors = blend_colors
+if (process.env.NODE_ENV === 'development') {
+    window.blend_colors = blend_colors
+    window.hex_to_hsl = hex_to_hsl
+    window.hsl_to_rgb = hsl_to_rgb
+    window.hex_to_rgb = hex_to_rgb
+    window.rgb_to_hex = rgb_to_hex
+    window.rgb_to_hsl = rgb_to_hsl
+}
+
 
 export {
     log,
@@ -370,6 +418,7 @@ export {
     hsl_to_rgb,
     hex_to_rgb,
     rgb_to_hex,
+    rgb_to_hsl,
     get_unique_props,
     is_none,
     camel_to_snake,

@@ -11,7 +11,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 map_Bump textures\\diamond_lambert2_Normal.png
-map_Kd textures\\diamond_lambert2_BaseColor.png
-map_Ke textures\\diamond_lambert2_Emissive.png
+map_Kd textures\\diamond_lambert2_BaseColor.png?maxsize=512&filter=[hsl(-0.1,0,0)]
+map_Ke textures\\diamond_lambert2_Emissive.png?maxsize=512&filter=[hsl(-0.2,0.5,0.1)]
 map_Ns textures\\diamond_lambert2_Roughness.png
 refl textures\\diamond_lambert2_Metallic.png
