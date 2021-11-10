@@ -5,7 +5,6 @@ const zeros = require("zeros")
 const fs = require("fs")
 const path = require("path")
 
-const INPUT_CHANNELS_COUNT = 4
 const CHANNEL_NAMES = ["RED", "GREEN", "BLUE", "ALPHA"]
 const options = cmd_args([
     { name: 'input', alias: 'i', type: String },
@@ -35,7 +34,7 @@ async function main() {
 function extract_channel(arr, channel) {
     let result = new Uint8Array(arr.length / 4);
     for (let a = 0, l = result.length; a < l; a++) {
-        let c = Math.min(arr[a * 4 + channel] * 2, 255)
+        let c = Math.min(arr[a * 4 + channel], 255)
         result[a] = c
     }
     return result

@@ -35,7 +35,7 @@ class ClockComponent extends Component {
         this.loop_id = requestAnimationFrame(this.handle_raf)
     }
     handle_raf() {
-        this.loop_id = requestAnimationFrame(this.handle_raf)
+        
         let now = this.time_data.now = +new Date()
         let frame_time = this.time_data.frame_time = now - this.time_data.prev_frame_time
         let delta = this.time_data.delta = frame_time / (1000 / 60)
@@ -51,6 +51,8 @@ class ClockComponent extends Component {
         }
 
         this.globals.tick_skip = this.globals.need_render ? 1 : 1
+
+        this.loop_id = requestAnimationFrame(this.handle_raf)
     }
     on_tick(time_data) {
         this.globals.uniforms.time.value += (1 / 60) * this.tick_delta;

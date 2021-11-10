@@ -59,9 +59,9 @@ class AssetMaterial extends THREE.Material {
         this.roughness = isNumber(params.roughness) ? params.roughness : 1
         this.metalness = isNumber(params.metalness) ? params.metalness : 0
         this.reflectivity = isNumber(params.reflectivity) ? params.reflectivity : 0
-        this.doubleside = params.doubleside || false
+        this.doubleside = isBoolean(params.doubleside) ? params.doubleside : false
         this.color = params.color || "#ffffff"
-        this.allow_transparency = isBoolean(params.allow_transparency) ? params.allow_transparency : true
+        this.transparent = isBoolean(params.transparent) ? params.transparent : false
         this.emissive_color = params.emissive_color || undefined
         this.add_clearcoat = isBoolean(params.add_clearcoat) ? params.add_clearcoat : false
         this.add_sheen = isBoolean(params.add_sheen) ? params.add_sheen : false
@@ -226,8 +226,6 @@ class AssetMaterial extends THREE.Material {
                 block_data.reflectivity = this.reflectivity
             }
 
-
-
             if (this.add_clearcoat) {
                 block_data.clearcoat = isNumber(block_data.reflectivity) ? block_data.reflectivity : 1
                 block_data.clearcoatRoughness = isNumber(block_data.roughness) ? block_data.roughness : 1
@@ -244,6 +242,13 @@ class AssetMaterial extends THREE.Material {
                 if (!isUndefined(block_data.specular)) block_data.sheenColor = new THREE.Color(block_data.specular.r, block_data.specular.g, block_data.specular.b)
             }
 
+            if (this.transparent === true) {
+                block_data.transparent = true
+            }
+
+            if (this.doubleside === true) {
+                block_data.side = THREE.DoubleSide
+            }
 
             block_data.bumpScale = 0.0005
             if (block_data.shininess !== undefined ||

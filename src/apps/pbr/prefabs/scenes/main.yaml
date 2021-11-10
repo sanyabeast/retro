@@ -20,7 +20,7 @@ components:
     name: Sun
     params:
       cycling: 5
-      time: 0.51
+      time: 0.57
       global_intensity: 1
   skybox_switcher:
     name: "SkyboxSwitcher"
@@ -236,6 +236,14 @@ children:
       model_2:
         prefab: "pbr.model_viewer_item"
         components:
+          sfx:
+            name: AudioComponent
+            params:
+              src: "res/pbr/sound/166185__drminky__mystical-object-aura"
+              autoplay: true
+              max_distance: 0.5
+              loop: true
+              volume: 0.4
           body:
             name: MeshComponent
             params:
@@ -256,6 +264,14 @@ children:
       model_3:
         prefab: "pbr.model_viewer_item"
         components:
+          sfx:
+            name: AudioComponent
+            params:
+              src: "res/pbr/sound/179114__sinatra314__elvis-radio-announcer"
+              autoplay: true
+              max_distance: 0.5
+              loop: true
+              volume: 0.1
           body:
             name: MeshComponent
             params:
@@ -274,6 +290,14 @@ children:
       model_4:
         prefab: "pbr.model_viewer_item"
         components:
+          sfx:
+            name: AudioComponent
+            params:
+              src: "res/pbr/sound/171249__oddworld__icecreamvan"
+              autoplay: true
+              max_distance: 1
+              loop: true
+              volume: 0.5
           body:
             name: MeshComponent
             params:
@@ -329,3 +353,33 @@ children:
                   roughness: 2
                   metalness: 0.5
                   reflectivity: 0.5
+      model_7:
+        prefab: "pbr.model_viewer_item"
+        components:
+          sfx:
+            name: AudioComponent
+            params:
+              src: "res/core/ambient_sound/house_ambience_a1"
+              autoplay: true
+              max_distance: 1
+              loop: true
+              volume: 1
+          body:
+            name: MeshComponent
+            params:
+              rotation: [0, 1.5707, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/basic_clock_a1/basic_clock_a1.obj"
+                - 1
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/basic_clock_a1/basic_clock_a1.mtl"
+                  allow_transparency: false
+                  doubleside: true
+                  emissive_intensity: 5
+                  roughness: 1
+                  metalness: 1
+                  reflectivity: 0.5
+
