@@ -20,57 +20,59 @@ class AssetBufferGeometry extends THREE.BufferGeometry {
                 if (obj_cache[src]) {
                     g = obj_cache[src].clone()
                 } else {
-                    obj_loader.load(
-                        src,
-                        (object) => {
-                            console.log(object)
-                            let g = new THREE.BufferGeometry()
-                            if (object instanceof THREE.Group) {
-                                if (object.children.length > 1) {
-                                    let geometries = []
-                                    object.children.forEach(child => {
-                                        if (child instanceof THREE.Mesh) {
-                                            let position_attr = child.geometry.getAttribute("position")
-                                            let count = position_attr.count
-                                            if (child.geometry.attributes["uv"] === undefined) {
-                                                child.geometry.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(count * 2), 2))
+                    setTimeout(() => {
+                        obj_loader.load(
+                            src,
+                            (object) => {
+                                console.log(object)
+                                let g = new THREE.BufferGeometry()
+                                if (object instanceof THREE.Group) {
+                                    if (object.children.length > 1) {
+                                        let geometries = []
+                                        object.children.forEach(child => {
+                                            if (child instanceof THREE.Mesh) {
+                                                let position_attr = child.geometry.getAttribute("position")
+                                                let count = position_attr.count
+                                                if (child.geometry.attributes["uv"] === undefined) {
+                                                    child.geometry.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(count * 2), 2))
+                                                }
+                                                if (child.geometry.attributes["normal"] === undefined) {
+                                                    child.geometry.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(count * 3), 3))
+                                                }
+                                                geometries.push(child.geometry)
                                             }
-                                            if (child.geometry.attributes["normal"] === undefined) {
-                                                child.geometry.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(count * 3), 3))
-                                            }
-                                            geometries.push(child.geometry)
-                                        }
-                                    })
-                                    let merged_geometry = BufferGeometryUtils.mergeBufferGeometries(geometries, true)
-                                    for (let k in merged_geometry) {
-                                        g[k] = merged_geometry[k]
-                                    }
-                                } else {
-                                    g = object.children[0].geometry
-                                    let materials_order = undefined
-                                    if (isArray(object.children[0].material)) {
-                                        materials_order = map(object.children[0].material, (mat) => {
-                                            return mat.name
                                         })
+                                        let merged_geometry = BufferGeometryUtils.mergeBufferGeometries(geometries, true)
+                                        for (let k in merged_geometry) {
+                                            g[k] = merged_geometry[k]
+                                        }
+                                    } else {
+                                        g = object.children[0].geometry
+                                        let materials_order = undefined
+                                        if (isArray(object.children[0].material)) {
+                                            materials_order = map(object.children[0].material, (mat) => {
+                                                return mat.name
+                                            })
+                                        }
+                                        g.materials_order = materials_order
                                     }
-                                    g.materials_order = materials_order
+                                } else if (object instanceof THREE.Mesh) {
+                                    g = object.geometry.clone()
                                 }
-                            } else if (object instanceof THREE.Mesh) {
-                                g = object.geometry.clone()
+
+                                obj_cache[src] = g
+
+                                for (let k in g) {
+                                    this[k] = g[k]
+                                }
+
+                                setTimeout(() => {
+                                    this.scale(scale, scale, scale)
+                                })
+
                             }
-
-                            obj_cache[src] = g
-
-                            for (let k in g) {
-                                this[k] = g[k]
-                            }
-
-                            setTimeout(() => {
-                                this.scale(scale, scale, scale)
-                            })
-
-                        }
-                    );
+                        );
+                    })
                 }
 
                 for (let k in g) {
