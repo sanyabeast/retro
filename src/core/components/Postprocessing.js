@@ -71,7 +71,7 @@ class Postprocessing extends Component {
     composer = undefined
     outline_effect = undefined
     use_ffx = true
-    use_fxaa = true
+    use_fxaa = false
     use_smaa = false
     use_taa = false
     use_ssao = true
