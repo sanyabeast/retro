@@ -65,26 +65,29 @@ children:
         params:
           position: [0, 4, 0]
           type: PointLight
-          intensity: 1.8
-          distance: 8
+          intensity: 2.2
+          distance: 18
+          color: "#fccdca"
       light_2:
         name: LightComponent
         params:
-          position: [0, 2, 0]
+          position: [0, 3, 0]
           type: PointLight
-          intensity: 1.2
-          distance: 10
+          intensity: 1.5
+          distance: 25
+          color: "#e4fcca"
       light_3:
         name: LightComponent
         params:
-          position: [0, 0.5, 0]
+          position: [0, 5, 0]
           type: PointLight
-          intensity: 0.6
-          distance: 12
+          intensity: 0.8
+          distance: 30
+          color: "#cad0fc"
       controller:
         order: 1
         params:
-          radius: 4
+          radius: 15
           speed: 0.4
         inline:
           methods:
@@ -125,7 +128,7 @@ children:
                 - src: "res/pbr/models/jerrycan/jerrycan_a1.mtl"
                   allow_transparency: false
                   doubleside: false
-                  emissive_intensity: 10
+                  emissive_intensity: 1
           body2:
             name: MeshComponent
             params:
@@ -142,7 +145,7 @@ children:
                 - src: "res/pbr/models/jerrycan/jerrycan_a1.mtl"
                   allow_transparency: false
                   doubleside: false
-                  emissive_intensity: 10
+                  emissive_intensity: 1
       model_2:
         prefab: "pbr.model_viewer_item"
         components:
@@ -161,6 +164,7 @@ children:
                 - src: "res/pbr/models/magic_stone_a1/magic_stone_a1.mtl"
                   allow_transparency: false
                   doubleside: false
+                  emissive_intensity: 0.333
       model_3:
         prefab: "pbr.model_viewer_item"
         components:
@@ -178,4 +182,22 @@ children:
                 - src: "res/pbr/models/vintage_radio_a1/vintage_radio_a1.mtl"
                   allow_transparency: false
                   doubleside: false
-                  emissive_intensity: 10
+                  emissive_intensity: 1
+      model_4:
+        prefab: "pbr.model_viewer_item"
+        components:
+          body:
+            name: MeshComponent
+            params:
+              rotation: [0, 1.5707, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/gmc_motorhome_a1/gmc_motorhome_a1.obj"
+                - 0.3
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/gmc_motorhome_a1/gmc_motorhome_a1.mtl"
+                  allow_transparency: false
+                  doubleside: false
+                  emissive_intensity: 5

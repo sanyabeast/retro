@@ -20,9 +20,9 @@ function v3(arr) {
 const mtl_props = {
     "newmtl": ["name"],
     "d": ["opacity"],
+    "Kd": ["color"],
     "Ns": ["shininess"],
     "Ks": ["specular"],
-    "Ke": ["emissive"],
     "Ka": ["reflectivity", "metalness"],
     "Ni": ["refractionRatio"],
     "map_d": ["alphaMap"],
@@ -61,7 +61,7 @@ class AssetMaterial extends THREE.Material {
         this.allow_transparency = isBoolean(params.allow_transparency) ? params.allow_transparency : true
         this.emissive_color = params.emissive_color || undefined
 
-        this.emissive_intensity = isNumber(params.emissive_intensity) ? params.emissive_intensity : 10
+        this.emissive_intensity = isNumber(params.emissive_intensity) ? params.emissive_intensity : 1
         let r = []
 
         let type = src.split(".")
@@ -142,21 +142,14 @@ class AssetMaterial extends THREE.Material {
                     }
                 }
 
-                if (result.opacity && result.opacity < 1 || result.alphaMap !== undefined) {
-                    result.transparent = true
-                    if (!result.alphaMap) {
-                        result.alphaMap = result.map
-                    }
-                }
 
                 forEach(pbr_props, (prop_name) => {
                     result[prop_name] = v
                 })
 
-                result.bumpScale = 0.0005
-                result.emissiveIntensity = 200
                 if (result.emissiveMap !== undefined) {
-                    result.emissive.set(1, 1, 1)
+                    result.emissiveIntensity = 1
+                    result.emissive = new THREE.Color(0xFFFFFF)
                 }
             })
             forEach(result, (v, k) => {
@@ -165,7 +158,7 @@ class AssetMaterial extends THREE.Material {
                 }
             })
 
-            console.log(result)
+            console.log(asset_dir, result)
             return result
         }
         function parse_line(line_data) {
@@ -189,6 +182,28 @@ class AssetMaterial extends THREE.Material {
             let material_layers = []
             let material_type = Device.is_mobile ? LQ_MAT : HQ_MAT
             let block_data = parse_block(b)
+
+            if (block_data.color) {
+                block_data.color.set_any(blend_colors("multiply", block_data.color, this.color, "array"))
+            }
+
+            if (block_data.emissive && this.emissive_color) {
+                block_data.emissive.set_any(blend_colors("multiply", block_data.emissive, this.emissive_color, "array"))
+            }
+
+            if (block_data.emissiveIntensity !== undefined) {
+                block_data.emissiveIntensity *= this.emissive_intensity
+            }
+
+            if (this.use_map_as_alphamap) {
+                block_data.alphaMap = block_data.map
+            }
+
+            if (block_data.opacity && block_data.opacity < 1 || block_data.alphaMap !== undefined) {
+                block_data.transparent = true
+            }
+
+            block_data.bumpScale = 0.0005
             if (block_data.shininess !== undefined ||
                 block_data.specular !== undefined ||
                 block_data.specularMap !== undefined ||
@@ -196,6 +211,7 @@ class AssetMaterial extends THREE.Material {
                 block_data.reflectivity !== undefined) {
                 let rmat = new THREE.MeshPhongMaterial({
                     ...block_data,
+                    color: 0x000000,
                     userData: {
                         layer_name: "phong"
                     }
@@ -203,15 +219,6 @@ class AssetMaterial extends THREE.Material {
                 rmat.blending = 2;
                 material_layers.push(rmat)
             }
-
-            if (block_data.color) {
-                block_data.color.set_any(blend_colors("multiply", block_data.color, this.color, "array"))
-            }
-
-            if (block_data.color && this.emissive_color) {
-                block_data.color.set_any(blend_colors("multiply", block_data.color, this.emissive_color, "array"))
-            }
-
             let mat = new THREE.materials[material_type](block_data)
             if (material_layers.length > 0) {
                 mat.material_layers = material_layers

@@ -382,7 +382,7 @@ class ResourceManager extends BasicObject {
                     image_src = src.split("?")[0]
                 }
 
-                console.log(src, params)
+                // console.log(src, params)
                 if (params && (params.filter !== undefined || params.maxsize !== undefined)) {
                     texture = image_filter.get_texture(src, params.filter || "", params.maxsize || 1024)
                 } else {

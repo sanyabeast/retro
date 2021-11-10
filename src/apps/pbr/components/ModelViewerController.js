@@ -6,7 +6,7 @@ import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefin
 import Schema from "core/utils/Schema"
 
 class ModelViewerController extends Component {
-    radius = 5
+    radius = 9
     current_model = 0
     /**private */
     target_rotation = undefined
@@ -41,6 +41,9 @@ class ModelViewerController extends Component {
         this.log(`created`)
         this.align_items()
         this.current_model = 0
+    }
+    on_start() {
+        this.current_model = this.children.length - 1
     }
     align_items() {
         let items_count = this.children.length;
