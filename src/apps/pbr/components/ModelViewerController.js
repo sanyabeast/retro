@@ -6,7 +6,7 @@ import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefin
 import Schema from "core/utils/Schema"
 
 class ModelViewerController extends Component {
-    radius = 9
+    radius = 14
     current_model = 0
     /**private */
     target_rotation = undefined
