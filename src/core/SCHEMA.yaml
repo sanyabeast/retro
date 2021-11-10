@@ -66,3 +66,5 @@ INLINE_COMPONENT_FUNCTION:
       type: array|none
       any_prop: string
     body: string
+    throttle: number|none
+    debounce: number|none

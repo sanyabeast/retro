@@ -1,0 +1,152 @@
+# Blender MTL File: 'None'
+# Material Count: 10
+
+newmtl Material.001
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_normal.png
+map_Kd textures\\Material_baseColor.png
+map_Ke textures\\Material_emissive.jpeg
+map_Ns textures\\Material_metallicRoughness.png?maxsize=256&filter=[extract_ch(1)]
+refl textures\\Material_metallicRoughness.png?maxsize=256&filter=[extract_ch(2)]
+
+newmtl Material_001
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_001_normal.png
+map_Kd textures\\Material_001_baseColor.png
+map_Ke textures\\Material_001_emissive.jpeg
+map_Ns textures\\Material_001_metallicRoughness.png?maxsize=256&filter=[extract_ch(1)]
+refl textures\\Material_001_metallicRoughness.png?maxsize=256&filter=[extract_ch(2)]
+
+newmtl Material_012
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_012_normal.png
+map_Kd textures\\Material_012_baseColor.png
+map_Ke textures\\Material_012_emissive.jpeg
+map_Ns textures\\Material_012_metallicRoughness.png?maxsize=256&filter=[extract_ch(1)]
+refl textures\\Material_012_metallicRoughness.png?maxsize=256&filter=[extract_ch(2)]
+
+newmtl Material_014
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_014_normal.png
+map_Kd textures\\Material_014_baseColor.png
+map_Ke textures\\Material_014_emissive.jpeg
+map_Ns textures\\Material_014_metallicRoughness.png?maxsize=256&filter=[extract_ch(1)]
+refl textures\\Material_014_metallicRoughness.png?maxsize=512&filter=[extract_ch(2)]
+
+newmtl Material_015
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_015_normal.png
+map_Kd textures\\Material_015_baseColor.png
+map_Ke textures\\Material_015_emissive.jpeg
+map_Ns textures\\Material_015_metallicRoughness.png?maxsize=512&filter=[extract_ch(1)]
+refl textures\\Material_015_metallicRoughness.png?maxsize=512&filter=[extract_ch(2)]
+
+newmtl Material_018
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_018_normal.png
+map_Kd textures\\Material_018_baseColor.png
+map_Ke textures\\Material_018_emissive.jpeg
+map_Ns textures\\Material_018_metallicRoughness.png?maxsize=512&filter=[extract_ch(1)]
+refl textures\\Material_018_metallicRoughness.png?maxsize=512&filter=[extract_ch(2)]
+
+newmtl Material_019
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_019_normal.png
+map_Kd textures\\Material_019_baseColor.png
+map_Ke textures\\Material_019_emissive.jpeg
+map_Ns textures\\Material_019_metallicRoughness.png?maxsize=256&filter=[extract_ch(1)]
+refl textures\\Material_019_metallicRoughness.png?maxsize=256&filter=[extract_ch(2)]
+
+newmtl Material_020
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_020_normal.png
+map_Kd textures\\Material_020_baseColor.png
+map_Ke textures\\Material_020_emissive.jpeg
+map_Ns textures\\Material_020_metallicRoughness.png?maxsize=256&filter=[extract_ch(1)]
+refl textures\\Material_020_metallicRoughness.png?maxsize=256&filter=[extract_ch(2)]
+
+newmtl Material_024
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_024_normal.png
+map_Kd textures\\Material_024_baseColor.png
+map_Ke textures\\Material_024_emissive.jpeg
+map_Ns textures\\Material_024_metallicRoughness.png?maxsize=256&filter=[extract_ch(1)]
+refl textures\\Material_024_metallicRoughness.png?maxsize=256&filter=[extract_ch(2)]
+
+newmtl Material_025
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Material_025_normal.png
+map_Kd textures\\Material_025_baseColor.png
+map_Ke textures\\Material_025_emissive.jpeg
+map_Ns textures\\Material_025_metallicRoughness.png?maxsize=256&filter=[extract_ch(1)]
+refl textures\\Material_025_metallicRoughness.png?maxsize=256&filter=[extract_ch(2)]

@@ -6,7 +6,7 @@
 import { log, makeid, datetime, is_none, hex_to_hsl, hsl_to_rgb, hex_to_rgb, request_text_sync, console, get_most_suitable_dict_keys } from "core/utils/Tools";
 import * as Tools from "core/utils/Tools";
 import BasicObject from "core/BasicObject";
-import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, isFunction, isString, map, keys, values, forEach } from "lodash-es"
+import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, isFunction, isString, map, keys, values, forEach, throttle, debounce } from "lodash-es"
 import ResourceManager from "core/ResourceManager"
 import Schema from "core/utils/Schema"
 import GameObject from "./GameObject"
@@ -148,6 +148,16 @@ Component.create = (params, name) => {
         ${name};
     `
     let result = eval(code)
+
+    forEach(params.methods, (method_data, method_name) => {
+        if (isNumber(method_data.throttle)){
+            result.prototype[method_name] = throttle(result.prototype[method_name], method_data.throttle)
+        } else if (isNumber(method_data.debounce)){
+            result.prototype[method_name] = debounce(result.prototype[method_name], method_data.debounce)
+        }
+    })
+
+
     log("Component", `just created new inline component "${name}"`)
     return result
 }

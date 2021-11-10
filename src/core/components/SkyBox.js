@@ -17,21 +17,38 @@ class SkyBox extends Component {
     /**private */
     scene_background = undefined
     refraction_map = undefined
-    on_create() {
-        let scene = this.globals.app
-        scene.background = this.scene_background = scene.environment = this.create_background(
-            this.color,
-            this.cubemap,
-            this.texture,
-            THREE.CubeRefractionMapping
-        )
+    get_reactive_props() {
+        return [
+            "cubemap",
+            super.get_reactive_props()
+        ]
+    }
+    on_update(props) {
+        super.on_update(props)
+        props.forEach(prop => {
+            switch (prop) {
+                case "cubemap": {
+                    let scene = this.globals.app
+                    scene.background = this.scene_background = scene.environment = this.create_background(
+                        this.color,
+                        this.cubemap,
+                        this.texture,
+                        THREE.CubeRefractionMapping
+                    )
 
-        scene.refraction_map = this.refraction_map = scene.environment = this.create_background(
-            this.color,
-            this.cubemap,
-            this.texture,
-            THREE.CubeRefractionMapping
-        )
+                    scene.refraction_map = this.refraction_map = scene.environment = this.create_background(
+                        this.color,
+                        this.cubemap,
+                        this.texture,
+                        THREE.CubeRefractionMapping
+                    )
+                    break
+                }
+            }
+        })
+    }
+    on_create() {
+
     }
     create_background(color = "#ffffff", cubemap = undefined, texture = undefined, mapping = THREE.UVMapping) {
         if (cubemap === undefined && texture === undefined) {
