@@ -9,7 +9,7 @@ components:
   skybox:
     name: SkyBox
     params:
-      cubemap: res/core/cubemaps/cntower_1
+      cubemap: res/core/cubemaps/nightpath_1
       cubemap_format: jpg
   sun:
     name: Sun
@@ -17,22 +17,94 @@ components:
       cycling: 5
       time: 0.51
       global_intensity: 1
+  skybox_switcher:
+    name: "SkyboxSwitcher"
+    params:
+      tick_rate: 30
+      maps:
+        - nightpath_1
+        - purplenebula
+        - tantolunden_1
+        - afterrain
+        - areskutan_1
+        - cntower_1
+        - cosmos_1
+        - creek_1
+        - flame
+        - forest_1
+        - h2s
+        - heart_sand_1
+        - hornstulls_1
+        - hornstulls_2
+        - house_1
+        - icelake_1
+        - iceriver_1
+        - lundagatan_1
+        - nalovardo_1
+        - nightpath_1
+        - nissi_beach_1
+        - pondnight_1
+        - vindelalven_1
+        - yokohama_3
+    inline:
+      props:
+        current: 0
+      methods:
+        switch_skybox:
+          debounce: 100
+          body: |
+            let skybox = this.find_component_of_type("SkyBox");
+            let new_skybox = this.current
+            while(new_skybox === this.current){
+              new_skybox = Math.floor(Math.random() * this.maps.length);
+            }
+            this.current = new_skybox;
+            skybox.cubemap = `res/core/cubemaps/${this.maps[new_skybox]}`
+        on_start: 
+          body: |
+            //this.switch_skybox();
+        on_tick:
+          body: let input = this.find_component_of_type("InputComponent");
+            if (input.is_keypress("space")){
+            this.switch_skybox();
+            }
 children:
   infostand:
+    position: [0, 2, -5]
     components:
+      bg:
+        name: MeshComponent
+        params:
+          position: [0, 0, -0.666]
+          geometry:
+            - PlaneBufferGeometry
+            - [5, 2, 1]
+          material:
+            - MeshBasicMaterial
+            - color: "#000000"
+              opacity: 0.4
+              transparent: true
       title:
         name: TroikaTextComponent
         params:
-          position: [0, 4, -3]
-          font_size: 0.333
+          position: [0, 1.2, 0]
+          font_size: 0.18
           anchor_x: 1.85
           text: "USE `A` & `D` TO NAVIGATE"
+          color: "#ffc107"
+      title2:
+        name: TroikaTextComponent
+        params:
+          position: [0, 0.95, 0]
+          font_size: 0.12
+          anchor_x: 1.85
+          text: "USE `SPACE` TO SWITCH SKYBOX"
           color: "#ffc107"
       current_model_title:
         name: TroikaTextComponent
         tag: current_model_title
         params:
-          position: [0, 3.55, -3]
+          position: [0, 0.666, 0]
           font_size: 0.5
           anchor_x: 1.85
           text: "#1"
@@ -41,12 +113,12 @@ children:
         tag: current_time
         params:
           text: " "
-          position: [0, 2.95, -3]
+          position: [0, 0, 0]
           font_size: 0.25
           color: "#9e9e9e"
           anchor_x: 1.85
       time_component:
-        inline: 
+        inline:
           methods:
             on_tick:
               body: >
@@ -55,7 +127,7 @@ children:
                 if (caption && sun){
                   caption.text = `IN-GAME TIME: ${sun.get_time_string()}`
                 }
-                
+
         params:
           tick_rate: 1
   lighting:
@@ -198,6 +270,24 @@ children:
               material:
                 - AssetMaterial
                 - src: "res/pbr/models/gmc_motorhome_a1/gmc_motorhome_a1.mtl"
+                  allow_transparency: false
+                  doubleside: false
+                  emissive_intensity: 5
+      model_5:
+        prefab: "pbr.model_viewer_item"
+        components:
+          body:
+            name: MeshComponent
+            params:
+              rotation: [0, 1.5707, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/scorpion_vz61_a1/scorpion_vz61_a1.obj"
+                - 0.5
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/scorpion_vz61_a1/scorpion_vz61_a1.mtl"
                   allow_transparency: false
                   doubleside: false
                   emissive_intensity: 5

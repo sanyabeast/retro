@@ -157,7 +157,6 @@ class AssetMaterial extends THREE.Material {
                     delete result[k]
                 }
             })
-
             console.log(asset_dir, result)
             return result
         }
