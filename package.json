@@ -1,14 +1,14 @@
 {
     "private": true,
     "name": "gamecore",
-    "version": "1.0.139",
+    "version": "1.0.145",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
         "url": "https://github.com/sanyabeast"
     },
     "scripts": {
-        "build-demos": "npm run build -- --env.APP_NAME=pbr && npm run build -- --env.APP_NAME=demo && npm run build -- --env.APP_NAME=default && npm run build -- --env.APP_NAME=subway &&npm run build -- --env.APP_NAME=lab",
+        "build-demos": "npm run build -- --env.APP_NAME=pbr && npm run build -- --env.APP_NAME=demo && npm run build -- --env.APP_NAME=default && npm run build -- --env.APP_NAME=subway && npm run build -- --env.APP_NAME=lab && npm run build -- --env.APP_NAME=gizmos",
         "clear": "rm -rf dist/",
         "clear:all": "rm -rf node_modules/ && npm run clear",
         "prebuild": "",
