@@ -408,7 +408,7 @@ class ResourceManager extends BasicObject {
 
         return texture;
     }
-    load_cubemap(src, type = "jpg") {
+    load_cubemap(src, type = "jpg", onload = () => { }) {
         let texture = this.loaders.cubemap.load([
             `${src}/posx.${type}`,
             `${src}/negx.${type}`,
@@ -416,7 +416,7 @@ class ResourceManager extends BasicObject {
             `${src}/negy.${type}`,
             `${src}/posz.${type}`,
             `${src}/negz.${type}`
-        ])
+        ], onload)
 
         return texture
     }

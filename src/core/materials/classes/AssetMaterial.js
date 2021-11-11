@@ -47,7 +47,7 @@ const mtl_map_props = [
 class AssetMaterial extends THREE.Material {
     src = ""
     bump_scale = 0.001
-    shininess = 10
+    shininess = 0.3333
     displacement_scale = 0.01
     doubleside = false
     constructor(params) {
@@ -55,7 +55,7 @@ class AssetMaterial extends THREE.Material {
         let src = this.src = params.src
         this.bump_scale = isNumber(params.bump_scale) ? params.bump_scale : 0.0001
         this.displacement_scale = isNumber(params.displacement_scale) ? params.displacement_scale : 0.01
-        this.shininess = isNumber(params.shininess) ? params.shininess : 16
+        this.shininess = isNumber(params.shininess) ? params.shininess : 0.5
         this.roughness = isNumber(params.roughness) ? params.roughness : 1
         this.metalness = isNumber(params.metalness) ? params.metalness : 0
         this.reflectivity = isNumber(params.reflectivity) ? params.reflectivity : 0
@@ -219,6 +219,10 @@ class AssetMaterial extends THREE.Material {
             } else {
                 block_data.metalness = this.metalness
             }
+
+            if (isNumber(block_data.shininess)) {
+                block_data.shininess *= this.shininess
+            } 
 
             if (isNumber(block_data.reflectivity)) {
                 block_data.reflectivity *= this.reflectivity
