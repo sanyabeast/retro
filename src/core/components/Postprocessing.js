@@ -189,6 +189,7 @@ class Postprocessing extends Component {
                     break
                 }
                 case "use_ssao": this.ssao_pass.enabled = this.use_ssao; break;
+                case "use_bloom": this.bloom_pass.enabled = this.use_bloom; break;
                 case "use_ffx": this.ffx_pass.enabled = this.use_ffx; break;
                 default: {
                     if (this.hs_effect) {
@@ -372,7 +373,8 @@ class Postprocessing extends Component {
                     height: 480
                 })
 
-                composer.addPass(new postfx.EffectPass(camera, effect))
+                this.bloom_pass = new postfx.EffectPass(camera, effect)
+                composer.addPass(this.bloom_pass)
                 break;
             }
 
@@ -387,7 +389,8 @@ class Postprocessing extends Component {
                 })
                 // effect.inverted = true
 
-                composer.addPass(new postfx.EffectPass(camera, effect))
+                this.bloom_pass = new postfx.EffectPass(camera, effect)
+                composer.addPass(this.bloom_pass)
                 break;
             }
 
