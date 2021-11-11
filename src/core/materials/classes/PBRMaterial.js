@@ -3,7 +3,7 @@ import Device from 'core/utils/Device';
 import { isNumber } from "lodash-es"
 
 const LQ_MAT = "MeshLambertMaterial"
-const HQ_MAT = "MeshStandardMaterial"
+const HQ_MAT = "MeshPhysicalMaterial"
 
 
 function setup_pbr(params) {
@@ -24,12 +24,52 @@ function setup_pbr(params) {
     this.normalMap = `${this.pbr}_n.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.roughnessMap = `${this.pbr}_r.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.metalnessMap = `${this.pbr}_m.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
+    this.reflectivityMap = `${this.pbr}_m.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.displacementMap = `${this.pbr}_h.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.bumpMap = `${this.pbr}_h.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.emissiveMap = `${this.pbr}_e.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
     this.bumpScale = typeof params.bumpScale === "number" ? params.bumpScale : 1
-    this.reflectivity = isNumber(params.reflectivity) ? params.reflectivity : 0.5
+    this.reflectivity = isNumber(params.reflectivity) ? params.reflectivity : 0.2
     this.displacementScale = -0.001
+    this.metalness = isNumber(params.metalness) ? params.metalness : 0.5
+    this.roughness = isNumber(params.roughness) ? params.roughness : 1
+    this.specular = new THREE.Color(1, 1, 1)
+    this.emissive = new THREE.Color(1, 1, 1)
+
+    this.material_layers = [
+        new THREE.MeshPhongMaterial({
+            shininess: 1,
+            color: new THREE.Color(0, 0, 0),
+            map: this.map,
+            metalness: this.metalness,
+            roughness: this.roughness,
+            specular: this.specular,
+            emissive: this.emissive,
+            normalMap: this.normalMap,
+            roughnessMap: this.roughnessMap,
+            metalnessMap: this.metalnessMap,
+            reflectivityMap: this.metalnessMap,
+            bumpMap: this.bumpMap,
+            emissiveMap: this.emissiveMap,
+            emissiveMap: this.emissiveMap,
+            bumpScale: this.bumpScale,
+            reflectivity: this.reflectivity,
+            blending: 2,
+            userData: {
+                layer_name: "phong"
+            }
+        }),
+        new THREE.MeshBasicMaterial({
+            color: new THREE.Color(0, 0, 0),
+            alphaMap: `${this.pbr}_ao.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}&maxsize=1024&filter=[invert]`,
+            opacity: 1,
+            transparent: true,
+            blending: 1,
+            userData: {
+                layer_name: "ao"
+            }
+        })
+    ]
 }
 
 let PBRMaterial
@@ -41,8 +81,6 @@ if (Device.is_mobile) {
         constructor(params) {
             super(params)
             setup_pbr.call(this, params)
-            // this.map = `${this.pbr}_c.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
-
         }
     }
 
@@ -53,11 +91,8 @@ if (Device.is_mobile) {
         constructor(params) {
             super(params)
             setup_pbr.call(this, params)
-            // this.map = `${this.pbr}_c.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}`
-
         }
     }
-
 }
 
 export default PBRMaterial

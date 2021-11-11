@@ -12,6 +12,14 @@ import {
 
 const cache = {}
 const filters_lib = {
+    invert(pixel) {
+        return [
+            1 - pixel[0],
+            1 - pixel[1],
+            1 - pixel[2],
+            pixel[2],
+        ]
+    },
     extract_ch(pixel, channel_id) {
         let v = pixel[channel_id]
         return [v, v, v, pixel[3]];
