@@ -1,0 +1,124 @@
+type: ShaderMaterial
+params:
+  vertexShader: |
+    varying vec2 vUv;
+    uniform float opacity;
+    uniform float cell_scale;
+
+    void main() {
+        vUv = uv;
+        vec4 pos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        gl_Position = pos;
+    }
+
+  fragmentShader: |
+    uniform sampler2D normalBuffer;
+    uniform sampler2D diffuseBuffer;
+    uniform int quality;
+
+    #import core.blending
+
+    vec3 decode_normal(vec3 n){
+      return vec3(
+        (n.x * 2.) - 1.,
+        (n.y * 2.) - 1.,
+        (n.z * 2.) - 1.
+      );
+    }
+
+    float get_lightness(vec3 c){
+      return (c.x + c.y + c.z) / 3.;
+    }
+
+    vec3 get_uv_direction(vec2 uv1, vec2 uv2){
+      return vec3(
+        vec2(
+          uv1.x - uv2.x,
+          uv1.y - uv2.y
+        ),
+        0.
+      );
+    }
+
+    float get_diffuse_factor1(vec3 s_normal, vec3 l_normal){
+      l_normal.x = -l_normal.x;
+      return dot(normalize(s_normal), normalize(l_normal));
+    }
+
+    float get_diffuse_factor2(vec3 s_normal, vec3 l_normal){
+      return (abs(s_normal.x - l_normal.x) + abs(s_normal.y - l_normal.y) + abs(s_normal.z - l_normal.z)) / 3.;
+    }
+
+    vec3 get_light_diffuse(vec2 light_uv){
+      vec3 result = vec3(0., 0., 0.);
+      float total = 0.;
+      float step = 0.01;
+      for (int x = -2; x < 2; x++){
+        for (int y = -2; y < 2; y++){
+          result+=texture2D(diffuseBuffer, vec2(
+            light_uv.x + (float(x) * step),
+            light_uv.y + (float(y) * step)
+          )).xyz;
+          total += 1.;
+        }
+      }
+      
+      return vec3(
+        result.x / total,
+        result.y / total,
+        result.z / total
+      );
+    }
+
+    vec3 get_light_diffuse2(vec2 light_uv){
+      return texture2D(diffuseBuffer, light_uv).xyz;
+    }
+
+
+    void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+        outputColor = inputColor;
+        vec3 surface_normal = decode_normal(texture2D(normalBuffer, uv).xyz);
+        vec3 scgi_diffuse = vec3(0., 0., 0.);
+        
+        for (int y = 0; y < quality; y++){
+          for (int x = 0; x < quality; x++){
+            float fx = float(x);
+            float fy = float(y);
+            vec2 light_uv = vec2(fx/float(quality), 1.-fy/float(quality));
+            vec3 light_diffuse = get_light_diffuse2(light_uv);
+            vec3 light_normal = decode_normal(texture2D(normalBuffer, light_uv).xyz);
+            //vec3 uv_direction = get_uv_direction(light_uv, uv);
+            float light_distance = distance(uv, light_uv);
+
+            //float diffuse_factor = dot(normalize(surface_normal), normalize(light_normal));
+            float diffuse_factor = get_diffuse_factor1(surface_normal, light_normal);
+            float light_factor = (pow((1.-light_distance), 2.) * pow(get_lightness(light_diffuse), 2.));
+
+            scgi_diffuse = mix(scgi_diffuse, light_diffuse, clamp(light_factor * diffuse_factor, 0., 1.));
+            //scgi_diffuse += light_diffuse * light_factor;
+          }
+        }
+
+        scgi_diffuse = normalize(scgi_diffuse);
+
+        outputColor.xyz = mix(outputColor.xyz, BlendSoftLight(inputColor.xyz, scgi_diffuse), 1.);
+        if (uv.y > 0.66){
+          outputColor.xyz = scgi_diffuse;
+          //outputColor.xyz = get_light_diffuse(uv);
+        }
+
+        
+    }
+  transparent: true
+  blending: 1
+  uniforms:
+    opacity:
+      type: f
+      value: 1
+    normalBuffer:
+      type: t
+    diffuseBuffer:
+      type: t
+    quality:
+      type: i
+      value: 16

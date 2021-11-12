@@ -13,6 +13,7 @@ import { ShaderPass } from "core/lib/postprocessing/build/postprocessing.esm";
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import { TAARenderPass } from 'three/examples/jsm/postprocessing/TAARenderPass.js';
 import { map } from "lodash-es"
+import { Resizer } from "postprocessing/src/core/Resizer";
 
 const BLOOM_TYPE = "default"
 const postfx = require("core/lib/postprocessing").default
@@ -65,12 +66,50 @@ class FFXEffect extends postfx.Effect {
     }
 }
 
+class SCGIEffect extends postfx.Effect {
+    constructor(scene, camera, {
+        blendFunction = postfx.BlendFunction.NORMAL,
+        normalBuffer = null,
+        width = Resizer.AUTO_SIZE,
+        height = Resizer.AUTO_SIZE,
+        quality = 16
+    } = {}) {
+        let material_template = ResourceManager.get_material_template("core.scgi")
+        super("SCGI", material_template.params.fragmentShader, {
+            blendFunction,
+            width,
+            height,
+            uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)]))
+        });
+
+        this.render_pass_target = new THREE.WebGLRenderTarget(quality, quality, {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.LinearFilter,
+            format: THREE.RGBAFormat
+        });
+
+        this.render_pass_list = []
+        this.render_pass = new postfx.RenderPass(scene, camera);
+        this.render_pass.resolution = this.resolution = new Resizer(this, quality, quality, 0.5);
+        this.render_pass.resolution.scale = 0.2
+
+        this.uniforms.get("normalBuffer").value = normalBuffer
+        this.uniforms.get("quality").value = quality
+        this.uniforms.get("diffuseBuffer").value = this.render_pass_target.texture
+    }
+    update(renderer, inputBuffer, deltaTime) {
+        this.render_pass.scene.children = this.render_pass_list
+        this.render_pass.render(renderer, this.render_pass_target);
+    }
+}
+
 class Postprocessing extends Component {
     outline_selection = []
     /**private */
     composer = undefined
     outline_effect = undefined
     use_ffx = true
+    use_scgi = true
     use_fxaa = true
     use_smaa = false
     use_taa = false
@@ -114,6 +153,7 @@ class Postprocessing extends Component {
     }
     get_reactive_props() {
         return [
+            "use_scgi",
             "use_ffx",
             "use_fxaa",
             "use_ssao",
@@ -155,11 +195,10 @@ class Postprocessing extends Component {
             this.normal_pass_scene.children = normal_rendering_list
         }
 
-        if (this.render_pass) {
-            let postfx_rendering_list = renderer.get_rendering_list()
-            this.render_pass.scene.children = postfx_rendering_list
+        if (this.scgi_effect) {
+            let rendering_list = renderer.get_object_layer_list({ rendering: true, gizmo: false })
+            this.scgi_effect.render_pass_list = rendering_list
         }
-
     }
 
     on_update(props) {
@@ -191,6 +230,7 @@ class Postprocessing extends Component {
                 case "use_ssao": this.ssao_pass.enabled = this.use_ssao; break;
                 case "use_bloom": this.bloom_pass.enabled = this.use_bloom; break;
                 case "use_ffx": this.ffx_pass.enabled = this.use_ffx; break;
+                case "use_scgi": this.scgi_pass.enabled = this.use_scgi; break;
                 default: {
                     if (this.hs_effect) {
                         this.hs_effect.uniforms.get("saturation").value = this.saturation
@@ -224,6 +264,7 @@ class Postprocessing extends Component {
             if (this.use_hs) this.setup_hs(renderer, scene, camera, composer)
             if (this.use_bc) this.setup_bc(renderer, scene, camera, composer)
             if (this.use_fxaa) this.setup_fxaa(renderer, scene, camera, composer)
+            if (this.use_scgi) this.setup_scgi(renderer, scene, camera, composer)
             if (this.use_tonemapping) this.setup_tonemapping(renderer, scene, camera, composer)
             if (this.use_chromatic_abberation) this.setup_chromatic_abberation(renderer, scene, camera, composer)
             if (this.use_godrays) this.setup_godrays(renderer, scene, camera, composer)
@@ -236,7 +277,7 @@ class Postprocessing extends Component {
             if (this.use_vignette) this.setup_vignette(renderer, scene, camera, composer)
             if (this.use_gc) this.setup_gc(renderer, scene, camera, composer)
 
-            
+
             if (this.use_smaa) this.setup_smaa(renderer, scene, camera, composer)
             if (this.use_taa) this.setup_taa(renderer, scene, camera, composer)
 
@@ -415,7 +456,8 @@ class Postprocessing extends Component {
     }
     setup_ssao(renderer, scene, camera, composer) {
         let normal_pass_scene = this.normal_pass_scene = new THREE.Scene()
-        const normal_pass = this.normal_pass = new postfx.NormalPass(normal_pass_scene, camera);
+        const normal_pass = this.normal_pass || new postfx.NormalPass(normal_pass_scene, camera);
+        this.normal_pass = normal_pass
         const depth_downsampling_pass = this.depth_downsampling_pass = new postfx.DepthDownsamplingPass({
             normalBuffer: normal_pass.texture,
             resolutionScale: 1
@@ -451,6 +493,25 @@ class Postprocessing extends Component {
             ssao_effect,
         )
         composer.addPass(this.ssao_pass);
+
+
+    }
+    setup_scgi(renderer, scene, camera, composer) {
+        let normal_pass_scene = this.normal_pass_scene || new THREE.Scene()
+        this.normal_pass_scene = normal_pass_scene
+        const normal_pass = this.normal_pass || new postfx.NormalPass(normal_pass_scene, camera);
+        this.normal_pass = normal_pass
+
+
+
+        composer.addPass(normal_pass)
+
+        let scgi_effect = this.scgi_effect = new SCGIEffect(scene, camera, {
+            normalBuffer: normal_pass.texture,
+            height: 512
+        });
+        let scgi_pass = this.scgi_pass = new postfx.EffectPass(camera, this.scgi_effect);
+        composer.addPass(scgi_pass)
     }
     on_enable() {
         let renderer = this.find_component_of_type("Renderer")

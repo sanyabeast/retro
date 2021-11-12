@@ -1,6 +1,6 @@
 type: ShaderMaterial
 params:
-  vertexShader: >
+  vertexShader: |
       varying vec2 vUv;
       uniform float opacity;
       uniform float cell_scale;
@@ -11,7 +11,7 @@ params:
           gl_Position = pos;
       }
 
-  fragmentShader: >
+  fragmentShader: |
       varying vec2 vUv;
       uniform float time;
       uniform vec2 resolution;
