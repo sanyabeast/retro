@@ -1,0 +1,89 @@
+prefabs:
+  - default.Postprocessing
+  - default.OrbitControlsComponent
+components:
+  # fog:
+  #   name: Fog
+  #   params:
+  #     density: 0.005
+  # skybox:
+  #   name: SkyBox
+  #   params:
+  #     cubemap: res/core/cubemaps/cntower_1
+  #     cubemap_format: jpg
+  sun:
+    name: Sun
+    params:
+      cycling: 1
+      time: 0.3
+      global_intensity: 1
+  # lantern:
+  #   name: Lantern
+children:
+  cornell_box:
+    prefab: core.examples.cornell_box
+    position: [-1.1, 0, 0]
+  cornell_box2:
+    prefab: core.examples.cornell_box
+    position: [1.1, 0, 0]
+    children:
+      box:  
+        components:
+          ceil: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#2196f3"
+                  emissive: "#2196f3"
+                  emissiveIntensity: 0.5
+                  metalness: 0
+                  roughness: 0.8
+                  reflectivity: 0
+                  shininess: 0
+                  side: 2
+  cornell_box3:
+    prefab: core.examples.cornell_box
+    position: [1.1, 0, -2.2]
+    rotation: [0, 1.5707, 0]
+    children:
+      box:  
+        components:
+          red_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#2196f3"
+                  metalness: 0
+                  roughness: 0.8
+                  reflectivity: 0
+                  shininess: 0
+                  side: 2
+          green_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#e91e63"
+                  metalness: 0
+                  roughness: 0.8
+                  reflectivity: 0
+                  shininess: 0
+                  side: 2
+  cornell_box4:
+    prefab: core.examples.cornell_box
+    position: [-1.1, 0, -2.2]
+    rotation: [0, -1.5707, 0]
+    children:
+      box:  
+        components:
+          back_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#2196f3"
+                  emissive: "#2196f3"
+                  emissiveIntensity: 0.5
+                  metalness: 0
+                  roughness: 0.8
+                  reflectivity: 0
+                  shininess: 0
+                  side: 2
