@@ -11,3 +11,4 @@ ETC Game Engine built on top of THREEjs graphics library
 
 [PBR Testing Scene](https://sanyabeast.github.io/gamecorejs/dist/pbr/)
 
+[Screen Space Global Illumination Testing Scene](https://sanyabeast.github.io/gamecorejs/dist/scgi/) (in progress)

@@ -14,9 +14,11 @@ params:
   fragmentShader: |
     uniform sampler2D normalBuffer;
     uniform sampler2D diffuseBuffer;
-    uniform int quality;
 
     #import core.blending
+    #import core.convert
+
+    #define QUALITY 16.
 
     vec3 decode_normal(vec3 n){
       return vec3(
@@ -27,7 +29,13 @@ params:
     }
 
     float get_lightness(vec3 c){
+      return max(max(c.x, c.y), c.z);
       return (c.x + c.y + c.z) / 3.;
+    }
+
+    float get_lightness2(vec3 c){
+      vec3 hsv = rgb2hsv(c);
+      return hsv.z;
     }
 
     vec3 get_uv_direction(vec2 uv1, vec2 uv2){
@@ -41,7 +49,6 @@ params:
     }
 
     float get_diffuse_factor1(vec3 s_normal, vec3 l_normal){
-      l_normal.x = -l_normal.x;
       return dot(normalize(s_normal), normalize(l_normal));
     }
 
@@ -50,62 +57,51 @@ params:
     }
 
     vec3 get_light_diffuse(vec2 light_uv){
-      vec3 result = vec3(0., 0., 0.);
-      float total = 0.;
-      float step = 0.01;
-      for (int x = -2; x < 2; x++){
-        for (int y = -2; y < 2; y++){
-          result+=texture2D(diffuseBuffer, vec2(
-            light_uv.x + (float(x) * step),
-            light_uv.y + (float(y) * step)
-          )).xyz;
-          total += 1.;
-        }
-      }
-      
-      return vec3(
-        result.x / total,
-        result.y / total,
-        result.z / total
-      );
-    }
-
-    vec3 get_light_diffuse2(vec2 light_uv){
       return texture2D(diffuseBuffer, light_uv).xyz;
     }
 
 
     void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
         outputColor = inputColor;
-        vec3 surface_normal = decode_normal(texture2D(normalBuffer, uv).xyz);
+        vec3 surface_normal = normalize(decode_normal(texture2D(normalBuffer, uv).xyz));
         vec3 scgi_diffuse = vec3(0., 0., 0.);
         
-        for (int y = 0; y < quality; y++){
-          for (int x = 0; x < quality; x++){
-            float fx = float(x);
-            float fy = float(y);
-            vec2 light_uv = vec2(fx/float(quality), 1.-fy/float(quality));
-            vec3 light_diffuse = get_light_diffuse2(light_uv);
-            vec3 light_normal = decode_normal(texture2D(normalBuffer, light_uv).xyz);
+        for (float y = 0.; y < QUALITY; y++){
+          for (float x = 0.; x < QUALITY; x++){
+            vec2 light_uv = vec2(x/QUALITY, y/QUALITY);
+            vec3 light_diffuse = get_light_diffuse(light_uv);
+            vec3 light_normal = normalize(decode_normal(texture2D(normalBuffer, light_uv).xyz));
             //vec3 uv_direction = get_uv_direction(light_uv, uv);
-            float light_distance = distance(uv, light_uv);
+            float light_distance = (distance(uv, light_uv) / sqrt(2.));
+            float saturation = rgb2hsv(light_diffuse).z;
 
-            //float diffuse_factor = dot(normalize(surface_normal), normalize(light_normal));
-            float diffuse_factor = get_diffuse_factor1(surface_normal, light_normal);
-            float light_factor = (pow((1.-light_distance), 2.) * pow(get_lightness(light_diffuse), 2.));
-
-            scgi_diffuse = mix(scgi_diffuse, light_diffuse, clamp(light_factor * diffuse_factor, 0., 1.));
-            //scgi_diffuse += light_diffuse * light_factor;
+            float diffuse_factor = dot(
+              surface_normal, 
+              vec3( -light_normal.x, light_normal.y, light_normal.z )
+            );
+            float ligtness = get_lightness(light_diffuse);
+            float local_lightness = get_lightness(light_diffuse);
+            
+            scgi_diffuse = mix(
+              scgi_diffuse,
+              light_diffuse,
+              pow((1.- light_distance), 6.) * ligtness * clamp(diffuse_factor, 0., 1.)  * saturation
+            );
           }
         }
 
-        scgi_diffuse = normalize(scgi_diffuse);
+        outputColor.xyz = mix(
+          outputColor.xyz,
+          BlendLinearLight(outputColor, scgi_diffuse),
+          0.33
+        );
+        //if (uv.x < 0.5){
+        //  outputColor.xyz = scgi_diffuse;
+        //}
 
-        outputColor.xyz = mix(outputColor.xyz, BlendSoftLight(inputColor.xyz, scgi_diffuse), 1.);
-        if (uv.y > 0.66){
-          outputColor.xyz = scgi_diffuse;
-          //outputColor.xyz = get_light_diffuse(uv);
-        }
+        //if (uv.y < 0.25){
+        //  outputColor.xyz = texture2D(diffuseBuffer, uv).xyz;
+        //}
 
         
     }
@@ -120,5 +116,5 @@ params:
     diffuseBuffer:
       type: t
     quality:
-      type: i
+      type: f
       value: 16

@@ -18,6 +18,10 @@ import { Resizer } from "postprocessing/src/core/Resizer";
 const BLOOM_TYPE = "default"
 const postfx = require("core/lib/postprocessing").default
 
+if (process.env.NODE_ENV === "development"){
+    window.postfxlib = postfx;
+}
+
 /* BLEND MODES
 BlendFunction.SKIP
 BlendFunction.ADD
@@ -72,34 +76,64 @@ class SCGIEffect extends postfx.Effect {
         normalBuffer = null,
         width = Resizer.AUTO_SIZE,
         height = Resizer.AUTO_SIZE,
-        quality = 16
+        quality = 25
     } = {}) {
         let material_template = ResourceManager.get_material_template("core.scgi")
+        
         super("SCGI", material_template.params.fragmentShader, {
             blendFunction,
             width,
             height,
             uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)]))
         });
-
-        this.render_pass_target = new THREE.WebGLRenderTarget(quality, quality, {
+        
+        this.quality = quality
+        this.renderTarget = new THREE.WebGLRenderTarget(1, 1, {
             minFilter: THREE.LinearFilter,
             magFilter: THREE.LinearFilter,
-            format: THREE.RGBAFormat
+            stencilBuffer: false,
+            depthBuffer: false
         });
 
-        this.render_pass_list = []
-        this.render_pass = new postfx.RenderPass(scene, camera);
-        this.render_pass.resolution = this.resolution = new Resizer(this, quality, quality, 0.5);
-        this.render_pass.resolution.scale = 0.2
+        this.renderTarget.texture.name = "Bloom.Target";
+        this.renderTarget.texture.generateMipmaps = false;
 
+        this.blurPass = new postfx.BlurPass({
+            blendFunction: postfx.BlendFunction.AVERAGE,
+            resolutionScale: 1,
+            width,
+            height,
+            kernelSize: postfx.KernelSize.VERY_LARGE
+        });
+
+        this.blurPass.convolutionMaterial.uniforms.scale.value = 3
+
+        this.blurPass.resolution.resizable = this;
+        console.log(this.renderTarget.texture)
         this.uniforms.get("normalBuffer").value = normalBuffer
         this.uniforms.get("quality").value = quality
-        this.uniforms.get("diffuseBuffer").value = this.render_pass_target.texture
+        this.uniforms.get("diffuseBuffer").value = this.renderTarget
     }
     update(renderer, inputBuffer, deltaTime) {
-        this.render_pass.scene.children = this.render_pass_list
-        this.render_pass.render(renderer, this.render_pass_target);
+        this.blurPass.render(renderer, inputBuffer, this.renderTarget);
+    }
+    get resolution() {
+        return this.blurPass.resolution;
+    }
+    setSize(width, height) {
+        const w = Math.floor(Math.max(width * (this.quality/100), 1));
+        const h = Math.floor(Math.max(height * (this.quality/100), 1));
+        this.blurPass.setSize(w, h);
+        this.renderTarget.setSize(w, h);
+    }
+    initialize(renderer, alpha, frameBufferType) {
+        this.blurPass.initialize(renderer, alpha, frameBufferType);
+        if (!alpha && frameBufferType === THREE.UnsignedByteType) {
+            this.renderTarget.texture.format = THREE.RGBFormat;
+        }
+        if (frameBufferType !== undefined) {
+            this.renderTarget.texture.type = frameBufferType;
+        }
     }
 }
 
@@ -502,7 +536,17 @@ class Postprocessing extends Component {
         const normal_pass = this.normal_pass || new postfx.NormalPass(normal_pass_scene, camera);
         this.normal_pass = normal_pass
 
+        const savePass = new postfx.SavePass();
+        const blur_pass = this.blur_pass || new postfx.BlurPass({
+            height: 480
+        });
 
+
+        const textureEffect = new postfx.TextureEffect({
+            texture: savePass.renderTarget.texture
+        });
+
+        const texturePass = new postfx.EffectPass(camera, textureEffect);
 
         composer.addPass(normal_pass)
 

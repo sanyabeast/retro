@@ -9,7 +9,7 @@ children:
           rotation: [-1.5707, 0, 0]
           
           type: PointLight
-          distance: 2
+          distance: 6
           decay: 2
           intensity: 1
           rect_width: 0.6
@@ -24,8 +24,8 @@ children:
           position: [0, 0, 0]
           rotation: [-1.5707, 0, 0]
           geometry:
-            - PlaneBufferGeometry
-            - [2, 2, 1]
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
           material:
             - MeshStandardMaterial
             - color: "#ffffff"
@@ -42,8 +42,8 @@ children:
           position: [0, 2, 0]
           rotation: [1.5707, 0, 0]
           geometry:
-            - PlaneBufferGeometry
-            - [2, 2, 1]
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
           material:
             - MeshStandardMaterial
             - color: "#ffffff"
@@ -62,8 +62,8 @@ children:
           position: [0, 1, -1]
           rotation: [0, 0, 0]
           geometry:
-            - PlaneBufferGeometry
-            - [2, 2, 1]
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
           material:
             - MeshStandardMaterial
             - color: "#ffffff"
@@ -80,8 +80,8 @@ children:
           position: [-1, 1, 0]
           rotation: [0, 1.5707, 0]
           geometry:
-            - PlaneBufferGeometry
-            - [2, 2, 1]
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
           material:
             - MeshStandardMaterial
             - color: "#ff0000"
@@ -98,8 +98,8 @@ children:
           position: [1, 1, 0]
           rotation: [0, -1.5707, 0]
           geometry:
-            - PlaneBufferGeometry
-            - [2, 2, 1]
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
           material:
             - MeshStandardMaterial
             - color: "#00ff00"
@@ -108,7 +108,6 @@ children:
               reflectivity: 0
               shininess: 0
               side: 2
-
   props:
     components:
       box_a:

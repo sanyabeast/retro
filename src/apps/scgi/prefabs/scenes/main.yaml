@@ -15,14 +15,14 @@ components:
     name: Sun
     params:
       cycling: 1
-      time: 0.3
-      global_intensity: 1
+      time: 0.4
+      global_intensity: 1.1
   # lantern:
   #   name: Lantern
 children:
-  cornell_box:
-    prefab: core.examples.cornell_box
-    position: [-1.1, 0, 0]
+  # cornell_box:
+  #   prefab: core.examples.cornell_box
+  #   position: [-1.1, 0, 0]
   cornell_box2:
     prefab: core.examples.cornell_box
     position: [1.1, 0, 0]
@@ -33,8 +33,7 @@ children:
             params:
               material:
                 - MeshStandardMaterial
-                - color: "#2196f3"
-                  emissive: "#2196f3"
+                - color: "#ffffff"
                   emissiveIntensity: 0.5
                   metalness: 0
                   roughness: 0.8
@@ -58,7 +57,7 @@ children:
                   reflectivity: 0
                   shininess: 0
                   side: 2
-          green_wall: 
+          ceil: 
             params:
               material:
                 - MeshStandardMaterial

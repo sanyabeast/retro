@@ -175,7 +175,7 @@ class Sun extends SceneComponent {
 
 
                     /**ambinet */
-                    let amb_intensity = this.lerp(this.n_amb_intensity, this.d_amb_intensity, Math.pow(p, 0.2)) * this.global_intensity
+                    let amb_intensity = this.lerp(this.n_amb_intensity, this.d_amb_intensity, Math.pow(p, 0.2))
 
                     let d_amb_color = hex_to_rgb(this.d_amb_color)
                     let n_amb_color = hex_to_rgb(this.n_amb_color)
