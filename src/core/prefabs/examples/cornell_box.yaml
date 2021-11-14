@@ -5,13 +5,13 @@ children:
         name: LightComponent
         tag: "ceil_light"
         params:
-          position: [0, 1.8, 0]
+          position: [0, 1.8, 0.5]
           rotation: [-1.5707, 0, 0]
           
           type: PointLight
           distance: 6
-          decay: 2
-          intensity: 1
+          decay: 1.5
+          intensity: 1.1
           rect_width: 0.6
           rect_height: 0.3
   box:
@@ -84,7 +84,7 @@ children:
             - [2, 2, 0.01]
           material:
             - MeshStandardMaterial
-            - color: "#ff0000"
+            - color: "#f44336"
               metalness: 0
               roughness: 0.8
               reflectivity: 0
@@ -102,7 +102,7 @@ children:
             - [2, 2, 0.01]
           material:
             - MeshStandardMaterial
-            - color: "#00ff00"
+            - color: "#4caf50"
               metalness: 0
               roughness: 0.8
               reflectivity: 0
@@ -116,13 +116,31 @@ children:
           cast_shadow: true
           recieve_shadow: true
           position: [0.4, 0.28, 0.3]
-          rotation: [0, -0.3, 0]
+          rotation: [0, -0.6, 0]
           geometry:
             - BoxBufferGeometry
             - [0.56, 0.56, 0.56]
           material:
             - MeshStandardMaterial
             - color: "#ffffff"
+              metalness: 0
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+      box_c:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [0.4, 0.65, 0.3]
+          rotation: [0, -0.1, 0]
+          geometry:
+            - BoxBufferGeometry
+            - [0.2, 0.2, 0.2]
+          material:
+            - MeshStandardMaterial
+            - color: "#eeeeee"
               metalness: 0
               roughness: 0.8
               reflectivity: 0
@@ -141,7 +159,7 @@ children:
           material:
             - MeshStandardMaterial
             - color: "#ffffff"
-              metalness: 0
+              metalness: 0.2
               roughness: 0.8
               reflectivity: 0
               shininess: 0

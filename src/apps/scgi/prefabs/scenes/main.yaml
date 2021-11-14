@@ -14,32 +14,47 @@ components:
   sun:
     name: Sun
     params:
-      cycling: 1
+      cycling: 100
       time: 0.4
       global_intensity: 1.1
   # lantern:
   #   name: Lantern
 children:
-  # cornell_box:
-  #   prefab: core.examples.cornell_box
-  #   position: [-1.1, 0, 0]
+  cornell_box:
+    prefab: core.examples.cornell_box
+    position: [-1.1, 0, 0]
   cornell_box2:
     prefab: core.examples.cornell_box
     position: [1.1, 0, 0]
     children:
       box:  
         components:
+          floor: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#00bcd4"
+          red_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#e91e63"
+          green_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#00bcd4"  
+          back_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#e91e63"
           ceil: 
             params:
               material:
                 - MeshStandardMaterial
-                - color: "#ffffff"
-                  emissiveIntensity: 0.5
-                  metalness: 0
-                  roughness: 0.8
-                  reflectivity: 0
-                  shininess: 0
-                  side: 2
+                - color: "#e91e63"
+                  emissive: "#e91e63"
   cornell_box3:
     prefab: core.examples.cornell_box
     position: [1.1, 0, -2.2]
@@ -47,26 +62,26 @@ children:
     children:
       box:  
         components:
+          back_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#000000"
           red_wall: 
             params:
               material:
                 - MeshStandardMaterial
                 - color: "#2196f3"
-                  metalness: 0
-                  roughness: 0.8
-                  reflectivity: 0
-                  shininess: 0
-                  side: 2
           ceil: 
             params:
               material:
                 - MeshStandardMaterial
                 - color: "#e91e63"
-                  metalness: 0
-                  roughness: 0.8
-                  reflectivity: 0
-                  shininess: 0
-                  side: 2
+          floor: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#cddc39"
   cornell_box4:
     prefab: core.examples.cornell_box
     position: [-1.1, 0, -2.2]
@@ -79,10 +94,13 @@ children:
               material:
                 - MeshStandardMaterial
                 - color: "#2196f3"
-                  emissive: "#2196f3"
-                  emissiveIntensity: 0.5
-                  metalness: 0
-                  roughness: 0.8
-                  reflectivity: 0
-                  shininess: 0
-                  side: 2
+          red_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#ff9800"
+          green_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#9c27b0"

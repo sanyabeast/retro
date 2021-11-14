@@ -18,7 +18,7 @@ import { Resizer } from "postprocessing/src/core/Resizer";
 const BLOOM_TYPE = "default"
 const postfx = require("core/lib/postprocessing").default
 
-if (process.env.NODE_ENV === "development"){
+if (process.env.NODE_ENV === "development") {
     window.postfxlib = postfx;
 }
 
@@ -79,14 +79,14 @@ class SCGIEffect extends postfx.Effect {
         quality = 25
     } = {}) {
         let material_template = ResourceManager.get_material_template("core.scgi")
-        
+
         super("SCGI", material_template.params.fragmentShader, {
             blendFunction,
             width,
             height,
             uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)]))
         });
-        
+
         this.quality = quality
         this.renderTarget = new THREE.WebGLRenderTarget(1, 1, {
             minFilter: THREE.LinearFilter,
@@ -95,39 +95,62 @@ class SCGIEffect extends postfx.Effect {
             depthBuffer: false
         });
 
-        this.renderTarget.texture.name = "Bloom.Target";
+        this.renderTarget.texture.name = "ssgi.blur";
         this.renderTarget.texture.generateMipmaps = false;
 
+        this.blur_targets = []
+        this.current_blur_target = 0
+        for (let a = 0; a < 6; a++) {
+            let rt = new THREE.WebGLRenderTarget(1, 1, {
+                minFilter: THREE.LinearFilter,
+                magFilter: THREE.LinearFilter,
+                stencilBuffer: false,
+                depthBuffer: true
+            });
+
+            rt.texture.name = `ssgi.blur.${a}`;
+            rt.texture.generateMipmaps = false;
+
+            this.blur_targets.push(rt)
+
+            this.uniforms.get(`diffuse_buffer_${a}`).value = rt
+        }
+
+        this.depthPass = new postfx.DepthPass(scene, camera);
+
         this.blurPass = new postfx.BlurPass({
-            blendFunction: postfx.BlendFunction.AVERAGE,
             resolutionScale: 1,
             width,
             height,
             kernelSize: postfx.KernelSize.VERY_LARGE
         });
 
-        this.blurPass.convolutionMaterial.uniforms.scale.value = 3
-
+        this.blurPass.convolutionMaterial.uniforms.scale.value =6
         this.blurPass.resolution.resizable = this;
-        console.log(this.renderTarget.texture)
         this.uniforms.get("normalBuffer").value = normalBuffer
         this.uniforms.get("quality").value = quality
-        this.uniforms.get("diffuseBuffer").value = this.renderTarget
+        this.uniforms.get("depth_buffer").value = this.depthPass.texture
     }
     update(renderer, inputBuffer, deltaTime) {
-        this.blurPass.render(renderer, inputBuffer, this.renderTarget);
+        let rt = this.blur_targets[Math.floor(this.current_blur_target)]
+        //this.depthPass.render(renderer)
+        this.blurPass.render(renderer, inputBuffer, rt);
+        this.current_blur_target = (this.current_blur_target + 0.3333) % this.blur_targets.length;
     }
     get resolution() {
         return this.blurPass.resolution;
     }
     setSize(width, height) {
-        const w = Math.floor(Math.max(width * (this.quality/100), 1));
-        const h = Math.floor(Math.max(height * (this.quality/100), 1));
+        const w = Math.floor(Math.max(width * (this.quality / 100), 1));
+        const h = Math.floor(Math.max(height * (this.quality / 100), 1));
         this.blurPass.setSize(w, h);
+        this.depthPass.setSize(w, h);
         this.renderTarget.setSize(w, h);
+        this.blur_targets.forEach(rt => rt.setSize(w, h))
     }
     initialize(renderer, alpha, frameBufferType) {
         this.blurPass.initialize(renderer, alpha, frameBufferType);
+        this.depthPass.initialize(renderer, alpha, frameBufferType);
         if (!alpha && frameBufferType === THREE.UnsignedByteType) {
             this.renderTarget.texture.format = THREE.RGBFormat;
         }
