@@ -7,7 +7,8 @@ src/apps/*
 !src/apps/lab/
 !src/apps/pbr/
 !src/apps/gizmos/
-!src/apps/scgi/
+!src/apps/ssgi/
+!src/apps/snake/
 dist/*
 !dist/demo
 !dist/default
@@ -15,5 +16,6 @@ dist/*
 !dist/lab
 !dist/pbr
 !dist/gizmos
-!dist/scgi
+!dist/ssgi
+!dist/snake
 .DS_Store

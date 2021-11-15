@@ -1,0 +1,13 @@
+children:
+  head: 
+    prefab: snake.actors.snake_part
+    components:
+      controller:
+        params:
+          is_head: true
+components:
+  controller:
+    name: SnakeController
+    context: snake_game
+    params:
+      pass: true

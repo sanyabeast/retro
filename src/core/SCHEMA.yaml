@@ -44,6 +44,7 @@ COMPONENT:
     name: string|none
     order: number|none
     enabled: bool|none
+    context: string|none
     ref: string|none
     tag: string|none
     tick_rate: number|none

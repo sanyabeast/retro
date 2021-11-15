@@ -89,11 +89,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 button.set_active(postfx.use_ffx)
             }, "#cddc39", a => app.find_component_of_type("Postprocessing").use_ffx)
 
-            frame.add_button("SCGI", "Screen Space Global Illumination Toggle", (button) => {
+            frame.add_button("SSGI", "Screen Space Global Illumination Toggle", (button) => {
                 let postfx = app.find_component_of_type("Postprocessing")
-                postfx.use_scgi = !postfx.use_scgi
-                button.set_active(postfx.use_scgi)
-            }, "#cddc39", a => app.find_component_of_type("Postprocessing").use_scgi)
+                postfx.use_ssgi = !postfx.use_ssgi
+                button.set_active(postfx.use_ssgi)
+            }, "#cddc39", a => app.find_component_of_type("Postprocessing").use_ssgi)
 
             frame.add_button("FOG", "Toggle Fog", () => {
                 app.refs.renderer.use_fog = !app.refs.renderer.use_fog

@@ -15,8 +15,8 @@ class SkyBox extends SceneComponent {
     cubemap = undefined
     cubemap_format = undefined
     texture = undefined
-    light_probe_enabled = true
-    light_probe_intensity = 0.5
+    light_probe_enabled = false
+    light_probe_intensity = 0.1
     /**private */
     scene_background = undefined
     refraction_map = undefined

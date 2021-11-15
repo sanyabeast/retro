@@ -1,0 +1,158 @@
+prefabs:
+  - default.Postprocessing
+  - default.OrbitControlsComponent
+components:
+  fog:
+    name: Fog
+    params:
+      density: 0.005
+  skybox:
+    name: SkyBox
+    params:
+      cubemap: res/core/cubemaps/cntower_1
+      cubemap_format: jpg
+  sun:
+    name: Sun
+    params:
+      cycling: 100
+      time: 0.4
+      global_intensity:  1
+  skybox_switcher:
+    name: "SkyboxSwitcher"
+    params:
+      tick_rate: 30
+      maps:
+        - nightpath_1
+        - purplenebula
+        - tantolunden_1
+        - afterrain
+        - areskutan_1
+        - cntower_1
+        - cosmos_1
+        - creek_1
+        - flame
+        - forest_1
+        - h2s
+        - heart_sand_1
+        - hornstulls_1
+        - hornstulls_2
+        - house_1
+        - icelake_1
+        - iceriver_1
+        - lundagatan_1
+        - nalovardo_1
+        - nightpath_1
+        - nissi_beach_1
+        - pondnight_1
+        - vindelalven_1
+        - yokohama_3
+    inline:
+      props:
+        current: 0
+      methods:
+        switch_skybox:
+          debounce: 100
+          body: |
+            let skybox = this.find_component_of_type("SkyBox");
+            let new_skybox = this.current
+            while(new_skybox === this.current){
+              new_skybox = Math.floor(Math.random() * this.maps.length);
+            }
+            this.current = new_skybox;
+            skybox.cubemap = `res/core/cubemaps/${this.maps[new_skybox]}`
+        on_start:
+          body: |
+            //this.switch_skybox();
+        on_tick:
+          body: |
+            let input = this.find_component_of_type("InputComponent");
+            if (input.is_keypress("space")){
+              this.switch_skybox();
+            }
+  # lantern:
+  #   name: Lantern
+children:
+  cornell_box:
+    prefab: core.examples.cornell_box
+    position: [-1.1, 0, 0]
+  cornell_box2:
+    prefab: core.examples.cornell_box
+    position: [1.1, 0, 0]
+    children:
+      box:  
+        components:
+          floor: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#00bcd4"
+          red_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#e91e63"
+          green_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#00bcd4"  
+          back_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#e91e63"
+          ceil: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#e91e63"
+                  emissive: "#e91e63"
+  cornell_box3:
+    prefab: core.examples.cornell_box
+    position: [1.1, 0, -2.2]
+    rotation: [0, 1.5707, 0]
+    children:
+      box:  
+        components:
+          back_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#000000"
+          red_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#2196f3"
+          ceil: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#e91e63"
+          floor: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#cddc39"
+  cornell_box4:
+    prefab: core.examples.cornell_box
+    position: [-1.1, 0, -2.2]
+    rotation: [0, -1.5707, 0]
+    children:
+      box:  
+        components:
+          back_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#2196f3"
+          red_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#ff9800"
+          green_wall: 
+            params:
+              material:
+                - MeshStandardMaterial
+                - color: "#9c27b0"

@@ -1,0 +1,13 @@
+children:
+  plane:
+    components:
+      body:
+        name: MeshComponent
+        params:
+          rotation: [-1.5707, 0, 0]
+          geometry:
+            - PlaneBufferGeometry
+            - [32, 32, 1]
+          material:
+            - MeshStandardMaterial
+            - color: "#eeeeee"

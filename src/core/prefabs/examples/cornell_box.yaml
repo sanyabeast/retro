@@ -27,7 +27,7 @@ children:
             - BoxBufferGeometry
             - [2, 2, 0.01]
           material:
-            - MeshStandardMaterial
+            - MeshLambertMaterial
             - color: "#ffffff"
               metalness: 0
               roughness: 0.8
@@ -45,7 +45,7 @@ children:
             - BoxBufferGeometry
             - [2, 2, 0.01]
           material:
-            - MeshStandardMaterial
+            - MeshLambertMaterial
             - color: "#ffffff"
               emissive: "#c5c3c9"
               emissiveIntensity: 0.5
@@ -65,7 +65,7 @@ children:
             - BoxBufferGeometry
             - [2, 2, 0.01]
           material:
-            - MeshStandardMaterial
+            - MeshLambertMaterial
             - color: "#ffffff"
               metalness: 0
               roughness: 0.8
@@ -83,7 +83,7 @@ children:
             - BoxBufferGeometry
             - [2, 2, 0.01]
           material:
-            - MeshStandardMaterial
+            - MeshLambertMaterial
             - color: "#f44336"
               metalness: 0
               roughness: 0.8
@@ -101,7 +101,7 @@ children:
             - BoxBufferGeometry
             - [2, 2, 0.01]
           material:
-            - MeshStandardMaterial
+            - MeshLambertMaterial
             - color: "#4caf50"
               metalness: 0
               roughness: 0.8
@@ -121,7 +121,7 @@ children:
             - BoxBufferGeometry
             - [0.56, 0.56, 0.56]
           material:
-            - MeshStandardMaterial
+            - MeshLambertMaterial
             - color: "#ffffff"
               metalness: 0
               roughness: 0.8
@@ -139,7 +139,7 @@ children:
             - BoxBufferGeometry
             - [0.2, 0.2, 0.2]
           material:
-            - MeshStandardMaterial
+            - MeshLambertMaterial
             - color: "#eeeeee"
               metalness: 0
               roughness: 0.8
@@ -157,7 +157,7 @@ children:
             - BoxBufferGeometry
             - [0.5, 1.4, 0.5]
           material:
-            - MeshStandardMaterial
+            - MeshLambertMaterial
             - color: "#ffffff"
               metalness: 0.2
               roughness: 0.8
@@ -175,7 +175,7 @@ children:
             - SphereBufferGeometry
             - [0.26, 32, 16]
           material:
-            - MeshStandardMaterial
+            - MeshLambertMaterial
             - color: "#ffffff"
               metalness: 0
               roughness: 0.8
@@ -193,7 +193,7 @@ children:
       #       - SphereBufferGeometry
       #       - [0.18, 32, 16]
       #     material:
-      #       - MeshStandardMaterial
+      #       - MeshLambertMaterial
       #       - color: "#0000ff"
       #         metalness: 0
       #         roughness: 0.8

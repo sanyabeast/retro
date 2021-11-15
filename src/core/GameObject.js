@@ -413,6 +413,7 @@ class GameObject extends BasicObject {
         this.remove(child)
     }
     add_component(data) {
+        console.log(data)
         let component_name = data.name;
         let params = data.params
         let enabled = typeof data.enabled === 'boolean' ? data.enabled : true

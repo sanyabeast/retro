@@ -70,54 +70,46 @@ class FFXEffect extends postfx.Effect {
     }
 }
 
-class SCGIEffect extends postfx.Effect {
+class SSGIEffect extends postfx.Effect {
     constructor(scene, camera, {
         blendFunction = postfx.BlendFunction.NORMAL,
-        normalBuffer = null,
+        normal_buffer = null,
         width = Resizer.AUTO_SIZE,
         height = Resizer.AUTO_SIZE,
-        quality = 25
+        resolution_scale = 25,
+        samples = 10
     } = {}) {
-        let material_template = ResourceManager.get_material_template("core.scgi")
-
-        super("SCGI", material_template.params.fragmentShader, {
+        let material_template = ResourceManager.get_material_template("core.ssgi")
+        super("ssgi", material_template.params.fragmentShader, {
             blendFunction,
             width,
             height,
             uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)]))
         });
-
-        this.quality = quality
+        this.resolution_scale = resolution_scale
         this.renderTarget = new THREE.WebGLRenderTarget(1, 1, {
             minFilter: THREE.LinearFilter,
             magFilter: THREE.LinearFilter,
             stencilBuffer: false,
             depthBuffer: false
         });
-
         this.renderTarget.texture.name = "ssgi.blur";
         this.renderTarget.texture.generateMipmaps = false;
-
         this.blur_targets = []
         this.current_blur_target = 0
-        for (let a = 0; a < 6; a++) {
+        for (let a = 0; a < 4; a++) {
             let rt = new THREE.WebGLRenderTarget(1, 1, {
                 minFilter: THREE.LinearFilter,
                 magFilter: THREE.LinearFilter,
                 stencilBuffer: false,
                 depthBuffer: true
             });
-
             rt.texture.name = `ssgi.blur.${a}`;
             rt.texture.generateMipmaps = false;
-
             this.blur_targets.push(rt)
-
             this.uniforms.get(`diffuse_buffer_${a}`).value = rt
         }
-
         this.depthPass = new postfx.DepthPass(scene, camera);
-
         this.blurPass = new postfx.BlurPass({
             resolutionScale: 1,
             width,
@@ -125,15 +117,19 @@ class SCGIEffect extends postfx.Effect {
             kernelSize: postfx.KernelSize.VERY_LARGE
         });
 
-        this.blurPass.convolutionMaterial.uniforms.scale.value =6
+        this.render_pass_scene = new THREE.Scene();
+        this.blurPass.convolutionMaterial.uniforms.scale.value = 6
         this.blurPass.resolution.resizable = this;
-        this.uniforms.get("normalBuffer").value = normalBuffer
-        this.uniforms.get("quality").value = quality
+        this.uniforms.get("normal_buffer").value = normal_buffer
+        this.uniforms.get("resolution_scale").value = resolution_scale
+        this.uniforms.get("samples").value = samples
         this.uniforms.get("depth_buffer").value = this.depthPass.texture
     }
     update(renderer, inputBuffer, deltaTime) {
         let rt = this.blur_targets[Math.floor(this.current_blur_target)]
         //this.depthPass.render(renderer)
+        // this.blurPass.scene = this.render_pass_scene
+        this.blurPass.scene.children = this.render_pass_list || []
         this.blurPass.render(renderer, inputBuffer, rt);
         this.current_blur_target = (this.current_blur_target + 0.3333) % this.blur_targets.length;
     }
@@ -141,8 +137,8 @@ class SCGIEffect extends postfx.Effect {
         return this.blurPass.resolution;
     }
     setSize(width, height) {
-        const w = Math.floor(Math.max(width * (this.quality / 100), 1));
-        const h = Math.floor(Math.max(height * (this.quality / 100), 1));
+        const w = Math.floor(Math.max(width * (this.resolution_scale / 100), 1));
+        const h = Math.floor(Math.max(height * (this.resolution_scale / 100), 1));
         this.blurPass.setSize(w, h);
         this.depthPass.setSize(w, h);
         this.renderTarget.setSize(w, h);
@@ -166,7 +162,7 @@ class Postprocessing extends Component {
     composer = undefined
     outline_effect = undefined
     use_ffx = true
-    use_scgi = true
+    use_ssgi = false
     use_fxaa = true
     use_smaa = false
     use_taa = false
@@ -210,7 +206,7 @@ class Postprocessing extends Component {
     }
     get_reactive_props() {
         return [
-            "use_scgi",
+            "use_ssgi",
             "use_ffx",
             "use_fxaa",
             "use_ssao",
@@ -252,9 +248,9 @@ class Postprocessing extends Component {
             this.normal_pass_scene.children = normal_rendering_list
         }
 
-        if (this.scgi_effect) {
+        if (this.ssgi_effect) {
             let rendering_list = renderer.get_object_layer_list({ rendering: true, gizmo: false })
-            this.scgi_effect.render_pass_list = rendering_list
+            this.ssgi_effect.render_pass_list = rendering_list
         }
     }
 
@@ -287,7 +283,7 @@ class Postprocessing extends Component {
                 case "use_ssao": this.ssao_pass.enabled = this.use_ssao; break;
                 case "use_bloom": this.bloom_pass.enabled = this.use_bloom; break;
                 case "use_ffx": this.ffx_pass.enabled = this.use_ffx; break;
-                case "use_scgi": this.scgi_pass.enabled = this.use_scgi; break;
+                case "use_ssgi": this.ssgi_pass.enabled = this.use_ssgi; break;
                 default: {
                     if (this.hs_effect) {
                         this.hs_effect.uniforms.get("saturation").value = this.saturation
@@ -321,7 +317,7 @@ class Postprocessing extends Component {
             if (this.use_hs) this.setup_hs(renderer, scene, camera, composer)
             if (this.use_bc) this.setup_bc(renderer, scene, camera, composer)
             if (this.use_fxaa) this.setup_fxaa(renderer, scene, camera, composer)
-            if (this.use_scgi) this.setup_scgi(renderer, scene, camera, composer)
+            if (this.use_ssgi) this.setup_ssgi(renderer, scene, camera, composer)
             if (this.use_tonemapping) this.setup_tonemapping(renderer, scene, camera, composer)
             if (this.use_chromatic_abberation) this.setup_chromatic_abberation(renderer, scene, camera, composer)
             if (this.use_godrays) this.setup_godrays(renderer, scene, camera, composer)
@@ -553,7 +549,7 @@ class Postprocessing extends Component {
 
 
     }
-    setup_scgi(renderer, scene, camera, composer) {
+    setup_ssgi(renderer, scene, camera, composer) {
         let normal_pass_scene = this.normal_pass_scene || new THREE.Scene()
         this.normal_pass_scene = normal_pass_scene
         const normal_pass = this.normal_pass || new postfx.NormalPass(normal_pass_scene, camera);
@@ -573,12 +569,12 @@ class Postprocessing extends Component {
 
         composer.addPass(normal_pass)
 
-        let scgi_effect = this.scgi_effect = new SCGIEffect(scene, camera, {
-            normalBuffer: normal_pass.texture,
+        let ssgi_effect = this.ssgi_effect = new SSGIEffect(scene, camera, {
+            normal_buffer: normal_pass.texture,
             height: 512
         });
-        let scgi_pass = this.scgi_pass = new postfx.EffectPass(camera, this.scgi_effect);
-        composer.addPass(scgi_pass)
+        let ssgi_pass = this.ssgi_pass = new postfx.EffectPass(camera, this.ssgi_effect);
+        composer.addPass(ssgi_pass)
     }
     on_enable() {
         let renderer = this.find_component_of_type("Renderer")

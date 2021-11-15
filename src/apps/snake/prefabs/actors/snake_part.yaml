@@ -1,0 +1,19 @@
+components:
+  body:
+    name: MeshComponent
+    params:
+      position: [0, 0.5, 0]
+      geometry:
+        - SphereBufferGeometry
+        - [0.5, 32, 16]
+      material:
+        - MeshStandardMaterial
+        - color: "#8bc34a"
+          roughness: 0.89
+          metalness: 0
+          reflectivity: 0.4
+  controller:
+    name: SnakePartController
+    context: "snake_game"
+    params:
+      pass: true
