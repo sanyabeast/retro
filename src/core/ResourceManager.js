@@ -146,6 +146,7 @@ class ResourceManager extends BasicObject {
         this.cached_streamed_textures = new CachedDataDict()
         this.cached_images = new CachedDataDict()
         this.gameobject_refs = new RmDict()
+        this.shared_contexts = new RmDict()
         this.templates_of_materials = new TemplatesDataDict()
         this.templates_of_geometries = new TemplatesDataDict()
         /**comps */
@@ -708,6 +709,10 @@ class ResourceManager extends BasicObject {
 
     get_component_instance(type, UUID) {
         return this.components_instances[type] ? this.components_instances[type][UUID] : undefined
+    }
+    /**contexts */
+    load_context(){
+        
     }
 }
 
