@@ -116,6 +116,13 @@ MyPlugin.install = function (Vue, options) {
             },
             get_components(component_name) {
                 return this.game_object.get_components(component_name);
+            },
+            log() {
+                console.log(this)
+                log(`VUE Component "${this.$options.name || '?'}"`, ...arguments)
+            },
+            error() {
+                error(`VUE Component "${this.$options.name || '?'}"`, ...arguments)
             }
 
         }
