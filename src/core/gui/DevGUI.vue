@@ -127,6 +127,7 @@ export default {
   color: #ffffff;
   font-family: monospace;
   font-size: 14px;
+  opacity: 0.2;
   &.mobile {
     font-size: 8px;
     .status .status-line {
