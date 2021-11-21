@@ -38,13 +38,7 @@ class CameraComponent extends SceneComponent {
             position: new THREE.Vector3(0, 0, 20),
         });
 
-        let p_camera = this.subject = this.p_camera = new THREE.PerspectiveCamera({
-            fov: this.fov,
-            aspect: this.aspect,
-            near: this.near,
-            far: this.far,
-            position: new THREE.Vector3(0, 0, 20),
-        });
+        let p_camera = this.subject = this.p_camera = new THREE.PerspectiveCamera(this.fov, this.aspect, this.near, this.far);
 
         console.log(12)
         this.define_global_var("camera", a => this.subject)
