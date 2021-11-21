@@ -413,7 +413,6 @@ class GameObject extends BasicObject {
         this.remove(child)
     }
     add_component(data) {
-        console.log(data)
         let component_name = data.name;
         let params = data.params
         let enabled = typeof data.enabled === 'boolean' ? data.enabled : true
@@ -439,6 +438,7 @@ class GameObject extends BasicObject {
             }
         }
         if (component !== undefined) {
+            component.context = ResourceManager.load_context(data.context)
             component._game_object = this
             component.init()
             component.name = component_name
