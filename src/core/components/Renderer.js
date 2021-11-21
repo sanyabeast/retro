@@ -15,6 +15,8 @@ import Schema from "core/utils/Schema"
 import { Object3D } from "three/src/core/Object3D";
 import { WebGLShadowMap } from "three/src/renderers/webgl/WebGLShadowMap"
 
+const $v3 = new THREE.Vector3()
+
 // THREE.Object3D.DefaultMatrixAutoUpdate = false
 
 /**THREEJS PATCHES*/
@@ -463,6 +465,27 @@ class Renderer extends Component {
             this.original_threejs_webgl_shadowmap_render.call(this.renderer.shadowMap, lights, scene, camera)
             this.renderer.shadowMap.needsUpdate = true
         }
+    }
+    get_camera_bounds(z_position = 0) {
+        let camera = this.globals.camera
+        camera.getWorldPosition($v3)
+        let distance = Math.abs($v3.z - z_position)
+
+        let fov = camera.fov
+        let height = Math.abs(Math.tan(camera.fov) * distance) * 4
+        let aspect = camera.aspect
+        let width = height * aspect
+
+        let bounds = [
+            $v3.x - width / 2,
+            $v3.y - height / 2,
+            $v3.x + width / 2,
+            $v3.y + height / 2
+        ]
+
+        console.log(width)
+
+        return bounds
     }
 }
 export default Renderer;
