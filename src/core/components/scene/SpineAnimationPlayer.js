@@ -67,7 +67,7 @@ class SpineAnimationPlayer extends SceneComponent {
                 if (from_pool) {
                     this.subject = from_pool
                 } else {
-                    this.log(`creating new ${this.src}`)
+                   // this.log(`creating new ${this.src}`)
                     await this.load_assets();
                     await this.setup_view();
                 }
@@ -92,7 +92,7 @@ class SpineAnimationPlayer extends SceneComponent {
                 if (from_pool) {
                     this.subject = from_pool
                 } else {
-                    this.log(`creating new ${this.src}`)
+                    //this.log(`creating new ${this.src}`)
                     await this.load_assets();
                     await this.setup_view();
                 }
@@ -171,7 +171,7 @@ class SpineAnimationPlayer extends SceneComponent {
     get_from_pool() {
         POOL[this.src] = POOL[this.src] || []
         let mesh = POOL[this.src].pop()
-        this.log(`${this.src}. pool size: ${POOL[this.src].length}`)
+        //this.log(`${this.src}. pool size: ${POOL[this.src].length}`)
         return mesh
     }
     on_destroy() {
