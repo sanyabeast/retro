@@ -68,6 +68,8 @@ module.exports = {
                 AIS_START: "DEMO AIV started",
             },
         }),
-        new BundleAnalyzerPlugin()
+        new BundleAnalyzerPlugin({
+            analyzerMode: "static"
+        })
     ],
 };
