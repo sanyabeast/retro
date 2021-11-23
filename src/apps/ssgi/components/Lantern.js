@@ -1,9 +1,9 @@
-import SceneComponent from "core/SceneComponent";
-import ResourceManager from "core/ResourceManager";
+import SceneComponent from "retro/SceneComponent";
+import ResourceManager from "retro/ResourceManager";
 import * as THREE from 'three';
-import { log, error, is_none, console } from "core/utils/Tools"
+import { log, error, is_none, console } from "retro/utils/Tools"
 import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefined, isNull, map, filter, keys, values, set, get, unset, debounce, throttle } from "lodash-es"
-import Schema from "core/utils/Schema"
+import Schema from "retro/utils/Schema"
 
 class Lantern extends SceneComponent {
     color = "#ffffff"

@@ -9,7 +9,7 @@ components:
   skybox:
     name: SkyBox
     params:
-      cubemap: res/core/cubemaps/cntower_1
+      cubemap: res/retro/cubemaps/cntower_1
       cubemap_format: jpg
   sun:
     name: Sun
@@ -29,7 +29,7 @@ children:
           material:
             - PBRMaterial
             - color: "#ffffff"
-              pbr: "res/core/pbr/storage-container2-bl/storage-container2"
+              pbr: "res/retro/pbr/storage-container2-bl/storage-container2"
       some_controller:
         inline:
           methods:

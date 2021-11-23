@@ -2,12 +2,13 @@
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const WebpackAutoInject = require("webpack-auto-inject-version");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const path = require("path");
 const root = path.join(__dirname, "../..");
 
 module.exports = {
     entry: {
-        app: path.join(root, "src", "core", "App")
+        app: path.join(root, "src", "retro", "App")
     },
     mode: "production",
     optimization: {
@@ -67,5 +68,6 @@ module.exports = {
                 AIS_START: "DEMO AIV started",
             },
         }),
+        new BundleAnalyzerPlugin()
     ],
 };

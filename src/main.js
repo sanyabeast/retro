@@ -1,10 +1,10 @@
 
 import "./index.html";
-import ResourceManager from "core/ResourceManager";
-import Frame from "core/utils/Frame";
-import { log, get_app_name, console } from "core/utils/Tools";
+import ResourceManager from "retro/ResourceManager";
+import Frame from "retro/utils/Frame";
+import { log, get_app_name, console } from "retro/utils/Tools";
 
-import Device from "core/utils/Device"
+import Device from "retro/utils/Device"
 
 let App = null
 const APP_NAME = get_app_name()

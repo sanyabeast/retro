@@ -1,7 +1,7 @@
-import CoreApp from "core/App"
-import ResourceManager from "core/ResourceManager";
+import RetroApp from "retro/App"
+import ResourceManager from "retro/ResourceManager";
 
-class App extends CoreApp {
+class App extends RetroApp {
     constructor(params) {
         super({
             ...params,

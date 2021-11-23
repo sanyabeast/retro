@@ -1,7 +1,7 @@
 {
     "private": true,
-    "name": "gamecore",
-    "version": "1.0.204",
+    "name": "retro",
+    "version": "1.0.226",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
@@ -67,6 +67,7 @@
         "@esotericsoftware/spine-core": "^4.0.14",
         "@esotericsoftware/spine-threejs": "^4.0.14",
         "color-blend": "^3.0.1",
+        "colors": "^1.4.0",
         "command-line-args": "^5.2.0",
         "core-js": "^3.17.3",
         "datetime-js": "^4.0.0",
@@ -75,6 +76,7 @@
         "extract-zip": "^2.0.1",
         "fflate": "^0.7.1",
         "image-pixels": "^2.2.2",
+        "jsonfile": "^6.1.0",
         "keycode": "^2.2.0",
         "regenerator-runtime": "^0.13.9",
         "save-pixels": "^2.3.6",
@@ -82,6 +84,7 @@
         "stats.js": "^0.17.0",
         "troika-three-text": "^0.42.0",
         "vuex": "^3.6.2",
+        "yamlfile": "^1.0.1",
         "zeros": "^1.0.0"
     }
 }

@@ -9,7 +9,7 @@ components:
   skybox:
     name: SkyBox
     params:
-      cubemap: res/core/cubemaps/cntower_1
+      cubemap: res/retro/cubemaps/cntower_1
       cubemap_format: jpg
   sun:
     name: Sun

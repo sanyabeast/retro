@@ -8,11 +8,69 @@ const { webpack, DefinePlugin } = require("webpack");
 const package_data = require("../package.json")
 const CopyPlugin = require("copy-webpack-plugin");
 const dir_tree = require("directory-tree");
+const jsonfile = require('jsonfile')
+const yamlfile = require('yamlfile')
+const colors = require("colors")
 
+function log() { console.log(`[RETRO] [i]`.green, ...arguments); }
+function warn() { console.log(`[RETRO] [*]`.yellow, ...arguments); }
+function err() { console.log(`[RETRO] [!]`.red, ...arguments); }
+
+function load_preset(app_name) {
+    log(`loading preset for "${app_name}"`)
+    let default_preset = yamlfile.readFileSync(
+        path.join(root, "src", "retro", "PRESET.yaml")
+    )
+    let preset = undefined
+    let error_code = undefined
+    try {
+        preset = yamlfile.readFileSync(
+            path.join(root, 'src', 'apps', app_name, "PRESET.yaml")
+        )
+        preset = {
+            ...default_preset,
+            ...preset
+        }
+    } catch (err) {
+        error_code = err.code
+        err(err.code)
+    }
+
+    if (!preset) {
+        preset = { ...default_preset }
+        if (error_code === 'ENOENT') {
+            warn(`Preset not found. Creating new one with default settings...`)
+            yamlfile.writeFileSync(
+                path.join(root, 'src', 'apps', app_name, "PRESET.yaml"),
+                preset
+            )
+        }
+    }
+    log(`preset: ${JSON.stringify(preset, null, '\t')}`)
+    return preset
+}
+
+function get_output_config(app_name, preset) {
+    let output_path
+    if (preset.is_example) {
+        output_path = path.join(root, `dist`, app_name)
+    } else {
+        output_path = path.join(root, `src`, 'apps', app_name, 'dist')
+    }
+    log(`"${app_name}" is bundled to "${output_path}"`)
+    return {
+        filename: "[name].js",
+        path: output_path,
+        libraryTarget: "umd",
+        library: "lib",
+        umdNamedDefine: true,
+    }
+}
 
 module.exports = (env) => {
     const APP_NAME = env.APP_NAME
-    console.log(`APP_NAME: ${APP_NAME}`)
+    const preset = load_preset(APP_NAME)
+    log(`working on app "${APP_NAME}"...`)
     let define_plugin_params = {}
 
     for (let k in process.env) {
@@ -21,18 +79,13 @@ module.exports = (env) => {
 
     define_plugin_params["PACKAGE_DATA"] = JSON.stringify(package_data)
     define_plugin_params[`process.env.APP_NAME`] = JSON.stringify(APP_NAME)
+    define_plugin_params[`PRESET`] = JSON.stringify(preset)
 
     let config = {
         entry: {
             main: path.join(root, "src", "main"),
         },
-        output: {
-            filename: "[name].js",
-            path: path.join(root, `dist`, APP_NAME),
-            libraryTarget: "umd",
-            library: "lib",
-            umdNamedDefine: true,
-        },
+        output: get_output_config(APP_NAME, preset),
         module: {
             rules: [
                 {
@@ -92,7 +145,7 @@ module.exports = (env) => {
             new CopyPlugin({
                 patterns: [
                     { from: `src/apps/${APP_NAME}/res`, to: `res/${APP_NAME}` },
-                    { from: `src/core/res`, to: `res/core` },
+                    { from: `src/retro/res`, to: `res/retro` },
                 ]
             }),
             new VueLoaderPlugin(),
@@ -107,7 +160,7 @@ module.exports = (env) => {
             alias: {
                 "@": path.resolve(__dirname, "src"),
                 vue: 'vue/dist/vue.js',
-                three: 'core/lib/three'
+                three: 'retro/lib/three'
             },
         },
     };
@@ -128,7 +181,7 @@ module.exports = (env) => {
         );
     });
 
-    console.log(`Build mode: \x1b[33m${config.mode}\x1b[0m`);
+    log(`Build mode: \x1b[33m${config.mode}\x1b[0m`);
     return config;
 };
 

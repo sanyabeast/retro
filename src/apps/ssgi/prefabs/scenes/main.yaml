@@ -9,7 +9,7 @@ components:
   skybox:
     name: SkyBox
     params:
-      cubemap: res/core/cubemaps/cntower_1
+      cubemap: res/retro/cubemaps/cntower_1
       cubemap_format: jpg
   sun:
     name: Sun
@@ -59,7 +59,7 @@ components:
               new_skybox = Math.floor(Math.random() * this.maps.length);
             }
             this.current = new_skybox;
-            skybox.cubemap = `res/core/cubemaps/${this.maps[new_skybox]}`
+            skybox.cubemap = `res/retro/cubemaps/${this.maps[new_skybox]}`
         on_start:
           body: |
             //this.switch_skybox();

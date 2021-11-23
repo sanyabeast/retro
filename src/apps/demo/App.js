@@ -1,9 +1,9 @@
-import CoreApp from "core/App"
-import ResourceManager from "core/ResourceManager";
-import Device from "core/utils/Device"
+import RetroApp from "retro/App"
+import ResourceManager from "retro/ResourceManager";
+import Device from "retro/utils/Device"
 import { map } from "lodash-es"
 
-class App extends CoreApp {
+class App extends RetroApp {
     constructor(params) {
         super({
             ...params,
