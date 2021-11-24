@@ -460,6 +460,34 @@ function wait(d) {
     });
 }
 
+/**vector math */
+function direction(v_a, v_b) {
+    if (v_a.length === 3) {
+        return normalize([
+            v_b[0] - v_a[0],
+            v_b[1] - v_a[1],
+            v_b[2] - v_a[2],
+        ])
+    }
+}
+
+function normalize(v_a) {
+    let r = [...v_a]
+    let max = Math.max.apply(Math, r)
+    r.forEach(v => v /= max)
+    return r
+}
+
+function distance(v_a, v_b){
+    if (Math.min(v_a.length, v_b.length) === 3){
+        return Math.sqrt(
+            Math.pow(v_b[0] - v_a[0], 2) +
+            Math.pow(v_b[1] - v_a[1], 2) +
+            Math.pow(v_b[2] - v_a[2], 2)
+        )
+    }
+}
+
 
 export {
     log,
@@ -496,5 +524,8 @@ export {
     random_choice,
     random_string,
     /**timing */
-    wait
+    wait,
+    /*vector math*/
+    direction,
+    distance
 }
