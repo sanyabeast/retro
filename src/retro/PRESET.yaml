@@ -2,3 +2,4 @@ is_example: false
 app_persistent_scene: core.scenes.persistent
 basic_object_default_tickrate: 30
 renderer_default_target_fps: 30
+no_greetings: false

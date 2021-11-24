@@ -15,7 +15,7 @@ class SomeComponent extends Component {
     on_create() {
 
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
 
     }
 }
@@ -40,7 +40,7 @@ class SomeSceneComponent extends SceneComponent {
     on_create() {
 
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
 
     }
     get_reactive_props() {

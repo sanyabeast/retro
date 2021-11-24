@@ -16,7 +16,10 @@ import SCHEMA_CORE from "retro/SCHEMA.yaml"
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js';
 import ImageFilter from "retro/utils/ImageFilter"
 
-
+function is_class_excluded_from_mixin(data) {
+    let r = data.__proto__ !== window.Object.prototype
+    return r
+}
 
 
 const SCHEMA_APP = require(`apps/${process.env.APP_NAME}/SCHEMA.yaml`)
@@ -232,6 +235,10 @@ class ResourceManager extends BasicObject {
         let data_type = Schema.get_type_name(data)
         switch (data_type) {
             case "object": {
+                if (is_class_excluded_from_mixin(data)) {
+                    r = data
+                    break
+                }
                 r = {}
                 if (data.prefab) {
                     let prefab_id = data.prefab
@@ -496,7 +503,7 @@ class ResourceManager extends BasicObject {
     }
     load_prefab(id, params) {
         id = this.resolve_string_placeholders(id)
-        
+
         if (this.templates_of_prefabs[id] === undefined) {
             throw new Error(`no prefab with id "${id} found"`)
         }
@@ -704,8 +711,8 @@ class ResourceManager extends BasicObject {
         return this.components_instances[type] ? this.components_instances[type][UUID] : undefined
     }
     /**contexts */
-    load_context(){
-        
+    load_context() {
+
     }
 }
 

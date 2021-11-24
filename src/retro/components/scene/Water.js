@@ -58,7 +58,7 @@ class Water extends SceneComponent {
     on_update(props) {
         super.on_update(...arguments)
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         switch (this.water_type) {
             case 1:
                 if (this.find_sun) {

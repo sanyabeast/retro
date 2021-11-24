@@ -139,7 +139,7 @@ class OrbitControlsComponent extends Component {
             console.error(`OrbitControls requires "CameraComponent" presense on scene`)
         }
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         let camera = this.find_component_of_type("CameraComponent")
         camera.position[0] = camera.subject.position.x
         camera.position[1] = camera.subject.position.y

@@ -138,7 +138,7 @@ class Animator extends Component {
         })
     }
 
-    on_tick(time_delta) {
+    on_tick(time_data) {
         let now = +new Date();
         let new_values = {};
         for (let k in this.active_animations) {
@@ -169,7 +169,7 @@ class Animator extends Component {
 
             let target_values = this.animations[a.name].values;
             for (let k in target_values) {
-                let cv = this.lerp(
+                let cv = this.tools.lerp(
                     a.start_values[k],
                     target_values[k],
                     progress

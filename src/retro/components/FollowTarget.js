@@ -11,7 +11,7 @@ class FollowTarget extends Component {
     on_create() {
         this.log(`FollowTarget`, "component created");
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         if (this.target) {
             this.game_object.position[0] = this.target.position.x + this.offset[0];
             this.game_object.position[1] = this.target.position.y + this.offset[1];

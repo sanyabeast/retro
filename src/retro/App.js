@@ -10,6 +10,8 @@ import * as THREE from 'three';
 import GameObject from "retro/GameObject";
 import { log, console } from "retro/utils/Tools"
 
+
+
 class RetroApp extends GameObject {
     /**private */
     dom = undefined

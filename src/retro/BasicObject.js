@@ -4,6 +4,28 @@ import { log, error, makeid, datetime, is_none, hex_to_hsl, hsl_to_rgb, hex_to_r
 import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, isFunction, isString, map, keys, values, forEach, method } from "lodash-es"
 import ResourceManager from "retro/ResourceManager"
 import Schema from "retro/utils/Schema"
+import * as Tools from "retro/utils/Tools"
+
+if (PRESET.no_greetings !== true) {
+    console.log(
+        `         
+%c_____ _____ _____ _____ _____              
+%c| __  |   __|_   _| __  |     |            
+%c|    -|   __| | | |    -|  |  |            
+%c|__|__|_____| |_| |__|__|_____| %cv. ${PACKAGE_DATA.version}
+%c- - - - - - - - - - - - - - - - - - - - - - - 
+%chttps://github.com/sanyabeast/retro
+`,
+        'color:#f44336; background: #222',
+        'color:#607d8b; background: #222',
+        'color:#ffc107; background: #222',
+        'color:#03a9f4; background: #222',
+        'color:#8bc34a; background: #222',
+        'color:#444; background: #222;',
+        'color:#9c27b0; background: #222'
+
+    );
+}
 
 let id = 0
 const exclude_props = [
@@ -47,6 +69,7 @@ class BasicObject extends THREE.EventDispatcher {
                 enabled: true
             }
         }
+        this.tools = Tools
         this.id = id
         id++
         this.meta.params = params || this.meta.params;
@@ -238,60 +261,12 @@ class BasicObject extends THREE.EventDispatcher {
     on_disable() {
         if (this._on_disable) this._on_disable()
     }
-    /**math */
-    round(x, n) {
-        if (x % 5 == 0) {
-            return Math.floor(x / n) * n;
-        } else {
-            return Math.floor(x / n) * n + n;
-        }
-    }
-    wait(d) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, d);
-        });
-    }
-    lerp(start, end, amt) {
-        if (isNumber(start) && isNumber(end)) {
-            return (1 - amt) * start + amt * end;
-        } else if (isArray(start) && isArray(end)) {
-            let r = []
-            start.forEach((v, i) => {
-                r[i] = this.lerp(start[i], end[i], amt)
-            })
-            return r
-        } else {
-            this.log(`cannot lerp: unknown type "${typeof start}"`, start, end)
-        }
-    }
-    clamp(v, min, max) {
-        v = Math.max(min, v)
-        v = Math.min(max, v)
-        return v
-    }
+
     log() {
         log(this.constructor.name, ...arguments);
     }
     error() {
         error(this.constructor.name, ...arguments);
-    }
-    shuffle_array(arr) {
-        return arr.sort(() => (Math.random() > .5) ? 1 : -1);
-    }
-    random_range(min, max) {
-        return Math.random() * (max - min) + min;
-    }
-    random_choice(arr) {
-        return arr[Math.floor(Math.random() * arr.length)]
-    }
-    random_string(length) {
-        let r = ""
-        while (r.length < length) {
-            r += Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
-        }
-        return r.substring(0, length)
     }
     /*events*/
     on() {

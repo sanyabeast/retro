@@ -234,7 +234,7 @@ class Postprocessing extends Component {
         this.postfx_render_function = this.postfx_render_function.bind(this)
         this.setup_postfx()
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         let renderer = this.find_component_of_type("Renderer")
 
         if (this.use_godrays && this.godrays_autodetect_sun) {

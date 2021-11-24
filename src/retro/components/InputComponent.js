@@ -197,7 +197,7 @@ class InputComponent extends SceneComponent {
         window.removeEventListener('click', this.handle_click)
         window.removeEventListener('mouseout', this.handle_mouseout)
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         switch (this.detection_mode) {
             case "colorid": {
                 this.update_colorid()

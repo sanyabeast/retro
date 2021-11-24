@@ -181,7 +181,7 @@ class PartykalsComponent extends SceneComponent {
             parent: this.game_object
         }
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         this.particle_system.update()
     }
 }

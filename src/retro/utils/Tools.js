@@ -408,6 +408,58 @@ if (process.env.NODE_ENV === 'development') {
     window.rgb_to_hsl = rgb_to_hsl
 }
 
+/**math */
+function round(x, n) {
+    if (x % 5 == 0) {
+        return Math.floor(x / n) * n;
+    } else {
+        return Math.floor(x / n) * n + n;
+    }
+}
+
+function lerp(start, end, amt) {
+    if (isNumber(start) && isNumber(end)) {
+        return (1 - amt) * start + amt * end;
+    } else if (isArray(start) && isArray(end)) {
+        let r = []
+        start.forEach((v, i) => {
+            r[i] = lerp(start[i], end[i], amt)
+        })
+        return r
+    } else {
+        this.log(`cannot lerp: unknown type "${typeof start}"`, start, end)
+    }
+}
+function clamp(v, min, max) {
+    v = Math.max(min, v)
+    v = Math.min(max, v)
+    return v
+}
+
+function shuffle_array(arr) {
+    return arr.sort(() => (Math.random() > .5) ? 1 : -1);
+}
+function random_range(min, max) {
+    return Math.random() * (max - min) + min;
+}
+function random_choice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)]
+}
+function random_string(length) {
+    let r = ""
+    while (r.length < length) {
+        r += Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+    }
+    return r.substring(0, length)
+}
+function wait(d) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, d);
+    });
+}
+
 
 export {
     log,
@@ -432,5 +484,17 @@ export {
     random_in_range,
     blend_colors,
     console,
-    easings
+    easings,
+    /**math */
+    round,
+    lerp,
+    clamp,
+    /**arrays */
+    shuffle_array,
+    /**random */
+    random_range,
+    random_choice,
+    random_string,
+    /**timing */
+    wait
 }

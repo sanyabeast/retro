@@ -51,7 +51,7 @@ class Anchor extends SceneComponent {
     on_destroy() {
         super.on_destroy(...arguments)
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
 
     }
     get_reactive_props() {

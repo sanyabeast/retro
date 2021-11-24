@@ -183,10 +183,10 @@ class SpineAnimationPlayer extends SceneComponent {
         }
         super.on_destroy()
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         this.update_queue()
         if (this.subject) {
-            this.subject.update(time_delta.delta)
+            this.subject.update(time_data.delta)
         }
     }
     update_queue() {

@@ -65,7 +65,7 @@ class Fog extends Component {
         scene.background = scene.background || this.color
         scene.fog = this.fog_exp
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
 
     }
 }

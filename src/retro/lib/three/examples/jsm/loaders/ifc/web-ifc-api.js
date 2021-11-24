@@ -36566,7 +36566,7 @@ var IfcRoundedRectangleProfileDef = class {
     this.Position = Position;
     this.XDim = XDim;
     this.YDim = YDim;
-    this.RoundingRadius = RoundingRadius;
+    this.tools.roundingRadius = RoundingRadius;
   }
   static FromTape(expressID, type, tape) {
     let ptr = 0;
@@ -36590,7 +36590,7 @@ var IfcRoundedRectangleProfileDef = class {
     ;
     args.push(this.YDim);
     ;
-    args.push(this.RoundingRadius);
+    args.push(this.tools.roundingRadius);
     ;
     return args;
   }

@@ -34,7 +34,7 @@ class CSMShadowSystem extends Component {
 
         console.log(csm)
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
 
     }
 }

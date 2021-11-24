@@ -4,7 +4,7 @@ children:
     components:
       controller:
         params:
-          is_head: true
+          pass: true
 components:
   controller:
     name: SnakeController

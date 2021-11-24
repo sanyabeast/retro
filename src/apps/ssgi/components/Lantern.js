@@ -28,7 +28,7 @@ class Lantern extends SceneComponent {
             }
         ]
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         let input = this.find_component_of_type("InputComponent");
         if (input.is_keypress("q")) {
             this.toggle_light()

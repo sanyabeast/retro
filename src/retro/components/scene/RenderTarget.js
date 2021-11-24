@@ -67,7 +67,7 @@ class RenderTarget extends SceneComponent {
         log(this, render_target_state)
 
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         this.update_camera()
         this.update_scene()
         this.render()

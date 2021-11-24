@@ -16,7 +16,7 @@ class AudioListener extends SceneComponent {
     on_destroy() {
         super.on_destroy(...arguments)
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
 
     }
     get_render_data() {

@@ -183,7 +183,7 @@ class Collider extends SceneComponent {
             }
         })
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         if (this.use_mesh_position) {
             let mesh_component = this.mesh_component
             if (mesh_component === undefined) {

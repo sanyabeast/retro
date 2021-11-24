@@ -62,7 +62,7 @@ class MovieClipComponent extends MeshComponent {
             this.subject.visible = false
         }
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         if (this.playing) {
             let frames_count = this.grid[0] * this.grid[1]
             this.current_frame += (this.speed / 60)

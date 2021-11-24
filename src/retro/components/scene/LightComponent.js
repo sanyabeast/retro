@@ -173,7 +173,7 @@ class LightComponent extends SceneComponent {
 
 
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         super.on_tick(...arguments)
     }
 }

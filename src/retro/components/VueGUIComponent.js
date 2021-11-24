@@ -208,8 +208,8 @@ class VueGUIComponent extends Component {
         this.ui_wrapper.$mount(this.dom)
         this.el.style.transform = "translate(0, 0)"
     }
-    on_tick(time_delta) {
-        this.ui_wrapper.tick(time_delta)
+    on_tick(time_data) {
+        this.ui_wrapper.tick(time_data)
     }
     store_set(key, value) {
         setTimeout(a => this.vuex_store.state[key] = value)

@@ -232,7 +232,7 @@ class Renderer extends Component {
         this.globals.uniforms.mouse.value.x = x;
         this.globals.uniforms.mouse.value.y = y;
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         this.update_object_layers()
         if (this.use_progressive_lightmap) this.update_progressive_lightmap()
         this.check_size()

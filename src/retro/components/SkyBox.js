@@ -97,7 +97,7 @@ class SkyBox extends SceneComponent {
             }
         }
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
 
     }
 }

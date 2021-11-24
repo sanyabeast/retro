@@ -67,7 +67,7 @@ class Gizmos extends SceneComponent {
             "#2196f3"
         )
     }
-    on_tick(time_delta) {
+    on_tick(time_data) {
         let renderer = this.find_component_of_type("Renderer")
         if (renderer && renderer.rendering_layers.gizmo === true) {
             this.gizmo_objects_list.forEach(object => {
