@@ -42,17 +42,17 @@ class SnakePartController extends Component {
 
         if (isNumber(direction)) {
             this.game_object.position = [
-                this.game_object.position[0] + Math.sin(direction) * this.snake_speed * time_data.delta,
+                this.game_object.position[0] + Math.sin(direction) * this.snake_speed * this.tools.clamp(time_data.delta, 0, 1),
                 this.game_object.position[1],
-                this.game_object.position[2] - Math.cos(direction) * this.snake_speed * time_data.delta,
+                this.game_object.position[2] - Math.cos(direction) * this.snake_speed * this.tools.clamp(time_data.delta, 0, 1),
             ]
         } else if (isArray(direction)) {
             let distance = this.tools.distance(this.game_object.position, this.before_part.game_object.position)
             let distance_correction = (distance * this.snake_speed) / this.distance_between_parts
             this.game_object.position = [
-                this.game_object.position[0] + direction[0] * time_data.delta * distance_correction,
+                this.game_object.position[0] + direction[0] * this.tools.clamp(time_data.delta, 0, 1) * distance_correction,
                 this.game_object.position[1],
-                this.game_object.position[2] + direction[2] * time_data.delta * distance_correction,
+                this.game_object.position[2] + direction[2] * this.tools.clamp(time_data.delta, 0, 1) * distance_correction,
             ]
         }
 
@@ -61,7 +61,7 @@ class SnakePartController extends Component {
     update_jam(time_data) {
         let before_part = this.before_part
         if (!before_part) {
-            this.jam_phase = (this.jam_phase + (this.jam_speed * this.snake_speed) * time_data.delta) % 1
+            this.jam_phase = (this.jam_phase + (this.jam_speed * this.snake_speed) * this.tools.clamp(time_data.delta, 0, 1)) % 1
         } else {
             this.jam_phase = (before_part.jam_phase + this.jam_delta) % 1
         }

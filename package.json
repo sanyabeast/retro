@@ -84,6 +84,7 @@
         "stats.js": "^0.17.0",
         "troika-three-text": "^0.42.0",
         "vuex": "^3.6.2",
+        "worker-timers": "^7.0.42",
         "yamlfile": "^1.0.1",
         "zeros": "^1.0.0"
     }
