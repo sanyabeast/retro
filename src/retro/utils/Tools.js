@@ -23,8 +23,6 @@ const color_blend = require("color-blend")
     softLight: (…)
 */
 
-
-
 const easings = {
     linear: t => t,
     ease_in_quad: t => t * t,
@@ -43,9 +41,8 @@ const easings = {
     ease_out_back: t => --t * t * ((2.5 + 1) * t + 2.5) + 1,
     ease_in_out_back: t => ((t *= 2) < 1 ? t * t * ((2.5 + 1) * t - 2.5) : (t -= 2) * t * ((2.5 + 1) * t + 2.5) + 2) / 2
 }
-
 const cached_tag_colors = {}
-function get_random_color_for_string(tag) {
+const get_random_color_for_string = (tag) => {
     if (cached_tag_colors[tag]) return cached_tag_colors[tag]
     let h = 0;
     let s = 100
@@ -60,24 +57,22 @@ function get_random_color_for_string(tag) {
     cached_tag_colors[tag] = `hsl(${h}, ${s}%, ${l}%)`
     return cached_tag_colors[tag]
 }
-
 let _console = window.console
-function log(tag, ...data) {
+const log = (tag, ...data) => {
     if (!isString(tag)) {
-        return log('ANONYMOUS', ...arguments)
+        return log('ANONYMOUS', ...data)
     }
     _console.log(`%c[${tag}]`, `color: ${get_random_color_for_string(tag)}`, ...data);
 }
-
-function error(tag, ...data) {
+const error = (tag, ...data) => {
     if (!isString(tag)) {
-        return error('ANONYMOUS', ...arguments)
+        return error('ANONYMOUS', ...data)
     }
     _console.log(`%c[${tag}]`, "color: red", ...data);
 }
 
 
-function get_query_string_params(query) {
+const get_query_string_params = (query) => {
     return query
         ? (/^[?#]/.test(query) ? query.slice(1) : query)
             .split('&')
@@ -93,8 +88,7 @@ function get_query_string_params(query) {
             )
         : {}
 };
-
-function get_unique_props(dict_list) {
+const get_unique_props = (dict_list) => {
     let r = []
     dict_list.forEach(d => {
         if (isObject(d)) {
@@ -108,8 +102,7 @@ function get_unique_props(dict_list) {
     })
     return r
 }
-
-function get_app_name() {
+const get_app_name = () => {
     let result = ""
     let url_params = get_query_string_params(window.location.search.replace("?", ""))
     if (process.env.NODE_ENV === "development") {
@@ -127,14 +120,14 @@ function get_app_name() {
 
 }
 
-function request_text_sync(url) {
+const request_text_sync = (url) => {
     let xhr = new XMLHttpRequest()
     xhr.open("get", url, false)
     xhr.send()
     return xhr.responseText
 }
-
-function hex_to_hsl(H) {
+/**COLOR */
+const hex_to_hsl = (H) => {
     // Convert hex to RGB first
     let r = 0, g = 0, b = 0;
     if (H.length == 4) {
@@ -178,8 +171,7 @@ function hex_to_hsl(H) {
 
     return [h / 360, s / 100, l / 100]
 }
-
-function rgb_to_hsl(r, g, b) {
+const rgb_to_hsl = (r, g, b) => {
 
     // Find greatest and smallest channel values
     let cmin = Math.min(r, g, b),
@@ -217,8 +209,7 @@ function rgb_to_hsl(r, g, b) {
 
     return [h / 360, s / 100, l / 100];
 }
-
-function hsl_to_rgb(h, s, l) {
+const hsl_to_rgb = (h, s, l) => {
     // Must be fractions of 1
     h *= 360
 
@@ -248,8 +239,7 @@ function hsl_to_rgb(h, s, l) {
 
     return [r, g, b]
 }
-
-function hex_to_rgb(h) {
+const hex_to_rgb = (h) => {
     let r = 0, g = 0, b = 0;
     // 3 digits
     if (h.length == 4) {
@@ -264,8 +254,7 @@ function hex_to_rgb(h) {
     }
     return [(+r) / 255, (+g) / 255, (+b) / 255]
 }
-
-function rgb_to_hex(r, g, b) {
+const rgb_to_hex = (r, g, b) => {
     r = (+r * 255).toString(16);
     g = (+g * 255).toString(16);
     b = (+b * 255).toString(16);
@@ -279,92 +268,11 @@ function rgb_to_hex(r, g, b) {
 
     return "#" + r + g + b;
 }
-
-function is_none(v) {
-    return v === undefined || v === null || v === NaN
-}
-
-function camel_to_snake(key) {
-    var result = key.replace(/([A-Z])/g, " $1");
-    result = result.split(' ').join('_').toLowerCase();
-    if (result.startsWith("_")) {
-        result = result.replace("_", "")
-    }
-
-    return result
-}
-
-function is_inline_dict(data) {
-    return (isString(data)) && data.startsWith("??")
-}
-
-function parse_inline_dict(d) {
-    let r = {}
-    let s = d.replace("??", "")
-    let t = s.split("&")
-
-    t.forEach(p => {
-        let k = p.split("=")[0]
-        let v = p.split("=")[1]
-        r[k] = v
-    })
-    return r
-}
-
-function makeid(length = 24, lowercase = true, uppercase = true, digits = true) {
-    let result = '';
-    let uc_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    let lc_chars = "abcdefghijklmnopqrstuvwxyz"
-    let d_chars = "0123456789"
-    let characters = (uppercase ? uc_chars : "") + (lowercase ? lc_chars : "") + (digits ? d_chars : "");
-    let charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() *
-            charactersLength));
-    }
-    return result;
-}
-
-function datetime(template = "%H:%i:%s", date = new Date) {
-    return DateTime(date, template)
-}
-
-// let console = {
-//     log() {
-//         return log(...arguments)
-//     },
-//     error() {
-//         return error(...arguments)
-//     },
-//     dir() {
-//         return _console.dir(...arguments)
-//     }
-// }
-
-function get_most_suitable_dict_keys(dict, test_string, single_key = false) {
-    if (!isString(test_string) || !isObject(dict)) {
-        return []
-    }
-    let r = []
-    forEach(dict, (value, key) => {
-        if (key.match(new RegExp(test_string, "gm"))) {
-            r.push(key)
-        }
-    })
-    return r
-}
-
-function random_in_range(min, max) {
-    return Math.random() * (max - min) + min
-}
-
-let console = _console
-
 let $color1 = new Color()
 let $color2 = new Color()
 let $color3 = new Color()
 let $v3 = new Vector3()
-function blend_colors(mode, color_a, color_b, output_type = "rgb") {
+const blend_colors = (mode, color_a, color_b, output_type = "rgb") => {
     $color1.set_any(color_a)
     $color2.set_any(color_b)
     let { r, g, b, a } = color_blend[mode](
@@ -397,7 +305,63 @@ function blend_colors(mode, color_a, color_b, output_type = "rgb") {
     }
 }
 
+/**TYPE */
+const is_none = (v) => {
+    return v === undefined || v === null || v === NaN
+}
+const camel_to_snake = (key) => {
+    var result = key.replace(/([A-Z])/g, " $1");
+    result = result.split(' ').join('_').toLowerCase();
+    if (result.startsWith("_")) {
+        result = result.replace("_", "")
+    }
 
+    return result
+}
+const is_inline_dict = (data) => {
+    return (isString(data)) && data.startsWith("??")
+}
+const parse_inline_dict = (d) => {
+    let r = {}
+    let s = d.replace("??", "")
+    let t = s.split("&")
+
+    t.forEach(p => {
+        let k = p.split("=")[0]
+        let v = p.split("=")[1]
+        r[k] = v
+    })
+    return r
+}
+const makeid = (length = 24, lowercase = true, uppercase = true, digits = true) => {
+    let result = '';
+    let uc_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let lc_chars = "abcdefghijklmnopqrstuvwxyz"
+    let d_chars = "0123456789"
+    let characters = (uppercase ? uc_chars : "") + (lowercase ? lc_chars : "") + (digits ? d_chars : "");
+    let charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            charactersLength));
+    }
+    return result;
+}
+const datetime = (template = "%H:%i:%s", date = new Date) => {
+    return DateTime(date, template)
+}
+const get_most_suitable_dict_keys = (dict, test_string, single_key = false) => {
+    if (!isString(test_string) || !isObject(dict)) {
+        return []
+    }
+    let r = []
+    forEach(dict, (value, key) => {
+        if (key.match(new RegExp(test_string, "gm"))) {
+            r.push(key)
+        }
+    })
+    return r
+}
+let console = _console
 
 if (process.env.NODE_ENV === 'development') {
     window.blend_colors = blend_colors
@@ -408,16 +372,40 @@ if (process.env.NODE_ENV === 'development') {
     window.rgb_to_hsl = rgb_to_hsl
 }
 
-/**math */
-function round(x, n) {
+const shuffle_array = (arr) => {
+    return arr.sort(() => (Math.random() > .5) ? 1 : -1);
+}
+/**RANDOM */
+const random_range = (min, max) => {
+    return Math.random() * (max - min) + min;
+}
+const random_choice = (arr) => {
+    return arr[Math.floor(Math.random() * arr.length)]
+}
+const random_string = (length) => {
+    let r = ""
+    while (r.length < length) {
+        r += Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+    }
+    return r.substring(0, length)
+}
+/**TIME */
+const wait = (d) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, d);
+    });
+}
+/**MATH*/
+const round = (x, n) => {
     if (x % 5 == 0) {
         return Math.floor(x / n) * n;
     } else {
         return Math.floor(x / n) * n + n;
     }
 }
-
-function lerp(start, end, amt) {
+const lerp = (start, end, amt) => {
     if (isNumber(start) && isNumber(end)) {
         return (1 - amt) * start + amt * end;
     } else if (isArray(start) && isArray(end)) {
@@ -430,38 +418,12 @@ function lerp(start, end, amt) {
         this.log(`cannot lerp: unknown type "${typeof start}"`, start, end)
     }
 }
-function clamp(v, min, max) {
+const clamp = (v, min, max) => {
     v = Math.max(min, v)
     v = Math.min(max, v)
     return v
 }
-
-function shuffle_array(arr) {
-    return arr.sort(() => (Math.random() > .5) ? 1 : -1);
-}
-function random_range(min, max) {
-    return Math.random() * (max - min) + min;
-}
-function random_choice(arr) {
-    return arr[Math.floor(Math.random() * arr.length)]
-}
-function random_string(length) {
-    let r = ""
-    while (r.length < length) {
-        r += Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
-    }
-    return r.substring(0, length)
-}
-function wait(d) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve();
-        }, d);
-    });
-}
-
-/**vector math */
-function direction(v_a, v_b) {
+const direction = (v_a, v_b) => {
     if (v_a.length === 3) {
         return normalize([
             v_b[0] - v_a[0],
@@ -470,15 +432,13 @@ function direction(v_a, v_b) {
         ])
     }
 }
-
-function normalize(v_a) {
+const normalize = (v_a) => {
     let r = [...v_a]
     let max = Math.max.apply(Math, map(r, mv => Math.abs(mv)))
     r = map(r, v => v /= max)
     return r
 }
-
-function distance(v_a, v_b) {
+const distance = (v_a, v_b) => {
     if (Math.min(v_a.length, v_b.length) === 3) {
         return Math.sqrt(
             Math.pow(v_b[0] - v_a[0], 2) +
@@ -487,25 +447,69 @@ function distance(v_a, v_b) {
         )
     }
 }
-
-function dot(a, b) {
+const dot = (a, b) => {
     return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2])
 }
-
-function magnitude(a) {
+const magnitude = (a) => {
     return Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
 }
-
-function angle(a, b) {
+const angle = (a, b) => {
     return Math.acos(dot(a, b) / (magnitude(a) * magnitude(b)))
 }
-
-function translate_range(value, a_min, a_max, b_min, b_max) {
+const translate_range = (value, a_min, a_max, b_min, b_max) => {
     return lerp(b_min, b_max, (value - a_min) / (a_max - a_min))
 }
 
+const tools = {
+    array: {
+        shuffle: shuffle_array,
+    },
+    color: {
+        hsl_to_rgb,
+        rgb_to_hex,
+        rgb_to_hsl,
+        hex_to_hsl,
+        hex_to_rgb,
+    },
+    console: {
+        log: log,
+        error: error,
+    },
+    easings,
+    extra: {
+        get_random_color_for_string,
+        get_query_string_params,
+        get_unique_props,
+        get_app_name,
+
+    },
+    math: {
+        round: round,
+        lerp: lerp,
+        clamp: clamp,
+        direction: direction,
+        distance: distance,
+        normalize: normalize,
+        dot: dot,
+        magnitude: magnitude,
+        angle: angle,
+        translate_range,
+    },
+    net: {
+        request_text_sync: request_text_sync,
+    },
+    random: {
+        range: random_range,
+        choice: random_choice,
+        string: random_string,
+    },
+    time: {
+        wait: wait
+    },
+}
 
 export {
+    tools,
     log,
     get_query_string_params,
     get_app_name,
@@ -525,7 +529,6 @@ export {
     error,
     get_random_color_for_string,
     get_most_suitable_dict_keys,
-    random_in_range,
     blend_colors,
     console,
     easings,
