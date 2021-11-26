@@ -3,7 +3,51 @@
  *
  */
 
-import * as THREE from 'three';
+import {
+    ShaderChunk,
+    ShaderLib,
+    Texture,
+    TextureLoader,
+    Audio,
+    PositionalAudio,
+    AudioListener,
+    AudioLoader,
+    Vector2,
+    Vector3,
+    MeshBasicMaterial,
+    MeshDistanceMaterial,
+    MeshDepthMaterial,
+    MeshLambertMaterial,
+    MeshMatcapMaterial,
+    MeshNormalMaterial,
+    MeshPhongMaterial,
+    MeshPhysicalMaterial,
+    MeshStandardMaterial,
+    MeshToonMaterial,
+    PointsMaterial,
+    ShaderMaterial,
+    SpriteMaterial,
+    LineDashedMaterial,
+    BoxBufferGeometry,
+    ConeBufferGeometry,
+    RingBufferGeometry,
+    TextBufferGeometry,
+    TubeBufferGeometry,
+    LatheBufferGeometry,
+    PlaneBufferGeometry,
+    ShapeBufferGeometry,
+    TorusBufferGeometry,
+    CircleBufferGeometry,
+    SphereBufferGeometry,
+    ExtrudeBufferGeometry,
+    CylinderBufferGeometry,
+    InstancedBufferGeometry,
+    OctahedronBufferGeometry,
+    ParametricBufferGeometry,
+    PolyhedronBufferGeometry,
+
+} from 'three';
+import * as THREE from "three"
 import { log, error, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict, console, get_most_suitable_dict_keys } from "retro/utils/Tools";
 import { isObject, isArray, merge, forEach, isString, isUndefined, isFunction, keys, values, set, map, filter } from "lodash-es";
 import GameObject from 'retro/GameObject';
@@ -84,8 +128,8 @@ class ResourceManager extends BasicObject {
         this.loaders = {
             cubemap: new THREE.CubeTextureLoader()
         }
-        const classes_of_objects = this.classes_of_objects = THREE.objects = new ClassesDataDict()
-        const classes_of_materials = this.classes_of_materials = THREE.materials = new ClassesDataDict({
+        const classes_of_objects = this.classes_of_objects = new ClassesDataDict()
+        const classes_of_materials = this.classes_of_materials = new ClassesDataDict({
             MeshBasicMaterial: THREE.MeshBasicMaterial,
             MeshDistanceMaterial: THREE.MeshDistanceMaterial,
             MeshDepthMaterial: THREE.MeshDepthMaterial,
@@ -101,7 +145,7 @@ class ResourceManager extends BasicObject {
             SpriteMaterial: THREE.SpriteMaterial,
             LineDashedMaterial: THREE.LineDashedMaterial
         })
-        const classes_of_geometries = this.classes_of_geometries = THREE.geometries = new ClassesDataDict({
+        const classes_of_geometries = this.classes_of_geometries = new ClassesDataDict({
             BoxBufferGeometry: THREE.BoxBufferGeometry,
             ConeBufferGeometry: THREE.ConeBufferGeometry,
             RingBufferGeometry: THREE.RingBufferGeometry,
@@ -226,7 +270,7 @@ class ResourceManager extends BasicObject {
                 }
             }
         }
-        let mat = new THREE.materials[template_data.type](template_data.params);
+        let mat = new this.classes_of_materials[template_data.type](template_data.params);
         return mat
     }
     mixin_object(data, mixins = []) {
@@ -309,10 +353,10 @@ class ResourceManager extends BasicObject {
             if (type.indexOf("@") === 0) {
                 mat = this.create_material_with_template(type, params, id);
             } else {
-                if (THREE.materials[type] === undefined) {
+                if (this.classes_of_materials[type] === undefined) {
                     console.error(`Cannot find constructor for material "${type}"`)
                 } else {
-                    mat = new THREE.materials[type](params)
+                    mat = new this.classes_of_materials[type](params)
                 }
             }
 
@@ -353,10 +397,10 @@ class ResourceManager extends BasicObject {
                 return this.create_geometry_with_template(type, params, id);
             if (type.indexOf("url:") === 0)
                 return this.create_obj_geometry(type, params, id);
-            if (THREE.geometries[type] === undefined) {
+            if (this.classes_of_geometries[type] === undefined) {
                 console.error("this", `cannot find geometry class "${type}"`)
             } else {
-                g = new THREE.geometries[type](...params);
+                g = new this.classes_of_geometries[type](...params);
             }
             if (id !== undefined) {
                 this.cached_geometries[id] = g;
@@ -713,6 +757,9 @@ class ResourceManager extends BasicObject {
     /**contexts */
     load_context() {
 
+    }
+    create_object(object_class, options){
+        return new this.classes_of_objects[object_class](options)
     }
 }
 

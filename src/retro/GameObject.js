@@ -1,6 +1,5 @@
 
-import * as THREE from 'three';
-import { Group } from 'three/src/objects/Group';
+import { Vector3 } from 'three';
 import ResourceManager from 'retro/ResourceManager';
 import { Task, TaskScheduler } from "retro/utils/TaskScheduler"
 import StateMachine from "retro/utils/StateMachine"
@@ -11,7 +10,7 @@ import Component from "retro/Component"
 import BasicObject from './BasicObject';
 import Transform from "retro/Transform"
 
-const $v3 = new THREE.Vector3()
+const $v3 = new Vector3()
 
 
 class GameObject extends BasicObject {

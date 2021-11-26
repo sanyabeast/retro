@@ -1,5 +1,4 @@
 import RetroApp from "retro/App"
-import * as THREE from 'three';
 import Main from "apps/aviator/gui/Main.vue"
 import store from "apps/aviator/gui/store"
 import AssetManager from "retro/utils/AssetManager";

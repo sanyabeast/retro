@@ -1,17 +1,17 @@
-import * as THREE from 'three';
+import { ShaderMaterial, BoxBufferGeometry, Vector2, Vector3, UniformsUtils, Mesh, BackSide } from 'three';
 
-class SkyMesh extends THREE.Mesh {
+class SkyMesh extends Mesh {
     isSky = true
     constructor() {
         super()
         var shader = SkyMesh.shader_data;
 
-        var material = new THREE.materials.ShaderMaterial({
+        var material = new ShaderMaterial({
             name: 'SkyMeshShader',
             fragmentShader: shader.fragment_shader,
             vertexShader: shader.vertex_shader,
-            uniforms: THREE.UniformsUtils.clone(shader.uniforms),
-            side: THREE.BackSide,
+            uniforms: UniformsUtils.clone(shader.uniforms),
+            side: BackSide,
             depthWrite: false,
             fog: false
         });
@@ -20,7 +20,7 @@ class SkyMesh extends THREE.Mesh {
         this.castShadow = false
 
         this.material = material
-        this.geometry = new THREE.BoxBufferGeometry(1, 1, 1)
+        this.geometry = new BoxBufferGeometry(1, 1, 1)
         this.scale.setScalar(45000)
     }
 }
@@ -32,8 +32,8 @@ SkyMesh.shader_data = {
         'mie_coefficient': { value: 0.005 },
         'opacity': { value: 1 },
         'mie_directional_g': { value: 0.8 },
-        'sun_position': { value: new THREE.Vector3() },
-        'up': { value: new THREE.Vector3(0, 1, 0) }
+        'sun_position': { value: new Vector3() },
+        'up': { value: new Vector3(0, 1, 0) }
     },
     vertex_shader: `
         uniform vec3 sun_position;

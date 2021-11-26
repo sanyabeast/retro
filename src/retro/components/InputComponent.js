@@ -98,7 +98,7 @@ class InputComponent extends SceneComponent {
             mag_filter: "nearest"
         })
 
-        let colorid_debug_plane = this.colorid_debug_plane = new THREE.objects.FullscreenRect({
+        let colorid_debug_plane = this.colorid_debug_plane = ResourceManager.create_object("FullscreenRect", {
             map: `rt:${render_target_state.id}`,
             scale: 1,
             opacity: 0.5

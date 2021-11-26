@@ -1,5 +1,5 @@
 
-import * as THREE from "three"
+import { Vector3, EventDispatcher } from "three"
 import { log, error, makeid, datetime, is_none, hex_to_hsl, hsl_to_rgb, hex_to_rgb, request_text_sync, console, get_most_suitable_dict_keys } from "retro/utils/Tools";
 import { get, set, isObject, isArray, isNumber, isUndefined, isNull, isBoolean, isFunction, isString, map, keys, values, forEach, method } from "lodash-es"
 import ResourceManager from "retro/ResourceManager"
@@ -33,9 +33,9 @@ const exclude_props = [
     "children"
 ]
 
-const $v3 = new THREE.Vector3()
+const $v3 = new Vector3()
 
-class BasicObject extends THREE.EventDispatcher {
+class BasicObject extends EventDispatcher {
     tick_rate = PRESET.basic_object_default_tickrate
     tick_enabled = true
     debug_log_this = false

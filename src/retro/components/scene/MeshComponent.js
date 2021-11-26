@@ -20,12 +20,8 @@ class MeshComponent extends SceneComponent {
 
         /**readymade objects stored in /objects/ directory of both app and core */
         if (isString(this.class)) {
-            if (isFunction(THREE.objects[this.class])) {
-                mesh = this.subject = new THREE.objects[this.class](this.options)
-                console.log(this, mesh)
-            } else {
-                error("MeshComponent", `cannot create object of class "${this.class} - unknown class."`)
-            }
+            mesh = this.subject = ResourceManager.create_object(this.class, this.options)
+            console.log(this, mesh)
         } else {
             mesh = this.subject = MeshComponent.create_mesh({
                 geometry: this.geometry,

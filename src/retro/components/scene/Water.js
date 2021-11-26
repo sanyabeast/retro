@@ -6,9 +6,6 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import { union } from "lodash";
-import { Vector2 } from "spine-ts-threejs";
-import * as THREE from 'three';
 import { hex_to_hsl, hsl_to_rgb, hex_to_rgb, console } from "retro/utils/Tools";
 
 
@@ -26,18 +23,18 @@ class Water extends SceneComponent {
         let water = undefined
         switch (this.water_type) {
             case 1:
-                water = this.subject = new THREE.objects.Water({
+                water = this.subject = ResourceManager.create_object("Water", {
                     width: this.width,
                     height: this.height,
                     fog: false
-                });
+                })
                 break;
             case 2:
-                water = this.subject = new THREE.objects.Water2({
+                water = this.subject = ResourceManager.create_object("Water2", {
                     width: this.width,
                     height: this.height,
                     fog: false
-                });
+                })
                 break;
             default:
                 break;

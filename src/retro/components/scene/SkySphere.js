@@ -6,9 +6,7 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import { union } from "lodash";
-import { Vector2 } from "spine-ts-threejs";
-import * as THREE from 'three';
+import { Vector3, HemisphereLight, CustomBlending, AddEquation, SrcAlphaFactor, OneMinusSrcAlphaFactor, MathUtils } from 'three';
 import { hex_to_hsl, hsl_to_rgb, hex_to_rgb, console } from "retro/utils/Tools";
 
 
@@ -51,18 +49,18 @@ class SkySphere extends SceneComponent {
     hemi_light = undefined
 
     on_create() {
-        let sky = this.subject = new THREE.objects.SkyMesh();
+        let sky = this.subject = ResourceManager.create_object("SkyMesh");
         console.log(sky)
 
-        let sun = this.sun_vector = new THREE.Vector3();
+        let sun = this.sun_vector = new Vector3();
 
-        let hemi_light = this.hemi_light = new THREE.HemisphereLight()
+        let hemi_light = this.hemi_light = new HemisphereLight()
 
         let material = sky.material
-        material.blending = THREE.CustomBlending;
-        material.blendEquation = THREE.AddEquation; //default
-        material.blendSrc = THREE.SrcAlphaFactor; //default
-        material.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+        material.blending = CustomBlending;
+        material.blendEquation = AddEquation; //default
+        material.blendSrc = SrcAlphaFactor; //default
+        material.blendDst = OneMinusSrcAlphaFactor; //default
 
     }
     get_render_data() {
@@ -115,8 +113,8 @@ class SkySphere extends SceneComponent {
                         let sun = this.find_component_of_type("Sun")
                         uniforms['sun_position'].value.copy(sun.sphere.position);
                     } else {
-                        const phi = THREE.MathUtils.degToRad(90 - c_elevation);
-                        const theta = THREE.MathUtils.degToRad(c_azimuth);
+                        const phi = MathUtils.degToRad(90 - c_elevation);
+                        const theta = MathUtils.degToRad(c_azimuth);
                         this.sun_vector.setFromSphericalCoords(1, phi, theta);
                         uniforms['sun_position'].value.copy(this.sun_vector);
                     }

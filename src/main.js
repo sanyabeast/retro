@@ -14,7 +14,6 @@ if (APP_NAME === undefined) {
     log(`MAIN`, `loading application "${APP_NAME}"`)
     App = require(`apps/${APP_NAME}/App`)
     App = App.default
-
 }
 
 log(`MAIN`, `app version - ${PACKAGE_DATA.version}`)

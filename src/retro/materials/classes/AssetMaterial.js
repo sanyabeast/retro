@@ -278,7 +278,7 @@ class AssetMaterial extends THREE.Material {
 
 
             console.log(asset_dir, b, block_data)
-            let mat = new THREE.materials[material_type](block_data)
+            let mat = new ResourceManager.classes_of_materials[material_type](block_data)
             if (material_layers.length > 0) {
                 mat.material_layers = material_layers
             }

@@ -1,6 +1,6 @@
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { SpotLight, Color } from 'three';
 import { log, error, is_none, console } from "retro/utils/Tools"
 import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefined, isNull, map, filter, keys, values, set, get, unset, debounce, throttle } from "lodash-es"
 import Schema from "retro/utils/Schema"
@@ -12,12 +12,12 @@ class Lantern extends SceneComponent {
     angle = Math.PI / 6
     penumbra = 0
     decay = 2
-    constructor(){
+    constructor() {
         super(...arguments)
         this.toggle_light = debounce(this.toggle_light, 150)
     }
     on_create() {
-        let light = this.light = this.subject = new THREE.SpotLight(new THREE.Color(), this.intenisty, this.distance, this.angle, this.penumbra, this.decay)
+        let light = this.light = this.subject = new SpotLight(new Color(), this.intenisty, this.distance, this.angle, this.penumbra, this.decay)
         light.color.set_any(this.color)
     }
     get_render_data() {
@@ -34,7 +34,7 @@ class Lantern extends SceneComponent {
             this.toggle_light()
         }
     }
-    toggle_light(){
+    toggle_light() {
         this.light.visible = !this.light.visible
     }
     get_reactive_props() {
