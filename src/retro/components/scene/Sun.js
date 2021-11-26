@@ -146,28 +146,28 @@ class Sun extends SceneComponent {
                     p = (p + 1) / 2
 
                     // console.log(`day_progress: ${p}`)
-                    let d = this.tools.lerp(this.n_distance, this.d_distance, p)
+                    let d = this.tools.math.lerp(this.n_distance, this.d_distance, p)
                     let pos_x = Math.sin(t * Math.PI * 2) * d
                     let pos_z = Math.cos(t * Math.PI * 2) * d
-                    let pos_y = this.tools.lerp(this.n_height, this.d_height, p)
+                    let pos_y = this.tools.math.lerp(this.n_height, this.d_height, p)
                     this.subject.position.set(pos_x, pos_y, pos_z)
                     this.position[0] = pos_x
                     this.position[1] = pos_y
                     this.position[2] = pos_z
 
-                    let intensity = this.tools.lerp(this.n_intensity, this.d_intensity, Math.pow(p, 0.2))
+                    let intensity = this.tools.math.lerp(this.n_intensity, this.d_intensity, Math.pow(p, 0.2))
                     this.light.intensity = intensity * this.global_intensity
 
-                    let emissive = this.tools.lerp(this.n_emissive, this.d_emissive, p)
+                    let emissive = this.tools.math.lerp(this.n_emissive, this.d_emissive, p)
                     this.sphere.material.emissiveIntensity = emissive
 
                     let n_color_hsl = hex_to_hsl(this.n_color)
                     let d_color_hsl = hex_to_hsl(this.d_color)
 
                     let c_color = [
-                        this.tools.lerp(n_color_hsl[0], d_color_hsl[0], p),
-                        this.tools.lerp(n_color_hsl[1], d_color_hsl[1], p),
-                        this.tools.lerp(n_color_hsl[2], d_color_hsl[2], p)
+                        this.tools.math.lerp(n_color_hsl[0], d_color_hsl[0], p),
+                        this.tools.math.lerp(n_color_hsl[1], d_color_hsl[1], p),
+                        this.tools.math.lerp(n_color_hsl[2], d_color_hsl[2], p)
                     ]
                     let c_color_rgb = hsl_to_rgb(...c_color)
                     this.light.color.set(c_color_rgb)
@@ -175,15 +175,15 @@ class Sun extends SceneComponent {
 
 
                     /**ambinet */
-                    let amb_intensity = this.tools.lerp(this.n_amb_intensity, this.d_amb_intensity, Math.pow(p, 0.2))
+                    let amb_intensity = this.tools.math.lerp(this.n_amb_intensity, this.d_amb_intensity, Math.pow(p, 0.2))
 
                     let d_amb_color = hex_to_rgb(this.d_amb_color)
                     let n_amb_color = hex_to_rgb(this.n_amb_color)
 
                     let c_amb_color = [
-                        this.tools.lerp(n_amb_color[0], d_amb_color[0], p),
-                        this.tools.lerp(n_amb_color[1], d_amb_color[1], p),
-                        this.tools.lerp(n_amb_color[2], d_amb_color[2], p)
+                        this.tools.math.lerp(n_amb_color[0], d_amb_color[0], p),
+                        this.tools.math.lerp(n_amb_color[1], d_amb_color[1], p),
+                        this.tools.math.lerp(n_amb_color[2], d_amb_color[2], p)
                     ]
 
                     this.amb_light.color.set_any(c_amb_color)
@@ -192,9 +192,9 @@ class Sun extends SceneComponent {
                     if (this.use_postfx) {
                         let postfx = this.find_component_of_type("Postprocessing")
                         if (postfx) {
-                            postfx.grain_power = this.tools.lerp(this.n_grain_power, this.d_grain_power, p)
-                            postfx.bloom_smoothing = this.tools.lerp(this.n_bloom_smoothing, this.d_bloom_smoothing, p)
-                            postfx.bloom_threshold = this.tools.lerp(this.n_bloom_threshold, this.d_bloom_threshold, p)
+                            postfx.grain_power = this.tools.math.lerp(this.n_grain_power, this.d_grain_power, p)
+                            postfx.bloom_smoothing = this.tools.math.lerp(this.n_bloom_smoothing, this.d_bloom_smoothing, p)
+                            postfx.bloom_threshold = this.tools.math.lerp(this.n_bloom_threshold, this.d_bloom_threshold, p)
                         }
 
                     }

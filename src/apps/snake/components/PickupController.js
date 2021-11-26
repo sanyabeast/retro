@@ -31,7 +31,7 @@ class PickupController extends Component {
         this.winking_cycle += time_data.delta * this.winking_speed
         this.mesh_comp.set_material_param(
             "emissiveIntensity",
-            this.tools.translate_range(
+            this.tools.math.translate_range(
                 Math.sin(this.winking_cycle * Math.PI),
                 -1,
                 +1,
@@ -43,15 +43,15 @@ class PickupController extends Component {
         this.floating_cycle += time_data.delta * this.floating_speed
         this.mesh_comp.position = [
             this.mesh_comp.position[0],
-            this.tools.translate_range(Math.sin(this.floating_cycle * Math.PI), -1, +1, 0.025, 0.15),
+            this.tools.math.translate_range(Math.sin(this.floating_cycle * Math.PI), -1, +1, 0.025, 0.15),
             this.mesh_comp.position[2],
         ]
 
         this.spinning_cycle += time_data.delta * this.spinning_speed_y
         this.mesh_comp.rotation = [
-            this.tools.translate_range(Math.sin(this.spinning_cycle * Math.PI * this.spinning_speed_x), -1, +1, -Math.PI/32, Math.PI/32),
+            this.tools.math.translate_range(Math.sin(this.spinning_cycle * Math.PI * this.spinning_speed_x), -1, +1, -Math.PI/32, Math.PI/32),
             this.mesh_comp.rotation[1] + (this.spinning_speed_y * time_data.delta),
-            this.tools.translate_range(Math.sin(this.spinning_cycle * Math.PI * this.spinning_speed_z), -1, +1,-Math.PI/32, Math.PI/32),
+            this.tools.math.translate_range(Math.sin(this.spinning_cycle * Math.PI * this.spinning_speed_z), -1, +1,-Math.PI/32, Math.PI/32),
         ]
     }
     on_gizmo_draw() {

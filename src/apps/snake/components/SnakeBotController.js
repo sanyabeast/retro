@@ -44,15 +44,15 @@ class SnakeBotController extends Component {
         //this.log(`kek`)
     }
     move_to_target(time_data) {
-        let direction = this.tools.direction(this.snake_controller.position, this.target_location)
+        let direction = this.tools.math.direction(this.snake_controller.position, this.target_location)
         //this.log(direction)
         if (!isArray(this.snake_controller.snake_direction)) {
             this.snake_controller.snake_direction = [0, 0, 0]
         }
-        this.snake_controller.snake_direction = this.tools.lerp(
+        this.snake_controller.snake_direction = this.tools.math.lerp(
             this.snake_controller.snake_direction,
             direction,
-            this.tools.clamp(1 - this.direction_switch_smooting, 0, 1) * time_data.delta
+            this.tools.math.clamp(1 - this.direction_switch_smooting, 0, 1) * time_data.delta
         )
     }
     on_gizmo_draw() {
@@ -78,15 +78,15 @@ class SnakeBotController extends Component {
         if (time_since_last_update > this.behaviour_model_random_params.target_location_switch_rate) {
             this.behaviour_model_random_params.target_location_last_switch_date = now
             let new_target_location = [
-                this.tools.random_range(
+                this.tools.random.range(
                     this.behaviour_model_random_params.target_location_range[0][0],
                     this.behaviour_model_random_params.target_location_range[1][0]
                 ),
-                this.tools.random_range(
+                this.tools.random.range(
                     this.behaviour_model_random_params.target_location_range[0][1],
                     this.behaviour_model_random_params.target_location_range[1][1]
                 ),
-                this.tools.random_range(
+                this.tools.random.range(
                     this.behaviour_model_random_params.target_location_range[0][2],
                     this.behaviour_model_random_params.target_location_range[1][2]
                 ),

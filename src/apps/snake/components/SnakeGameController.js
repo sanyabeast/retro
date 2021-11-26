@@ -78,9 +78,9 @@ class SnakeGameController extends Component {
     }
     spawn_pickup(prefab, params) {
         let position = [
-            this.tools.random_range(-15, 15),
+            this.tools.random.range(-15, 15),
             0,
-            this.tools.random_range(-15, 15)
+            this.tools.random.range(-15, 15)
         ]
         console.log(position)
         console.log(ResourceManager.load_prefab(prefab, {
@@ -94,7 +94,7 @@ class SnakeGameController extends Component {
         this.add(game_object)
     }
     spawn_food() {
-        let prefab = this.tools.random_choice(this.food_prefabs)
+        let prefab = this.tools.random.choice(this.food_prefabs)
         this.log(`prepare to spawn food "${prefab}"`)
         this.spawn_pickup(prefab, { })
     }

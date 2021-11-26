@@ -69,7 +69,7 @@ class BasicObject extends THREE.EventDispatcher {
                 enabled: true
             }
         }
-        this.tools = Tools
+        this.tools = Tools.tools
         this.id = id
         id++
         this.meta.params = params || this.meta.params;

@@ -92,14 +92,14 @@ class SkySphere extends SceneComponent {
                     let p = Math.sin((t * Math.PI * 2) - Math.PI / 2)
                     p = (p + 1) / 2
 
-                    let c_turbidity = this.tools.lerp(this.n_turbidity, this.d_turbidity, p)
-                    let c_rayleigh = this.tools.lerp(this.n_rayleigh, this.d_rayleigh, p)
-                    let c_mie_coeff = this.tools.lerp(this.n_mie_coeff, this.d_mie_coeff, p)
-                    let c_mie_direct = this.tools.lerp(this.n_mie_direct, this.d_mie_direct, p)
-                    let c_elevation = this.tools.lerp(this.n_elevation, this.d_elevation, p)
-                    let c_azimuth = this.tools.lerp(this.n_azimuth, this.d_azimuth, p)
-                    let c_exposure = this.tools.lerp(this.n_exposure, this.d_exposure, p)
-                    let c_opacity = this.tools.lerp(this.n_opacity, this.d_opacity, p)
+                    let c_turbidity = this.tools.math.lerp(this.n_turbidity, this.d_turbidity, p)
+                    let c_rayleigh = this.tools.math.lerp(this.n_rayleigh, this.d_rayleigh, p)
+                    let c_mie_coeff = this.tools.math.lerp(this.n_mie_coeff, this.d_mie_coeff, p)
+                    let c_mie_direct = this.tools.math.lerp(this.n_mie_direct, this.d_mie_direct, p)
+                    let c_elevation = this.tools.math.lerp(this.n_elevation, this.d_elevation, p)
+                    let c_azimuth = this.tools.math.lerp(this.n_azimuth, this.d_azimuth, p)
+                    let c_exposure = this.tools.math.lerp(this.n_exposure, this.d_exposure, p)
+                    let c_opacity = this.tools.math.lerp(this.n_opacity, this.d_opacity, p)
 
 
                     const uniforms = this.subject.material.uniforms;
@@ -128,18 +128,18 @@ class SkySphere extends SceneComponent {
                     let d_hemi_ground_color = hex_to_rgb(this.d_hemi_ground_color)
 
                     let c_hemi_sky = [
-                        this.tools.lerp(n_hemi_sky_color[0], d_hemi_sky_color[0], p),
-                        this.tools.lerp(n_hemi_sky_color[1], d_hemi_sky_color[1], p),
-                        this.tools.lerp(n_hemi_sky_color[2], d_hemi_sky_color[2], p)
+                        this.tools.math.lerp(n_hemi_sky_color[0], d_hemi_sky_color[0], p),
+                        this.tools.math.lerp(n_hemi_sky_color[1], d_hemi_sky_color[1], p),
+                        this.tools.math.lerp(n_hemi_sky_color[2], d_hemi_sky_color[2], p)
                     ]
 
                     let c_hemi_ground = [
-                        this.tools.lerp(n_hemi_ground_color[0], d_hemi_ground_color[0], p),
-                        this.tools.lerp(n_hemi_ground_color[1], d_hemi_ground_color[1], p),
-                        this.tools.lerp(n_hemi_ground_color[2], d_hemi_ground_color[2], p)
+                        this.tools.math.lerp(n_hemi_ground_color[0], d_hemi_ground_color[0], p),
+                        this.tools.math.lerp(n_hemi_ground_color[1], d_hemi_ground_color[1], p),
+                        this.tools.math.lerp(n_hemi_ground_color[2], d_hemi_ground_color[2], p)
                     ]
 
-                    let hemi_intensity = this.tools.lerp(this.n_hemi_intensity, this.d_hemi_intensity, Math.pow(p, 0.2))
+                    let hemi_intensity = this.tools.math.lerp(this.n_hemi_intensity, this.d_hemi_intensity, Math.pow(p, 0.2))
                     this.hemi_light.intensity = hemi_intensity
                     this.hemi_light.color.set_any(c_hemi_sky)
                     this.hemi_light.groundColor.set_any(c_hemi_ground)

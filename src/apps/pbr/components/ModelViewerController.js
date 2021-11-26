@@ -93,7 +93,7 @@ class ModelViewerController extends Component {
 
     }
     on_tick(time_data) {
-        this.game_object.rotation = this.tools.lerp(
+        this.game_object.rotation = this.tools.math.lerp(
             this.game_object.rotation,
             this.target_rotation,
             0.1

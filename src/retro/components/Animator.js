@@ -169,7 +169,7 @@ class Animator extends Component {
 
             let target_values = this.animations[a.name].values;
             for (let k in target_values) {
-                let cv = this.tools.lerp(
+                let cv = this.tools.math.lerp(
                     a.start_values[k],
                     target_values[k],
                     progress
