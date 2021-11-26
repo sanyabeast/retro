@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import ResourceManager from "retro/ResourceManager";
 import SceneComponent from "retro/SceneComponent";
-import { set, get, isString, isFunction, isArray } from "lodash-es"
+import { set, get, isString, isFunction, isArray, isNumber } from "lodash-es"
 import { log, error, console } from "retro/utils/Tools"
 
 class MeshComponent extends SceneComponent {
@@ -126,6 +126,54 @@ class MeshComponent extends SceneComponent {
     }
     get uniforms() {
         return this.subject.material.uniforms
+    }
+    _set_material_param(material, param_name, param_value) {
+        let current_value = material[param_name]
+        switch (true) {
+            case isNumber(current_value): {
+                material[param_name] = param_value
+                break;
+            }
+            case (current_value instanceof THREE.Color): {
+                material[param_name].set_any(param_value)
+                break
+            }
+        }
+    }
+    set_material_param(name, value, params = { layer: undefined, first_only: false }) {
+        if (this.subject) {
+            if (isArray(this.subject.material)) {
+                this.subject.material.forEach((material, index) => {
+                    if (index > 0 && params.first_only) return
+                    if (params.layer === undefined || params.all_layers === true) {
+                        this._set_material_param(material, name, value)
+                    }
+
+                    if (isArray(material.material_layers)) {
+                        material.material_layers.forEach(material => {
+                            let layer_name = material.userData.layer_name
+                            if (params.all_layers === true || params.layer === layer_name) {
+                                this._set_material_param(material, name, value)
+                            }
+                        })
+                    }
+                })
+            } else if (this.subject.material instanceof THREE.Material) {
+                let material = this.subject.material_layers
+                if (params.layer === undefined || params.all_layers === true) {
+                    this._set_material_param(material, name, value)
+                }
+
+                if (isArray(material.material_layers)) {
+                    material.material_layers.forEach(material => {
+                        let layer_name = material.userData.layer_name
+                        if (params.all_layers === true || params.layer === layer_name) {
+                            this._set_material_param(material, name, value)
+                        }
+                    })
+                }
+            }
+        }
     }
 }
 

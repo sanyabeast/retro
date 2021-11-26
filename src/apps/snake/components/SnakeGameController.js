@@ -13,10 +13,21 @@ import Schema from "retro/utils/Schema"
 
 class SnakeGameController extends Component {
     user_snake = undefined
+    use_first_found_snake_as_user_snake = true
     emenies = undefined
+    all_pickups = undefined
+    pickups = undefined
+    food_prefabs = undefined
+    food_items = undefined
     constructor() {
         super(...arguments)
         this.enemies = {}
+        this.pickups = {}
+        this.all_pickups = {}
+        this.food_items = {}
+        this.food_prefabs = [
+            "snake.pickups.food_apple_1"
+        ]
     }
     on_create() {
 
@@ -34,15 +45,21 @@ class SnakeGameController extends Component {
     on_start() {
         let snakes = this.find_components_of_type("SnakeController")
         snakes.forEach((snake_controller, index) => {
-            if (index === 0) {
+            if (index === 0 && this.use_first_found_snake_as_user_snake === true) {
                 this.register_user_snake(snake_controller)
             } else {
                 this.register_enemy_snake(snake_controller)
             }
         })
+
+        this.spawn_food()
+        this.spawn_food()
+        this.spawn_food()
+        this.spawn_food()
+        this.spawn_food()
+        this.spawn_food()
     }
     register_user_snake(snake_controller) {
-
         let user_snake_controller = snake_controller.get_component("UserSnakeController")
         if (user_snake_controller === undefined) {
             snake_controller.add_component({
@@ -58,6 +75,28 @@ class SnakeGameController extends Component {
             user_controller: user_snake_controller
         }
         console.log(user_snake_controller)
+    }
+    spawn_pickup(prefab, params) {
+        let position = [
+            this.tools.random_range(-15, 15),
+            0,
+            this.tools.random_range(-15, 15)
+        ]
+        console.log(position)
+        console.log(ResourceManager.load_prefab(prefab, {
+            ...params,
+            position: position
+        }))
+        let game_object = this.create_game_object(ResourceManager.load_prefab(prefab, {
+            ...params,
+            position: position
+        }))
+        this.add(game_object)
+    }
+    spawn_food() {
+        let prefab = this.tools.random_choice(this.food_prefabs)
+        this.log(`prepare to spawn food "${prefab}"`)
+        this.spawn_pickup(prefab, { })
     }
     register_enemy_snake(snake_controller, params) {
         let uuid = snake_controller.UUID

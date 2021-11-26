@@ -84,6 +84,10 @@ class BasicObject extends THREE.EventDispatcher {
     get game_object() {
         return this._game_object
     }
+    create_game_object() {
+        let game_object = this.game_object
+        return game_object.create_game_object(...arguments)
+    }
     /**calls */
     call_down(method_name, ...args) {
 

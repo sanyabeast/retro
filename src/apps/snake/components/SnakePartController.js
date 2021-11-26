@@ -7,20 +7,23 @@ import Schema from "retro/utils/Schema"
 
 class SnakePartController extends Component {
     color = "#ff0000"
-    snake_speed = 2
+    snake_speed = 1
     snake_direction = Math.PI / 3
     before_part = undefined
-    distance_between_parts = 1
+    distance_between_parts = 0.5
     jam_speed = 1
     jam_delta = 0.333
     jam_min = 0.7
     jam_max = 1
     jam_phase = 0
+    flexibility = 0.5
     position = undefined
     /*private*/
     part_direction = 0
     part_index = 0
     mesh_comp = undefined
+    grow_cycle = 0
+    grow_speed = 0.5
     constructor() {
         super(...arguments)
         this.position = this.position || [0, 0, 0]
@@ -33,11 +36,16 @@ class SnakePartController extends Component {
         let mesh_comp = this.mesh_comp = this.get_component("MeshComponent")
         mesh_comp.subject.material.color.set_any(this.color)
         console.log(mesh_comp)
+
+        if (this.before_part) {
+            this.game_object.position = this.before_part.game_object.position
+        }
     }
     on_tick(time_data) {
         if (this.before_part) {
             this.part_index = this.before_part.part_index + 1
         }
+
         this.move_part(time_data)
         this.update_jam(time_data)
 
@@ -47,6 +55,15 @@ class SnakePartController extends Component {
         this.position[0] = this.game_object.position[0]
         this.position[1] = this.game_object.position[1]
         this.position[2] = this.game_object.position[2]
+
+        this.grow_cycle += time_data.delta * this.grow_speed
+        if (this.grow_cycle <= 1) {
+            this.mesh_comp.scale = [
+                this.grow_cycle,
+                this.grow_cycle,
+                this.grow_cycle
+            ]
+        }
     }
     get_reactive_props() {
         return [
@@ -94,12 +111,27 @@ class SnakePartController extends Component {
                 ]
             } else {
                 let distance = this.tools.distance(this.game_object.position, this.before_part.game_object.position)
-                let distance_correction = (distance * this.snake_speed) / this.distance_between_parts
-                this.game_object.position = [
-                    this.game_object.position[0] + direction[0] * this.tools.clamp(time_data.delta, 0, 1) * distance_correction,
-                    this.game_object.position[1],
-                    this.game_object.position[2] + direction[2] * this.tools.clamp(time_data.delta, 0, 1) * distance_correction,
+                let distance_correction = distance / this.distance_between_parts
+                // console.log(this.UUID, distance_correction, this.snake_speed)
+                // this.game_object.position = [
+                //     this.game_object.position[0] + direction[0] * distance_correction,
+                //     this.game_object.position[1],
+                //     this.game_object.position[2] + direction[2] * distance_correction,
+                // ]
+                this.game_object.scale = [
+                    distance_correction,
+                    distance_correction,
+                    distance_correction
                 ]
+                this.game_object.position = this.tools.lerp(
+                    this.game_object.position,
+                    [
+                        this.before_part.game_object.position[0] - direction[0] * this.distance_between_parts,
+                        this.before_part.game_object.position[1] - direction[1] * this.distance_between_parts,
+                        this.before_part.game_object.position[2] - direction[2] * this.distance_between_parts,
+                    ],
+                    this.flexibility
+                )
             }
         }
 

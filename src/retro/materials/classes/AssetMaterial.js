@@ -64,6 +64,7 @@ class AssetMaterial extends THREE.Material {
         this.transparent = isBoolean(params.transparent) ? params.transparent : false
         this.emissive_color = params.emissive_color || undefined
         this.add_clearcoat = isBoolean(params.add_clearcoat) ? params.add_clearcoat : false
+        this.diffuse_to_emissive = isBoolean(params.diffuse_to_emissive) ? params.diffuse_to_emissive : false
         this.add_sheen = isBoolean(params.add_sheen) ? params.add_sheen : false
 
         this.emissive_intensity = isNumber(params.emissive_intensity) ? params.emissive_intensity : 1
@@ -222,7 +223,7 @@ class AssetMaterial extends THREE.Material {
 
             if (isNumber(block_data.shininess)) {
                 block_data.shininess *= this.shininess
-            } 
+            }
 
             if (isNumber(block_data.reflectivity)) {
                 block_data.reflectivity *= this.reflectivity
@@ -244,6 +245,10 @@ class AssetMaterial extends THREE.Material {
                 if (isString(block_data.roughnessMap)) block_data.sheenRoughnessMap = block_data.specularMap
                 if (!isUndefined(block_data.specularMap)) block_data.sheenColorMap = block_data.specularMap
                 if (!isUndefined(block_data.specular)) block_data.sheenColor = new THREE.Color(block_data.specular.r, block_data.specular.g, block_data.specular.b)
+            }
+
+            if (this.diffuse_to_emissive) {
+                block_data.emissiveMap = block_data.map
             }
 
             if (this.transparent === true) {
@@ -270,6 +275,7 @@ class AssetMaterial extends THREE.Material {
                 rmat.blending = 2;
                 material_layers.push(rmat)
             }
+
 
             console.log(asset_dir, b, block_data)
             let mat = new THREE.materials[material_type](block_data)

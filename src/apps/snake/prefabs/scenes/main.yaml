@@ -56,8 +56,10 @@ children:
     components:
       controller:
         params:
-          position: [0, 0, 1]
+          position: [0, 0, 10]
           color: "#ffeb3b"
+          start_length: 1
+          snake_speed: 3
   enemy_snake_1:
     prefab: snake.actors.snake
     components:

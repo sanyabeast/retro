@@ -1,0 +1,24 @@
+components:
+  body:
+    name: MeshComponent
+    params:
+      debug_transform: false
+      position: [1, 0, 0]
+      rotation: [0, 0, 0]
+      recieve_shadow: false
+      cast_shadow: false
+      geometry:
+        - "url:res/snake/models/apple_a1/apple_a1.obj"
+        - 0.5
+      material:
+        - AssetMaterial
+        - src: "res/snake/models/apple_a1/apple_a1.mtl"
+          diffuse_to_emissive: true
+  collider:
+    name: SnakeGameCollider
+  controller:
+    name: PickupController
+    order: 1
+    params:
+      type: food
+      value: 1

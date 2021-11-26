@@ -1,8 +1,10 @@
+
 components:
   body:
     name: MeshComponent
     params:
       position: [0, 0.5, 0]
+      scale: [0.1, 0.1, 0.1]
       geometry:
         - SphereBufferGeometry
         - [0.5, 32, 16]
@@ -12,6 +14,10 @@ components:
           roughness: 0.89
           metalness: 0
           reflectivity: 0.4
+  collider:
+    name: SnakeGameCollider
+    params:
+      radius: 1
   controller:
     name: SnakePartController
     context: "snake_game"

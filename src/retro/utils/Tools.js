@@ -500,6 +500,10 @@ function angle(a, b) {
     return Math.acos(dot(a, b) / (magnitude(a) * magnitude(b)))
 }
 
+function translate_range(value, a_min, a_max, b_min, b_max) {
+    return lerp(b_min, b_max, (value - a_min) / (a_max - a_min))
+}
+
 
 export {
     log,
@@ -542,5 +546,6 @@ export {
     distance,
     dot,
     magnitude,
-    angle
+    angle,
+    translate_range
 }

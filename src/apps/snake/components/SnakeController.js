@@ -60,7 +60,8 @@ class SnakeController extends Component {
     }
     grow() {
         let snake_part_prefab = ResourceManager.load_prefab(this.snake_part_prefab, {
-            "components.controller.params.before_part": this.last_part
+            "components.controller.params.before_part": this.last_part,
+            "components.controller.params.color": this.color
         })
         let part_object = new GameObject(snake_part_prefab)
         console.log(part_object, snake_part_prefab, this)

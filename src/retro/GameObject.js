@@ -54,7 +54,9 @@ class GameObject extends BasicObject {
         }
         return ResourceManager.gameobject_refs[this.UUID]
     }
-
+    create_game_object() {
+        return new GameObject(...arguments)
+    }
     tick(time_data) {
         super.tick(time_data)
         if (this.enabled) {
