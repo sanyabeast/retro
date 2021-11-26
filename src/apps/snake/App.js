@@ -15,7 +15,7 @@ class App extends RetroApp {
             2,
             5
         ]
-        camera.fov = 60
+        camera.fov = 45
         let controls = this.find_component_of_type("OrbitControlsComponent")
         controls.set_controls_state({"target":[0,0,0],"position":[-0.0026379660244335835,30.799284084135753,0.4937334129267248],"zoom":1})
 
