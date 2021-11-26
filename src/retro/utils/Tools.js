@@ -1,5 +1,5 @@
 
-import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRightvv } from "lodash-es"
+import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRight } from "lodash-es"
 import DateTime from "datetime-js"
 import exp from "constants";
 import { Color, Vector2, Vector3 } from "three"
@@ -473,19 +473,31 @@ function direction(v_a, v_b) {
 
 function normalize(v_a) {
     let r = [...v_a]
-    let max = Math.max.apply(Math, r)
-    r.forEach(v => v /= max)
+    let max = Math.max.apply(Math, map(r, mv => Math.abs(mv)))
+    r = map(r, v => v /= max)
     return r
 }
 
-function distance(v_a, v_b){
-    if (Math.min(v_a.length, v_b.length) === 3){
+function distance(v_a, v_b) {
+    if (Math.min(v_a.length, v_b.length) === 3) {
         return Math.sqrt(
             Math.pow(v_b[0] - v_a[0], 2) +
             Math.pow(v_b[1] - v_a[1], 2) +
             Math.pow(v_b[2] - v_a[2], 2)
         )
     }
+}
+
+function dot(a, b) {
+    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2])
+}
+
+function magnitude(a) {
+    return Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
+}
+
+function angle(a, b) {
+    return Math.acos(dot(a, b) / (magnitude(a) * magnitude(b)))
 }
 
 
@@ -527,5 +539,8 @@ export {
     wait,
     /*vector math*/
     direction,
-    distance
+    distance,
+    dot,
+    magnitude,
+    angle
 }

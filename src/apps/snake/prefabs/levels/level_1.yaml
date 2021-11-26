@@ -8,6 +8,11 @@ children:
           geometry:
             - PlaneBufferGeometry
             - [32, 32, 1]
+          recieve_shadow: true
+          cast_shadow: true
           material:
-            - MeshStandardMaterial
-            - color: "#eeeeee"
+            - PBRMaterial
+            - pbr: "res/retro/pbr/diamond-metal-siding-bl/diamond-metal-siding"
+              file_format: jpg
+              tiling: [2.5, 2.5]
+              color: "#ffffff"

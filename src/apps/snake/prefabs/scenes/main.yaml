@@ -4,7 +4,7 @@ prefabs:
 components:
   fog:
     name: Fog
-    params: 
+    params:
       density: 0.005
   skybox:
     name: SkyBox
@@ -17,6 +17,86 @@ components:
       cycling: 10
       time: 0.65
       global_intensity: 1
+  game_controller:
+    name: SnakeGameController
+    params:
+      pass: true
 children:
   level: "??prefab=snake.levels.level_1"
-  snake: "??prefab=snake.actors.snake"
+  infostand:
+    position: [0, 5, -10]
+    rotation: [-1.5707, 0, 0]
+    components:
+      title:
+        name: TroikaTextComponent
+        params:
+          position: [0, 0, 0]
+          font_size: 0.7
+          anchor_x: 10
+          text: "PRESS `ENTER` TO START MOVING"
+          color: "#ffc107"
+      title2:
+        name: TroikaTextComponent
+        params:
+          position: [0, -1, 0]
+          font_size: 0.4
+          anchor_x: 10
+          text: "USE `A` and `D` BUTTONS TO STEER"
+          color: "#ffc107"
+      title3:
+        name: TroikaTextComponent
+        params:
+          position: [0, -1.5, 0]
+          font_size: 0.4
+          anchor_x: 10
+          text: "PRESS `SPACE` TO GROW UP"
+          color: "#ffffff"
+  user_snake:
+    prefab: snake.actors.snake
+    components:
+      controller:
+        params:
+          position: [0, 0, 1]
+          color: "#ffeb3b"
+  enemy_snake_1:
+    prefab: snake.actors.snake
+    components:
+      controller:
+        params:
+          color: "#e91e63"
+          position: [-1, 0, -2]
+  enemy_snake_2:
+    prefab: snake.actors.snake
+    components:
+      controller:
+        params:
+          color: "#00bcd4"
+          position: [4, 0, 4]
+          start_length: 12
+  enemy_snake_3:
+    prefab: snake.actors.snake
+    components:
+      controller:
+        params:
+          color: "#ff5722"
+          position: [-8, 0, 8]
+          start_length: 8
+          snake_speed: 0.5
+  enemy_snake_4:
+    prefab: snake.actors.snake
+    components:
+      controller:
+        params:
+          color: "#8bc34a"
+          position: [16, 0, -12]
+          start_length: 24
+          snake_speed: 0.2
+  enemy_snake_5:
+    prefab: snake.actors.snake
+    components:
+      controller:
+        params:
+          color: "#9e9e9e"
+          position: [-24, 0, -12]
+          start_length: 48
+          snake_speed: 0.25
