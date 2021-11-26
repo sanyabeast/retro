@@ -59,7 +59,7 @@ children:
           position: [0, 0, 10]
           color: "#ffeb3b"
           start_length: 1
-          snake_speed: 3
+          snake_speed: 2
   enemy_snake_1:
     prefab: snake.actors.snake
     components:
@@ -75,6 +75,7 @@ children:
           color: "#00bcd4"
           position: [4, 0, 4]
           start_length: 12
+          snake_speed: 10
   enemy_snake_3:
     prefab: snake.actors.snake
     components:

@@ -7,7 +7,7 @@ import Schema from "retro/utils/Schema"
 
 class SnakePartController extends Component {
     color = "#ff0000"
-    snake_speed = 1
+    snake_speed = 2
     snake_direction = Math.PI / 3
     before_part = undefined
     distance_between_parts = 0.5
@@ -16,14 +16,14 @@ class SnakePartController extends Component {
     jam_min = 0.7
     jam_max = 1
     jam_phase = 0
-    flexibility = 0.5
+    flexibility = 0.7
     position = undefined
     /*private*/
     part_direction = 0
     part_index = 0
     mesh_comp = undefined
     grow_cycle = 0
-    grow_speed = 0.5
+    grow_speed = 0.7
     constructor() {
         super(...arguments)
         this.position = this.position || [0, 0, 0]
@@ -123,15 +123,11 @@ class SnakePartController extends Component {
                     distance_correction,
                     distance_correction
                 ]
-                this.game_object.position = this.tools.lerp(
-                    this.game_object.position,
-                    [
-                        this.before_part.game_object.position[0] - direction[0] * this.distance_between_parts,
-                        this.before_part.game_object.position[1] - direction[1] * this.distance_between_parts,
-                        this.before_part.game_object.position[2] - direction[2] * this.distance_between_parts,
-                    ],
-                    this.flexibility
-                )
+                this.game_object.position = [
+                    this.before_part.game_object.position[0] - direction[0] * this.distance_between_parts,
+                    this.before_part.game_object.position[1] - direction[1] * this.distance_between_parts,
+                    this.before_part.game_object.position[2] - direction[2] * this.distance_between_parts,
+                ]
             }
         }
 
@@ -140,7 +136,7 @@ class SnakePartController extends Component {
     update_jam(time_data) {
         let before_part = this.before_part
         if (!before_part) {
-            this.jam_phase = (this.jam_phase + (this.jam_speed * this.snake_speed) * this.tools.clamp(time_data.delta, 0, 1)) % 1
+            this.jam_phase = (this.jam_phase + (this.jam_speed) * this.tools.clamp(time_data.delta, 0, 1)) % 1
         } else {
             this.jam_phase = (before_part.jam_phase + this.jam_delta) % 1
         }
