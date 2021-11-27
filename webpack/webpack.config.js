@@ -16,48 +16,48 @@ function log() { console.log(`[RETRO] [i]`.green, ...arguments); }
 function warn() { console.log(`[RETRO] [*]`.yellow, ...arguments); }
 function err() { console.log(`[RETRO] [!]`.red, ...arguments); }
 
-function load_preset(app_name) {
-    log(`loading preset for "${app_name}"`)
+function load_preset(APP_NAME) {
+    log(`loading preset for "${APP_NAME}"`)
     let default_preset = yamlfile.readFileSync(
         path.join(root, "src", "retro", "PRESET.yaml")
     )
-    let preset = undefined
+    let PRESET = undefined
     let error_code = undefined
     try {
-        preset = yamlfile.readFileSync(
-            path.join(root, 'src', 'apps', app_name, "PRESET.yaml")
+        PRESET = yamlfile.readFileSync(
+            path.join(root, 'src', 'apps', APP_NAME, "PRESET.yaml")
         )
-        preset = {
+        PRESET = {
             ...default_preset,
-            ...preset
+            ...PRESET
         }
-    } catch (err) {
-        error_code = err.code
-        err(err.code)
+    } catch (e) {
+        error_code = e.code
+        err(e.code)
     }
 
-    if (!preset) {
-        preset = { ...default_preset }
+    if (!PRESET) {
+        PRESET = { ...default_preset }
         if (error_code === 'ENOENT') {
             warn(`Preset not found. Creating new one with default settings...`)
             yamlfile.writeFileSync(
-                path.join(root, 'src', 'apps', app_name, "PRESET.yaml"),
-                preset
+                path.join(root, 'src', 'apps', APP_NAME, "PRESET.yaml"),
+                PRESET
             )
         }
     }
-    log(`preset: ${JSON.stringify(preset, null, '\t')}`)
-    return preset
+    log(`preset: ${JSON.stringify(PRESET, null, '\t')}`)
+    return PRESET
 }
 
-function get_output_config(app_name, preset) {
+function get_output_config(APP_NAME, PRESET) {
     let output_path
-    if (preset.IS_EXAMPLE) {
-        output_path = path.join(root, `dist`, app_name)
+    if (PRESET.IS_EXAMPLE) {
+        output_path = path.join(root, `dist`, APP_NAME)
     } else {
-        output_path = path.join(root, `src`, 'apps', app_name, 'dist')
+        output_path = path.join(root, `src`, 'apps', APP_NAME, 'dist')
     }
-    log(`"${app_name}" is bundled to "${output_path}"`)
+    log(`"${APP_NAME}" is bundled to "${output_path}"`)
     return {
         filename: "[name].js",
         path: output_path,
@@ -69,7 +69,7 @@ function get_output_config(app_name, preset) {
 
 module.exports = (env) => {
     const APP_NAME = env.APP_NAME
-    const preset = load_preset(APP_NAME)
+    const PRESET = load_preset(APP_NAME)
     log(`working on app "${APP_NAME}"...`)
     let define_plugin_params = {}
 
@@ -79,13 +79,13 @@ module.exports = (env) => {
 
     define_plugin_params["PACKAGE_DATA"] = JSON.stringify(package_data)
     define_plugin_params[`process.env.APP_NAME`] = JSON.stringify(APP_NAME)
-    define_plugin_params[`PRESET`] = JSON.stringify(preset)
+    define_plugin_params[`PRESET`] = JSON.stringify(PRESET)
 
     let config = {
         entry: {
             main: path.join(root, "src", "main"),
         },
-        output: get_output_config(APP_NAME, preset),
+        output: get_output_config(APP_NAME, PRESET),
         module: {
             rules: [
                 {
@@ -168,9 +168,14 @@ module.exports = (env) => {
 
     // Builds
     const build = env && env.production ? "prod" : "dev";
+    const mode_config = require(path.join(root, "webpack", "builds", `webpack.config.${build}`))
+    console.log(mode_config)
     config = merge.smart(
         config,
-        require(path.join(root, "webpack", "builds", `webpack.config.${build}`))
+        typeof mode_config === "function" ? mode_config({
+            APP_NAME,
+            PRESET
+        }) : mode_config
     );
 
     // Addons
