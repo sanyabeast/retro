@@ -1,0 +1,17 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl Inesta_02
+Ns 323.999994
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump -bm 0.000000 Z:\\Projects\\$JOB\\gamecore\\src\\core\\res\\models\\free_sunglasses_set_a1\\maps\\Inesta_02_1001_normal.png
+map_Kd Z:\\Projects\\$JOB\\gamecore\\src\\core\\res\\models\\free_sunglasses_set_a1\\maps\\Inesta_02_1001_albedo.jpg
+map_Ns Z:\\Projects\\$JOB\\gamecore\\src\\core\\res\\models\\free_sunglasses_set_a1\\maps\\Inesta_02_1001_roughness.jpg
+map_d Z:\\Projects\\$JOB\\gamecore\\src\\core\\res\\models\\free_sunglasses_set_a1\\maps\\Inesta_02_1001_opacity.jpg
+refl Z:\\Projects\\$JOB\\gamecore\\src\\core\\res\\models\\free_sunglasses_set_a1\\maps\\Inesta_02_1001_metallic.jpg
