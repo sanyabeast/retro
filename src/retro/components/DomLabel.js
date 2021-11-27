@@ -4,7 +4,7 @@
  */
 
 import Component from "retro/Component";
-import * as THREE from 'three';
+import { Vector3 } from 'three';
 
 class DomLabel extends Component {
     tick_skip = 3;
@@ -75,7 +75,7 @@ class DomLabel extends Component {
         console.log(`component init params: `, params);
     }
     set_position(x, y, z) {
-        let v = new THREE.Vector3(x, y, z);
+        let v = new Vector3(x, y, z);
         let p = v.project(this.camera);
         this.dom.style.transform = `translate(calc(${((v.x + 1) / 2) * this.globals.resolution.x
             }px), ${((-v.y + 1) / 2) * this.globals.resolution.y}px)`;

@@ -10,7 +10,8 @@
  */
 
 import SceneComponent from "retro/SceneComponent";
-import * as THREE from 'three';
+import { PerspectiveCamera, Matrix4, OrthographicCamera, Vector3 } from 'three';
+
 class CameraComponent extends SceneComponent {
     offset = [0, 0, 0];
     camera_type = 1
@@ -27,18 +28,18 @@ class CameraComponent extends SceneComponent {
     prev_camera_matrix = undefined
     constructor() {
         super(...arguments)
-        this.prev_camera_matrix = new THREE.Matrix4()
+        this.prev_camera_matrix = new Matrix4()
     }
     on_create() {
-        let o_camera = this.o_camera = new THREE.OrthographicCamera({
+        let o_camera = this.o_camera = new OrthographicCamera({
             fov: this.fov,
             aspect: this.aspect,
             near: this.near,
             far: this.far,
-            position: new THREE.Vector3(0, 0, 20),
+            position: new Vector3(0, 0, 20),
         });
 
-        let p_camera = this.subject = this.p_camera = new THREE.PerspectiveCamera(this.fov, this.aspect, this.near, this.far);
+        let p_camera = this.subject = this.p_camera = new PerspectiveCamera(this.fov, this.aspect, this.near, this.far);
 
         console.log(12)
         this.define_global_var("camera", a => this.subject)
@@ -83,7 +84,7 @@ class CameraComponent extends SceneComponent {
     }
 
     look_at(x, y, z) {
-        this.subject.lookAt(new THREE.Vector3(x, y, z))
+        this.subject.lookAt(new Vector3(x, y, z))
     }
 
     on_update(props) {

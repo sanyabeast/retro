@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { BufferGeometry, BoxBufferGeometry, Group, BufferAttribute, Mesh } from 'three';
 import { forEach, map, isArray } from "lodash-es";
 import OBJLoader from 'three/examples/js/loaders/OBJLoader.js';
 import FBXLoader from "three/examples/js/loaders/FBXLoader.js"
@@ -9,14 +9,14 @@ let fbx_loader = new FBXLoader()
 
 let obj_cache = {}
 
-class AssetBufferGeometry extends THREE.BufferGeometry {
+class AssetBufferGeometry extends BufferGeometry {
     constructor(src = "", scale = 1) {
         super(...arguments);
         let type = src.split(".")
         type = type[type.length - 1]
         switch (type) {
             case "obj": {
-                let g = new THREE.BoxBufferGeometry()
+                let g = new BoxBufferGeometry()
                 if (obj_cache[src]) {
                     g = obj_cache[src].clone()
                 } else {
@@ -25,19 +25,19 @@ class AssetBufferGeometry extends THREE.BufferGeometry {
                             src,
                             (object) => {
                                 console.log(object)
-                                let g = new THREE.BufferGeometry()
-                                if (object instanceof THREE.Group) {
+                                let g = new BufferGeometry()
+                                if (object instanceof Group) {
                                     if (object.children.length > 1) {
                                         let geometries = []
                                         object.children.forEach(child => {
-                                            if (child instanceof THREE.Mesh) {
+                                            if (child instanceof Mesh) {
                                                 let position_attr = child.geometry.getAttribute("position")
                                                 let count = position_attr.count
                                                 if (child.geometry.attributes["uv"] === undefined) {
-                                                    child.geometry.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(count * 2), 2))
+                                                    child.geometry.setAttribute("uv", new BufferAttribute(new Float32Array(count * 2), 2))
                                                 }
                                                 if (child.geometry.attributes["normal"] === undefined) {
-                                                    child.geometry.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(count * 3), 3))
+                                                    child.geometry.setAttribute("normal", new BufferAttribute(new Float32Array(count * 3), 3))
                                                 }
                                                 geometries.push(child.geometry)
                                             }
@@ -56,7 +56,7 @@ class AssetBufferGeometry extends THREE.BufferGeometry {
                                         }
                                         g.materials_order = materials_order
                                     }
-                                } else if (object instanceof THREE.Mesh) {
+                                } else if (object instanceof Mesh) {
                                     g = object.geometry.clone()
                                 }
 
@@ -85,13 +85,13 @@ class AssetBufferGeometry extends THREE.BufferGeometry {
                 fbx_loader.load(
                     src,
                     (object) => {
-                        if (object instanceof THREE.Group) {
-                            if (object.children && object.children[0] && object.children[0] instanceof THREE.Mesh) {
+                        if (object instanceof Group) {
+                            if (object.children && object.children[0] && object.children[0] instanceof Mesh) {
                                 for (let k in object.children[0].geometry) {
                                     this[k] = object.children[0].geometry[k]
                                 }
                             }
-                        } else if (object instanceof THREE.Mesh) {
+                        } else if (object instanceof Mesh) {
                             for (let k in object.geometry) {
                                 this[k] = object.geometry[k]
                             }

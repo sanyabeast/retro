@@ -6,9 +6,7 @@
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager"
 import { forEach, isUndefined, isArray } from "lodash-es";
-import * as THREE from 'three';
 const path = require("path")
-const SPINE_VERSION = 38
 let spine = undefined
 
 // import spine from "spine/spine-threejs.js";
@@ -16,7 +14,7 @@ let spine = undefined
 /**TODO. Clearing */
 const POOL = {}
 
-switch (SPINE_VERSION) {
+switch (PRESET.spine_component_spine_version) {
     case 38: {
         spine = require("spine/spine-threejs-38.js").default
         // spine = require("spine/spine-all-38.js").default
@@ -67,7 +65,7 @@ class SpineAnimationPlayer extends SceneComponent {
                 if (from_pool) {
                     this.subject = from_pool
                 } else {
-                   // this.log(`creating new ${this.src}`)
+                    // this.log(`creating new ${this.src}`)
                     await this.load_assets();
                     await this.setup_view();
                 }

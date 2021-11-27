@@ -5,8 +5,8 @@
  */
 
 import Component from "retro/Component";
-import ResourceManager  from "retro/ResourceManager";
-import * as THREE from 'three';
+import ResourceManager from "retro/ResourceManager";
+import { Vector3 } from 'three';
 
 class SimpleRotator extends Component {
     speed = 1;

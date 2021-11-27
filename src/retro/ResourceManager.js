@@ -8,6 +8,7 @@ import {
     ShaderLib,
     Texture,
     TextureLoader,
+    CubeTextureLoader,
     Audio,
     PositionalAudio,
     AudioListener,
@@ -47,7 +48,6 @@ import {
     PolyhedronBufferGeometry,
 
 } from 'three';
-import * as THREE from "three"
 import { log, error, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict, console, get_most_suitable_dict_keys } from "retro/utils/Tools";
 import { isObject, isArray, merge, forEach, isString, isUndefined, isFunction, keys, values, set, map, filter } from "lodash-es";
 import GameObject from 'retro/GameObject';
@@ -67,8 +67,8 @@ function is_class_excluded_from_mixin(data) {
 
 
 const SCHEMA_APP = require(`apps/${process.env.APP_NAME}/SCHEMA.yaml`)
-const audio_loader = new THREE.AudioLoader();
-const audio_listener = new THREE.AudioListener();
+const audio_loader = new AudioLoader();
+const audio_listener = new AudioListener();
 const image_filter = new ImageFilter()
 
 class RmDict {
@@ -97,13 +97,13 @@ class ResourceManager extends BasicObject {
             stage: undefined,
             dom_rect: { left: 0, top: 0, width: 1, height: 1 },
             uniforms: {
-                bc: { value: new THREE.Vector2(0, 1), type: "v2" },
+                bc: { value: new Vector2(0, 1), type: "v2" },
                 time: { value: 0, type: "f" },
-                resolution: { value: new THREE.Vector2(1, 1), type: "v2" },
-                resolution2: { value: new THREE.Vector2(0.001, 0.001), type: "v2" },
+                resolution: { value: new Vector2(1, 1), type: "v2" },
+                resolution2: { value: new Vector2(0.001, 0.001), type: "v2" },
                 pixel_ratio: { value: window.devicePixelRatio, type: "f" },
-                mouse: { value: new THREE.Vector2(0, 0), type: "v2" },
-                camera_pos: { value: new THREE.Vector3(), type: "v3" },
+                mouse: { value: new Vector2(0, 0), type: "v2" },
+                camera_pos: { value: new Vector3(), type: "v3" },
             },
             get resolution() {
                 return this.uniforms.resolution.value;
@@ -126,60 +126,60 @@ class ResourceManager extends BasicObject {
             geometries_count: 0,
         }
         this.loaders = {
-            cubemap: new THREE.CubeTextureLoader()
+            cubemap: new CubeTextureLoader()
         }
         const classes_of_objects = this.classes_of_objects = new ClassesDataDict()
         const classes_of_materials = this.classes_of_materials = new ClassesDataDict({
-            MeshBasicMaterial: THREE.MeshBasicMaterial,
-            MeshDistanceMaterial: THREE.MeshDistanceMaterial,
-            MeshDepthMaterial: THREE.MeshDepthMaterial,
-            MeshLambertMaterial: THREE.MeshLambertMaterial,
-            MeshMatcapMaterial: THREE.MeshMatcapMaterial,
-            MeshNormalMaterial: THREE.MeshNormalMaterial,
-            MeshPhongMaterial: THREE.MeshPhongMaterial,
-            MeshPhysicalMaterial: THREE.MeshPhysicalMaterial,
-            MeshStandardMaterial: THREE.MeshStandardMaterial,
-            MeshToonMaterial: THREE.MeshToonMaterial,
-            PointsMaterial: THREE.PointsMaterial,
-            ShaderMaterial: THREE.ShaderMaterial,
-            SpriteMaterial: THREE.SpriteMaterial,
-            LineDashedMaterial: THREE.LineDashedMaterial
+            MeshBasicMaterial: MeshBasicMaterial,
+            MeshDistanceMaterial: MeshDistanceMaterial,
+            MeshDepthMaterial: MeshDepthMaterial,
+            MeshLambertMaterial: MeshLambertMaterial,
+            MeshMatcapMaterial: MeshMatcapMaterial,
+            MeshNormalMaterial: MeshNormalMaterial,
+            MeshPhongMaterial: MeshPhongMaterial,
+            MeshPhysicalMaterial: MeshPhysicalMaterial,
+            MeshStandardMaterial: MeshStandardMaterial,
+            MeshToonMaterial: MeshToonMaterial,
+            PointsMaterial: PointsMaterial,
+            ShaderMaterial: ShaderMaterial,
+            SpriteMaterial: SpriteMaterial,
+            LineDashedMaterial: LineDashedMaterial
         })
         const classes_of_geometries = this.classes_of_geometries = new ClassesDataDict({
-            BoxBufferGeometry: THREE.BoxBufferGeometry,
-            ConeBufferGeometry: THREE.ConeBufferGeometry,
-            RingBufferGeometry: THREE.RingBufferGeometry,
-            TextBufferGeometry: THREE.TextBufferGeometry,
-            TubeBufferGeometry: THREE.TubeBufferGeometry,
-            LatheBufferGeometry: THREE.LatheBufferGeometry,
-            PlaneBufferGeometry: THREE.PlaneBufferGeometry,
-            ShapeBufferGeometry: THREE.ShapeBufferGeometry,
-            TorusBufferGeometry: THREE.TorusBufferGeometry,
-            CircleBufferGeometry: THREE.CircleBufferGeometry,
-            SphereBufferGeometry: THREE.SphereBufferGeometry,
-            ExtrudeBufferGeometry: THREE.ExtrudeBufferGeometry,
-            CylinderBufferGeometry: THREE.CylinderBufferGeometry,
-            InstancedBufferGeometry: THREE.InstancedBufferGeometry,
-            OctahedronBufferGeometry: THREE.OctahedronBufferGeometry,
-            ParametricBufferGeometry: THREE.ParametricBufferGeometry,
-            PolyhedronBufferGeometry: THREE.PolyhedronBufferGeometry,
-            BoxGeometry: THREE.BoxBufferGeometry,
-            ConeGeometry: THREE.ConeBufferGeometry,
-            RingGeometry: THREE.RingBufferGeometry,
-            TextGeometry: THREE.TextBufferGeometry,
-            TubeGeometry: THREE.TubeBufferGeometry,
-            LatheGeometry: THREE.LatheBufferGeometry,
-            PlaneGeometry: THREE.PlaneBufferGeometry,
-            ShapeGeometry: THREE.ShapeBufferGeometry,
-            TorusGeometry: THREE.TorusBufferGeometry,
-            CircleGeometry: THREE.CircleBufferGeometry,
-            SphereGeometry: THREE.SphereBufferGeometry,
-            ExtrudeGeometry: THREE.ExtrudeBufferGeometry,
-            CylinderGeometry: THREE.CylinderBufferGeometry,
-            InstancedGeometry: THREE.InstancedBufferGeometry,
-            OctahedronGeometry: THREE.OctahedronBufferGeometry,
-            ParametricGeometry: THREE.ParametricBufferGeometry,
-            PolyhedronGeometry: THREE.PolyhedronBufferGeometry,
+            BoxBufferGeometry: BoxBufferGeometry,
+            ConeBufferGeometry: ConeBufferGeometry,
+            RingBufferGeometry: RingBufferGeometry,
+            TextBufferGeometry: TextBufferGeometry,
+            TubeBufferGeometry: TubeBufferGeometry,
+            LatheBufferGeometry: LatheBufferGeometry,
+            PlaneBufferGeometry: PlaneBufferGeometry,
+            ShapeBufferGeometry: ShapeBufferGeometry,
+            TorusBufferGeometry: TorusBufferGeometry,
+            CircleBufferGeometry: CircleBufferGeometry,
+            SphereBufferGeometry: SphereBufferGeometry,
+            ExtrudeBufferGeometry: ExtrudeBufferGeometry,
+            CylinderBufferGeometry: CylinderBufferGeometry,
+            InstancedBufferGeometry: InstancedBufferGeometry,
+            OctahedronBufferGeometry: OctahedronBufferGeometry,
+            ParametricBufferGeometry: ParametricBufferGeometry,
+            PolyhedronBufferGeometry: PolyhedronBufferGeometry,
+            BoxGeometry: BoxBufferGeometry,
+            ConeGeometry: ConeBufferGeometry,
+            RingGeometry: RingBufferGeometry,
+            TextGeometry: TextBufferGeometry,
+            TubeGeometry: TubeBufferGeometry,
+            LatheGeometry: LatheBufferGeometry,
+            PlaneGeometry: PlaneBufferGeometry,
+            ShapeGeometry: ShapeBufferGeometry,
+            TorusGeometry: TorusBufferGeometry,
+            CircleGeometry: CircleBufferGeometry,
+            SphereGeometry: SphereBufferGeometry,
+            ExtrudeGeometry: ExtrudeBufferGeometry,
+            CylinderGeometry: CylinderBufferGeometry,
+            InstancedGeometry: InstancedBufferGeometry,
+            OctahedronGeometry: OctahedronBufferGeometry,
+            ParametricGeometry: ParametricBufferGeometry,
+            PolyhedronGeometry: PolyhedronBufferGeometry,
         })
         this.Schema = Schema
         this.SCHEMA_CORE = SCHEMA_CORE
@@ -263,10 +263,10 @@ class ResourceManager extends BasicObject {
                 let uniform = template_data.params.uniforms[name]
                 console.log(uniform)
                 if (uniform.type === "v3" && isArray(uniform.value)) {
-                    uniform.value = new THREE.Vector3(...uniform.value)
+                    uniform.value = new Vector3(...uniform.value)
                 }
                 if (uniform.type === "v2" && isArray(uniform.value)) {
-                    uniform.value = new THREE.Vector2(...uniform.value)
+                    uniform.value = new Vector2(...uniform.value)
                 }
             }
         }
@@ -411,7 +411,7 @@ class ResourceManager extends BasicObject {
     load_from_texture_lib(src, params) {
         let name = src.replace("@", "")
         let image = new Image();
-        let texture = new THREE.Texture();
+        let texture = new Texture();
         image.src = textures_lib[name].base64
         texture.image = image;
         image.onload = function () {
@@ -438,7 +438,7 @@ class ResourceManager extends BasicObject {
                 if (params && (params.filter !== undefined || params.maxsize !== undefined)) {
                     texture = image_filter.get_texture(src, params.filter || "", params.maxsize || 1024)
                 } else {
-                    texture = this.cached_textures[src] = new THREE.TextureLoader().load(image_src);
+                    texture = this.cached_textures[src] = new TextureLoader().load(image_src);
                 }
             }
         }
@@ -527,11 +527,11 @@ class ResourceManager extends BasicObject {
     async load_audio(src, spatial = true, autoplay = false) {
         let sound = undefined
         if (spatial === true) {
-            sound = new THREE.PositionalAudio(audio_listener)
+            sound = new PositionalAudio(audio_listener)
             // const helper = new PositionalAudioHelper(sound);
             // sound.helper = helper
         } else {
-            sound = new THREE.Audio(audio_listener)
+            sound = new Audio(audio_listener)
         }
 
         sound.autoplay = autoplay
@@ -572,13 +572,11 @@ class ResourceManager extends BasicObject {
     preload_classes(ns, context, category) {
         this.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".js", "");
-            THREE[category] = THREE[category] || {}
-            THREE[category][name] = mod.default
-            if (isObject(THREE[category][name])) {
-                THREE[category][name].ResourceManager = this
-            }
             this[`classes_of_${category}`] = this[`classes_of_${category}`] || {}
             this[`classes_of_${category}`][name] = mod.default
+            if (isObject(this[`classes_of_${category}`][name])) {
+                this[`classes_of_${category}`][name].ResourceManager = this
+            }
         })
     }
     preload_textures(ns, context) {
@@ -644,7 +642,7 @@ class ResourceManager extends BasicObject {
             this.asset_stats.materials_count++
             let template = templates_of_materials[`${ns}.${name}`] = mod;
             if (template.params) {
-                let shader_lib_uniforms = THREE.ShaderLib[template.params.extend]
+                let shader_lib_uniforms = ShaderLib[template.params.extend]
                 shader_lib_uniforms = shader_lib_uniforms !== undefined ? shader_lib_uniforms.uniforms : {}
                 let uniforms = {
                     ...shader_lib_uniforms,
@@ -744,8 +742,8 @@ class ResourceManager extends BasicObject {
                     }
                 }
             }
-            for (let s in THREE.ShaderChunk) {
-                code = code.replace(`#include <${s}>`, THREE.ShaderChunk[s])
+            for (let s in ShaderChunk) {
+                code = code.replace(`#include <${s}>`, ShaderChunk[s])
             }
         }
         return code
@@ -758,7 +756,7 @@ class ResourceManager extends BasicObject {
     load_context() {
 
     }
-    create_object(object_class, options){
+    create_object(object_class, options) {
         return new this.classes_of_objects[object_class](options)
     }
 }

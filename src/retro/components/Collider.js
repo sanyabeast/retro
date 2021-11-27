@@ -6,7 +6,7 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { Color, MeshBasicMaterial, SphereBufferGeometry, BoxBufferGeometry, Mesh } from 'three';
 
 const COLLIDER_WIREFRAME_COLOR = "#8bc34a"
 
@@ -18,12 +18,12 @@ function get_collider_color(collider_id) {
     let id = `${r}|${g}|${b}`
     return {
         id,
-        color: new THREE.Color(r / 255, g / 255, b / 255)
+        color: new Color(r / 255, g / 255, b / 255)
     }
 }
 function get_colorid_material(collider_id) {
     let color_data = get_collider_color(collider_id)
-    let mat = new THREE.MeshBasicMaterial({ color: color_data.color })
+    let mat = new MeshBasicMaterial({ color: color_data.color })
     return {
         id: color_data.id,
         material: mat
@@ -68,7 +68,7 @@ class Collider extends SceneComponent {
         this.meta.layers.rendering = false
     }
     on_create() {
-        let wireframe_mat = this.wireframe_mat = new THREE.MeshBasicMaterial({
+        let wireframe_mat = this.wireframe_mat = new MeshBasicMaterial({
             wireframe: true,
             color: COLLIDER_WIREFRAME_COLOR,
             opacity: 0.1,
@@ -76,12 +76,12 @@ class Collider extends SceneComponent {
         })
 
         /**raycast collider */
-        let sphere_mesh = this.sphere_mesh = new THREE.Mesh(
-            new THREE.SphereBufferGeometry(1, 12, 6),
+        let sphere_mesh = this.sphere_mesh = new Mesh(
+            new SphereBufferGeometry(1, 12, 6),
             wireframe_mat
         )
-        let box_mesh = this.box_mesh = new THREE.Mesh(
-            new THREE.BoxBufferGeometry(1, 1, 1, 1),
+        let box_mesh = this.box_mesh = new Mesh(
+            new BoxBufferGeometry(1, 1, 1, 1),
             wireframe_mat
         )
 
@@ -92,12 +92,12 @@ class Collider extends SceneComponent {
         this.colorid_id = colorid_material_data.id
         Collider.colorid_list[this.colorid_id] = this
 
-        let colorid_sphere_mesh = this.colorid_sphere_mesh = new THREE.Mesh(
-            new THREE.SphereBufferGeometry(1, 12, 6),
+        let colorid_sphere_mesh = this.colorid_sphere_mesh = new Mesh(
+            new SphereBufferGeometry(1, 12, 6),
             colorid_material_data.material
         )
-        let colorid_box_mesh = this.colorid_box_mesh = new THREE.Mesh(
-            new THREE.BoxBufferGeometry(1, 1, 1, 1),
+        let colorid_box_mesh = this.colorid_box_mesh = new Mesh(
+            new BoxBufferGeometry(1, 1, 1, 1),
             colorid_material_data.material
         )
 

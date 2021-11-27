@@ -6,7 +6,7 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { CubeRefractionMapping, Color, LightProbe, UVMapping } from 'three';
 import { LightProbeGenerator } from 'three/examples/jsm/lights/LightProbeGenerator';
 
 class SkyBox extends SceneComponent {
@@ -41,7 +41,7 @@ class SkyBox extends SceneComponent {
                         this.color,
                         this.cubemap,
                         this.texture,
-                        THREE.CubeRefractionMapping,
+                        CubeRefractionMapping,
                         cubemap => {
                             if (this.light_probe_enabled) {
                                 this.light_probe.copy(LightProbeGenerator.fromCubeTexture(this.scene_background));
@@ -54,7 +54,7 @@ class SkyBox extends SceneComponent {
                         this.color,
                         this.cubemap,
                         this.texture,
-                        THREE.CubeRefractionMapping
+                        CubeRefractionMapping
                     )
                     break
                 }
@@ -81,12 +81,12 @@ class SkyBox extends SceneComponent {
         ]
     }
     on_create() {
-        let light_probe = this.light_probe = new THREE.LightProbe()
+        let light_probe = this.light_probe = new LightProbe()
         light_probe.intensity = this.light_probe_intensity
     }
-    create_background(color = "#ffffff", cubemap = undefined, texture = undefined, mapping = THREE.UVMapping, onload = () => { }) {
+    create_background(color = "#ffffff", cubemap = undefined, texture = undefined, mapping = UVMapping, onload = () => { }) {
         if (cubemap === undefined && texture === undefined) {
-            let c = new THREE.Color()
+            let c = new Color()
             c.set_any(color)
             return c
         } else {

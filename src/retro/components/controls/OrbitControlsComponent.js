@@ -6,7 +6,7 @@
 
 import Component from "retro/Component";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { Vector3 } from 'three';
 
 import OrbitControls from "three/examples/js/controls/OrbitControls"
 
@@ -76,7 +76,7 @@ class OrbitControlsComponent extends Component {
             zoom: this.controls.object.zoom
         }
     }
-    set_controls_state (data){
+    set_controls_state(data) {
         this.target = data.target || [0, 0, 0]
         this.position = data.position || [0, 1, -4]
         this.zoom = data.zoom || 1
@@ -96,7 +96,7 @@ class OrbitControlsComponent extends Component {
                     break;
                 }
                 case "target": {
-                    controls.target = new THREE.Vector3(...this.target)
+                    controls.target = new Vector3(...this.target)
                     break
                 }
                 case "position": {

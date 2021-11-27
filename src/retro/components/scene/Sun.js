@@ -6,7 +6,7 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { DirectionalLight, DirectionalLightHelper, SphereBufferGeometry, MeshPhongMaterial, Color, Mesh, AmbientLight } from 'three';
 import { hex_to_hsl, hsl_to_rgb, hex_to_rgb, console } from "retro/utils/Tools";
 
 class Sun extends SceneComponent {
@@ -66,8 +66,8 @@ class Sun extends SceneComponent {
     on_create() {
 
         /*dir light*/
-        let light = this.light = new THREE.DirectionalLight()
-        let gizmo_dirlight_helper = this.gizmo_dirlight_helper = new THREE.DirectionalLightHelper(light, 5);
+        let light = this.light = new DirectionalLight()
+        let gizmo_dirlight_helper = this.gizmo_dirlight_helper = new DirectionalLightHelper(light, 5);
         if (this.shadows_enabled) {
             if (light.shadow) {
                 light.shadow.mapSize.width = this.shadow_resolution;
@@ -78,16 +78,16 @@ class Sun extends SceneComponent {
             light.castShadow = true
         }
 
-        let amb_light = this.amb_light = new THREE.AmbientLight()
+        let amb_light = this.amb_light = new AmbientLight()
 
         amb_light.color.set_any(this.d_amb_color)
 
         /**sphere */
-        let sphere = this.sphere = this.subject = new THREE.Mesh(
-            new THREE.SphereBufferGeometry(1, 32, 32),
-            new THREE.MeshPhongMaterial({
-                emissive: new THREE.Color(1, 1, 1),
-                color: new THREE.Color(1, 1, 1),
+        let sphere = this.sphere = this.subject = new Mesh(
+            new SphereBufferGeometry(1, 32, 32),
+            new MeshPhongMaterial({
+                emissive: new Color(1, 1, 1),
+                color: new Color(1, 1, 1),
                 emissiveIntensity: 10000,
                 fog: false
             })
@@ -102,8 +102,8 @@ class Sun extends SceneComponent {
         sphere.frustumCulled = false
 
 
-        this.d_color3 = new THREE.Color()
-        this.n_color3 = new THREE.Color()
+        this.d_color3 = new Color()
+        this.n_color3 = new Color()
         this.d_color3.set_any(this.d_color)
         this.n_color3.set_any(this.n_color)
 

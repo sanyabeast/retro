@@ -6,7 +6,7 @@
 
 import Component from "retro/Component";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { Mesh } from 'three';
 import MeshComponent from "retro/components/scene/MeshComponent"
 import { Vector2 } from "spine-ts-threejs";
 
@@ -30,7 +30,7 @@ class MovieClipComponent extends MeshComponent {
             }
         )
 
-        let mesh = this.subject = new THREE.Mesh({
+        let mesh = this.subject = new Mesh({
             geometry,
             material
         })

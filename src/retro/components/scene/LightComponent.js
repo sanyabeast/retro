@@ -6,11 +6,11 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { TextureLoader, SpriteMaterial, DirectionalLight, HemisphereLight, PointLight, SpotLight, RectAreaLight, Sprite } from 'three';
 import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 
-const LAMP_ICON_TEXTURE = new THREE.TextureLoader().load('res/retro/gizmo/lamp_a.png');
-const LAMP_ICON_MATERIAL = new THREE.SpriteMaterial({ map: LAMP_ICON_TEXTURE });
+const LAMP_ICON_TEXTURE = new TextureLoader().load('res/retro/gizmo/lamp_a.png');
+const LAMP_ICON_MATERIAL = new SpriteMaterial({ map: LAMP_ICON_TEXTURE });
 
 class LightComponent extends SceneComponent {
     type = "PointLight"
@@ -47,11 +47,11 @@ class LightComponent extends SceneComponent {
 
         switch (this.type) {
             case "HemisphereLight": {
-                light = this.subject = new THREE.HemisphereLight(this.sky_color, this.ground_color, this.intensity)
+                light = this.subject = new HemisphereLight(this.sky_color, this.ground_color, this.intensity)
                 break
             }
             case "DirectionalLight": {
-                light = this.subject = new THREE.DirectionalLight({
+                light = this.subject = new DirectionalLight({
                     intensity: this.intensity,
                     color: this.color,
                     decay: this.decay,
@@ -61,12 +61,12 @@ class LightComponent extends SceneComponent {
                 break
             }
             case "PointLight": {
-                light = this.subject = new THREE.PointLight(this.color, this.intensity, this.distance, this.decay)
+                light = this.subject = new PointLight(this.color, this.intensity, this.distance, this.decay)
                 console.log(this)
                 break
             }
             case "RectAreaLight": {
-                light = this.subject = new THREE.RectAreaLight(this.color, this.intensity, this.rect_width, this.rect_height)
+                light = this.subject = new RectAreaLight(this.color, this.intensity, this.rect_width, this.rect_height)
 
                 /**gizmo */
                 let rect_area_helper = this.rect_area_helper = new RectAreaLightHelper(this.subject)
@@ -80,16 +80,8 @@ class LightComponent extends SceneComponent {
                 break
             }
             case "SpotLight": {
-                light = this.subject = new THREE.SpotLight(this.color)
+                light = this.subject = new SpotLight(this.color)
                 break
-            }
-            default: {
-                light = this.subject = new THREE[this.type]({
-                    intensity: this.intensity,
-                    color: this.color,
-                    decay: this.decay,
-                    distance: this.distance,
-                })
             }
         }
 
@@ -110,7 +102,7 @@ class LightComponent extends SceneComponent {
         }
 
         /**gizmo */
-        const gizmo_lamp_icon = this.gizmo_lamp_icon = new THREE.Sprite(LAMP_ICON_MATERIAL);
+        const gizmo_lamp_icon = this.gizmo_lamp_icon = new Sprite(LAMP_ICON_MATERIAL);
         gizmo_lamp_icon.scale.set(0.05, 0.05, 0.05)
         gizmo_lamp_icon.material.sizeAttenuation = false
         gizmo_lamp_icon.material.depthTest = false

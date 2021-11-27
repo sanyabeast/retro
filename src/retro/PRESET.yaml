@@ -4,3 +4,4 @@ basic_object_default_tickrate: 30
 renderer_default_target_fps: 30
 no_greetings: false
 clock_component_default_tick_loop_type: "worker"
+spine_component_spine_version: 38

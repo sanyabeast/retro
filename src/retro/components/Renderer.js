@@ -7,17 +7,27 @@
 
 import Component from "retro/Component";
 import { Vector2 } from "spine-ts-threejs";
-import * as THREE from 'three';
+import {
+    Vector3,
+    Scene,
+    MeshNormalMaterial,
+    MeshBasicMaterial,
+    MeshDepthMaterial,
+    MeshDistanceMaterial,
+    MeshMatcapMaterial,
+    Object3D,
+    WebGLRenderer,
+    PCFSoftShadowMap,
+    DirectionalLight
+} from 'three';
 import Device from "retro/utils/Device";
 import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
 import { isArray, isObject, map, debounce, throttle } from "lodash-es"
-import Schema from "retro/utils/Schema"
-import { Object3D } from "three/src/core/Object3D";
 import { WebGLShadowMap } from "three/src/renderers/webgl/WebGLShadowMap"
 
-const $v3 = new THREE.Vector3()
+const $v3 = new Vector3()
 
-// THREE.Object3D.DefaultMatrixAutoUpdate = false
+// Object3D.DefaultMatrixAutoUpdate = false
 
 /**THREEJS PATCHES*/
 Object3D.matrix_cache = {}
@@ -70,7 +80,7 @@ WebGLShadowMap.prototype.render = function (lights, scene, camera) {
 /**!THREEJS PATCHES */
 
 /** */
-class RenderScene extends THREE.Scene { }
+class RenderScene extends Scene { }
 
 const renderer_presets = {
     desktop: {
@@ -114,14 +124,14 @@ class Renderer extends Component {
     progressive_lightmap_dirlight = undefined
 
     current_override_material = null
-    override_normal_material = new THREE.MeshNormalMaterial()
-    override_depth_material = new THREE.MeshDepthMaterial()
-    override_distance_material = new THREE.MeshDistanceMaterial()
-    override_wireframe_material = new THREE.MeshBasicMaterial({ wireframe: true, wireframeLinewidth: 1, fog: false })
-    override_matcap_material = new THREE.MeshMatcapMaterial({ fog: false, matcap: "res/retro/matcap_texture/matcap (1).png" })
+    override_normal_material = new MeshNormalMaterial()
+    override_depth_material = new MeshDepthMaterial()
+    override_distance_material = new MeshDistanceMaterial()
+    override_wireframe_material = new MeshBasicMaterial({ wireframe: true, wireframeLinewidth: 1, fog: false })
+    override_matcap_material = new MeshMatcapMaterial({ fog: false, matcap: "res/retro/matcap_texture/matcap (1).png" })
 
     object_layers = undefined
-    zero_object = new THREE.Object3D()
+    zero_object = new Object3D()
 
     original_threejs_webgl_shadowmap_render = undefined
     prev_shadowmap_render_time = +new Date
@@ -139,7 +149,7 @@ class Renderer extends Component {
             gizmo: process.env.NODE_ENV === "development"
         }
         let render_scene = this.render_scene = new RenderScene()
-        let renderer = this.renderer = this.globals.renderer = new THREE.WebGLRenderer({
+        let renderer = this.renderer = this.globals.renderer = new WebGLRenderer({
             antialias: false,
             alpha: false,
             // preserveDrawingBuffer: true,
@@ -163,7 +173,7 @@ class Renderer extends Component {
 
         /**shadowmap */
         renderer.shadowMap.enabled = this.shadows_enabled && !Device.is_mobile
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap
+        renderer.shadowMap.type = PCFSoftShadowMap
         renderer.shadowMap.autoUpdate = false
 
         /**@TODO:move shadowmap patch to prototype of WebGLShadowMap class ? */
@@ -351,7 +361,7 @@ class Renderer extends Component {
     setup_progressive_lightmap() {
         let renderer = this.renderer
         this.progressive_lightmap = new ProgressiveLightMap(renderer, 1024);
-        let dirlight = this.progressive_lightmap_dirlight = new THREE.DirectionalLight(0xffffff, 1.0)
+        let dirlight = this.progressive_lightmap_dirlight = new DirectionalLight(0xffffff, 1.0)
         dirlight.castShadow = true;
         dirlight.shadow.camera.near = 100;
         dirlight.shadow.camera.far = 5000;

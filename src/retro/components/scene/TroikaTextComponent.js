@@ -5,7 +5,7 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { ShaderMaterial } from 'three';
 
 import { Text } from "troika-three-text";
 
@@ -44,7 +44,7 @@ class TroikaTextComponent extends SceneComponent {
         subject.depthWrite = false
         subject.depthTest = false
         subject.stencilWrite = false
-        subject.material._depthMaterial = subject._depthMaterial = new THREE.ShaderMaterial({
+        subject.material._depthMaterial = subject._depthMaterial = new ShaderMaterial({
             vertexShader: `
                 void main(){
                     gl_FragCoord = vec4(0., 0., 0., 1.);

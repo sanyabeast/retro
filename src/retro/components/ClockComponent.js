@@ -6,7 +6,6 @@
 
 
 import Component from "retro/Component";
-import * as THREE from 'three';
 import * as worker_timers from 'worker-timers';
 
 let tick_loop_types = ["worker", "default", "raf"]

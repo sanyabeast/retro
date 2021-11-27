@@ -6,11 +6,11 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { SphereBufferGeometry, MeshBasicMaterial, Mesh, Object3D, Vector3 } from 'three';
 import { log, error, is_none, console } from "retro/utils/Tools"
 import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefined, isNull, map, filter, keys, values, set, get, unset } from "lodash-es"
 import Schema from "retro/utils/Schema"
-const $v3 = new THREE.Vector3()
+const $v3 = new Vector3()
 
 class Anchor extends SceneComponent {
     parent_object = undefined
@@ -24,10 +24,10 @@ class Anchor extends SceneComponent {
         return [r.x, r.y, r.z]
     }
     on_create() {
-        this.subject = new THREE.Object3D()
-        this.anchor_gizmo = new THREE.Mesh(
-            new THREE.SphereBufferGeometry(0.05, 2, 2),
-            new THREE.MeshBasicMaterial({ wireframe: true, color: "#ff00ff" })
+        this.subject = new Object3D()
+        this.anchor_gizmo = new Mesh(
+            new SphereBufferGeometry(0.05, 2, 2),
+            new MeshBasicMaterial({ wireframe: true, color: "#ff00ff" })
         )
     }
     get_render_data() {

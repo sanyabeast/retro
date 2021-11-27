@@ -3,7 +3,7 @@
  *
  */
 
-import * as THREE from 'three';
+import { Mesh, Material, Color } from 'three';
 import ResourceManager from "retro/ResourceManager";
 import SceneComponent from "retro/SceneComponent";
 import { set, get, isString, isFunction, isArray, isNumber } from "lodash-es"
@@ -47,7 +47,7 @@ class MeshComponent extends SceneComponent {
             ? MeshComponent.create_material(params.material)
             : undefined;
 
-        let mesh = new THREE.Mesh(geometry, material);
+        let mesh = new Mesh(geometry, material);
 
         if (params) {
             if (params.geometry_translation) {
@@ -130,7 +130,7 @@ class MeshComponent extends SceneComponent {
                 material[param_name] = param_value
                 break;
             }
-            case (current_value instanceof THREE.Color): {
+            case (current_value instanceof Color): {
                 material[param_name].set_any(param_value)
                 break
             }
@@ -154,7 +154,7 @@ class MeshComponent extends SceneComponent {
                         })
                     }
                 })
-            } else if (this.subject.material instanceof THREE.Material) {
+            } else if (this.subject.material instanceof Material) {
                 let material = this.subject.material_layers
                 if (params.layer === undefined || params.all_layers === true) {
                     this._set_material_param(material, name, value)
