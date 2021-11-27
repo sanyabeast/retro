@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "retro",
-    "version": "1.0.236",
+    "version": "1.0.258",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
@@ -80,7 +80,6 @@
         "keycode": "^2.2.0",
         "regenerator-runtime": "^0.13.9",
         "save-pixels": "^2.3.6",
-        "spine-ts-threejs": "^1.1.7",
         "stats.js": "^0.17.0",
         "troika-three-text": "^0.42.0",
         "vuex": "^3.6.2",

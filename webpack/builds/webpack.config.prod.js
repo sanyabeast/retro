@@ -1,10 +1,26 @@
 "use strict";
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const WebpackAutoInject = require("webpack-auto-inject-version");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const path = require("path");
 const root = path.join(__dirname, "../..");
+
+const terser_options = {
+    ecma: undefined,
+    parse: {},
+    compress: {},
+    mangle: true, // Note `mangle.properties` is `false` by default.
+    module: false,
+    // Deprecated
+    output: null,
+    format: null,
+    toplevel: false,
+    nameCache: null,
+    ie8: false,
+    keep_classnames: true,
+    keep_fnames: false,
+    safari10: false,
+}
 
 module.exports = {
     entry: {
@@ -15,25 +31,14 @@ module.exports = {
         minimize: true,
         minimizer: [
             new TerserPlugin({
-                terserOptions: {
-                    ecma: undefined,
-                    warnings: false,
-                    parse: {},
-                    compress: {},
-                    mangle: true,
-                    module: false,
-                    output: null,
-                    toplevel: false,
-                    nameCache: null,
-                    ie8: false,
-                    keep_classnames: undefined,
-                    keep_fnames: true, // change to true here
-                    safari10: false,
-                },
+                terserOptions: terser_options,
             }),
         ],
     },
     plugins: [
+        new TerserPlugin({
+            terserOptions: terser_options,
+        }),
         new WebpackAutoInject({
             // specify the name of the tag in the outputed files eg
             // bundle.js: [SHORT]  Version: 0.13.36 ...

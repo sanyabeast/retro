@@ -6,10 +6,10 @@
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager"
 import { forEach, isUndefined, isArray } from "lodash-es";
+import { log } from "retro/utils/Tools"
 const path = require("path")
 let spine = undefined
 
-// import spine from "spine/spine-threejs.js";
 
 /**TODO. Clearing */
 const POOL = {}
@@ -17,16 +17,18 @@ const POOL = {}
 switch (PRESET.SPINE_VERSION) {
     case 38: {
         spine = require("spine/spine-threejs-38.js").default
-        // spine = require("spine/spine-all-38.js").default
         break
     }
     case 40: {
-        spine = require("spine/spine-threejs-40.js").default
+        //spine = require("spine/spine-threejs-40.js").default
         break
     }
     default:
         break;
 }
+
+log(`SpineComponent`, `spine version: ${PRESET.SPINE_VERSION}`)
+
 class SpineAnimationPlayer extends SceneComponent {
     src = "res/spine/raptor.json";
     animation_name = undefined;

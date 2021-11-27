@@ -8,7 +8,6 @@ import Component from "retro/Component";
 import ResourceManager from "retro/ResourceManager";
 import { Mesh } from 'three';
 import MeshComponent from "retro/components/scene/MeshComponent"
-import { Vector2 } from "spine-ts-threejs";
 
 class MovieClipComponent extends MeshComponent {
     current_frame = 0

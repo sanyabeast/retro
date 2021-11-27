@@ -1,4 +1,26 @@
-import * as THREE from "three"
+
+import {
+	Mesh,
+	BufferGeometry,
+	InterleavedBuffer,
+	InterleavedBufferAttribute,
+	BufferAttribute,
+	ShaderMaterial,
+	Texture,
+	Material,
+	Object3D,
+	LinearFilter,
+	LinearMipMapLinearFilter,
+	LinearMipMapNearestFilter,
+	NearestMipMapLinearFilter,
+	NearestMipMapNearestFilter,
+	NearestFilter,
+	RepeatWrapping,
+	MirroredRepeatWrapping,
+	ClampToEdgeWrapping,
+	DoubleSide
+} from "three"
+
 
 var __extends = (this && this.__extends) || (function () {
 	var extendStatics = function (d, b) {
@@ -8228,7 +8250,7 @@ var spine;
 	(function (threejs) {
 		var MeshBatcher = (function (_super) {
 			class MeshBatcher extends _super {
-				constructor (maxVertices, materialCustomizer) {
+				constructor(maxVertices, materialCustomizer) {
 					super()
 					if (maxVertices === void 0) { maxVertices = 10920; }
 					if (materialCustomizer === void 0) { materialCustomizer = function (parameters) { }; }
@@ -8239,13 +8261,13 @@ var spine;
 						throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 					var vertices = _this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
 					var indices = _this.indices = new Uint16Array(maxVertices * 3);
-					var geo = new THREE.BufferGeometry();
-					var vertexBuffer = _this.vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
+					var geo = new BufferGeometry();
+					var vertexBuffer = _this.vertexBuffer = new InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
 					vertexBuffer.usage = WebGLRenderingContext.DYNAMIC_DRAW;
-					geo.setAttribute("position", new THREE.InterleavedBufferAttribute(vertexBuffer, 3, 0, false));
-					geo.setAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
-					geo.setAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
-					geo.setIndex(new THREE.BufferAttribute(indices, 1));
+					geo.setAttribute("position", new InterleavedBufferAttribute(vertexBuffer, 3, 0, false));
+					geo.setAttribute("color", new InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
+					geo.setAttribute("uv", new InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
+					geo.setIndex(new BufferAttribute(indices, 1));
 					geo.getIndex().usage = WebGLRenderingContext.DYNAMIC_DRAW;
 					;
 					geo.drawRange.start = 0;
@@ -8257,12 +8279,12 @@ var spine;
 			}
 			MeshBatcher.prototype.dispose = function () {
 				this.geometry.dispose();
-				if (this.material instanceof THREE.Material)
+				if (this.material instanceof Material)
 					this.material.dispose();
 				else if (this.material) {
 					for (var i = 0; i < this.material.length; i++) {
 						var material = this.material[i];
-						if (material instanceof THREE.Material)
+						if (material instanceof Material)
 							material.dispose();
 					}
 				}
@@ -8320,7 +8342,7 @@ var spine;
 			};
 			MeshBatcher.VERTEX_SIZE = 9;
 			return MeshBatcher;
-		}(THREE.Mesh));
+		}(Mesh));
 		threejs.MeshBatcher = MeshBatcher;
 	})(threejs = spine.threejs || (spine.threejs = {}));
 })(spine || (spine = {}));
@@ -8330,7 +8352,7 @@ var spine;
 	(function (threejs) {
 		var SkeletonMeshMaterial = (function (_super) {
 			class SkeletonMeshMaterial extends _super {
-				constructor (customizer) {
+				constructor(customizer) {
 					var vertexShader = "\n\t\t\t\tattribute vec4 color;\n\t\t\t\tvarying vec2 vUv;\n\t\t\t\tvarying vec4 vColor;\n\t\t\t\tvoid main() {\n\t\t\t\t\tvUv = uv;\n\t\t\t\t\tvColor = color;\n\t\t\t\t\tgl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);\n\t\t\t\t}\n\t\t\t";
 					var fragmentShader = "\n\t\t\t\tuniform sampler2D map;\n\t\t\t\tvarying vec2 vUv;\n\t\t\t\tvarying vec4 vColor;\n\t\t\t\tvoid main(void) {\n\t\t\t\t\tgl_FragColor = texture2D(map, vUv)*vColor;\n\t\t\t\t}\n\t\t\t";
 					var parameters = {
@@ -8339,7 +8361,7 @@ var spine;
 						},
 						vertexShader: vertexShader,
 						fragmentShader: fragmentShader,
-						side: THREE.DoubleSide,
+						side: DoubleSide,
 						transparent: true,
 						alphaTest: 0.5
 					};
@@ -8349,11 +8371,11 @@ var spine;
 			}
 
 			return SkeletonMeshMaterial;
-		}(THREE.ShaderMaterial));
+		}(ShaderMaterial));
 		threejs.SkeletonMeshMaterial = SkeletonMeshMaterial;
 		var SkeletonMesh = (function (_super) {
 			class SkeletonMesh extends _super {
-				constructor (skeletonData, materialCustomizer) {
+				constructor(skeletonData, materialCustomizer) {
 					super()
 					if (materialCustomizer === void 0) { materialCustomizer = function (parameters) { }; }
 					var _this = this;
@@ -8571,7 +8593,7 @@ var spine;
 			SkeletonMesh.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 			SkeletonMesh.VERTEX_SIZE = 2 + 2 + 4;
 			return SkeletonMesh;
-		}(THREE.Object3D));
+		}(Object3D));
 		threejs.SkeletonMesh = SkeletonMesh;
 	})(threejs = spine.threejs || (spine.threejs = {}));
 })(spine || (spine = {}));
@@ -8583,7 +8605,7 @@ var spine;
 			__extends(ThreeJsTexture, _super);
 			function ThreeJsTexture(image) {
 				var _this = _super.call(this, image) || this;
-				_this.texture = new THREE.Texture(image);
+				_this.texture = new Texture(image);
 				_this.texture.flipY = false;
 				_this.texture.needsUpdate = true;
 				return _this;
@@ -8601,27 +8623,27 @@ var spine;
 			};
 			ThreeJsTexture.toThreeJsTextureFilter = function (filter) {
 				if (filter === spine.TextureFilter.Linear)
-					return THREE.LinearFilter;
+					return LinearFilter;
 				else if (filter === spine.TextureFilter.MipMap)
-					return THREE.LinearMipMapLinearFilter;
+					return LinearMipMapLinearFilter;
 				else if (filter === spine.TextureFilter.MipMapLinearNearest)
-					return THREE.LinearMipMapNearestFilter;
+					return LinearMipMapNearestFilter;
 				else if (filter === spine.TextureFilter.MipMapNearestLinear)
-					return THREE.NearestMipMapLinearFilter;
+					return NearestMipMapLinearFilter;
 				else if (filter === spine.TextureFilter.MipMapNearestNearest)
-					return THREE.NearestMipMapNearestFilter;
+					return NearestMipMapNearestFilter;
 				else if (filter === spine.TextureFilter.Nearest)
-					return THREE.NearestFilter;
+					return NearestFilter;
 				else
 					throw new Error("Unknown texture filter: " + filter);
 			};
 			ThreeJsTexture.toThreeJsTextureWrap = function (wrap) {
 				if (wrap === spine.TextureWrap.ClampToEdge)
-					return THREE.ClampToEdgeWrapping;
+					return ClampToEdgeWrapping;
 				else if (wrap === spine.TextureWrap.MirroredRepeat)
-					return THREE.MirroredRepeatWrapping;
+					return MirroredRepeatWrapping;
 				else if (wrap === spine.TextureWrap.Repeat)
-					return THREE.RepeatWrapping;
+					return RepeatWrapping;
 				else
 					throw new Error("Unknown texture wrap: " + wrap);
 			};

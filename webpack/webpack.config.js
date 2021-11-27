@@ -52,7 +52,7 @@ function load_preset(app_name) {
 
 function get_output_config(app_name, preset) {
     let output_path
-    if (preset.is_example) {
+    if (preset.IS_EXAMPLE) {
         output_path = path.join(root, `dist`, app_name)
     } else {
         output_path = path.join(root, `src`, 'apps', app_name, 'dist')
@@ -160,7 +160,8 @@ module.exports = (env) => {
             alias: {
                 "@": path.resolve(__dirname, "src"),
                 vue: 'vue/dist/vue.js',
-                three: 'retro/lib/three'
+                three: 'retro/lib/three',
+                "../../../build/three.module.js": "retro/lib/three"
             },
         },
     };

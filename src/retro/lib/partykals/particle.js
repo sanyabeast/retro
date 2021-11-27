@@ -5,7 +5,6 @@
 */
 const THREE = require('./_three');
 const Utils = require('./utils');
-const { Color } = require('spine-ts-threejs');
 
 
 /**

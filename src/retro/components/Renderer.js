@@ -6,8 +6,8 @@
 
 
 import Component from "retro/Component";
-import { Vector2 } from "spine-ts-threejs";
 import {
+    Vector2,
     Vector3,
     Scene,
     MeshNormalMaterial,
