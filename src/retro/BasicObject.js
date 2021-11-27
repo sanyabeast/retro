@@ -6,7 +6,7 @@ import ResourceManager from "retro/ResourceManager"
 import Schema from "retro/utils/Schema"
 import * as Tools from "retro/utils/Tools"
 
-if (PRESET.no_greetings !== true) {
+if (PRESET.NO_GREETING !== true) {
     console.log(
         `         
 %c_____ _____ _____ _____ _____              
@@ -36,7 +36,7 @@ const exclude_props = [
 const $v3 = new Vector3()
 
 class BasicObject extends EventDispatcher {
-    tick_rate = PRESET.basic_object_default_tickrate
+    tick_rate = PRESET.DEFAULT_TICKRATE
     tick_enabled = true
     debug_log_this = false
     UUID = undefined
@@ -65,7 +65,7 @@ class BasicObject extends EventDispatcher {
                 prev_time: +new Date(),
                 delta: 1,
                 ticks: 0,
-                rate: PRESET.basic_object_default_tickrate,
+                rate: PRESET.DEFAULT_TICKRATE,
                 enabled: true
             }
         }

@@ -43,7 +43,6 @@
 
 <script>
 import { mapState } from "vuex";
-import * as THREE from "three";
 import ResourceManager from "retro/ResourceManager";
 import Device from "retro/utils/Device";
 

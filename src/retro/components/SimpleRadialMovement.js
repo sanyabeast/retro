@@ -6,7 +6,6 @@
 
 import Component from "retro/Component";
 import ResourceManager  from "retro/ResourceManager";
-import * as THREE from 'three';
 
 class SimpleRadialMovement extends Component {
     speed = 1;

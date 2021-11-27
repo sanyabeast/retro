@@ -5,7 +5,7 @@
 
 import { log, console } from "retro/utils/Tools";
 import Component from "retro/Component";
-import * as THREE from 'three';
+import { SphereBufferGeometry, MeshNormalMaterial, Mesh, AxesHelper } from 'three';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import { get, isObject, isArray } from "lodash-es"
 
@@ -14,8 +14,8 @@ const exclude_props = [
     "components"
 ]
 
-const ANCHOR_GIZMO_GEOMETRY = new THREE.SphereBufferGeometry(0.0125, 8, 8)
-const ANCHOR_GIZMO_MATERIAL = new THREE.MeshNormalMaterial({
+const ANCHOR_GIZMO_GEOMETRY = new SphereBufferGeometry(0.0125, 8, 8)
+const ANCHOR_GIZMO_MATERIAL = new MeshNormalMaterial({
     opacity: 0.5,
     transparent: true,
     depthWrite: false,
@@ -43,14 +43,14 @@ class SceneComponent extends Component {
         this.rotation = [...this.rotation]
 
         /**gizmos */
-        let anchor_gizmo = this.anchor_gizmo = new THREE.Mesh(
+        let anchor_gizmo = this.anchor_gizmo = new Mesh(
             ANCHOR_GIZMO_GEOMETRY,
             ANCHOR_GIZMO_MATERIAL
 
         )
         anchor_gizmo.renderOrder = 1
 
-        // const axes_gizmo = this.axes_gizmo = new THREE.AxesHelper(0.25);
+        // const axes_gizmo = this.axes_gizmo = new AxesHelper(0.25);
         // axes_gizmo.material.depthWrite = false
         // axes_gizmo.material.depthTest = false
         // axes_gizmo.material.transparent = true

@@ -5,7 +5,6 @@
 
 import ResourceManager from "retro/ResourceManager";
 import DevGUI from "retro/gui/DevGUI.vue"
-import * as THREE from 'three';
 
 import GameObject from "retro/GameObject";
 import { log, console } from "retro/utils/Tools"
@@ -23,7 +22,7 @@ class RetroApp extends GameObject {
 
         this.setup_app()
         this.define_global_var("app", a => this)
-        this.load_prefab(ResourceManager.load_prefab(PRESET.app_persistent_scene, {
+        this.load_prefab(ResourceManager.load_prefab(PRESET.PERSISTENT_SCENE_PREFAB, {
             "components.renderer.params.pixel_ratio": Math.min(window.devicePixelRatio, 2),
             "components.devgui.params.root_component": DevGUI
         }))

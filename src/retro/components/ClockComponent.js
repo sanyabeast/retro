@@ -11,7 +11,7 @@ import * as worker_timers from 'worker-timers';
 let tick_loop_types = ["worker", "default", "raf"]
 
 class ClockComponent extends Component {
-    tick_loop_type = PRESET.clock_component_default_tick_loop_type
+    tick_loop_type = PRESET.TICKING_LOOP_TYPE
     scene_tick_enabled = true
     tick_interval = 1000 / 45
     tick_delta = 1

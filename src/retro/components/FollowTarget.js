@@ -4,7 +4,6 @@
  */
 
 import Component from "retro/Component";
-import * as THREE from 'three';
 
 class FollowTarget extends Component {
     offset = [0, 0, 0];

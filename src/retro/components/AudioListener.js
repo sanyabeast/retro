@@ -1,6 +1,6 @@
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { Object3D } from 'three';
 import { log, error, is_none, console } from "retro/utils/Tools"
 import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefined, isNull, map, filter, keys, values, set, get, unset } from "lodash-es"
 import Schema from "retro/utils/Schema"
@@ -11,7 +11,7 @@ class AudioListener extends SceneComponent {
     on_create() {
         this.log(`created`)
         this.audio_listener = this.globals.audio_listener
-        this.anchor = new THREE.Object3D()
+        this.anchor = new Object3D()
     }
     on_destroy() {
         super.on_destroy(...arguments)

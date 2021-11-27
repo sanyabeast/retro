@@ -6,7 +6,22 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import {
+    MeshNormalMaterial,
+    MeshDepthMaterial,
+    MeshDistanceMaterial,
+    MeshMatcapMaterial,
+    MeshBasicMaterial,
+    MathUtils,
+    RGBAFormat,
+    Vector2,
+    Vector3,
+    OrthographicCamera,
+    PerspectiveCamera,
+    Scene,
+    WebGLRenderTarget,
+    LinearFilter
+} from 'three';
 import { log, error, is_none, console, makeid } from "retro/utils/Tools"
 import { isString, isObject, isFunction, isArray, isNumber, isBoolean, isUndefined, isNull, map, filter, keys, values, set, get, unset } from "lodash-es"
 import Schema from "retro/utils/Schema"
@@ -34,11 +49,11 @@ class RenderTarget extends SceneComponent {
     render_target_state = undefined;
 
     current_override_material = undefined
-    override_normal_material = new THREE.MeshNormalMaterial()
-    override_depth_material = new THREE.MeshDepthMaterial()
-    override_distance_material = new THREE.MeshDistanceMaterial()
-    override_wireframe_material = new THREE.MeshBasicMaterial({ wireframe: true, wireframeLinewidth: 1, fog: false })
-    override_matcap_material = new THREE.MeshMatcapMaterial({ fog: false, matcap: "res/retro/matcap_texture/matcap (1).png" })
+    override_normal_material = new MeshNormalMaterial()
+    override_depth_material = new MeshDepthMaterial()
+    override_distance_material = new MeshDistanceMaterial()
+    override_wireframe_material = new MeshBasicMaterial({ wireframe: true, wireframeLinewidth: 1, fog: false })
+    override_matcap_material = new MeshMatcapMaterial({ fog: false, matcap: "res/retro/matcap_texture/matcap (1).png" })
 
 
 
@@ -60,7 +75,7 @@ class RenderTarget extends SceneComponent {
             resolution_scale: this.resolution_scale,
             camera_type: this.camera_type
         })
-        if (!THREE.MathUtils.isPowerOfTwo(this.width) || !THREE.MathUtils.isPowerOfTwo(this.height)) {
+        if (!MathUtils.isPowerOfTwo(this.width) || !MathUtils.isPowerOfTwo(this.height)) {
             render_target_state.render_target.texture.generateMipmaps = false;
         }
 
@@ -234,8 +249,8 @@ class RenderTarget extends SceneComponent {
 RenderTarget.list = {}
 RenderTarget.get_render_target = ({ id = "", resolution_scale = 0.5, camera_params, mag_filter = "linear" }) => {
 
-    let renderer_size = new THREE.Vector2(1, 1)
-    let render_target_size = new THREE.Vector2(2, 2)
+    let renderer_size = new Vector2(1, 1)
+    let render_target_size = new Vector2(2, 2)
     let canvas2d = document.createElement("canvas")
     let canvas2d_context = canvas2d.getContext("2d")
 
@@ -252,42 +267,42 @@ RenderTarget.get_render_target = ({ id = "", resolution_scale = 0.5, camera_para
     }
 
 
-    let _mag_filter = THREE.LinearFilter
+    let _mag_filter = LinearFilter
     switch (mag_filter) {
         case "linear": {
-            _mag_filter = THREE.LinearFilter
+            _mag_filter = LinearFilter
             break
         }
         case "nearest": {
-            _mag_filter = THREE.NearestFilter
+            _mag_filter = NearestFilter
             break
         }
     }
-    const rt = new THREE.WebGLRenderTarget(512, 512, {
+    const rt = new WebGLRenderTarget(512, 512, {
         minFilter: _mag_filter,
         magFilter: _mag_filter,
-        format: THREE.RGBAFormat
+        format: RGBAFormat
     });
 
     rt.depthBuffer = false
     let camera = undefined
     switch (camera_params.type) {
         case "othographic": {
-            camera = new THREE.OrthographicCamera({
+            camera = new OrthographicCamera({
                 fov: camera_params.fov,
                 aspect: camera_params.aspect,
                 near: camera_params.near,
                 far: camera_params.far,
-                position: new THREE.Vector3(0, 0, 20),
+                position: new Vector3(0, 0, 20),
             });
             break
         }
         default: {
-            camera = new THREE.PerspectiveCamera(camera_params.fov, camera_params.aspect, camera_params.near, camera_params.far);
+            camera = new PerspectiveCamera(camera_params.fov, camera_params.aspect, camera_params.near, camera_params.far);
             break
         }
     }
-    let scene = new THREE.Scene()
+    let scene = new Scene()
     scene.updateWorldMatrix = false
     let render_target_state = {
         resolution_scale,

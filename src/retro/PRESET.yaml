@@ -1,7 +1,7 @@
-is_example: false
-app_persistent_scene: core.scenes.persistent
-basic_object_default_tickrate: 30
-renderer_default_target_fps: 30
-no_greetings: false
-clock_component_default_tick_loop_type: "worker"
-spine_component_spine_version: 38
+IS_EXAMPLE: false
+PERSISTENT_SCENE_PREFAB: core.scenes.persistent
+DEFAULT_TICKRATE: 30
+TARGET_FPS: 30
+NO_GREETING: false
+TICKING_LOOP_TYPE: "worker"
+SPINE_VERSION: 38

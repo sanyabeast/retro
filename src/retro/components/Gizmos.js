@@ -6,7 +6,7 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { AxesHelper, Mesh, SphereBufferGeometry, BoxBufferGeometry, MeshBasicMaterial } from 'three';
 import { flatten } from "lodash-es"
 
 const gizmos_pool = {
@@ -41,13 +41,13 @@ class Gizmos extends SceneComponent {
     }
     on_create() {
         SceneComponent.add_traversal_method("component", "gizmo_draw")
-        let zero_axes_helper_a = this.zero_axes_helper_a = new THREE.AxesHelper(99999)
+        let zero_axes_helper_a = this.zero_axes_helper_a = new AxesHelper(99999)
         zero_axes_helper_a.material.depthWrite = false
         zero_axes_helper_a.material.depthTest = false
         zero_axes_helper_a.material.transparent = true
         zero_axes_helper_a.material.fog = false
         zero_axes_helper_a.renderOrder = 1
-        let zero_axes_helper_b = this.zero_axes_helper_b = new THREE.AxesHelper(99999)
+        let zero_axes_helper_b = this.zero_axes_helper_b = new AxesHelper(99999)
         zero_axes_helper_b.rotation.y = Math.PI
         zero_axes_helper_b.scale.y = -1
         // zero_axes_helper_b.rotation.z = Math.PI
@@ -100,9 +100,9 @@ class Gizmos extends SceneComponent {
         let item = gizmos_pool[type].pop()
         if (!item) {
             switch (type) {
-                case "sphere": item = new THREE.Mesh(new THREE.SphereBufferGeometry(1, 16, 8), new THREE.MeshBasicMaterial({ color: 0xFF0000, transparent: true })); item.gizmo_type = "sphere"; break;
-                case "box": item = new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xFF0000, transparent: true })); item.gizmo_type = "box"; break;
-                case "plane": item = new THREE.Mesh(new THREE.SphereBufferGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xFF0000, transparent: true })); item.gizmo_type = "plane"; break;
+                case "sphere": item = new Mesh(new SphereBufferGeometry(1, 16, 8), new MeshBasicMaterial({ color: 0xFF0000, transparent: true })); item.gizmo_type = "sphere"; break;
+                case "box": item = new Mesh(new BoxBufferGeometry(1, 1, 1), new MeshBasicMaterial({ color: 0xFF0000, transparent: true })); item.gizmo_type = "box"; break;
+                case "plane": item = new Mesh(new SphereBufferGeometry(1, 1, 1), new MeshBasicMaterial({ color: 0xFF0000, transparent: true })); item.gizmo_type = "plane"; break;
             }
         }
         switch (type) {

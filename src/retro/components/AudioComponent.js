@@ -5,15 +5,15 @@
  */
 
 import SceneComponent from "retro/SceneComponent";
-import * as THREE from "three"
+import { Sprite, Object3D, TextureLoader, SpriteMaterial, Vector3 } from "three"
 import ResourceManager from "retro/ResourceManager"
 
-const SPEAKER_ICON_TEXTURE = new THREE.TextureLoader().load('res/retro/gizmo/speaker_a.png');
-const SPEAKER_ICON_MATERIAL = new THREE.SpriteMaterial({ map: SPEAKER_ICON_TEXTURE });
-const SPEAKER_ICON_MATERIAL_SPATIAL = new THREE.SpriteMaterial({ map: SPEAKER_ICON_TEXTURE, color: "#65b2b8" });
+const SPEAKER_ICON_TEXTURE = new TextureLoader().load('res/retro/gizmo/speaker_a.png');
+const SPEAKER_ICON_MATERIAL = new SpriteMaterial({ map: SPEAKER_ICON_TEXTURE });
+const SPEAKER_ICON_MATERIAL_SPATIAL = new SpriteMaterial({ map: SPEAKER_ICON_TEXTURE, color: "#65b2b8" });
 
-const $v3_1 = new THREE.Vector3()
-const $v3_2 = new THREE.Vector3()
+const $v3_1 = new Vector3()
+const $v3_2 = new Vector3()
 
 let global_volume = 0.5;
 
@@ -38,9 +38,9 @@ class AudioComponent extends SceneComponent {
     }
     on_create() {
         console.log(ResourceManager)
-        this.subject = new THREE.Object3D()
+        this.subject = new Object3D()
         /**gizmo */
-        const gizmo_speaker_icon = this.gizmo_speaker_icon = new THREE.Sprite(this.spatial ? SPEAKER_ICON_MATERIAL_SPATIAL : SPEAKER_ICON_MATERIAL);
+        const gizmo_speaker_icon = this.gizmo_speaker_icon = new Sprite(this.spatial ? SPEAKER_ICON_MATERIAL_SPATIAL : SPEAKER_ICON_MATERIAL);
         gizmo_speaker_icon.scale.set(0.05, 0.05, 0.05)
         gizmo_speaker_icon.material.sizeAttenuation = false
         gizmo_speaker_icon.material.depthTest = false

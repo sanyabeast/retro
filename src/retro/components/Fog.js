@@ -6,7 +6,7 @@
 
 import Component from "retro/Component";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { Fog as TFog, FogExp2 as TFogExp2 } from 'three';
 
 class Fog extends Component {
     color = "#1f3556"
@@ -47,8 +47,8 @@ class Fog extends Component {
         })
     }
     on_create() {
-        this.fog_exp = new THREE.FogExp2()
-        this.fog = new THREE.Fog()
+        this.fog_exp = new TFogExp2()
+        this.fog = new TFog()
 
         this.fog_exp.color.set_any(this.color)
         this.fog_exp.density = this.density

@@ -1,6 +1,6 @@
-import * as THREE from 'three';
+import { MeshBasicMaterial } from 'three';
 
-class TestMaterial extends THREE.MeshBasicMaterial {
+class TestMaterial extends MeshBasicMaterial {
 
 }
 

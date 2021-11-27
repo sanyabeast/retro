@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { Vector3, CircleBufferGeometry, PlaneBufferGeometry } from 'three';
 import { Water as TWater } from 'three/examples/jsm/objects/Water2.js';
 import ResourceManager from "retro/ResourceManager"
 import { isNumber } from "lodash-es"
@@ -17,7 +17,7 @@ class Water extends TWater {
             reflectivity: 0.1,
             normalMap0: ResourceManager.load_texture("res/retro/Water_1_M_Normal.jpg"),
             normalMap1: ResourceManager.load_texture("res/retro/Water_1_M_Normal.jpg"),
-            sunDirection: new THREE.Vector3(),
+            sunDirection: new Vector3(),
             sunColor: 0xffffff,
             waterColor: 0x001e0f,
             distortionScale: 1.7,
@@ -29,10 +29,10 @@ class Water extends TWater {
 
         switch (options.geometry) {
             case "cicle":
-                geometry = new THREE.CircleBufferGeometry(options.radius, options.segments).rotateX(-Math.PI / 2)
+                geometry = new CircleBufferGeometry(options.radius, options.segments).rotateX(-Math.PI / 2)
                 break;
             case "plane":
-                geometry = new THREE.PlaneBufferGeometry(options.width, options.height).rotateX(-Math.PI / 2)
+                geometry = new PlaneBufferGeometry(options.width, options.height).rotateX(-Math.PI / 2)
                 break
             default:
                 break;

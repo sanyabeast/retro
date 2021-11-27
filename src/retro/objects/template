@@ -5,9 +5,9 @@
 */
 
 
-import * as THREE from 'three';
+import {Group} from 'three';
 
-class ArrowA extends THREE.Group {
+class ArrowA extends Group {
     constructor(params) {
         params = {
             ...params

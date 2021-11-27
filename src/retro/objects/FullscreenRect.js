@@ -6,17 +6,17 @@
 
 
 import { isNumber } from 'lodash-es';
-import * as THREE from 'three';
+import { PlaneBufferGeometry, ShaderMaterial, Mesh } from 'three';
 
-class FullscreenRect extends THREE.Mesh {
+class FullscreenRect extends Mesh {
     constructor(params) {
         params = {
             map: undefined,
             alphaMap: undefined,
             ...params
         }
-        let geometry = new THREE.PlaneBufferGeometry(1, 1, 1)
-        let material = new THREE.ShaderMaterial({
+        let geometry = new PlaneBufferGeometry(1, 1, 1)
+        let material = new ShaderMaterial({
             vertexShader: `
                 attribute vec3 postion;
                 varying vec2 vUv;

@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { Material, Color, MeshPhongMaterial, MeshLambertMaterial, MeshPhysicalMaterial, DoubleSide } from 'three';
 import { request_text_sync, blend_colors } from 'retro/utils/Tools';
 import Device from 'retro/utils/Device';
 import { isNumber, isBoolean, map, keys, values, forEach, isString, isArray, isUndefined } from "lodash-es"
@@ -44,7 +44,7 @@ const mtl_map_props = [
     "refl"
 ]
 
-class AssetMaterial extends THREE.Material {
+class AssetMaterial extends Material {
     src = ""
     bump_scale = 0.001
     shininess = 0.3333
@@ -131,7 +131,7 @@ class AssetMaterial extends THREE.Material {
                                 break
                             }
                             default: {
-                                v = new THREE.Color(...v3(v))
+                                v = new Color(...v3(v))
                             }
                         }
 
@@ -155,7 +155,7 @@ class AssetMaterial extends THREE.Material {
 
                 if (result.emissiveMap !== undefined) {
                     result.emissiveIntensity = 1
-                    result.emissive = new THREE.Color(0xFFFFFF)
+                    result.emissive = new Color(0xFFFFFF)
                 }
             })
             forEach(result, (v, k) => {
@@ -244,7 +244,7 @@ class AssetMaterial extends THREE.Material {
                 block_data.sheenRoughness = isNumber(block_data.roughness) ? block_data.roughness : 1
                 if (isString(block_data.roughnessMap)) block_data.sheenRoughnessMap = block_data.specularMap
                 if (!isUndefined(block_data.specularMap)) block_data.sheenColorMap = block_data.specularMap
-                if (!isUndefined(block_data.specular)) block_data.sheenColor = new THREE.Color(block_data.specular.r, block_data.specular.g, block_data.specular.b)
+                if (!isUndefined(block_data.specular)) block_data.sheenColor = new Color(block_data.specular.r, block_data.specular.g, block_data.specular.b)
             }
 
             if (this.diffuse_to_emissive) {
@@ -256,7 +256,7 @@ class AssetMaterial extends THREE.Material {
             }
 
             if (this.doubleside === true) {
-                block_data.side = THREE.DoubleSide
+                block_data.side = DoubleSide
             }
 
             block_data.bumpScale = 0.0005
@@ -265,7 +265,7 @@ class AssetMaterial extends THREE.Material {
                 block_data.specularMap !== undefined ||
                 block_data.refractionRatio !== undefined ||
                 block_data.reflectivity !== undefined) {
-                let rmat = new THREE.MeshPhongMaterial({
+                let rmat = new MeshPhongMaterial({
                     ...block_data,
                     color: 0x000000,
                     userData: {

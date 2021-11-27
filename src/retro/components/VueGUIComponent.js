@@ -6,7 +6,6 @@
 
 import Component from "retro/Component";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
 import Vue from "vue"
 import Vuex from "vuex"
 import { mapState, mapGetters } from "vuex"

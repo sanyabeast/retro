@@ -6,14 +6,14 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { Vector2, Raycaster } from 'three';
 import { map, forEach, set, get } from "lodash-es"
 import { makeid } from "retro/utils/Tools"
 import RenderTarget from "retro/components/scene/RenderTarget";
 import Collider from "retro/components/Collider";
 
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
+const raycaster = new Raycaster();
+const mouse = new Vector2();
 
 class InputComponent extends SceneComponent {
     detection_mode = "raycast"
@@ -46,8 +46,8 @@ class InputComponent extends SceneComponent {
         this.colliders_state = {}
         this.intersected_renderables = []
         this.intersect_colliders = []
-        this.pointer_position = new THREE.Vector2(0, 0)
-        this.pointer_position_abs = new THREE.Vector2(0, 0)
+        this.pointer_position = new Vector2(0, 0)
+        this.pointer_position_abs = new Vector2(0, 0)
     }
     on_create() {
         this.user_input_dom = document.createElement("div");

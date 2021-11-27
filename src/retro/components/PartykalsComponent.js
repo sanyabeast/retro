@@ -6,12 +6,10 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager";
-import * as THREE from 'three';
+import { Vector2, Vector3 } from 'three';
 import Tools from "retro/utils/Tools"
 const Partykals = require("partykals")
 import map from "lodash-es/map"
-import { Vector2 } from "spine-ts-threejs";
-import { Vector3 } from "three";
 
 class PartykalsComponent extends SceneComponent {
 

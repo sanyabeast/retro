@@ -7,7 +7,18 @@
 import Component from "retro/Component";
 import ResourceManager from "retro/ResourceManager";
 import { render } from "less";
-import * as THREE from 'three';
+import {
+    Uniform,
+    WebGLRenderTarget,
+    LinearFilter,
+    UnsignedByteType, RGBAFormat,
+    RGBFormat,
+    Mesh,
+    BufferGeometry,
+    MeshBasicMaterial,
+    Vector2,
+    Scene
+} from 'three';
 import Device from "retro/utils/Device"
 import { ShaderPass } from "retro/lib/postprocessing/build/postprocessing.esm";
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
@@ -51,7 +62,7 @@ class FXAAEffect extends postfx.Effect {
         let material_template = ResourceManager.get_material_template("core.fxaa")
         super("FidelityFX", material_template.params.fragmentShader, {
             blendFunction,
-            uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)])),
+            uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new Uniform(uniform.value)])),
             vertexShader: material_template.vertexShader
         });
     }
@@ -65,7 +76,7 @@ class FFXEffect extends postfx.Effect {
         let material_template = ResourceManager.get_material_template("core.fidelityfx")
         super("FidelityFX", material_template.params.fragmentShader, {
             blendFunction,
-            uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)]))
+            uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new Uniform(uniform.value)]))
         });
     }
 }
@@ -84,12 +95,12 @@ class SSGIEffect extends postfx.Effect {
             blendFunction,
             width,
             height,
-            uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new THREE.Uniform(uniform.value)]))
+            uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new Uniform(uniform.value)]))
         });
         this.resolution_scale = resolution_scale
-        this.renderTarget = new THREE.WebGLRenderTarget(1, 1, {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.LinearFilter,
+        this.renderTarget = new WebGLRenderTarget(1, 1, {
+            minFilter: LinearFilter,
+            magFilter: LinearFilter,
             stencilBuffer: false,
             depthBuffer: false
         });
@@ -98,9 +109,9 @@ class SSGIEffect extends postfx.Effect {
         this.blur_targets = []
         this.current_blur_target = 0
         for (let a = 0; a < 4; a++) {
-            let rt = new THREE.WebGLRenderTarget(1, 1, {
-                minFilter: THREE.LinearFilter,
-                magFilter: THREE.LinearFilter,
+            let rt = new WebGLRenderTarget(1, 1, {
+                minFilter: LinearFilter,
+                magFilter: LinearFilter,
                 stencilBuffer: false,
                 depthBuffer: true
             });
@@ -117,7 +128,7 @@ class SSGIEffect extends postfx.Effect {
             kernelSize: postfx.KernelSize.VERY_LARGE
         });
 
-        this.render_pass_scene = new THREE.Scene();
+        this.render_pass_scene = new Scene();
         this.blurPass.convolutionMaterial.uniforms.scale.value = 6
         this.blurPass.resolution.resizable = this;
         this.uniforms.get("normal_buffer").value = normal_buffer
@@ -147,8 +158,8 @@ class SSGIEffect extends postfx.Effect {
     initialize(renderer, alpha, frameBufferType) {
         this.blurPass.initialize(renderer, alpha, frameBufferType);
         this.depthPass.initialize(renderer, alpha, frameBufferType);
-        if (!alpha && frameBufferType === THREE.UnsignedByteType) {
-            this.renderTarget.texture.format = THREE.RGBFormat;
+        if (!alpha && frameBufferType === UnsignedByteType) {
+            this.renderTarget.texture.format = RGBFormat;
         }
         if (frameBufferType !== undefined) {
             this.renderTarget.texture.type = frameBufferType;
@@ -199,7 +210,7 @@ class Postprocessing extends Component {
     outline_selection = []
     constructor() {
         super(...arguments)
-        let sun = this.local_sun = new THREE.Mesh(new THREE.BufferGeometry(0.1, 32, 32), new THREE.MeshBasicMaterial())
+        let sun = this.local_sun = new Mesh(new BufferGeometry(0.1, 32, 32), new MeshBasicMaterial())
         sun.frustumCulled = false;
         sun.matrixAutoUpdate = false;
 
@@ -419,7 +430,7 @@ class Postprocessing extends Component {
     setup_chromatic_abberation(renderer, scene, camera, composer) {
         let chromatic_abberation_effect = this.chromatic_abberation_effect = new postfx.ChromaticAberrationEffect({
             blendFunction: postfx.BlendFunction.ADD,
-            offset: new THREE.Vector2(
+            offset: new Vector2(
                 this.chromatic_abberation_offset_x / 1000,
                 this.chromatic_abberation_offset_y / 1000
             )
@@ -508,7 +519,7 @@ class Postprocessing extends Component {
         ));
     }
     setup_ssao(renderer, scene, camera, composer) {
-        let normal_pass_scene = this.normal_pass_scene = new THREE.Scene()
+        let normal_pass_scene = this.normal_pass_scene = new Scene()
         const normal_pass = this.normal_pass || new postfx.NormalPass(normal_pass_scene, camera);
         this.normal_pass = normal_pass
         const depth_downsampling_pass = this.depth_downsampling_pass = new postfx.DepthDownsamplingPass({
@@ -550,7 +561,7 @@ class Postprocessing extends Component {
 
     }
     setup_ssgi(renderer, scene, camera, composer) {
-        let normal_pass_scene = this.normal_pass_scene || new THREE.Scene()
+        let normal_pass_scene = this.normal_pass_scene || new Scene()
         this.normal_pass_scene = normal_pass_scene
         const normal_pass = this.normal_pass || new postfx.NormalPass(normal_pass_scene, camera);
         this.normal_pass = normal_pass

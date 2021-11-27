@@ -96,7 +96,7 @@ const renderer_presets = {
 }
 
 class Renderer extends Component {
-    target_fps = PRESET.renderer_default_target_fps
+    target_fps = PRESET.TARGET_FPS
     postfx = true
     custom_render_function = undefined
     clear_depth = true

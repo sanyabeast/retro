@@ -14,7 +14,7 @@ let spine = undefined
 /**TODO. Clearing */
 const POOL = {}
 
-switch (PRESET.spine_component_spine_version) {
+switch (PRESET.SPINE_VERSION) {
     case 38: {
         spine = require("spine/spine-threejs-38.js").default
         // spine = require("spine/spine-all-38.js").default
@@ -52,7 +52,7 @@ class SpineAnimationPlayer extends SceneComponent {
     }
     async on_create() {
         this.playlist = isArray(this.playlist) ? this.playlist : []
-        switch (SPINE_VERSION) {
+        switch (PRESET.SPINE_VERSION) {
             case 38: {
                 let base_url = this.base_url = `${path.dirname(this.src)}/`
                 let file_name = this.file_name = path.basename(this.src).replace(".json", "")
@@ -226,7 +226,7 @@ class SpineAnimationPlayer extends SceneComponent {
         }
     }
     setup_view() {
-        switch (SPINE_VERSION) {
+        switch (PRESET.SPINE_VERSION) {
             case 38: {
                 let skeleton_data = ResourceManager.cached_spine_skeleton_data[this.src]
                 if (skeleton_data === undefined) {
