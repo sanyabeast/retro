@@ -6,7 +6,7 @@
 
 import Component from "retro/Component";
 import ResourceManager from "retro/ResourceManager";
-import { render } from "less";
+
 import {
     Uniform,
     WebGLRenderTarget,

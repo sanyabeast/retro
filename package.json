@@ -42,8 +42,6 @@
         "file-loader": "^6.2.0",
         "gsap": "^3.7.1",
         "http-server": "^0.12.3",
-        "less": "^4.1.1",
-        "less-loader": "^10.0.1",
         "lodash-es": "^4.17.21",
         "sass": "^1.40.0",
         "sass-loader": "^10.2.0",
