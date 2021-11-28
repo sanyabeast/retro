@@ -8,13 +8,16 @@ components:
         - SphereBufferGeometry
         - [0.5, 32, 16]
       material:
-        - MeshStandardMaterial
-        - color: "#8bc34a"
+        - PBRMaterial
+        - pbr: "res/retro/pbr/alien-slime1-bl/t"
+          file_format: jpg
+          tiling: [1, 1]
+          color: "#8bc34a"
           roughness: 0.89
           metalness: 0
           reflectivity: 0.4
   collider:
-    name: SnakeGameCollider
+    name: FluidCollider
     params:
       radius: 1
       layers: ["snake_part"]

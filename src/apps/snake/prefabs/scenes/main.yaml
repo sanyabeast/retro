@@ -14,8 +14,8 @@ components:
   sun:
     name: Sun
     params:
-      cycling: 10
-      time: 0.65
+      cycling: 1
+      time: 0.55
       global_intensity: 1
   game_controller:
     name: SnakeGameController
@@ -57,7 +57,7 @@ children:
     components:
       controller:
         params:
-          position: [0, 0, 10]
+          position: [0, 0, 6]
           color: "#ffeb3b"
           start_length: 1
           snake_speed: 2
@@ -74,33 +74,33 @@ children:
       controller:
         params:
           color: "#00bcd4"
-          position: [20, 0, -8  ]
+          position: [20, 0, -8]
           start_length: 4
           snake_speed: 10
-  # enemy_snake_3:
-  #   prefab: snake.actors.snake
-  #   components:
-  #     controller:
-  #       params:
-  #         color: "#ff5722"
-  #         position: [-8, 0, 8]
-  #         start_length: 8
-  #         snake_speed: 0.5
-  # enemy_snake_4:
-  #   prefab: snake.actors.snake
-  #   components:
-  #     controller:
-  #       params:
-  #         color: "#8bc34a"
-  #         position: [16, 0, -12]
-  #         start_length: 6
-  #         snake_speed: 0.2
-  # enemy_snake_5:
-  #   prefab: snake.actors.snake
-  #   components:
-  #     controller:
-  #       params:
-  #         color: "#9e9e9e"
-  #         position: [-24, 0, -12]
-  #         start_length: 6
-  #         snake_speed: 0.25
+  enemy_snake_3:
+    prefab: snake.actors.snake
+    components:
+      controller:
+        params:
+          color: "#ff5722"
+          position: [-8, 0, 8]
+          start_length: 8
+          snake_speed: 0.5
+  enemy_snake_4:
+    prefab: snake.actors.snake
+    components:
+      controller:
+        params:
+          color: "#8bc34a"
+          position: [16, 0, -12]
+          start_length: 6
+          snake_speed: 0.2
+  enemy_snake_5:
+    prefab: snake.actors.snake
+    components:
+      controller:
+        params:
+          color: "#9e9e9e"
+          position: [-24, 0, -12]
+          start_length: 6
+          snake_speed: 0.25

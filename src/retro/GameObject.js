@@ -3,7 +3,7 @@ import { Vector3 } from 'three';
 import ResourceManager from 'retro/ResourceManager';
 import { Task, TaskScheduler } from "retro/utils/TaskScheduler"
 import StateMachine from "retro/utils/StateMachine"
-import { isBoolean, isArray, isObject, isString, isFunction, isUndefined, forEach, sortBy } from "lodash-es"
+import { isBoolean, isArray, isObject, isString, isFunction, isUndefined, forEach, sortBy, isNumber } from "lodash-es"
 import { log, error, get_most_suitable_dict_keys } from "retro/utils/Tools"
 import Schema from "retro/utils/Schema"
 import Component from "retro/Component"
@@ -29,8 +29,8 @@ class GameObject extends BasicObject {
     constructor(prefab) {
         super(...arguments)
         this.meta.ticking.non_stop = true
-        this.position =
-            this.rotation = [0, 0, 0]
+        this.position = [0, 0, 0]
+        this.rotation = [0, 0, 0]
         this.scale = [1, 1, 1]
         this._game_object = this
         this.transform = new Transform()
@@ -87,14 +87,23 @@ class GameObject extends BasicObject {
         props.forEach(prop => {
             switch (prop) {
                 case "position": {
+                    this.position[0] = this.position[0] || 0
+                    this.position[1] = this.position[1] || 0
+                    this.position[2] = this.position[2] || 0
                     this.transform.position.set(...this.position)
                     break
                 }
                 case "rotation": {
+                    this.rotation[0] = this.rotation[0] || 0
+                    this.rotation[1] = this.rotation[1] || 0
+                    this.rotation[2] = this.rotation[2] || 0
                     this.transform.rotation.set(...this.rotation)
                     break
                 }
                 case "scale": {
+                    this.scale[0] = isNumber(this.scale[0]) ? this.scale[0] : 1
+                    this.scale[1] = isNumber(this.scale[1]) ? this.scale[1] : 1
+                    this.scale[2] = isNumber(this.scale[2]) ? this.scale[2] : 1
                     this.transform.scale.set(...this.scale)
                     break
                 }

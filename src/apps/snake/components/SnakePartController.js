@@ -35,7 +35,7 @@ class SnakePartController extends Component {
     on_create() {
         this.log(`created`)
         let mesh_comp = this.mesh_comp = this.get_component("MeshComponent")
-        let collider = this.collider = this.get_component("SnakeGameCollider")
+        let collider = this.collider = this.get_component("FluidCollider")
         mesh_comp.subject.material.color.set_any(this.color)
         console.log(mesh_comp)
 
@@ -58,14 +58,13 @@ class SnakePartController extends Component {
         this.position[1] = this.game_object.position[1]
         this.position[2] = this.game_object.position[2]
 
-        this.grow_cycle += time_data.delta * this.grow_speed
-        if (this.grow_cycle <= 1) {
-            this.mesh_comp.scale = [
-                this.grow_cycle,
-                this.grow_cycle,
-                this.grow_cycle
-            ]
-        }
+        this.grow_cycle = Math.min(1, this.grow_cycle + time_data.delta * this.grow_speed)
+
+        this.mesh_comp.scale = [
+            this.grow_cycle,
+            this.grow_cycle,
+            this.grow_cycle
+        ]
 
         if (this.is_head) {
             if (!this.collider.has_layer("snake_head")) {
@@ -113,31 +112,19 @@ class SnakePartController extends Component {
 
         if (isNumber(direction)) {
             this.game_object.position = [
-                this.game_object.position[0] + Math.sin(direction) * this.snake_speed * this.tools.math.clamp(time_data.delta, 0, 1),
+                this.game_object.position[0] + Math.sin(direction) * this.snake_speed * time_data.delta,
                 this.game_object.position[1],
-                this.game_object.position[2] - Math.cos(direction) * this.snake_speed * this.tools.math.clamp(time_data.delta, 0, 1),
+                this.game_object.position[2] - Math.cos(direction) * this.snake_speed * time_data.delta,
             ]
         } else if (isArray(direction)) {
             if (this.is_head) {
                 this.game_object.position = [
-                    this.game_object.position[0] + direction[0] * this.tools.math.clamp(time_data.delta, 0, 1),
+                    this.game_object.position[0] + direction[0] * time_data.delta,
                     this.game_object.position[1],
-                    this.game_object.position[2] + direction[2] * this.tools.math.clamp(time_data.delta, 0, 1),
+                    this.game_object.position[2] + direction[2] * time_data.delta,
                 ]
             } else {
                 let distance = this.tools.math.distance(this.game_object.position, this.before_part.game_object.position)
-                let distance_correction = distance / this.distance_between_parts
-                // console.log(this.UUID, distance_correction, this.snake_speed)
-                // this.game_object.position = [
-                //     this.game_object.position[0] + direction[0] * distance_correction,
-                //     this.game_object.position[1],
-                //     this.game_object.position[2] + direction[2] * distance_correction,
-                // ]
-                this.game_object.scale = [
-                    distance_correction,
-                    distance_correction,
-                    distance_correction
-                ]
                 this.game_object.position = [
                     this.before_part.game_object.position[0] - direction[0] * this.distance_between_parts,
                     this.before_part.game_object.position[1] - direction[1] * this.distance_between_parts,
@@ -151,12 +138,15 @@ class SnakePartController extends Component {
     update_jam(time_data) {
         let before_part = this.before_part
         if (!before_part) {
-            this.jam_phase = (this.jam_phase + (this.jam_speed) * this.tools.math.clamp(time_data.delta, 0, 1)) % 1
+            this.jam_phase = (this.jam_phase + (this.jam_speed) * time_data.delta) % 1
         } else {
             this.jam_phase = (before_part.jam_phase + this.jam_delta) % 1
         }
+
+        this.jam_phase = this.jam_phase || 0
         let scale = (Math.sin((1 - this.jam_phase) * Math.PI) * (this.jam_max - this.jam_min)) + this.jam_min
         scale = this.tools.math.lerp(1, scale, (1 - 1 / (this.part_index + 1)))
+        // console.log(scale, this.jam_phase)
         this.game_object.scale = [
             scale,
             scale,

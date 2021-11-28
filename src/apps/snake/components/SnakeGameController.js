@@ -59,7 +59,7 @@ class SnakeGameController extends Component {
             }
         })
 
-        this.tools.loop.for_x(12, i => this.spawn_food())
+        this.tools.loop.for_x(32, i => this.spawn_food())
     }
     register_user_snake(snake_controller) {
         let user_snake_controller = snake_controller.get_component("UserSnakeController")

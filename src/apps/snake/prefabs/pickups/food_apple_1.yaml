@@ -14,7 +14,7 @@ components:
         - src: "res/snake/models/apple_a1/apple_a1.mtl"
           diffuse_to_emissive: true
   collider:
-    name: SnakeGameCollider
+    name: FluidCollider
     params:
       radius: 2
       layers: ["pickup"]

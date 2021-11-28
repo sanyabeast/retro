@@ -9,6 +9,7 @@ class App extends RetroApp {
         let stage = this.load_stage(ResourceManager.load_prefab("{{APP_NAME}}.scenes.main"))
         let renderer = this.find_component_of_type("Renderer")
         renderer.target_fps = 60
+        renderer.shadows_enabled = false
         let camera = this.find_component_of_type("CameraComponent")
         camera.position = [
             0,

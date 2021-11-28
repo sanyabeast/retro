@@ -37,40 +37,48 @@ function setup_pbr(params) {
     this.specular = new Color(1, 1, 1)
     this.emissive = new Color(1, 1, 1)
 
-    this.material_layers = [
-        new MeshPhongMaterial({
-            shininess: 1,
-            color: new Color(0, 0, 0),
-            map: this.map,
-            metalness: this.metalness,
-            roughness: this.roughness,
-            specular: this.specular,
-            emissive: this.emissive,
-            normalMap: this.normalMap,
-            roughnessMap: this.roughnessMap,
-            metalnessMap: this.metalnessMap,
-            reflectivityMap: this.metalnessMap,
-            bumpMap: this.bumpMap,
-            emissiveMap: this.emissiveMap,
-            emissiveMap: this.emissiveMap,
-            bumpScale: this.bumpScale,
-            reflectivity: this.reflectivity,
-            blending: 2,
-            userData: {
-                layer_name: "phong"
-            }
-        }),
-        new MeshBasicMaterial({
-            color: new Color(0, 0, 0),
-            alphaMap: `${this.pbr}_ao.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}&maxsize=1024&filter=[invert]`,
-            opacity: 1,
-            transparent: true,
-            blending: 1,
-            userData: {
-                layer_name: "ao"
-            }
-        })
-    ]
+    if (PRESET.PBR_LEVEL > 0) {
+        this.material_layers.push(
+            new MeshPhongMaterial({
+                shininess: 1,
+                color: new Color(0, 0, 0),
+                map: this.map,
+                metalness: this.metalness,
+                roughness: this.roughness,
+                specular: this.specular,
+                emissive: this.emissive,
+                normalMap: this.normalMap,
+                roughnessMap: this.roughnessMap,
+                metalnessMap: this.metalnessMap,
+                reflectivityMap: this.metalnessMap,
+                bumpMap: this.bumpMap,
+                emissiveMap: this.emissiveMap,
+                emissiveMap: this.emissiveMap,
+                bumpScale: this.bumpScale,
+                reflectivity: this.reflectivity,
+                blending: 2,
+                transparent: true,
+                userData: {
+                    layer_name: "phong"
+                }
+            })
+        )
+    }
+
+    if (PRESET.PBR_LEVEL > 1) {
+        this.material_layers.push(
+            new MeshBasicMaterial({
+                color: new Color(0, 0, 0),
+                alphaMap: `${this.pbr}_ao.${this.file_format}?wrapS=1000&wrapT=1000&repeat.x=${repeat.x}&repeat.y=${repeat.y}&maxsize=1024&filter=[invert]`,
+                opacity: 1,
+                transparent: true,
+                blending: 1,
+                userData: {
+                    layer_name: "ao"
+                }
+            }),
+        )
+    }
 }
 
 const PBRMaterial = class PBRMaterial extends MeshPhysicalMaterial {

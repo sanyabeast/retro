@@ -260,24 +260,24 @@ class AssetMaterial extends Material {
             }
 
             block_data.bumpScale = 0.0005
-            if (block_data.shininess !== undefined ||
-                block_data.specular !== undefined ||
-                block_data.specularMap !== undefined ||
-                block_data.refractionRatio !== undefined ||
-                block_data.reflectivity !== undefined) {
-                let rmat = new MeshPhongMaterial({
-                    ...block_data,
-                    color: 0x000000,
-                    userData: {
-                        layer_name: "phong"
-                    }
-                })
-                rmat.blending = 2;
-                material_layers.push(rmat)
+            if (PRESET.PBR_LEVEL > 0) {
+                if (block_data.shininess !== undefined ||
+                    block_data.specular !== undefined ||
+                    block_data.specularMap !== undefined ||
+                    block_data.refractionRatio !== undefined ||
+                    block_data.reflectivity !== undefined) {
+                    let rmat = new MeshPhongMaterial({
+                        ...block_data,
+                        color: 0x000000,
+                        userData: {
+                            layer_name: "phong"
+                        }
+                    })
+                    rmat.blending = 2;
+                    material_layers.push(rmat)
+                }
             }
-
-
-            console.log(asset_dir, b, block_data)
+            // console.log(asset_dir, b, block_data)
             let mat = new ResourceManager.classes_of_materials[material_type](block_data)
             if (material_layers.length > 0) {
                 mat.material_layers = material_layers

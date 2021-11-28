@@ -88,7 +88,7 @@ class PickupController extends Component {
     }
     despawn(options, on_despawn_finished) {
         if (this.despawn_started) return
-        this.get_component("SnakeGameCollider").enabled = false
+        this.get_component("FluidCollider").enabled = false
         this.despawn_options = options
         this.on_despawn_finished = on_despawn_finished
         this.despawn_started = true

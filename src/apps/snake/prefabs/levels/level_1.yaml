@@ -7,12 +7,12 @@ children:
           rotation: [-1.5707, 0, 0]
           geometry:
             - PlaneBufferGeometry
-            - [32, 32, 1]
-          recieve_shadow: true
-          cast_shadow: true
+            - [64, 64, 1]
+          recieve_shadow: false
+          cast_shadow: false
           material:
             - PBRMaterial
-            - pbr: "res/retro/pbr/diamond-metal-siding-bl/diamond-metal-siding"
+            - pbr: "res/retro/pbr/mud-with-vegetation-bl/t"
               file_format: jpg
-              tiling: [2.5, 2.5]
+              tiling: [4, 4]
               color: "#ffffff"

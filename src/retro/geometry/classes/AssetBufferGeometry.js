@@ -24,7 +24,6 @@ class AssetBufferGeometry extends BufferGeometry {
                         obj_loader.load(
                             src,
                             (object) => {
-                                console.log(object)
                                 let g = new BufferGeometry()
                                 if (object instanceof Group) {
                                     if (object.children.length > 1) {
