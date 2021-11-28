@@ -40,7 +40,7 @@ class Gizmos extends SceneComponent {
         }
     }
     on_create() {
-        SceneComponent.add_traversal_method("component", "gizmo_draw")
+        SceneComponent.add_traversal_method("component", "gizmo_draw", true)
         let zero_axes_helper_a = this.zero_axes_helper_a = new AxesHelper(99999)
         zero_axes_helper_a.material.depthWrite = false
         zero_axes_helper_a.material.depthTest = false

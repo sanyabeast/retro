@@ -3,7 +3,6 @@ components:
     name: MeshComponent
     params:
       debug_transform: false
-      position: [1, 0, 0]
       rotation: [0, 0, 0]
       recieve_shadow: false
       cast_shadow: false
@@ -16,6 +15,9 @@ components:
           diffuse_to_emissive: true
   collider:
     name: SnakeGameCollider
+    params:
+      radius: 2
+      layers: ["pickup"]
   controller:
     name: PickupController
     order: 1

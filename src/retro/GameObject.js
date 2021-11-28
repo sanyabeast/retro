@@ -29,8 +29,8 @@ class GameObject extends BasicObject {
     constructor(prefab) {
         super(...arguments)
         this.meta.ticking.non_stop = true
-        this.position = [0, 0, 0]
-        this.rotation = [0, 0, 0]
+        this.position =
+            this.rotation = [0, 0, 0]
         this.scale = [1, 1, 1]
         this._game_object = this
         this.transform = new Transform()
@@ -423,6 +423,7 @@ class GameObject extends BasicObject {
         let component
         if (isFunction(creator)) {
             component = new creator(params)
+            component.recreate_reference_properties()
         } else if (isObject(creator)) {
             component = Object.assign({}, creator)
         } else if (isUndefined(creator)) {
@@ -430,6 +431,7 @@ class GameObject extends BasicObject {
                 if (Schema.validate(data.inline, ":INLINE_COMPONENT")) {
                     creator = Component.create(data.inline, component_name)
                     component = new creator(params)
+                    component.recreate_reference_properties()
                 }
             }
         }

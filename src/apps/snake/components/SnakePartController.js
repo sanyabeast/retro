@@ -17,10 +17,12 @@ class SnakePartController extends Component {
     jam_phase = 0
     flexibility = 0.7
     position = undefined
+    snake_controller = undefined
     /*private*/
     part_direction = 0
     part_index = 0
     mesh_comp = undefined
+    collider = undefined
     grow_cycle = 0
     grow_speed = 0.7
     constructor() {
@@ -33,6 +35,7 @@ class SnakePartController extends Component {
     on_create() {
         this.log(`created`)
         let mesh_comp = this.mesh_comp = this.get_component("MeshComponent")
+        let collider = this.collider = this.get_component("SnakeGameCollider")
         mesh_comp.subject.material.color.set_any(this.color)
         console.log(mesh_comp)
 
@@ -62,6 +65,19 @@ class SnakePartController extends Component {
                 this.grow_cycle,
                 this.grow_cycle
             ]
+        }
+
+        if (this.is_head) {
+            if (!this.collider.has_layer("snake_head")) {
+                this.collider.add_layer("snake_head")
+                this.collider.add_overlapping("pickup")
+            }
+
+        } else {
+            if (this.collider.has_layer("snake_head")) {
+                this.collider.remove_layer("snake_head")
+                this.collider.remove_overlapping("pickup")
+            }
         }
     }
     get_reactive_props() {
@@ -146,6 +162,22 @@ class SnakePartController extends Component {
             scale,
             scale
         ]
+    }
+    begin_overlap(data) {
+        if (this.snake_controller !== undefined) {
+            this.snake_controller.begin_overlap({
+                part: this,
+                collider: data.collider
+            })
+        }
+    }
+    end_overlap(data) {
+        if (this.snake_controller !== undefined) {
+            this.snake_controller.end_overlap({
+                part: this,
+                collider: data.collider
+            })
+        }
     }
 }
 

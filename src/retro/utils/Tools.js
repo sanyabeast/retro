@@ -57,6 +57,21 @@ const get_random_color_for_string = (tag) => {
     cached_tag_colors[tag] = `hsl(${h}, ${s}%, ${l}%)`
     return cached_tag_colors[tag]
 }
+const get_random_color_for_string2 = (tag) => {
+    if (cached_tag_colors[tag]) return cached_tag_colors[tag]
+    let h = 0;
+    let s = 100
+    let l = 75
+
+    for (let a = 0; a < tag.length; a += 2) {
+        h += ((tag.charCodeAt(a) || 0) % 18.5113) * 14.35546
+    }
+
+    h = Math.floor(h) % 360
+
+    cached_tag_colors[tag] = rgb_to_hex(hsl_to_rgb(h / 360, s / 100, l / 100))
+    return cached_tag_colors[tag]
+}
 let _console = window.console
 const log = (tag, ...data) => {
     if (!isString(tag)) {
@@ -255,6 +270,9 @@ const hex_to_rgb = (h) => {
     return [(+r) / 255, (+g) / 255, (+b) / 255]
 }
 const rgb_to_hex = (r, g, b) => {
+    if (isArray(r)) {
+        return rgb_to_hex(...r)
+    }
     r = (+r * 255).toString(16);
     g = (+g * 255).toString(16);
     b = (+b * 255).toString(16);
@@ -460,9 +478,19 @@ const translate_range = (value, a_min, a_max, b_min, b_max) => {
     return lerp(b_min, b_max, (value - a_min) / (a_max - a_min))
 }
 
+/**loops */
+const for_x = (x, cb) => {
+    for (let a = 0; a < x; a++) {
+        cb(x)
+    }
+}
+
 const tools = {
     array: {
         shuffle: shuffle_array,
+    },
+    loop: {
+        for_x,
     },
     color: {
         hsl_to_rgb,
@@ -478,6 +506,7 @@ const tools = {
     easings,
     extra: {
         get_random_color_for_string,
+        get_random_color_for_string2,
         get_query_string_params,
         get_unique_props,
         get_app_name,

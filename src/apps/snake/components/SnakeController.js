@@ -6,6 +6,7 @@ import Schema from "retro/utils/Schema"
 import GameObject from "retro/GameObject";
 
 class SnakeController extends Component {
+    teams = ["neutral"]
     start_length = 4
     snake_part_prefab = "snake.actors.snake_part"
     steering_speed = 2
@@ -13,11 +14,8 @@ class SnakeController extends Component {
     snake_speed = 1
     snake_moving = false
     color = "#009688"
-    position = undefined
-    constructor() {
-        super(...arguments)
-        this.position = this.position || [0, 0, 0]
-    }
+    position = [0, 0, 0]
+    game_controller = undefined
     /**private */
     parts = undefined
     get length() { return this.parts.length; }
@@ -28,6 +26,7 @@ class SnakeController extends Component {
         let persistent_parts = this.find_child_components_of_type("SnakePartController")
         persistent_parts.forEach((snake_part) => {
             snake_part.position = this.position
+            snake_part.snake_controller = this
             this.parts.push(snake_part)
         })
         this.log(`created`)
@@ -39,6 +38,7 @@ class SnakeController extends Component {
         return [
             "color",
             "position",
+            "teams",
             ...super.get_reactive_props()
         ]
     }
@@ -64,7 +64,10 @@ class SnakeController extends Component {
         })
         let part_object = new GameObject(snake_part_prefab)
         console.log(part_object, snake_part_prefab, this)
-        this.parts.push(part_object.get_component("SnakePartController"))
+
+        let snake_part = part_object.get_component("SnakePartController")
+        snake_part.snake_controller = this
+        this.parts.push(snake_part)
         this.add(part_object)
     }
     start_moving() {
@@ -94,6 +97,29 @@ class SnakeController extends Component {
     steer_left(delta = 1000 / 60) {
         this.snake_direction -= this.steering_speed * delta
     }
+    commit(name, data) {
+        switch (name) {
+            case "pickup_overlapping": {
+                this.log(`pickup`, data)
+                break
+            }
+        }
+    }
+    begin_overlap(data) {
+        if (this.game_controller !== undefined) {
+            this.game_controller.handle_snake_begin_overlap(data)
+        }
+    }
+    end_overlap(data) {
+        if (this.game_controller !== undefined) {
+            this.game_controller.handle_snake_end_overlap(data)
+        }
+    }
+    /**teams and fractions */
+    add_team(team_name) { this.teams.push(team_name); this.teams = this.teams; }
+    remove_team(team_name) { this.teams.splice(this.teams.indexOf(team_name), 1); this.teams = this.teams; }
+    in_team(team_name) { return this.teams.indexOf(team_name) > -1; }
+    clear_teams() { return this.teams = []; }
 }
 
 export default SnakeController;

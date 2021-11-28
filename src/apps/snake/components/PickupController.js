@@ -21,6 +21,10 @@ class PickupController extends Component {
     winking_cycle = 0
     floating_cycle = 0
     spinning_cycle = 0
+    despawn_started = false
+    despawn_progress = false
+    despawn_speed = 2
+    on_despawn_finished = undefined
     on_create() {
         this.log(`created`)
         let mesh_comp = this.mesh_comp = this.get_component("MeshComponent")
@@ -48,10 +52,27 @@ class PickupController extends Component {
 
         this.spinning_cycle += time_data.delta * this.spinning_speed_y
         this.mesh_comp.rotation = [
-            this.tools.math.translate_range(Math.sin(this.spinning_cycle * Math.PI * this.spinning_speed_x), -1, +1, -Math.PI/32, Math.PI/32),
+            this.tools.math.translate_range(Math.sin(this.spinning_cycle * Math.PI * this.spinning_speed_x), -1, +1, -Math.PI / 32, Math.PI / 32),
             this.mesh_comp.rotation[1] + (this.spinning_speed_y * time_data.delta),
-            this.tools.math.translate_range(Math.sin(this.spinning_cycle * Math.PI * this.spinning_speed_z), -1, +1,-Math.PI/32, Math.PI/32),
+            this.tools.math.translate_range(Math.sin(this.spinning_cycle * Math.PI * this.spinning_speed_z), -1, +1, -Math.PI / 32, Math.PI / 32),
         ]
+
+        if (this.despawn_started) {
+            this.despawn_progress += this.despawn_speed * time_data.delta
+            if (this.despawn_progress >= 1) {
+                this.on_despawn_finished = true
+                if (isFunction(this.on_despawn_finished)) {
+                    this.on_despawn_finished()
+                }
+                this.game_object.destroy()
+            }
+
+            this.game_object.scale = [
+                this.tools.math.clamp(1 - this.despawn_progress, 0, 1),
+                this.tools.math.clamp(1 - this.despawn_progress, 0, 1),
+                this.tools.math.clamp(1 - this.despawn_progress, 0, 1)
+            ]
+        }
     }
     on_gizmo_draw() {
         return [
@@ -64,6 +85,15 @@ class PickupController extends Component {
                 color: "#00ff00"
             }
         ]
+    }
+    despawn(options, on_despawn_finished) {
+        if (this.despawn_started) return
+        this.get_component("SnakeGameCollider").enabled = false
+        this.despawn_options = options
+        this.on_despawn_finished = on_despawn_finished
+        this.despawn_started = true
+        this.despawn_progress = 0
+
     }
 }
 

@@ -1,4 +1,3 @@
-
 components:
   body:
     name: MeshComponent
@@ -18,6 +17,7 @@ components:
     name: SnakeGameCollider
     params:
       radius: 1
+      layers: ["snake_part"]
   controller:
     name: SnakePartController
     context: "snake_game"

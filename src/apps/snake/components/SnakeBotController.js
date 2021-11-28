@@ -23,10 +23,10 @@ class SnakeBotController extends Component {
         this.target_location = [0, 0, 0]
         this.behaviour_model_random_params = {
             target_location_range: [
-                [-20, 0, -20],
-                [20, 0, 20]
+                [-40, 0, -40],
+                [40, 0, 40]
             ],
-            target_location_switch_rate: 3000,
+            target_location_switch_rate: 10000,
             target_location_last_switch_date: +new Date,
         }
     }

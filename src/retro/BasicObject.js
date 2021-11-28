@@ -33,6 +33,12 @@ const exclude_props = [
     "children"
 ]
 
+const properties_excluded_from_recreation = [
+    "meta",
+    "globals",
+    "tools"
+]
+
 const $v3 = new Vector3()
 
 class BasicObject extends EventDispatcher {
@@ -83,6 +89,20 @@ class BasicObject extends EventDispatcher {
     }
     get game_object() {
         return this._game_object
+    }
+    recreate_reference_properties() {
+        let descriptors = Object.getOwnPropertyDescriptors(this)
+        forEach(descriptors, (descriptor, key) => {
+            let value = descriptor.value
+            if (isObject(value) && value !== null) {
+                if (value.__proto__ === window.Object.prototype || value.__proto__ === window.Array.prototype) {
+                    if (properties_excluded_from_recreation.indexOf(key) < 0) {
+                        //this.log(`recreating reference prop: "${key}"`, value)
+                        this[key] = ResourceManager.mixin_object(value)
+                    }
+                }
+            }
+        })
     }
     create_game_object() {
         let game_object = this.game_object
@@ -267,10 +287,10 @@ class BasicObject extends EventDispatcher {
     }
 
     log() {
-        log(this.constructor.name, ...arguments);
+        log(this.UUID, ...arguments);
     }
     error() {
-        error(this.constructor.name, ...arguments);
+        error(this.UUID, ...arguments);
     }
     /*events*/
     on() {
@@ -289,7 +309,7 @@ class BasicObject extends EventDispatcher {
     /**world/local */
 }
 
-BasicObject.add_traversal_method = function (context_name = "component", method_name) {
+BasicObject.add_traversal_method = function (context_name = "component", method_name, skip_disabled = false) {
     let callback_name = `on_${method_name}`
     BasicObject.prototype[callback_name] = function () {
         // this.log(`traversal function ${method_name} is not implemented`)
@@ -300,10 +320,16 @@ BasicObject.add_traversal_method = function (context_name = "component", method_
             switch (context_name) {
                 case "component": {
                     game_object.components.forEach((comp, index) => {
+                        if (skip_disabled == true && comp.enabled === false) {
+                            return
+                        }
                         let data = comp[callback_name]()
                         data !== undefined && collected.push(data)
                     })
                     game_object.children.forEach(child => {
+                        if (skip_disabled == true && child.visible === false) {
+                            return
+                        }
                         child[method_name](collected)
                     })
                     break
@@ -312,6 +338,9 @@ BasicObject.add_traversal_method = function (context_name = "component", method_
                     let data = game_object[callback_name]()
                     data !== undefined && collected.push(data)
                     game_object.children.forEach(child => {
+                        if (skip_disabled == true && child.visible === false) {
+                            return
+                        }
                         child[method_name](collected)
                     })
                     break
