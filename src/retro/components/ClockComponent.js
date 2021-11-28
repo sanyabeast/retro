@@ -7,6 +7,8 @@
 
 import Component from "retro/Component";
 import * as worker_timers from 'worker-timers';
+import { keys } from "lodash-es"
+import ResourceManager from "retro/ResourceManager"
 
 let tick_loop_types = ["worker", "default", "raf"]
 
@@ -96,6 +98,12 @@ class ClockComponent extends Component {
         if (scene) {
             scene.tick(this.time_data)
         }
+        /*components` static ticks*/
+        let active_components_names = keys(ResourceManager.components_instances)
+        active_components_names.forEach(component_name => {
+            let creator = ResourceManager.classes_of_components[component_name]
+            creator.tick(ResourceManager.components_instances[component_name])
+        })
     }
     on_tick(time_data) {
         this.globals.uniforms.time.value += (1 / 60) * this.tick_delta;

@@ -292,6 +292,12 @@ class BasicObject extends EventDispatcher {
     error() {
         error(this.UUID, ...arguments);
     }
+    static log() {
+        log(this.name, ...arguments);
+    }
+    static error() {
+        error(this.name, ...arguments);
+    }
     /*events*/
     on() {
         return this.addEventListener(...arguments)

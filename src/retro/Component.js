@@ -48,6 +48,8 @@ const proxied_game_object_props = [
 class Component extends BasicObject {
     is_component = true
     subject = null;
+    static tick_rate = 1
+    static prev_tick_time = +new Date()
     constructor(params) {
         super(params);
         this.meta.object_type = "component"
@@ -86,6 +88,18 @@ class Component extends BasicObject {
     }
     get component_name() {
         return this.constructor.component_name;
+    }
+    static tick(instances) {
+        let now = +new Date()
+        let delta = now - this.prev_tick_time
+        let min_delta = 1000 / this.tick_rate
+        if (delta > min_delta) {
+            this.prev_tick_time = now
+            this.on_tick(delta / (1000 / 60), instances)
+        }
+    }
+    static on_tick(delta, instances) {
+        ///
     }
 }
 
@@ -150,9 +164,9 @@ Component.create = (params, name) => {
     let result = eval(code)
 
     forEach(params.methods, (method_data, method_name) => {
-        if (isNumber(method_data.throttle)){
+        if (isNumber(method_data.throttle)) {
             result.prototype[method_name] = throttle(result.prototype[method_name], method_data.throttle)
-        } else if (isNumber(method_data.debounce)){
+        } else if (isNumber(method_data.debounce)) {
             result.prototype[method_name] = debounce(result.prototype[method_name], method_data.debounce)
         }
     })

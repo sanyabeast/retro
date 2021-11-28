@@ -36,6 +36,7 @@ const get_colliders = (layer_name) => {
 }
 
 class SnakeGameCollider extends Component {
+    static tick_rate = 5
     tick_rate = 5
     radius = 1
     layers = []
@@ -141,6 +142,9 @@ class SnakeGameCollider extends Component {
     update_gizmo_color() {
         console.log(this.tools.extra.get_random_color_for_string2(this.layers.join("|")))
         this.gizmo_color = this.tools.extra.get_random_color_for_string2(this.layers.join("|"))
+    }
+    static on_tick(delta, colliders) {
+        console.log(delta, colliders)
     }
 }
 
