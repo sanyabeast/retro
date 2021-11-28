@@ -489,6 +489,18 @@ const tools = {
     array: {
         shuffle: shuffle_array,
     },
+    type: {
+        is_none: is_none,
+        is_array: isArray,
+        is_number: isNumber,
+        is_object: (t) => { isObject(t) && !isArray(t) },
+        is_function: isFunction,
+        is_undefined: isUndefined,
+        is_null: isNull,
+        is_boolean: isBoolean,
+        is_nan: isNaN,
+        is_typed_array: isTypedArray,
+    },
     loop: {
         for_x,
     },
