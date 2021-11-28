@@ -73,10 +73,10 @@ components:
   #   name: Lantern
 children:
   cornell_box:
-    prefab: core.examples.cornell_box
+    prefab: retro.examples.cornell_box
     position: [-1.1, 0, 0]
   cornell_box2:
-    prefab: core.examples.cornell_box
+    prefab: retro.examples.cornell_box
     position: [1.1, 0, 0]
     children:
       box:  
@@ -108,7 +108,7 @@ children:
                 - color: "#e91e63"
                   emissive: "#e91e63"
   cornell_box3:
-    prefab: core.examples.cornell_box
+    prefab: retro.examples.cornell_box
     position: [1.1, 0, -2.2]
     rotation: [0, 1.5707, 0]
     children:
@@ -135,7 +135,7 @@ children:
                 - MeshStandardMaterial
                 - color: "#cddc39"
   cornell_box4:
-    prefab: core.examples.cornell_box
+    prefab: retro.examples.cornell_box
     position: [-1.1, 0, -2.2]
     rotation: [0, -1.5707, 0]
     children:

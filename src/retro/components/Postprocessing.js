@@ -59,7 +59,7 @@ class FXAAEffect extends postfx.Effect {
     constructor({
         blendFunction = postfx.BlendFunction.NORMAL
     } = {}) {
-        let material_template = ResourceManager.get_material_template("core.fxaa")
+        let material_template = ResourceManager.get_material_template("retro.fxaa")
         super("FidelityFX", material_template.params.fragmentShader, {
             blendFunction,
             uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new Uniform(uniform.value)])),
@@ -73,7 +73,7 @@ class FFXEffect extends postfx.Effect {
     constructor({
         blendFunction = postfx.BlendFunction.NORMAL
     } = {}) {
-        let material_template = ResourceManager.get_material_template("core.fidelityfx")
+        let material_template = ResourceManager.get_material_template("retro.fidelityfx")
         super("FidelityFX", material_template.params.fragmentShader, {
             blendFunction,
             uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new Uniform(uniform.value)]))
@@ -90,7 +90,7 @@ class SSGIEffect extends postfx.Effect {
         resolution_scale = 25,
         samples = 10
     } = {}) {
-        let material_template = ResourceManager.get_material_template("core.ssgi")
+        let material_template = ResourceManager.get_material_template("retro.ssgi")
         super("ssgi", material_template.params.fragmentShader, {
             blendFunction,
             width,

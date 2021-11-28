@@ -18,4 +18,4 @@ components:
       time: 0.7
       global_intensity: 1
 children:
-  scene: ??prefab=core.scenes.lab
+  scene: ??prefab=retro.scenes.lab

@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "retro",
-    "version": "1.0.278",
+    "version": "1.0.279",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
@@ -76,6 +76,7 @@
         "image-pixels": "^2.2.2",
         "jsonfile": "^6.1.0",
         "keycode": "^2.2.0",
+        "loader-utils": "^1.1.0",
         "regenerator-runtime": "^0.13.9",
         "save-pixels": "^2.3.6",
         "stats.js": "^0.17.0",

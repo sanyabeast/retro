@@ -26,7 +26,7 @@ params:
 
     #define TEXEL_SIZE 0.0025
 
-    #import core.blending
+    #import retro.blending
 
     vec4 get_texel(sampler2D map, vec2 uv, float step, float x, float y){
         return texture2D(map, vec2(uv.x + step * x, uv.y + step * y));

@@ -191,13 +191,13 @@ children:
   lights:
     children:
       lamp_a:
-        prefab: core.examples.fluorescent_lamp
+        prefab: retro.examples.fluorescent_lamp
         position:
           - 0
           - 2.8
           - -1
       lamp_b:
-        prefab: core.examples.fluorescent_lamp
+        prefab: retro.examples.fluorescent_lamp
         position:
           - 0
           - 2.8

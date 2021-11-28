@@ -21,7 +21,7 @@ class MovieClipComponent extends MeshComponent {
             [1, 1, 1]
         )
         let material = ResourceManager.create_material(
-            "@core.movieclip",
+            "@retro.movieclip",
             {
                 "uniforms.grid.value": this.grid,
                 "uniforms.sheet.value": `${this.sheet}`,

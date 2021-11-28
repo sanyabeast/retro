@@ -22,8 +22,8 @@ params:
     uniform float samples;
 
 
-    #import core.blending
-    #import core.convert
+    #import retro.blending
+    #import retro.convert
 
     #define QUALITY samples
 

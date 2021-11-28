@@ -11,7 +11,7 @@ params:
     #include <logdepthbuf_pars_vertex>
     #include <clipping_planes_pars_vertex>
 
-    #import core.corelib
+    #import retro.corelib
 
     void main() {
 
@@ -54,7 +54,7 @@ params:
     uniform float particle_index;
     uniform float particle_degree;
     uniform float particle_speed;
-    #import core.corelib
+    #import retro.corelib
 
     void main(void) {
       vec2 uv = rotate_uv(vUv, vec2(0.5), -particle_degree);

@@ -21,6 +21,7 @@ function load_preset(APP_NAME) {
     let default_preset = yamlfile.readFileSync(
         path.join(root, "src", "retro", "PRESET.yaml")
     )
+
     let PRESET = undefined
     let error_code = undefined
     try {
@@ -73,6 +74,7 @@ module.exports = (env) => {
     log(`working on app "${APP_NAME}"...`)
     let define_plugin_params = {}
 
+    env.PRESET = PRESET
     for (let k in process.env) {
         define_plugin_params[`process.env.${k}`] = JSON.stringify(process.env[k])
     }
@@ -82,6 +84,7 @@ module.exports = (env) => {
     define_plugin_params[`PRESET`] = JSON.stringify(PRESET)
 
     let config = {
+        stats: { assets: false },
         entry: {
             main: path.join(root, "src", "main"),
         },
@@ -138,6 +141,14 @@ module.exports = (env) => {
                         'css-loader',
                         'sass-loader'
                     ]
+                },
+                {
+                    test: /\ResourceManager.js$/,
+                    loaders: path.join(root, "scripts", "assets-loader.js"),
+                    options: {
+                        app_name: APP_NAME,
+                        plugins: ["retro", ...(PRESET.PLUGINS || []), `apps/${APP_NAME}`]
+                    }
                 }
             ],
         },

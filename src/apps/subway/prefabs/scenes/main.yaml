@@ -1,6 +1,6 @@
 prefabs:
   - default.Postprocessing
-  - core.sound.default_ambient_audio_source
+  - retro.sound.default_ambient_audio_source
   - default.OrbitControlsComponent
   - default.SkyBox
 components:

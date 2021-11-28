@@ -764,34 +764,7 @@ class ResourceManager extends BasicObject {
 rm = new ResourceManager()
 window.F_TEXTURE_STREAMING_FUNCTION = rm.texture_stream_function.bind(rm)
 
-rm.preload_components("core", require.context("retro/components/", true, /\.js$/))
-rm.preload_classes("core", require.context("retro/materials/classes", true, /\.js$/), "materials")
-rm.preload_classes("core", require.context("retro/geometry/classes", true, /\.js$/), "geometries")
-rm.preload_classes("core", require.context("retro/objects", true, /\.js$/), "objects")
-rm.preload_textures("core", require.context("retro/textures/", true, /\.png$/))
-rm.preload_textures2("core", require.context("retro/textures/", true, /\.yaml$/))
-rm.preload_templates_of_shader_parts("core", require.context("retro/materials/lib/", true, /\.yaml$/))
-rm.preload_materials("core", require.context("retro/materials/", true, /\.yaml$/))
-rm.preload_geometries("core", require.context("retro/geometry/", true, /\.yaml$/))
-rm.preload_prefabs("core", require.context("retro/prefabs/", true, /\.yaml$/))
-
-if (isString(process.env.APP_NAME)) {
-    rm.preload_components(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/components/`, true, /\.js$/))
-    rm.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/classes`, true, /\.js$/), "materials")
-    rm.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/classes`, true, /\.js$/), "geometries")
-    rm.preload_classes(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/objects`, true, /\.js$/), "objects")
-    rm.preload_textures(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/textures/`, true, /\.png$/))
-    rm.preload_textures2(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/textures/`, true, /\.yaml$/))
-    rm.preload_templates_of_shader_parts(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/lib/`, true, /\.yaml$/))
-    rm.preload_materials(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/materials/`, true, /\.yaml$/))
-    rm.preload_geometries(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/geometry/`, true, /\.yaml$/))
-    rm.preload_prefabs(process.env.APP_NAME, require.context(`apps/${process.env.APP_NAME}/prefabs/`, true, /\.yaml$/))
-
-} else {
-    error("this", `failed to preload resource for app, invalid environment variable: process.env.APP_NAME=${process.env.APP_NAME}`)
-}
-
-rm.log("resources are preloaded")
+/**ASSETS_LOADER_INJECTED_CODE**/
 
 if (process.env.NODE_ENV === "development") {
     window.rm = rm

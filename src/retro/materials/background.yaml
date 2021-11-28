@@ -16,7 +16,7 @@ params:
       
       uniform sampler2D map;
 
-      #import core.corelib
+      #import retro.corelib
       
       void main(void) {
           gl_FragColor = texture2D(map, vUv);

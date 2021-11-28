@@ -1,6 +1,6 @@
 children:
   box1:
-    prefab: "core.actors.test_box_1"
+    prefab: "retro.actors.test_box_1"
   scene:
     components:
       ground:
@@ -47,7 +47,7 @@ children:
         params:
           tick_rate: 1
   snow_fx:
-    prefab: "core.snow_fx"
+    prefab: "retro.snow_fx"
     components:
       snow:
         params:
