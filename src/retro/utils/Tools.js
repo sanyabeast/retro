@@ -485,6 +485,12 @@ const for_x = (x, cb) => {
     }
 }
 
+const async_for_x = async (x, cb) => {
+    for (let a = 0; a < x; a++) {
+        await cb(x)
+    }
+}
+
 const tools = {
     array: {
         shuffle: shuffle_array,
@@ -493,7 +499,7 @@ const tools = {
         is_none: is_none,
         is_array: isArray,
         is_number: isNumber,
-        is_object: (t) => { isObject(t) && !isArray(t) },
+        is_object: (data) => { return isObject(data) && !isArray(data) && !isNull(data) },
         is_function: isFunction,
         is_undefined: isUndefined,
         is_null: isNull,
@@ -503,6 +509,7 @@ const tools = {
     },
     loop: {
         for_x,
+        async_for_x
     },
     color: {
         hsl_to_rgb,

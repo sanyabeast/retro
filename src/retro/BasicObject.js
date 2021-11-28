@@ -90,6 +90,9 @@ class BasicObject extends EventDispatcher {
     get game_object() {
         return this._game_object
     }
+    set game_object(game_object) {
+        this._game_object = this.game_object
+    }
     recreate_reference_properties() {
         let descriptors = Object.getOwnPropertyDescriptors(this)
         forEach(descriptors, (descriptor, key) => {
@@ -153,8 +156,8 @@ class BasicObject extends EventDispatcher {
     get_reactive_props() {
         return []
     }
-    force_update() {
-        let reactive_props = this.get_reactive_props()
+    force_update(props) {
+        let reactive_props = props || this.get_reactive_props()
         reactive_props.forEach(prop => {
             this[prop] = this[prop]
         })
@@ -211,7 +214,7 @@ class BasicObject extends EventDispatcher {
             })
         }
     }
-    tick(tick_data) {
+    tick(force) {
         if (this.enabled) {
             if (this.meta.need_reactive_update) {
                 let updated_props = [...this.meta.updated_reactive_props]
@@ -221,9 +224,9 @@ class BasicObject extends EventDispatcher {
             }
             this.meta.ticking.rate = this.tick_rate
             this.meta.ticking.enabled = this.tick_enabled
-            if (this.meta.ticking.enabled) {
+            if (this.meta.ticking.enabled || force) {
                 let now = +new Date()
-                if (this.meta.ticking.non_stop === true || now - this.meta.ticking.prev_time >= (1000 / this.meta.ticking.rate)) {
+                if (force || this.meta.ticking.non_stop === true || now - this.meta.ticking.prev_time >= (1000 / this.meta.ticking.rate)) {
                     let d = now - this.meta.ticking.prev_time
                     let delta = this.meta.ticking.delta = d / (1000)
                     this.meta.ticking.ticks++

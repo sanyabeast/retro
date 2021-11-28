@@ -43,6 +43,7 @@ class FluidCollider extends Component {
     radius = 1
     layers = []
     overlapping = []
+    group = undefined
     /**private */
     gizmo_color
     world_position = [0, 0, 0]
@@ -60,15 +61,19 @@ class FluidCollider extends Component {
         let new_collision_tests = []
         let cached_intersection_checks = {}
         forEach(colliders, (collider_a, uuid) => {
+            if (collider_a.enabled === false) return
             collider_a.update_world_position()
             forEach(colliders, (collider_b, uuid) => {
+                if (collider_b.enabled === false) return
+                if (collider_a.id === collider_b.id) return
+                if (collider_a.group !== undefined && collider_a.group === collider_b.group) return
                 collider_b.update_world_position()
                 let comp_id = `${collider_a.id}*${Math.max(collider_b.id)}`
                 let unique_comp_id = `${Math.min(collider_a.id, collider_b.id)}*${Math.max(collider_a.id, collider_b.id)}`
                 let checking_result = new_collision_state[comp_id]
                 if (checking_result === undefined) {
                     checking_result = {}
-                    let need_check = collider_a.overlaps_layers(collider_b.layers) && collider_a.id !== collider_b.id
+                    let need_check = collider_a.overlaps_layers(collider_b.layers)
                     let is_intersecting = false
                     if (need_check) {
                         if (cached_intersection_checks[unique_comp_id] !== undefined) {

@@ -33,12 +33,6 @@ class SnakeGameController extends Component {
                     if (current_length_title) {
                         current_length_title.text = `CURRENT LENGTH: ${this.user_snake.snake_controller.length}`
                     }
-                } else {
-                    // this.user_snake.snake_controller.stop_moving()
-                    // let current_length_title = this.find_component_with_tag("current_length_title")
-                    // if (current_length_title) {
-                    //     current_length_title.text = "PRESS `ENTER` TO START MOVING"
-                    // }
                 }
             } else {
                 let current_length_title = this.find_component_with_tag("current_length_title")
@@ -49,7 +43,7 @@ class SnakeGameController extends Component {
             }
         }
     }
-    on_start() {
+    async on_start() {
         let snakes = this.find_components_of_type("SnakeController")
         snakes.forEach((snake_controller, index) => {
             if (index === 0 && this.use_first_found_snake_as_user_snake === true) {
@@ -59,7 +53,10 @@ class SnakeGameController extends Component {
             }
         })
 
-        this.tools.loop.for_x(32, i => this.spawn_food())
+        await this.tools.loop.async_for_x(32, async (i) => {
+            this.spawn_food();
+            await this.tools.time.wait(250)
+        })
     }
     register_user_snake(snake_controller) {
         let user_snake_controller = snake_controller.get_component("UserSnakeController")
@@ -95,11 +92,12 @@ class SnakeGameController extends Component {
         let id = game_object.UUID
 
         this.active_pickups[id] = game_object
+        /**@TODO: fix initial state issue */
+        game_object.tick(true)
         this.add(game_object)
     }
     spawn_food() {
         let prefab = this.tools.random.choice(this.food_prefabs)
-        this.log(`prepare to spawn food "${prefab}"`)
         this.spawn_pickup(prefab, {})
     }
     despawn_pickup(pickup_controller, options) {
@@ -162,6 +160,13 @@ class SnakeGameController extends Component {
                     break
                 }
             }
+        }
+
+        if (collider.has_layer("snake_part")){
+            let snake_part_controller = collider.get_component("SnakePartController")
+            let snake_controller = snake_part_controller.snake_controller
+            let new_snake = snake_controller.split_snake(snake_part_controller.part_index)
+            console.log(collider)
         }
 
     }

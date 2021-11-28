@@ -120,6 +120,10 @@ class SnakeController extends Component {
     remove_team(team_name) { this.teams.splice(this.teams.indexOf(team_name), 1); this.teams = this.teams; }
     in_team(team_name) { return this.teams.indexOf(team_name) > -1; }
     clear_teams() { return this.teams = []; }
+    split_snake(index){
+        // let new_snake = 
+        // this.log(`splitting snake`, index)
+    }
 }
 
 export default SnakeController;

@@ -40,13 +40,19 @@ class SnakePartController extends Component {
         console.log(mesh_comp)
 
         if (this.before_part) {
-            this.game_object.position = this.before_part.game_object.position
+            this.game_object.position = [
+                this.before_part.game_object.position[0] + this.tools.random.range(-1, 1),
+                this.before_part.game_object.position[1] + 0,
+                this.before_part.game_object.position[2] + this.tools.random.range(-1, 1)
+            ]
         }
     }
     on_tick(time_data) {
         if (this.before_part) {
             this.part_index = this.before_part.part_index + 1
         }
+
+        this.collider.group = this.snake_controller.UUID
 
         this.move_part(time_data)
         this.update_jam(time_data)
@@ -69,13 +75,17 @@ class SnakePartController extends Component {
         if (this.is_head) {
             if (!this.collider.has_layer("snake_head")) {
                 this.collider.add_layer("snake_head")
+                this.collider.remove_layer("snake_part")
                 this.collider.add_overlapping("pickup")
+                this.collider.add_overlapping("snake_part")
             }
 
         } else {
             if (this.collider.has_layer("snake_head")) {
                 this.collider.remove_layer("snake_head")
+                this.collider.add_layer("snake_part")
                 this.collider.remove_overlapping("pickup")
+                this.collider.remove_overlapping("snake_part")
             }
         }
     }
