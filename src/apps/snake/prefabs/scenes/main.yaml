@@ -50,7 +50,7 @@ children:
           position: [0, -1.5, 0]
           font_size: 0.4
           anchor_x: 10
-          text: "PRESS `SPACE` TO GROW UP"
+          text: "PRESS `SPACE` TO GROW UP\nPRESS `1` TO RELOAD LEVEL"
           color: "#ffffff"
   user_snake:
     prefab: snake.actors.snake

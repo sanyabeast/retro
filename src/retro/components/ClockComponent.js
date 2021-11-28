@@ -44,6 +44,10 @@ class ClockComponent extends Component {
         this.raf_callbacks = {}
     }
     begin_tick() {
+        if (this.started){
+            this.log(`cannot begin. clock is already started`)
+            return
+        }
         this.started = true;
         this.time_data.started_at = +new Date()
         this.time_data_raf.started_at = +new Date()

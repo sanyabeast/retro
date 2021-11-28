@@ -55,7 +55,7 @@ class SnakeGameController extends Component {
 
         await this.tools.loop.async_for_x(32, async (i) => {
             this.spawn_food();
-            await this.tools.time.wait(250)
+            await this.tools.time.wait(100)
         })
     }
     register_user_snake(snake_controller) {

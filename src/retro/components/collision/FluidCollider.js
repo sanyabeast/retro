@@ -35,11 +35,32 @@ const get_colliders = (layer_name) => {
     return ResourceManager.snake_game_colliders.layers[layer_name]
 }
 
+const check_update_rate = (collider) => {
+    let tick_rate = collider.meta.ticking.rate
+    let now = +new Date
+    let min_delta = 1000 / tick_rate
+    let prev_update = collider.prev_collision_update
+    let delta = now - prev_update
+    if (delta > min_delta) {
+        collider.prev_collision_update = now
+        console.log(delta)
+        return true
+    } else {
+        //console.log(delta, min_delta)
+        return false
+    }
+}
+
 let current_collision_state = {}
+let per_collider_state = {}
+let stats = {
+    checks: 0,
+    optimized: 0
+}
 
 class FluidCollider extends Component {
-    static tick_rate = 5
-    tick_rate = 5
+    static tick_rate = 10
+    tick_rate = 10
     radius = 1
     layers = []
     overlapping = []
@@ -47,7 +68,9 @@ class FluidCollider extends Component {
     /**private */
     gizmo_color
     world_position = [0, 0, 0]
+    prev_collision_update = +new Date
     on_create() {
+        ResourceManager.fluid_colliders_state = current_collision_state
         create_colliders_storage()
         this.layers.forEach(layer_name => {
             register_collider(layer_name, this)
@@ -58,27 +81,46 @@ class FluidCollider extends Component {
     on_tick(time_data) { }
     static on_tick(delta, colliders) {
         let new_collision_state = {}
+        let new_per_collider_state = {}
         let new_collision_tests = []
         let cached_intersection_checks = {}
+        stats.checks = 0
+        stats.optimized = 0
         forEach(colliders, (collider_a, uuid) => {
             if (collider_a.enabled === false) return
-            collider_a.update_world_position()
+            // if (!check_update_rate(collider_a)) {
+            //     checking_result = current_collision_state[comp_id]
+            //     if (checking_result !== undefined) {
+            //         stats.optimized++
+            //         new_collision_tests.push(checking_result)
+            //         new_collision_state[comp_id] = checking_result
+            //         return
+            //     }
+            // }
+
             forEach(colliders, (collider_b, uuid) => {
                 if (collider_b.enabled === false) return
                 if (collider_a.id === collider_b.id) return
                 if (collider_a.group !== undefined && collider_a.group === collider_b.group) return
-                collider_b.update_world_position()
+
                 let comp_id = `${collider_a.id}*${Math.max(collider_b.id)}`
+                let checking_result = undefined
+
+                
                 let unique_comp_id = `${Math.min(collider_a.id, collider_b.id)}*${Math.max(collider_a.id, collider_b.id)}`
-                let checking_result = new_collision_state[comp_id]
+                checking_result = new_collision_state[comp_id]
                 if (checking_result === undefined) {
                     checking_result = {}
                     let need_check = collider_a.overlaps_layers(collider_b.layers)
                     let is_intersecting = false
                     if (need_check) {
                         if (cached_intersection_checks[unique_comp_id] !== undefined) {
+                            //stats.optimized++
                             is_intersecting = cached_intersection_checks[unique_comp_id]
                         } else {
+                            stats.checks++
+                            collider_b.update_world_position()
+                            collider_a.update_world_position()
                             if (collider_b.intersects(collider_a)) {
                                 cached_intersection_checks[unique_comp_id] = is_intersecting = true
                             }
@@ -95,6 +137,8 @@ class FluidCollider extends Component {
 
                     new_collision_tests.push(checking_result)
                     new_collision_state[comp_id] = checking_result
+                } else {
+                    // stats.optimized++
                 }
             })
         })
@@ -127,6 +171,8 @@ class FluidCollider extends Component {
         }
 
         current_collision_state = new_collision_state
+
+        this.log(`${stats.checks} performed; ${stats.optimized} optimized`)
     }
     overlaps_layers(layers) {
         let r = false

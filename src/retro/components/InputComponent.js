@@ -22,7 +22,7 @@ class InputComponent extends SceneComponent {
     pointer_position_abs = undefined
     intersected_renderables_changed = false
     pointer_position_changed = true
-    tick_rate = 60
+    tick_rate = 30
     keys_prevent_default = false
     keys_stop_propagation = false
     /**debug */
@@ -208,9 +208,10 @@ class InputComponent extends SceneComponent {
                 break
             }
         }
+
         this.pointer_position_changed = false
     }
-    get_alias(code) {
+    get_key_alias(code) {
         return code.toLowerCase().replace(/key|digit/gmi, "")
     }
     has_combination(key, ...s_keys) {
@@ -238,7 +239,7 @@ class InputComponent extends SceneComponent {
         return get(this.keys, `${key.toLowerCase()}.press`) || false
     }
     handle_keydown(evt) {
-        let key = this.get_alias(evt.code)
+        let key = this.get_key_alias(evt.code)
         if (this.keys_prevent_default) evt.preventDefault()
         if (this.keys_stop_propagation) evt.stopPropagation();
         set(this.keys, `${key}.press`, false)
@@ -251,7 +252,7 @@ class InputComponent extends SceneComponent {
         set(this.keys, `${key}.meta`, evt.metaKey)
     }
     handle_keyup(evt) {
-        let key = this.get_alias(evt.code)
+        let key = this.get_key_alias(evt.code)
         if (this.keys_prevent_default) evt.preventDefault()
         if (this.keys_stop_propagation) evt.stopPropagation();
         set(this.keys, `${key}.press`, false)
@@ -264,7 +265,7 @@ class InputComponent extends SceneComponent {
         set(this.keys, `${key}.meta`, evt.metaKey)
     }
     handle_keypress(evt) {
-        let key = this.get_alias(evt.code)
+        let key = this.get_key_alias(evt.code)
         if (this.keys_prevent_default) evt.preventDefault()
         if (this.keys_stop_propagation) evt.stopPropagation();
         set(this.keys, `${key}.up`, false)

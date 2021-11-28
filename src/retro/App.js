@@ -15,6 +15,7 @@ class RetroApp extends GameObject {
     /**private */
     dom = undefined
     stage = undefined
+    stage_prefab = undefined
     constructor(params) {
         super({
             ...params,
@@ -28,10 +29,21 @@ class RetroApp extends GameObject {
         }))
 
     }
-    load_stage(prefab) {
-        let stage = this.stage = new GameObject(prefab)
+    reload_stage() {
+        this.unload_stage()
+        this.load_stage(this.stage_prefab)
+    }
+    unload_stage() {
+        let stage = this.stage
+        stage.destroy()
+        this.remove(stage)
+    }
+    load_stage(prefab, prefab_options) {
+        this.stage_prefab = prefab
+        let stage = this.stage = new GameObject(ResourceManager.load_prefab(prefab, prefab_options))
         this.define_global_var("stage", a => stage)
         this.add(stage)
+        this.start()
         return stage
     }
     setup_app() {
@@ -48,9 +60,7 @@ class RetroApp extends GameObject {
     get_background_color() {
         return "linear-gradient(#131638, #69003a)"
     }
-    on_tick() {
-        //
-    }
+
     start() {
         let clock = this.find_component_of_type("ClockComponent")
         this.start_game()
