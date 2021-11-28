@@ -1,3 +1,4 @@
+position: [0, -100, 0]
 components:
   body:
     name: MeshComponent
@@ -15,9 +16,12 @@ components:
           diffuse_to_emissive: true
   collider:
     name: FluidCollider
+    enabled: false
     params:
       radius: 2
       layers: ["pickup"]
+  animator:
+    name: Animator
   controller:
     name: PickupController
     order: 1
