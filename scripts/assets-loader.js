@@ -50,17 +50,18 @@ module.exports = function (source_code, map, meta) {
             injected_code += `rm.preload_classes("${context}", require.context("${base_path}/objects", true, /\.js$/), "objects");\n`
         if (fs.existsSync(path.join(root, "src", base_path, "textures")))
             injected_code += `rm.preload_textures("${context}", require.context("${base_path}/textures/", true, /\.png$/));\n`
-        if (fs.existsSync(path.join(root, "src", base_path, "textures")))
+        if (fs.existsSync(path.join(root, "src", base_path, "gui")))
+            injected_code += `rm.preload_vue_components("${context}", require.context("${base_path}/gui/", false, /\.vue$/));\n`
+        if (fs.existsSync(path.join(root, "src", base_path, "textures")))    
             injected_code += `rm.preload_textures2("${context}", require.context("${base_path}/textures/", true, /\.yaml$/));\n`
-        if (fs.existsSync(path.join(root, "src", base_path, "materials/lib")))
+        if (fs.existsSync(path.join(root, "src", base_path, "materials/lib")))    
             injected_code += `rm.preload_templates_of_shader_parts("${context}", require.context("${base_path}/materials/lib/", true, /\.yaml$/));\n`
-        if (fs.existsSync(path.join(root, "src", base_path, "materials")))
+        if (fs.existsSync(path.join(root, "src", base_path, "materials")))    
             injected_code += `rm.preload_materials("${context}", require.context("${base_path}/materials/", true, /\.yaml$/));\n`
-        if (fs.existsSync(path.join(root, "src", base_path, "geometry")))
+        if (fs.existsSync(path.join(root, "src", base_path, "geometry")))    
             injected_code += `rm.preload_geometries("${context}", require.context("${base_path}/geometry/", true, /\.yaml$/));\n`
-        if (fs.existsSync(path.join(root, "src", base_path, "prefabs")))
+        if (fs.existsSync(path.join(root, "src", base_path, "prefabs")))    
             injected_code += `rm.preload_prefabs("${context}", require.context("${base_path}/prefabs/", true, /\.yaml$/));\n`
-
         loaded.push(plugin_name)
     })
 

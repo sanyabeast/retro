@@ -586,6 +586,17 @@ class ResourceManager extends BasicObject {
             }
         })
     }
+    preload_vue_components(ns, context, category) {
+        this.preload_context(context, (p, mod) => {
+            let name = p.replace("./", "").replace(".vue", "");
+            name = `${ns}.${name}`
+            this.vue_components_templates = this.vue_components_templates || {}
+            this.vue_components_templates[name] = mod.default
+            if (isObject(this.vue_components_templates[name])) {
+                this.vue_components_templates[name].ResourceManager = this
+            }
+        })
+    }
     preload_textures(ns, context) {
         this.textures_lib = this.textures_lib || {}
         this.preload_context(context, (p, mod) => {
@@ -776,5 +787,9 @@ window.F_TEXTURE_STREAMING_FUNCTION = rm.texture_stream_function.bind(rm)
 if (process.env.NODE_ENV === "development") {
     window.rm = rm
 }
+
+// let kek = require.context("retro/gui", true, /\.vue$/)
+// console.log(kek)
+// debugger
 
 export default rm;
