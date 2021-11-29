@@ -10,7 +10,7 @@ import Vue from "vue"
 import Vuex from "vuex"
 import { mapState, mapGetters } from "vuex"
 import { keys, set, isFunction, isObject, isArray, isNumber, isNull, isString } from "lodash-es"
-import { log, error } from "retro/utils/Tools"
+import { log, error, tools } from "retro/utils/Tools"
 Vue.use(Vuex)
 
 let MyPlugin = {}
@@ -132,11 +132,11 @@ MyPlugin.install = function (Vue, options) {
 Vue.use(MyPlugin)
 
 class VueGUIComponent extends Component {
-    root_component = undefined
-    store = undefined
-    module_name = "gui"
-    vuex_store = undefined
     tick_rate = 5
+    root_component = undefined
+    module_name = "gui"
+    /**private */
+    vuex_store = undefined
     props = undefined
     constructor() {
         super(...arguments)
@@ -146,7 +146,7 @@ class VueGUIComponent extends Component {
         return this.ui.$el
     }
     get ui() {
-        return this.ui_wrapper.$children[0]
+        return this.vue_app.$children[0]
 
     }
     get state() {
@@ -166,49 +166,28 @@ class VueGUIComponent extends Component {
         this.dom.style.userSelect = "none";
         this.dom.classList.add('gui-dom')
 
-        let store_config = this.store
-
-        if (typeof store_config !== "object" || store_config === null) {
-            store_config = {
-                state: {},
-                actions: {},
-                mutations: {},
-                getters: {}
-            }
-        }
-
-        store_config.getters = store_config.getters || {}
-        store_config.state = store_config.state || {}
-        store_config.actions = store_config.actions || {}
-        store_config.mutations = store_config.mutations || {}
-
-        this.vuex_store = new Vuex.Store(store_config)
-        ResourceManager.vuex_stores[this.UUID] = this.vuex_store
-
-        let ui_wrapper = this.ui_wrapper = new Vue({
-            template: `<${this.root_component.name}/>`,
-            components: {
-                [`${this.root_component.name}`]: this.root_component
-            },
+        let { vue_app, vuex_store } = VueGUIComponent.create_vue_app(this.root_component, {
             props: this.props,
-            store: this.vuex_store
+            id: this.UUID
         })
 
-        ui_wrapper.gui_component = this
+        this.vue_app = vue_app
+        this.vuex_store = vuex_store
+        vue_app.gui_component = this
     }
     on_destroy() {
         super.on_destroy(...arguments)
-        this.ui_wrapper.$destroy();
+        this.vue_app.$destroy();
         this.el.remove()
         delete ResourceManager.vuex_stores[this.UUID]
     }
     on_enable() {
         this.globals.dom.appendChild(this.dom)
-        this.ui_wrapper.$mount(this.dom)
+        this.vue_app.$mount(this.dom)
         this.el.style.transform = "translate(0, 0)"
     }
     on_tick(time_data) {
-        this.ui_wrapper.tick(time_data)
+        this.vue_app.tick(time_data)
     }
     store_set(key, value) {
         setTimeout(a => this.vuex_store.state[key] = value)
@@ -260,6 +239,55 @@ class VueGUIComponent extends Component {
             }
         })
     }
+}
+
+VueGUIComponent.create_vue_app = function (root_component, options = {}) {
+    if (isString(root_component)) {
+        root_component = ResourceManager.vue_components_templates[root_component]
+    }
+
+    if (!isObject(root_component)) {
+        throw new Error(`bad component template`, root_component)
+    }
+
+    let store_template = root_component.store_template
+
+    if (isFunction(store_template)) {
+        store_template = store_template(options)
+    }
+
+    if (!isObject(store_template)) {
+        store_template = {
+            state: {},
+            actions: {},
+            mutations: {},
+            getters: {}
+        }
+    }
+
+    store_template.getters = store_template.getters || {}
+    store_template.state = store_template.state || {}
+    store_template.actions = store_template.actions || {}
+    store_template.mutations = store_template.mutations || {}
+
+    let vuex_store = new Vuex.Store(store_template)
+    ResourceManager.vuex_stores[options.id || tools.random.string(16)] = vuex_store
+    
+    let vue_app = new Vue({
+        template: `<${root_component.name}/>`,
+        components: {
+            [`${root_component.name}`]: root_component
+        },
+        props: options.props || {},
+        store: vuex_store
+    })
+
+    let vue_app_data = {
+        vuex_store,
+        vue_app
+    }
+
+    return vue_app_data
 }
 
 export default VueGUIComponent;

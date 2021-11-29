@@ -15,3 +15,5 @@ components:
         - 5
   devgui:
     name: VueGUIComponent
+    params:
+      root_component: retro.DevGUI
