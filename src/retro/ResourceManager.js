@@ -546,7 +546,10 @@ class ResourceManager extends BasicObject {
         return data
     }
     load_prefab(id, params) {
-        let prefab_template = id
+        let prefab_template = undefined
+        if (isObject(id)) {
+            prefab_template = id
+        }
         if (isString(id)) {
             id = this.resolve_string_placeholders(id)
 
