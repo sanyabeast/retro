@@ -546,13 +546,17 @@ class ResourceManager extends BasicObject {
         return data
     }
     load_prefab(id, params) {
-        id = this.resolve_string_placeholders(id)
+        let prefab_template = id
+        if (isString(id)) {
+            id = this.resolve_string_placeholders(id)
 
-        if (this.templates_of_prefabs[id] === undefined) {
-            throw new Error(`no prefab with id "${id} found"`)
+            if (this.templates_of_prefabs[id] === undefined) {
+                throw new Error(`no prefab with id "${id} found"`)
+            }
+
+            prefab_template = this.templates_of_prefabs[id]
         }
 
-        let prefab_template = this.templates_of_prefabs[id]
         let prefab = this.mixin_object(prefab_template)
         for (let k in params) {
             set(prefab, k, params[k])

@@ -164,7 +164,7 @@ module.exports = (env) => {
         ],
         devServer: {
             overlay: true,
-            host: "192.168.0.107"
+            host: "localhost"
         },
         resolve: {
             modules: ["src", "lib", "node_modules", "dist"],
