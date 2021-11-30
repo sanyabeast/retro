@@ -60,7 +60,7 @@ class SpineAnimationPlayer extends SceneComponent {
     get_reactive_props() {
         return [
             "playlist",
-            super.get_reactive_props()
+            ...super.get_reactive_props()
         ]
     }
     on_update(props) {

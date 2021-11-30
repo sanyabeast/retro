@@ -11,6 +11,7 @@ const dir_tree = require("directory-tree");
 const jsonfile = require('jsonfile')
 const yamlfile = require('yamlfile')
 const colors = require("colors")
+const ip = require('ip');
 
 function log() { console.log(`[RETRO] [i]`.green, ...arguments); }
 function warn() { console.log(`[RETRO] [*]`.yellow, ...arguments); }
@@ -149,6 +150,17 @@ module.exports = (env) => {
                         app_name: APP_NAME,
                         plugins: ["retro", ...(PRESET.PLUGINS || []), `apps/${APP_NAME}`]
                     }
+                },
+                {
+                    test: /\.(jpe?g|png|webp)$/i,
+                    use: [
+                        {
+                            loader: 'responsive-loader',
+                            options: {
+                                adapter: require('responsive-loader/sharp')
+                            }
+                        }
+                    ]
                 }
             ],
         },
@@ -164,7 +176,7 @@ module.exports = (env) => {
         ],
         devServer: {
             overlay: true,
-            host: "localhost"
+            host: "0.0.0.0"
         },
         resolve: {
             modules: ["src", "lib", "node_modules", "dist"],
