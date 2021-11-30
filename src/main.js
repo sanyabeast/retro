@@ -3,8 +3,14 @@ import "./index.html";
 import ResourceManager from "retro/ResourceManager";
 import Frame from "retro/utils/Frame";
 import { log, get_app_name, console } from "retro/utils/Tools";
-
 import Device from "retro/utils/Device"
+import VueGUIComponent from "retro/components/VueGUIComponent"
+ResourceManager.preload_vue_components("editor", require.context("editor/", false, /\.vue$/))
+let editor_gui_data = VueGUIComponent.create_vue_app("editor.Main", {})
+let editor_app = window.editor_app = editor_gui_data.vue_app
+let editor_store = window.editor_store = editor_gui_data.vuex_store
+editor_app.$mount(document.getElementById("editor"))
+console.log(editor_gui_data)
 
 let App = null
 const APP_NAME = get_app_name()
@@ -38,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         default: {
             let frame = new Frame();
-            frame.set_size(window.innerWidth * 0.94, window.innerHeight * 0.94)
+            frame.set_size((window.innerWidth * 0.8), (window.innerWidth * 0.8) / 16 * 9)
             frame.set_caption(APP_NAME);
 
             let app = new App()
@@ -84,15 +90,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             frame.add_button("FFX", "Fidelity FX toggls", (button) => {
                 let postfx = app.find_component_of_type("Postprocessing")
+                if (!postfx) return
                 postfx.use_ffx = !postfx.use_ffx
                 button.set_active(postfx.use_ffx)
-            }, "#cddc39", a => app.find_component_of_type("Postprocessing").use_ffx)
+            }, "#cddc39", a => app.find_component_of_type("Postprocessing") ? app.find_component_of_type("Postprocessing").use_ffx : false)
 
             frame.add_button("SSGI", "Screen Space Global Illumination Toggle", (button) => {
                 let postfx = app.find_component_of_type("Postprocessing")
+                if (!postfx) return
                 postfx.use_ssgi = !postfx.use_ssgi
                 button.set_active(postfx.use_ssgi)
-            }, "#cddc39", a => app.find_component_of_type("Postprocessing").use_ssgi)
+            }, "#cddc39", a => app.find_component_of_type("Postprocessing") ? app.find_component_of_type("Postprocessing").use_ssgi : false)
 
             frame.add_button("FOG", "Toggle Fog", () => {
                 app.refs.renderer.use_fog = !app.refs.renderer.use_fog

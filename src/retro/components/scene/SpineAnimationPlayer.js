@@ -47,13 +47,33 @@ class SpineAnimationPlayer extends SceneComponent {
     disable_pool = false
     depth_test = false
     transparent = true
+    current_playlist_item_id = 0
     /**private */
-    playlist = undefined
+    playlist = []
     get current_playlist_item() {
-        return this.playlist[0] || undefined
+        if (this.current_playlist_item_id < this.playlist.length) {
+            return this.playlist[this.current_playlist_item_id]
+        } else {
+            return undefined
+        }
+    }
+    get_reactive_props() {
+        return [
+            "playlist",
+            super.get_reactive_props()
+        ]
+    }
+    on_update(props) {
+        super.on_update(props)
+        props.forEach(prop => {
+            switch (prop) {
+                case "playlist": {
+                    this.current_playlist_item_id = 0
+                }
+            }
+        })
     }
     async on_create() {
-        this.playlist = isArray(this.playlist) ? this.playlist : []
         switch (PRESET.SPINE_VERSION) {
             case 38: {
                 let base_url = this.base_url = `${path.dirname(this.src)}/`
@@ -67,7 +87,6 @@ class SpineAnimationPlayer extends SceneComponent {
                 if (from_pool) {
                     this.subject = from_pool
                 } else {
-                    // this.log(`creating new ${this.src}`)
                     await this.load_assets();
                     await this.setup_view();
                 }
@@ -92,7 +111,6 @@ class SpineAnimationPlayer extends SceneComponent {
                 if (from_pool) {
                     this.subject = from_pool
                 } else {
-                    //this.log(`creating new ${this.src}`)
                     await this.load_assets();
                     await this.setup_view();
                 }
@@ -171,7 +189,6 @@ class SpineAnimationPlayer extends SceneComponent {
     get_from_pool() {
         POOL[this.src] = POOL[this.src] || []
         let mesh = POOL[this.src].pop()
-        //this.log(`${this.src}. pool size: ${POOL[this.src].length}`)
         return mesh
     }
     on_destroy() {
@@ -194,19 +211,25 @@ class SpineAnimationPlayer extends SceneComponent {
         let current_playlist_item = this.current_playlist_item
         if (isUndefined(current_playlist_item)) {
         } else {
-            if (isUndefined(current_playlist_item.is_new)) current_playlist_item.is_new = true
-            if (isUndefined(current_playlist_item.is_playing)) current_playlist_item.is_playing = true
-            if (isUndefined(current_playlist_item.repeat)) current_playlist_item.repeat = 0
-            if (isUndefined(current_playlist_item.played_times)) current_playlist_item.played_times = 0
+            if (isUndefined(current_playlist_item.is_new)) current_playlist_item.is_new = true;
+            if (isUndefined(current_playlist_item.is_playing)) current_playlist_item.is_playing = true;
+            if (isUndefined(current_playlist_item.repeat)) current_playlist_item.repeat = 0;
+            if (isUndefined(current_playlist_item.played_times)) {
+                current_playlist_item.played_times = 0;
+            }
+
+            if (current_playlist_item.is_new === true) {
+                current_playlist_item.is_new = false
+                this.subject.state.setAnimation(0, current_playlist_item.animation_name, false)
+                current_playlist_item.is_playing = true
+            }
 
             if (current_playlist_item.repeat > 0 && current_playlist_item.repeat < Infinity) {
                 if (current_playlist_item.played_times >= current_playlist_item.repeat) {
-                    current_playlist_item = this.playlist.shift();
+                    this.current_playlist_item_id++
+                    current_playlist_item = this.current_playlist_item
                     if (this.loop_playlist === true) {
-                        this.add_to_queue({
-                            animation_name: current_playlist_item.animation_name,
-                            repeat: current_playlist_item.repeat
-                        })
+                        this.current_playlist_item_id = this.current_playlist_item_id % this.playlist.length
                     }
                 } else {
                     if (current_playlist_item.is_playing === false) {
@@ -220,11 +243,9 @@ class SpineAnimationPlayer extends SceneComponent {
                     current_playlist_item.is_playing = true
                 }
             }
-            if (current_playlist_item.is_new === true) {
-                current_playlist_item.is_new = false
-                this.subject.state.setAnimation(0, current_playlist_item.animation_name, false)
-                current_playlist_item.is_playing = true
-            }
+
+
+
         }
     }
     setup_view() {
@@ -307,12 +328,10 @@ class SpineAnimationPlayer extends SceneComponent {
             current_playlist_item.is_playing = false
             current_playlist_item.played_times++;
         }
-        // this.log(`animation event: "complete"`, animation_name)
     }
     handle_animation_event(payload) {
         let animation = payload.animation
         let animation_name = animation.name
-        // this.log(`animation event: "event"`, animation_name)
     }
 }
 

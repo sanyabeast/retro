@@ -30,12 +30,15 @@
             `pointer screen pos: [x: ${pointer_pos[0]}; y: ${pointer_pos[1]};]`
           "
         ></p>
-        <div class="status-line">
-          <p v-html="`render items: ${render_items_count}`"></p>
-        </div>
-        <div class="status-line">
-          <p v-html="`sun time: ${sun_time}`"></p>
-        </div>
+      </div>
+      <div class="status-line">
+        <p v-html="`render items: ${render_items_count}`"></p>
+      </div>
+      <div class="status-line">
+        <p v-html="`sun time: ${sun_time}`"></p>
+      </div>
+      <div class="status-line" v-for="(item, name) in user_lines" :key="name">
+        <p v-html="`${item.title}: ${item.text}`"></p>
       </div>
     </div>
   </div>
@@ -59,12 +62,14 @@ export default {
       render_items_count: 0,
       device: Device,
       sun_time: "00:00",
+      user_lines: {},
     };
   },
   props: {},
   computed: {},
   watch: {},
   mounted() {
+    window.dev_gui = this;
     console.log(this.$store);
     this.asset_stats = ResourceManager.get_asset_stats();
   },
@@ -107,6 +112,13 @@ export default {
 
       return `${h}:${m}`;
     },
+    update_line(tag, { title, text }) {
+      let current = this.user_lines[tag];
+      if (!current) current = {};
+      current.text = text;
+      current.title = title;
+      this.user_lines[tag] = current;
+    },
   },
   /** */
   store: {
@@ -127,21 +139,22 @@ export default {
   font-family: monospace;
   font-size: 14px;
   opacity: 0.2;
+  text-align: right;
   &.mobile {
     font-size: 8px;
     .status .status-line {
       font-size: 8px;
-      line-height: 0.5em;
+      line-height: 1em;
     }
   }
   .status {
     position: absolute;
     top: 16px;
-    left: 16px;
+    right: 16px;
     .status-line {
       color: #eeeeee;
       font-size: 10px;
-      line-height: 0.75em;
+      line-height: 1em;
     }
   }
 }

@@ -10,7 +10,7 @@ import Vue from "vue"
 import Vuex from "vuex"
 import { mapState, mapGetters } from "vuex"
 import { keys, set, isFunction, isObject, isArray, isNumber, isNull, isString } from "lodash-es"
-import { log, error, tools } from "retro/utils/Tools"
+import { tools, log, error } from "retro/utils/Tools"
 Vue.use(Vuex)
 
 let MyPlugin = {}
@@ -26,6 +26,7 @@ MyPlugin.install = function (Vue, options) {
         watch: {},
         beforeMount() {
             let p = this
+            this.tools = tools
             while (p.$parent !== undefined) {
                 p = p.$parent
             }
@@ -136,11 +137,12 @@ class VueGUIComponent extends Component {
     root_component = undefined
     module_name = "gui"
     /**private */
-    vuex_store = undefined
+    store = undefined
     props = undefined
     constructor() {
         super(...arguments)
         this.props = {}
+
     }
     get el() {
         return this.ui.$el
@@ -150,10 +152,10 @@ class VueGUIComponent extends Component {
 
     }
     get state() {
-        return this.vuex_store.state
+        return this.store.state
     }
     get getters() {
-        return this.vuex_store.state
+        return this.store.state
     }
     on_create() {
         console.log(this.game_object)
@@ -166,13 +168,13 @@ class VueGUIComponent extends Component {
         this.dom.style.userSelect = "none";
         this.dom.classList.add('gui-dom')
 
-        let { vue_app, vuex_store } = VueGUIComponent.create_vue_app(this.root_component, {
+        let { vue_app, store } = VueGUIComponent.create_vue_app(this.root_component, {
             props: this.props,
             id: this.UUID
         })
 
         this.vue_app = vue_app
-        this.vuex_store = vuex_store
+        this.store = store
         vue_app.gui_component = this
     }
     on_destroy() {
@@ -190,13 +192,13 @@ class VueGUIComponent extends Component {
         this.vue_app.tick(time_data)
     }
     store_set(key, value) {
-        setTimeout(a => this.vuex_store.state[key] = value)
+        setTimeout(a => this.store.state[key] = value)
     }
     store_commit(mutation_name, payload) {
-        setTimeout(a => this.vuex_store.commit(mutation_name, payload))
+        setTimeout(a => this.store.commit(mutation_name, payload))
     }
     store_dispatch(action_name, payload) {
-        setTimeout(a => this.vuex_store.dispatch(action_name, payload))
+        setTimeout(a => this.store.dispatch(action_name, payload))
     }
     call_method(method_name, ...payload) {
         let root_comp = this.ui
@@ -270,20 +272,20 @@ VueGUIComponent.create_vue_app = function (root_component, options = {}) {
     store_template.actions = store_template.actions || {}
     store_template.mutations = store_template.mutations || {}
 
-    let vuex_store = new Vuex.Store(store_template)
-    ResourceManager.vuex_stores[options.id || tools.random.string(16)] = vuex_store
-    
+    let store = new Vuex.Store(store_template)
+    ResourceManager.vuex_stores[options.id || tools.random.string(16)] = store
+
     let vue_app = new Vue({
         template: `<${root_component.name}/>`,
         components: {
             [`${root_component.name}`]: root_component
         },
         props: options.props || {},
-        store: vuex_store
+        store: store
     })
 
     let vue_app_data = {
-        vuex_store,
+        store,
         vue_app
     }
 
