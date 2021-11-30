@@ -12,10 +12,12 @@ const jsonfile = require('jsonfile')
 const yamlfile = require('yamlfile')
 const colors = require("colors")
 const ip = require('ip');
+const fs = require("fs")
 
 function log() { console.log(`[RETRO] [i]`.green, ...arguments); }
 function warn() { console.log(`[RETRO] [*]`.yellow, ...arguments); }
 function err() { console.log(`[RETRO] [!]`.red, ...arguments); }
+log
 
 function get_copy_plugin_patterns(APP_NAME, PRESET) {
     let r = [
@@ -25,11 +27,21 @@ function get_copy_plugin_patterns(APP_NAME, PRESET) {
 
     let plugins = PRESET.PLUGINS || []
     plugins.forEach((plugin_name) => {
-        if (plugin_name.startsWith("retro")) {
-            r.push({ from: `src/retro/${plugin_name}/res`, to: `res/${APP_NAME}` })
+        let full_path
+        if (plugin_name === "retro") {
+            full_path = `src/retro/res`
+        } else if (plugin_name.startsWith("retro/")) {
+            full_path = `src/${plugin_name}`
         } else {
-            r.push({ from: `src/apps/${plugin_name}`, to: `res/${APP_NAME}` })
+            full_path = `src/apps/${plugin_name}`
         }
+
+        let res_directory_exists = fs.existsSync(path.join(root, full_path))
+        log(`res directory for "${plugin_name} exists: ${res_directory_exists}"`)
+        if (!res_directory_exists) {
+            fs.mkdirSync(path.join(root, full_path), { recursive: true })
+        }
+        r.push({ from: full_path, to: `res/${APP_NAME}` })
     })
 
     r.push({ from: `src/apps/${APP_NAME}/res`, to: `res/${APP_NAME}` })
