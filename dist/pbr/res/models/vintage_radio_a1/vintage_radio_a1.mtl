@@ -1,0 +1,16 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl DefaultMaterial
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\DefaultMaterial_normal.png
+map_Kd Z:\\Projects\\$JOB\\gamecore\\src\\apps\\pbr\\res\\models\\vintage_radio_a1\\maps\\DefaultMaterial_baseColor.jpeg
+map_Ns textures\\DefaultMaterial_metallicRoughness_channel_GREEN.jpg
+refl textures\\DefaultMaterial_metallicRoughness_channel_BLUE.jpg

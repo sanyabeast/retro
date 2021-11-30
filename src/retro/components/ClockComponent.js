@@ -44,7 +44,7 @@ class ClockComponent extends Component {
         this.raf_callbacks = {}
     }
     begin_tick() {
-        if (this.started){
+        if (this.started) {
             this.log(`cannot begin. clock is already started`)
             return
         }
@@ -106,7 +106,11 @@ class ClockComponent extends Component {
         let active_components_names = keys(ResourceManager.components_instances)
         active_components_names.forEach(component_name => {
             let creator = ResourceManager.classes_of_components[component_name]
-            creator.tick(ResourceManager.components_instances[component_name])
+            if (creator) {
+                creator.tick(ResourceManager.components_instances[component_name])
+            } else {
+                //**inline components */
+            }
         })
     }
     on_tick(time_data) {

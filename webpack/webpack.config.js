@@ -17,12 +17,10 @@ const fs = require("fs")
 function log() { console.log(`[RETRO] [i]`.green, ...arguments); }
 function warn() { console.log(`[RETRO] [*]`.yellow, ...arguments); }
 function err() { console.log(`[RETRO] [!]`.red, ...arguments); }
-log
 
 function get_copy_plugin_patterns(APP_NAME, PRESET) {
     let r = [
-
-        { from: `src/retro/res`, to: `res/retro` },
+        { from: `src/retro/res`, to: `res` },
     ]
 
     let plugins = PRESET.PLUGINS || []
@@ -31,9 +29,9 @@ function get_copy_plugin_patterns(APP_NAME, PRESET) {
         if (plugin_name === "retro") {
             full_path = `src/retro/res`
         } else if (plugin_name.startsWith("retro/")) {
-            full_path = `src/${plugin_name}`
+            full_path = `src/${plugin_name}/res`
         } else {
-            full_path = `src/apps/${plugin_name}`
+            full_path = `src/apps/${plugin_name}/res`
         }
 
         let res_directory_exists = fs.existsSync(path.join(root, full_path))
@@ -41,10 +39,10 @@ function get_copy_plugin_patterns(APP_NAME, PRESET) {
         if (!res_directory_exists) {
             fs.mkdirSync(path.join(root, full_path), { recursive: true })
         }
-        r.push({ from: full_path, to: `res/${APP_NAME}` })
+        r.push({ from: full_path, to: `res` })
     })
 
-    r.push({ from: `src/apps/${APP_NAME}/res`, to: `res/${APP_NAME}` })
+    r.push({ from: `src/apps/${APP_NAME}/res`, to: `res` })
     log(`copy patterns:\n${JSON.stringify(r, null, "\t")}`)
 
     return r
