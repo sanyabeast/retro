@@ -14,7 +14,7 @@ components:
               z: 0
       geometry:
         - "AssetBufferGeometry"
-        - - "res/retro/models/teapot.fbx"
+        - - "res/retro/plugins/extra-assets/models/teapot.fbx"
           - 2
       material:
         - MeshPhongMaterial

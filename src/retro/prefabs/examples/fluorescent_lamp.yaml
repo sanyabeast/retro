@@ -7,11 +7,11 @@ components:
       recieve_shadow: false
       cast_shadow: false
       geometry:
-        - "url:res/retro/models/fluorescent_lamp_a1/lamp.obj"
+        - "url:res/retro/plugins/extra-assets/models/fluorescent_lamp_a1/lamp.obj"
         - 0.125
       material:
         - AssetMaterial
-        - src: "res/retro/models/fluorescent_lamp_a1/lamp.mtl"
+        - src: "res/retro/plugins/extra-assets/models/fluorescent_lamp_a1/lamp.mtl"
           allow_transparency: false
           doubleside: false
           emissive_intensity: 10
@@ -40,7 +40,7 @@ components:
   sfx_ambient:
     name: AudioComponent
     params:
-      src: "res/retro/ambient_sound/fluorescent_lamp_ambience_a1"
+      src: "res/retro/plugins/extra-assets/ambient_sound/fluorescent_lamp_ambience_a1"
       autoplay: true
       max_distance: 4
       loop: true

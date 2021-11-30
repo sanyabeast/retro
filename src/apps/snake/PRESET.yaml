@@ -1,2 +1,4 @@
 IS_EXAMPLE: true
 PBR_LEVEL: 0
+PLUGINS:
+  - retro/plugins/extra-assets

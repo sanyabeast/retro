@@ -12,7 +12,7 @@ children:
           cast_shadow: false
           material:
             - PBRMaterial
-            - pbr: "res/retro/pbr/mud-with-vegetation-bl/t"
+            - pbr: "res/retro/plugins/extra-assets/pbr/mud-with-vegetation-bl/t"
               file_format: jpg
               tiling: [4, 4]
               color: "#ffffff"

@@ -8,6 +8,7 @@ const HQ_MAT = "MeshPhysicalMaterial"
 
 
 function setup_pbr(params) {
+    this.material_layers = this.material_layers || []
     let repeat = new Vector2(1, 1)
     if (typeof params.tiling === "number") {
         repeat.set(params.tiling, params.tiling)

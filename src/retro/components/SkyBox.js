@@ -104,7 +104,7 @@ class SkyBox extends SceneComponent {
 
 SkyBox.DEFAULT = {
     color: "#ff00ff",
-    cubemap: "res/retro/cubemaps/icelake_1",
+    cubemap: "res/retro/plugins/extra-assets/cubemaps/icelake_1",
     cubemap_format: "jpg"
 }
 

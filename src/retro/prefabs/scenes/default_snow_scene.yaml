@@ -22,7 +22,7 @@ children:
           material:
             - PBRMaterial
             - color: "#daefe5"
-              pbr: "res/retro/pbr/dusty_groun_gravel_a1/t"
+              pbr: "res/retro/plugins/extra-assets/pbr/dusty_groun_gravel_a1/t"
               file_format: jpg
               tiling: 6
       caption_a:

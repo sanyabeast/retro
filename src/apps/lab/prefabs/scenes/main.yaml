@@ -9,7 +9,7 @@ components:
   skybox:
     name: SkyBox
     params:
-      cubemap: res/retro/cubemaps/nalovardo_1
+      cubemap: res/retro/plugins/extra-assets/cubemaps/nalovardo_1
       cubemap_format: jpg
   sun:
     name: Sun

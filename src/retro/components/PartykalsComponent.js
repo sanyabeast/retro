@@ -82,10 +82,23 @@ class PartykalsComponent extends SceneComponent {
 
     on_update(props) {
         super.on_update(props)
+        console.log(this.particles_velocity)
         try {
             props.forEach(prop => {
                 switch (prop) {
-                    case "particles_velocity": this.particle_system.options.particles.velocity.set(...this.particles_velocity); break;
+                    case "particles_velocity": {
+                        if (this.tools.type.is_string(this.particles_velocity)) {
+                            this.particles_velocity = this.get_value(this.particles_velocity)
+                        }
+                        // if (this.tools.type.is_array(this.particles_velocity)) {
+                        //     this.particle_system.options.particles.velocity.set(...particles_velocity);
+                        // } else {
+                        //     this.particle_system.options.particles.velocity = this.particles_velocity;
+                        // }
+
+                        break
+                    }
+
                 }
             })
         } catch (err) {

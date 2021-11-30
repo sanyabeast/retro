@@ -9,7 +9,7 @@ components:
         - [0.5, 32, 16]
       material:
         - PBRMaterial
-        - pbr: "res/retro/pbr/alien-slime1-bl/t"
+        - pbr: "res/retro/plugins/extra-assets/pbr/alien-slime1-bl/t"
           file_format: jpg
           tiling: [1, 1]
           color: "#8bc34a"

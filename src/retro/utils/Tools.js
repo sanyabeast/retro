@@ -502,6 +502,7 @@ const tools = {
         is_object: (data) => { return isObject(data) && !isArray(data) && !isNull(data) },
         is_function: isFunction,
         is_undefined: isUndefined,
+        is_string: isString,
         is_null: isNull,
         is_boolean: isBoolean,
         is_nan: isNaN,

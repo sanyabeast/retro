@@ -15,7 +15,7 @@ components:
       material:
         - PBRMaterial
         - color: "#ffffff"
-          pbr: "res/retro/pbr/storage-container2-bl/storage-container2"
+          pbr: "res/retro/plugins/extra-assets/pbr/storage-container2-bl/storage-container2"
   - name: Collider
     params:
       collider_type: box

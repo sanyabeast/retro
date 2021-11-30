@@ -1,1 +1,3 @@
 IS_EXAMPLE: true
+PLUGINS:
+  - retro/plugins/extra-assets

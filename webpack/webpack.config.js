@@ -13,14 +13,16 @@ const yamlfile = require('yamlfile')
 const colors = require("colors")
 const ip = require('ip');
 const fs = require("fs")
+const fs_extra = require('fs-extra');
 
 function log() { console.log(`[RETRO] [i]`.green, ...arguments); }
 function warn() { console.log(`[RETRO] [*]`.yellow, ...arguments); }
 function err() { console.log(`[RETRO] [!]`.red, ...arguments); }
+log
 
 function get_copy_plugin_patterns(APP_NAME, PRESET) {
     let r = [
-        { from: `src/retro/res`, to: `res` },
+        { from: `src/retro/res`, to: `res/retro` },
     ]
 
     let plugins = PRESET.PLUGINS || []
@@ -37,12 +39,13 @@ function get_copy_plugin_patterns(APP_NAME, PRESET) {
         let res_directory_exists = fs.existsSync(path.join(root, full_path))
         log(`res directory for "${plugin_name} exists: ${res_directory_exists}"`)
         if (!res_directory_exists) {
-            fs.mkdirSync(path.join(root, full_path), { recursive: true })
+            fs.mkdirSync(path.join(root, full_path), { recursive: true }) 
         }
-        r.push({ from: full_path, to: `res` })
+        fs_extra.copySync(path.join(root, "src/retro/res/1x1_black.png"), path.join(root, full_path, "1x1_black.png"));
+        r.push({ from: full_path, to: `res/${plugin_name}` })
     })
 
-    r.push({ from: `src/apps/${APP_NAME}/res`, to: `res` })
+    r.push({ from: `src/apps/${APP_NAME}/res`, to: `res/${APP_NAME}` })
     log(`copy patterns:\n${JSON.stringify(r, null, "\t")}`)
 
     return r

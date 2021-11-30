@@ -30,8 +30,8 @@ components:
   skybox:
     name: SkyBox
     params:
-      cubemap: "res/retro/cubemaps/purplenebula"
-      cubemap_format: png
+      cubemap: "res/retro/plugins/extra-assets/cubemaps/purplenebula"
+      cubemap_format: jpg
   sky_sphere:
     name: SkySphere
     params:
@@ -48,11 +48,11 @@ children:
             - 2.2
           rotation: [0, -2, 0]
           geometry:
-            - "url:res/retro/models/rest_chalkboard_1/chalkboard.obj"
+            - "url:res/retro/plugins/extra-assets/models/rest_chalkboard_1/chalkboard.obj"
             - 1
           material:
             - AssetMaterial
-            - src: "res/retro/models/rest_chalkboard_1/chalkboard.mtl"
+            - src: "res/retro/plugins/extra-assets/models/rest_chalkboard_1/chalkboard.mtl"
               transparent: false
               doubleside: true
       collider:
@@ -110,7 +110,7 @@ children:
                   emissiveIntensity: 10
                   texture_cache: false
                   transparent: false
-                  side: 2 
+                  side: 2
           rotator:
             params:
               tick_rate: 30
@@ -143,17 +143,6 @@ children:
               position: [0, -0.1, 0]
       - ??prefab=retro.scenes.default_snow_scene
       - components:
-          # spine3:
-          #   enabled: true
-          #   name: SpineAnimationPlayer
-          #   ref: spine
-          #   params:
-          #     position: [1, 1, 0]
-          #     asset_name: demo/spine/ship_for_spine
-          #     file_name: ship_for_spine
-          #     animation_name: idle_flight
-          #     skeleton_scale: 2
-
           bush_2:
             name: MeshComponent
             tag: bush
@@ -164,12 +153,12 @@ children:
                 - 0
                 - -1.5
               geometry:
-                - "url:res/retro/models/monsterra/monsterra.obj"
+                - "url:res/retro/plugins/extra-assets/models/monsterra/monsterra.obj"
                 - 0.1
               material:
                 - AssetMaterial
                 - color: "#daefe5"
-                  src: "res/retro/models/monsterra/monsterra.mtl"
+                  src: "res/retro/plugins/extra-assets/models/monsterra/monsterra.mtl"
 
           # lantern:
           #   name: MeshComponent
@@ -181,11 +170,11 @@ children:
           #       - 0
           #     rotation: [0, -2, 0]
           #     geometry:
-          #       - "url:res/retro/models/lantern/lantern_obj.obj"
+          #       - "url:res/retro/plugins/extra-assets/models/lantern/lantern_obj.obj"
           #       - 0.2
           #     material:
           #       - AssetMaterial
-          #       - src: "res/retro/models/lantern/lantern_obj.mtl"
+          #       - src: "res/retro/plugins/extra-assets/models/lantern/lantern_obj.mtl"
           #         transparent: false
           #         doubleside: true
           lantern_core:
@@ -220,13 +209,13 @@ children:
                         - 0
                         - 0
                       geometry:
-                        - "url:res/retro/models/wood_fence_a1/fence_1.obj"
+                        - "url:res/retro/plugins/extra-assets/models/wood_fence_a1/fence_1.obj"
                         - 1
                       material:
                         - AssetMaterial
                         - color: "#daefe5"
                           doubleside: true
-                          src: "res/retro/models/wood_fence_a1/fence_1.mtl"
+                          src: "res/retro/plugins/extra-assets/models/wood_fence_a1/fence_1.mtl"
                   linker_1:
                     name: MeshComponent
                     params:
@@ -235,12 +224,12 @@ children:
                         - 0
                         - 0
                       geometry:
-                        - "url:res/retro/models/wood_fence_a1/linker_1.obj"
+                        - "url:res/retro/plugins/extra-assets/models/wood_fence_a1/linker_1.obj"
                         - 1
                       material:
                         - AssetMaterial
                         - color: "#daefe5"
-                          src: "res/retro/models/wood_fence_a1/linker_1.mtl"
+                          src: "res/retro/plugins/extra-assets/models/wood_fence_a1/linker_1.mtl"
                   collider:
                     name: Collider
                     params:
@@ -259,12 +248,12 @@ children:
                         - 0
                         - 0
                       geometry:
-                        - "url:res/retro/models/wood_fence_a1/linker_1.obj"
+                        - "url:res/retro/plugins/extra-assets/models/wood_fence_a1/linker_1.obj"
                         - 1
                       material:
                         - AssetMaterial
                         - color: "#daefe5"
-                          src: "res/retro/models/wood_fence_a1/linker_1.mtl"
+                          src: "res/retro/plugins/extra-assets/models/wood_fence_a1/linker_1.mtl"
                   fence_a:
                     name: MeshComponent
                     params:
@@ -273,13 +262,13 @@ children:
                         - 0
                         - 0
                       geometry:
-                        - "url:res/retro/models/wood_fence_a1/fence_1.obj"
+                        - "url:res/retro/plugins/extra-assets/models/wood_fence_a1/fence_1.obj"
                         - 1
                       material:
                         - AssetMaterial
                         - color: "#daefe5"
                           doubleside: true
-                          src: "res/retro/models/wood_fence_a1/fence_1.mtl"
+                          src: "res/retro/plugins/extra-assets/models/wood_fence_a1/fence_1.mtl"
               - position: [3.9, 0, 1.9]
                 rotation: [0, -1.2, 0]
                 components:
@@ -291,12 +280,12 @@ children:
                         - 0
                         - 0
                       geometry:
-                        - "url:res/retro/models/wood_fence_a1/linker_1.obj"
+                        - "url:res/retro/plugins/extra-assets/models/wood_fence_a1/linker_1.obj"
                         - 1
                       material:
                         - AssetMaterial
                         - color: "#daefe5"
-                          src: "res/retro/models/wood_fence_a1/linker_1.mtl"
+                          src: "res/retro/plugins/extra-assets/models/wood_fence_a1/linker_1.mtl"
                   fence_a:
                     name: MeshComponent
                     params:
@@ -305,13 +294,13 @@ children:
                         - 0
                         - 0
                       geometry:
-                        - "url:res/retro/models/wood_fence_a1/fence_1.obj"
+                        - "url:res/retro/plugins/extra-assets/models/wood_fence_a1/fence_1.obj"
                         - 1
                       material:
                         - AssetMaterial
                         - color: "#daefe5"
                           doubleside: true
-                          src: "res/retro/models/wood_fence_a1/fence_1.mtl"
+                          src: "res/retro/plugins/extra-assets/models/wood_fence_a1/fence_1.mtl"
       - components:
           bush_1:
             name: MeshComponent
@@ -322,12 +311,12 @@ children:
                 - 0
                 - 1.5
               geometry:
-                - "url:res/retro/models/monsterra/monsterra.obj"
+                - "url:res/retro/plugins/extra-assets/models/monsterra/monsterra.obj"
                 - 0.07
               material:
                 - AssetMaterial
                 - color: "#daefe5"
-                  src: "res/retro/models/monsterra/monsterra.mtl"
+                  src: "res/retro/plugins/extra-assets/models/monsterra/monsterra.mtl"
           collider:
             name: Collider
             params:
