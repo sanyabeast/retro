@@ -17,6 +17,27 @@ function log() { console.log(`[RETRO] [i]`.green, ...arguments); }
 function warn() { console.log(`[RETRO] [*]`.yellow, ...arguments); }
 function err() { console.log(`[RETRO] [!]`.red, ...arguments); }
 
+function get_copy_plugin_patterns(APP_NAME, PRESET) {
+    let r = [
+
+        { from: `src/retro/res`, to: `res/retro` },
+    ]
+
+    let plugins = PRESET.PLUGINS || []
+    plugins.forEach((plugin_name) => {
+        if (plugin_name.startsWith("retro")) {
+            r.push({ from: `src/retro/${plugin_name}/res`, to: `res/${APP_NAME}` })
+        } else {
+            r.push({ from: `src/apps/${plugin_name}`, to: `res/${APP_NAME}` })
+        }
+    })
+
+    r.push({ from: `src/apps/${APP_NAME}/res`, to: `res/${APP_NAME}` })
+    log(`copy patterns:\n${JSON.stringify(r, null, "\t")}`)
+
+    return r
+}
+
 function load_preset(APP_NAME) {
     log(`loading preset for "${APP_NAME}"`)
     let default_preset = yamlfile.readFileSync(
@@ -166,10 +187,7 @@ module.exports = (env) => {
         },
         plugins: [
             new CopyPlugin({
-                patterns: [
-                    { from: `src/apps/${APP_NAME}/res`, to: `res/${APP_NAME}` },
-                    { from: `src/retro/res`, to: `res/retro` },
-                ]
+                patterns: get_copy_plugin_patterns(APP_NAME, PRESET)
             }),
             new VueLoaderPlugin(),
             new DefinePlugin(define_plugin_params)
