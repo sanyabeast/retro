@@ -1,14 +1,14 @@
 {
     "private": true,
     "name": "retro",
-    "version": "1.0.288",
+    "version": "1.0.296",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
         "url": "https://github.com/sanyabeast"
     },
     "scripts": {
-        "build-demos": "npm run build -- --env.APP_NAME=pbr && npm run build -- --env.APP_NAME=demo && npm run build -- --env.APP_NAME=default && npm run build -- --env.APP_NAME=subway && npm run build -- --env.APP_NAME=lab && npm run build -- --env.APP_NAME=gizmos && npm run build -- --env.APP_NAME=ssgi && npm run build -- --env.APP_NAME=gizmos && npm run build -- --env.APP_NAME=snake",
+        "build-demos": "npm run build -- --env.APP_NAME=pbr && npm run build -- --env.APP_NAME=demo && npm run build -- --env.APP_NAME=default && npm run build -- --env.APP_NAME=subway && npm run build -- --env.APP_NAME=lab && npm run build -- --env.APP_NAME=ssgi && npm run build -- --env.APP_NAME=gizmos && npm run build -- --env.APP_NAME=snake",
         "clear": "rm -rf dist/",
         "clear:all": "rm -rf node_modules/ && npm run clear",
         "prebuild": "",

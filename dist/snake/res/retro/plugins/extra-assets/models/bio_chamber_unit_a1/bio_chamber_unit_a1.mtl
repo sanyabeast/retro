@@ -1,0 +1,57 @@
+# Blender MTL File: 'None'
+# Material Count: 4
+
+newmtl Glass
+Ns 56.806129
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.536364 0.536364 0.536364
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd maps\\Glass_Color.png
+map_Ke maps\\Glass_Emissive.png
+map_Ns maps\\Glass_Roughness.jpg
+map_d maps\\Glass_Color.png
+
+
+newmtl Leaf
+Ns 56.806129
+Ka 0.500000 0.500000 0.500000
+Kd 0.419580 0.419580 0.419580
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump maps\\Leaf_Normals.png
+map_Kd maps\\Leaf_Diffuse.png
+map_d maps\\Leaf_Alpha.jpg
+
+newmtl Pollen
+Ns 56.806129
+Ka 0.500000 0.500000 0.500000
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd maps\\Sprite.png
+map_d maps\\Sprite.png
+
+newmtl lambert1
+Ns 179.999996
+Ka 1.000000 1.000000 1.000000
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump maps\\Body_Normal.jpg
+map_Kd maps\\Body_Color.jpg
+map_Ke maps\\Body_Emissive.png
+map_Ns maps\\Body_Roughness.jpg
+refl maps\\Body_Metallic.png
