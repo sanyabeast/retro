@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "retro",
-    "version": "1.0.297",
+    "version": "1.0.298",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
@@ -36,6 +36,7 @@
         "babel-polyfill": "^6.26.0",
         "babel-preset-es2017": "^6.24.1",
         "base64-image-loader": "^1.2.1",
+        "coffeescript": "^2.6.1",
         "copy-webpack-plugin": "^6.3.2",
         "cross-env": "^7.0.3",
         "css-loader": "^5.1.1",
@@ -68,6 +69,7 @@
         "@babel/eslint-parser": "^7.15.8",
         "@esotericsoftware/spine-core": "^4.0.14",
         "@esotericsoftware/spine-threejs": "^4.0.14",
+        "coffee-loader": "^1.0.1",
         "color-blend": "^3.0.1",
         "colors": "^1.4.0",
         "command-line-args": "^5.2.0",

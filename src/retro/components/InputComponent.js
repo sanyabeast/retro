@@ -10,7 +10,7 @@ import { Vector2, Raycaster } from 'three';
 import { map, forEach, set, get } from "lodash-es"
 import { makeid } from "retro/utils/Tools"
 import RenderTarget from "retro/components/scene/RenderTarget";
-import Collider from "retro/components/Collider";
+import Collider from "retro/components/collision/Collider";
 
 const raycaster = new Raycaster();
 const mouse = new Vector2();

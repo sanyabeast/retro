@@ -33,11 +33,10 @@ class SnakePartController extends Component {
         return this.before_part === undefined
     }
     on_create() {
-        this.log(`created`)
+        // this.log(`created`)
         let mesh_comp = this.mesh_comp = this.get_component("MeshComponent")
         let collider = this.collider = this.get_component("FluidCollider")
         mesh_comp.subject.material.color.set_any(this.color)
-        console.log(mesh_comp)
 
         if (this.before_part) {
             this.game_object.position = [

@@ -104,7 +104,7 @@ class PickupController extends Component {
         ]
     }
     despawn(options, on_despawn_finished) {
-        console.log(options)
+        // console.log(options)
         if (this.despawn_started) return
         let animator = this.animator
         this.get_component("FluidCollider").enabled = false

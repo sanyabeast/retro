@@ -43,7 +43,7 @@ const check_update_rate = (collider) => {
     let delta = now - prev_update
     if (delta > min_delta) {
         collider.prev_collision_update = now
-        console.log(delta)
+        // console.log(delta)
         return true
     } else {
         //console.log(delta, min_delta)
@@ -76,7 +76,7 @@ class FluidCollider extends Component {
             register_collider(layer_name, this)
         })
         this.update_gizmo_color()
-        this.log(`created: "${this.layers.join(", ")}"`)
+        // this.log(`created: "${this.layers.join(", ")}"`)
     }
     on_tick(time_data) { }
     static on_tick(delta, colliders) {
@@ -172,7 +172,7 @@ class FluidCollider extends Component {
 
         current_collision_state = new_collision_state
 
-        this.log(`${stats.checks} performed; ${stats.optimized} optimized`)
+        // this.log(`${stats.checks} performed; ${stats.optimized} optimized`)
     }
     overlaps_layers(layers) {
         let r = false
@@ -226,7 +226,7 @@ class FluidCollider extends Component {
         ]
     }
     update_gizmo_color() {
-        console.log(this.tools.extra.get_random_color_for_string2(this.layers.join("|")))
+        // console.log(this.tools.extra.get_random_color_for_string2(this.layers.join("|")))
         this.gizmo_color = this.tools.extra.get_random_color_for_string2(this.layers.join("|"))
     }
 

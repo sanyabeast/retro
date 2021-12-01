@@ -128,7 +128,7 @@ class SnakeGameController extends Component {
         snake_controller.clear_teams()
         snake_controller.add_team("enemy")
         snake_controller.game_controller = this
-        this.log(`addingt enemy snake with uuid "${uuid}"`)
+        this.log(`adding enemy snake with uuid "${uuid}"`)
     }
     handle_snake_begin_overlap(data) {
         let snake_part = data.part
@@ -137,13 +137,13 @@ class SnakeGameController extends Component {
         let is_user_snake = snake_controller.in_team("user")
         let collider = data.collider
         if (!collider) {
-            this.log(`no collider`, data)
+            // this.log(`no collider`, data)
             return
         }
         if (collider.has_layer("pickup") && is_head) {
             let pickup_controller = collider.get_component("PickupController")
             let pickup_type = pickup_controller.type
-            this.log(`${is_user_snake ? 'user`s' : 'enemy`s'} snake overlaps pickup: "${pickup_type}"`, data)
+            // this.log(`${is_user_snake ? 'user`s' : 'enemy`s'} snake overlaps pickup: "${pickup_type}"`, data)
             switch (pickup_type) {
                 case "food": {
                     snake_controller.grow()
@@ -166,12 +166,12 @@ class SnakeGameController extends Component {
             let snake_part_controller = collider.get_component("SnakePartController")
             let snake_controller = snake_part_controller.snake_controller
             let new_snake = snake_controller.split_snake(snake_part_controller.part_index)
-            console.log(collider)
+            // console.log(collider)
         }
 
     }
     handle_snake_end_overlap(data) {
-        this.log(`snake end overlap`, data)
+        // this.log(`snake end overlap`, data)
     }
 }
 

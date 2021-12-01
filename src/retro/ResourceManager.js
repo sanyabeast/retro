@@ -578,7 +578,7 @@ class ResourceManager extends BasicObject {
     }
     preload_classes(ns, context, category) {
         this.preload_context(context, (p, mod) => {
-            let name = p.replace("./", "").replace(".js", "");
+            let name = p.replace("./", "").replace(".js", "").replace(".coffee", "");
             this[`classes_of_${category}`] = this[`classes_of_${category}`] || {}
             this[`classes_of_${category}`][name] = mod.default
             if (isObject(this[`classes_of_${category}`][name])) {
@@ -619,9 +619,8 @@ class ResourceManager extends BasicObject {
         this.preload_context(context, (p, mod) => {
             this.asset_stats.components_count++;
 
-            let name = p.replace("./", "").replace(".js", "").replace(/\//gm, ".");
+            let name = p.replace("./", "").replace(".js", "").replace(".coffee", "").replace(/\//gm, ".");
             name = name.split(".")[name.split(".").length - 1]
-
             let creator = mod.default
 
             if (isObject(creator) || isFunction(creator)) {
@@ -640,8 +639,6 @@ class ResourceManager extends BasicObject {
             } else {
                 error(`this`, `failed to preload component "${ns}.${name}". Unknown type: "${typeof creator}"`)
             }
-
-
         })
     }
     preload_templates_of_shader_parts(ns, context) {

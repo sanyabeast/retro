@@ -43,13 +43,13 @@ module.exports = function (source_code, map, meta) {
         injected_code += `/** PRELOADING PLUGIN: ${plugin_name.toUpperCase()}**/`
 
         if (fs.existsSync(path.join(root, "src", base_path, "components")))
-            injected_code += `rm.preload_components("${context}", require.context("${base_path}/components/", true, /\.js$/));\n`
+            injected_code += `rm.preload_components("${context}", require.context("${base_path}/components/", true, /\.js$|\.coffee$/));\n`
         if (fs.existsSync(path.join(root, "src", base_path, "materials", "classes")))
-            injected_code += `rm.preload_classes("${context}", require.context("${base_path}/materials/classes", true, /\.js$/), "materials");\n`
+            injected_code += `rm.preload_classes("${context}", require.context("${base_path}/materials/classes", true, /\.js$|\.coffee$/), "materials");\n`
         if (fs.existsSync(path.join(root, "src", base_path, "geometry", "classes")))
-            injected_code += `rm.preload_classes("${context}", require.context("${base_path}/geometry/classes", true, /\.js$/), "geometries");\n`
+            injected_code += `rm.preload_classes("${context}", require.context("${base_path}/geometry/classes", true, /\.js$|\.coffee$/), "geometries");\n`
         if (fs.existsSync(path.join(root, "src", base_path, "objects")))
-            injected_code += `rm.preload_classes("${context}", require.context("${base_path}/objects", true, /\.js$/), "objects");\n`
+            injected_code += `rm.preload_classes("${context}", require.context("${base_path}/objects", true, /\.js$|\.coffee$/), "objects");\n`
         if (fs.existsSync(path.join(root, "src", base_path, "textures")))
             injected_code += `rm.preload_textures("${context}", require.context("${base_path}/textures/", true, /\.png$/));\n`
         if (fs.existsSync(path.join(root, "src", base_path, "gui")))

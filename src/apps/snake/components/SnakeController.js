@@ -63,7 +63,7 @@ class SnakeController extends Component {
             "components.controller.params.color": this.color
         })
         let part_object = new GameObject(snake_part_prefab)
-        console.log(part_object, snake_part_prefab, this)
+        // console.log(part_object, snake_part_prefab, this)
 
         let snake_part = part_object.get_component("SnakePartController")
         snake_part.snake_controller = this
@@ -96,14 +96,6 @@ class SnakeController extends Component {
     }
     steer_left(delta = 1000 / 60) {
         this.snake_direction -= this.steering_speed * delta
-    }
-    commit(name, data) {
-        switch (name) {
-            case "pickup_overlapping": {
-                this.log(`pickup`, data)
-                break
-            }
-        }
     }
     begin_overlap(data) {
         if (this.game_controller !== undefined) {

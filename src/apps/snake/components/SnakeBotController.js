@@ -34,7 +34,7 @@ class SnakeBotController extends Component {
         this.snake_controller.start_moving()
     }
     on_create() {
-        this.log(`created`)
+        // this.log(`created`)
         let snake_controller = this.snake_controller = this.get_component("SnakeController")
     }
     on_tick(time_data) {
@@ -92,7 +92,7 @@ class SnakeBotController extends Component {
             ]
 
             this.target_location = new_target_location
-            this.log(`update random bm`)
+            // this.log(`update random bm`)
         }
     }
 }
