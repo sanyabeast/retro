@@ -5,7 +5,7 @@ const root = path.join(__dirname, "..");
 const merge = require("webpack-merge");
 const { VueLoaderPlugin } = require('vue-loader');
 const { webpack, DefinePlugin } = require("webpack");
-const package_data = require("../package.json")
+const PACKAGE_DATA = require("../package.json")
 const CopyPlugin = require("copy-webpack-plugin");
 const dir_tree = require("directory-tree");
 const jsonfile = require('jsonfile')
@@ -18,7 +18,16 @@ const fs_extra = require('fs-extra');
 function log() { console.log(`[RETRO] [i]`.green, ...arguments); }
 function warn() { console.log(`[RETRO] [*]`.yellow, ...arguments); }
 function err() { console.log(`[RETRO] [!]`.red, ...arguments); }
-log
+
+
+console.log( 
+"_____ _____ _____ _____ _____              \n".red +
+"| __  |   __|_   _| __  |     |            \n".gray +
+"|    -|   __| | | |    -|  |  |            \n".yellow +
+"|__|__|_____| |_| |__|__|_____| ".blue + "v. ${PACKAGE_DATA.version}\n".green +
+"- - - - - - - - - - - - - - - - - - - - - - - \n".gray +
+"https://github.com/sanyabeast/retro\n".green
+);
 
 function get_copy_plugin_patterns(APP_NAME, PRESET) {
 	let r = [
@@ -114,7 +123,7 @@ module.exports = (env) => {
 		define_plugin_params[`process.env.${k}`] = JSON.stringify(process.env[k])
 	}
 
-	define_plugin_params["PACKAGE_DATA"] = JSON.stringify(package_data)
+	define_plugin_params["PACKAGE_DATA"] = JSON.stringify(PACKAGE_DATA)
 	define_plugin_params[`process.env.APP_NAME`] = JSON.stringify(APP_NAME)
 	define_plugin_params[`PRESET`] = JSON.stringify(PRESET)
 
@@ -204,7 +213,7 @@ module.exports = (env) => {
 							presets: ["@babel/env"],
 						}
 					}
-                }
+						}
 			],
 		},
 		plugins: [
