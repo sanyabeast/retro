@@ -27,7 +27,7 @@ class AudioComponent extends SceneComponent {
     rolloff = 1
     autoplay = false
     spatial = true
-    tick_rate = 5
+    tick_rate = 30
     paused = false;
     /**private */
     current_distance_to_camera = 0
@@ -46,10 +46,16 @@ class AudioComponent extends SceneComponent {
         gizmo_speaker_icon.material.depthTest = false
         gizmo_speaker_icon.material.depthWrite = false
         gizmo_speaker_icon.renderOrder = 1
+        this.on_sound_ended = this.on_sound_ended.bind(this)
 
     }
     async update_src() {
+        if (this.sound) {
+            this.sound.setLoop(false)
+        }
+        this.sound = undefined
         let sound = this.sound = await ResourceManager.load_audio(this.src, this.spatial, this.autoplay)
+
         if (sound.helper) {
             this.extra_gizmo_render_data = [{
                 object: sound.helper,
@@ -101,16 +107,19 @@ class AudioComponent extends SceneComponent {
             layers: { gizmo: true }
         }, ...this.extra_gizmo_render_data]
     }
-    on_update(props) {
+    async on_update(props) {
         super.on_update(props)
+
+        if (props.indexOf("src") > -1) {
+            await this.update_src()
+            if (this.autoplay) {
+                this.playing = true
+            }
+        }
         props.forEach(prop => {
             switch (prop) {
                 case "src": {
-                    this.update_src()
-                    if (this.sound && (this.autoplay || this.playing)) {
-                        this.sound.play()
-                    }
-                    break
+
                 }
                 case "ref_distance": {
                     if (this.sound && this.spatial) {
@@ -129,7 +138,7 @@ class AudioComponent extends SceneComponent {
                 }
                 case "playing": {
                     if (this.sound) {
-                        if (this.playing) {
+                        if (this.playing && !this.sound.isPlaying) {
                             this.sound.play()
                         } else {
                             this.sound.stop()
@@ -150,8 +159,8 @@ class AudioComponent extends SceneComponent {
                     break
                 }
                 case "autoplay": {
-                    if (this.sound && this.autoplay) {
-                        this.play()
+                    if (this.autoplay) {
+                        this.playing = true
                     }
 
                     break
@@ -162,11 +171,26 @@ class AudioComponent extends SceneComponent {
         })
     }
     on_tick(time_data) {
-
+        if (this.sound !== undefined && this.sound.is_new) {
+            this.sound.is_new = false
+            if (this.playing && !this.sound.isPlaying) {
+                this.never_played = false
+                console.log(`a`)
+                this.sound.play()
+            }
+            if (!this.playing && this.sound.isPlaying) {
+                this.sound.stop()
+            }
+            this.sound.setLoop(this.loop)
+            this.sound.setVolume(this.volume * global_volume)
+        }
     }
     play() {
         this.log("start playing...")
         this.playing = true
+    }
+    on_sound_ended() {
+        console.log(`${this.src} ended`)
     }
 }
 

@@ -534,6 +534,7 @@ class ResourceManager extends BasicObject {
             sound = new Audio(audio_listener)
         }
 
+        sound.is_new = true
         sound.autoplay = autoplay
         sound.frustumCulled = false
         let buffer = await this.load_audio_buffer(src)

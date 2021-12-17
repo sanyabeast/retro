@@ -214,6 +214,11 @@ class BasicObject extends EventDispatcher {
             })
         }
     }
+    update(params) {
+        forEach(params, (k, v) => {
+            this[v] = k
+        })
+    }
     tick(force) {
         if (this.enabled) {
             if (this.meta.need_reactive_update) {

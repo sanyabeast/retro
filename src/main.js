@@ -24,7 +24,7 @@ if (APP_NAME === undefined) {
 
 log(`MAIN`, `app version - ${PACKAGE_DATA.version}`)
 
-document.addEventListener("DOMContentLoaded", async () => {
+window.on_click_to_start = () => {
     switch (Device.device_type) {
         case "smartphone": {
             let app = window.app = new App()
@@ -108,9 +108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             break
         }
     }
-
-
-});
+}
 
 
 

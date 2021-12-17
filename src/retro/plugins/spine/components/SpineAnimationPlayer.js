@@ -5,7 +5,7 @@
 
 import SceneComponent from "retro/SceneComponent";
 import ResourceManager from "retro/ResourceManager"
-import { forEach, isUndefined, isArray } from "lodash-es";
+import { forEach, isUndefined, isArray, isFunction } from "lodash-es";
 import { log } from "retro/utils/Tools"
 const path = require("path")
 let spine = undefined
@@ -220,6 +220,11 @@ class SpineAnimationPlayer extends SceneComponent {
 
             if (current_playlist_item.is_new === true) {
                 current_playlist_item.is_new = false
+                /**on start callback */
+                if (isFunction(current_playlist_item.on_start)) {
+                    current_playlist_item.on_start(this)
+                    delete current_playlist_item.on_start
+                }
                 this.subject.state.setAnimation(0, current_playlist_item.animation_name, false)
                 current_playlist_item.is_playing = true
             }
@@ -326,6 +331,11 @@ class SpineAnimationPlayer extends SceneComponent {
         if (current_playlist_item && current_playlist_item.animation_name === animation_name) {
             if (!current_playlist_item.is_playing) return
             current_playlist_item.is_playing = false
+            /**on complete callback */
+            if (isFunction(current_playlist_item.on_complete)) {
+                current_playlist_item.on_complete(this)
+                delete current_playlist_item.on_complete
+            }
             current_playlist_item.played_times++;
         }
     }

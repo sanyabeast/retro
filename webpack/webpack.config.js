@@ -20,13 +20,13 @@ function warn() { console.log(`[RETRO] [*]`.yellow, ...arguments); }
 function err() { console.log(`[RETRO] [!]`.red, ...arguments); }
 
 
-console.log( 
-"_____ _____ _____ _____ _____              \n".red +
-"| __  |   __|_   _| __  |     |            \n".gray +
-"|    -|   __| | | |    -|  |  |            \n".yellow +
-"|__|__|_____| |_| |__|__|_____| ".blue + "v. ${PACKAGE_DATA.version}\n".green +
-"- - - - - - - - - - - - - - - - - - - - - - - \n".gray +
-"https://github.com/sanyabeast/retro\n".green
+console.log(
+	"_____ _____ _____ _____ _____              \n".red +
+	"| __  |   __|_   _| __  |     |            \n".gray +
+	"|    -|   __| | | |    -|  |  |            \n".yellow +
+	"|__|__|_____| |_| |__|__|_____| ".blue + "v. ${PACKAGE_DATA.version}\n".green +
+	"- - - - - - - - - - - - - - - - - - - - - - - \n".gray +
+	"https://github.com/sanyabeast/retro\n".green
 );
 
 function get_copy_plugin_patterns(APP_NAME, PRESET) {
@@ -194,17 +194,7 @@ module.exports = (env) => {
 						plugins: ["retro", ...(PRESET.PLUGINS || []), `apps/${APP_NAME}`]
 					}
 				},
-				{
-					test: /\.(jpe?g|png|webp)$/i,
-					use: [
-						{
-							loader: 'responsive-loader',
-							options: {
-								adapter: require('responsive-loader/sharp')
-							}
-						}
-					]
-				},
+
 				{
 					test: /\.coffee$/,
 					loader: "coffee-loader",
@@ -213,7 +203,7 @@ module.exports = (env) => {
 							presets: ["@babel/env"],
 						}
 					}
-						}
+				}
 			],
 		},
 		plugins: [

@@ -23,6 +23,28 @@
         color: #fff;
         outline: #000;
     }
+
+    .click_to_start {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000000cc;
+        z-index: 999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: #eee;
+        font-size: 56px;
+        user-select: none;
+        cursor: pointer;
+    }
+
+    p {
+        text-align: center;
+    }
 </style>
 
 <head>
@@ -37,5 +59,20 @@
 <body>
     <div id="editor"></div>
     <div class="version"></div>
+    <div class="click_to_start">
+        <p>CLICK TO START</p>
+    </div>
+    <script>
+        let click_to_start = document.querySelector(".click_to_start")
+        let started = false
+        click_to_start.addEventListener("click", function () {
+            if (started) return
+            started = true
+            if (window.on_click_to_start) {
+                window.on_click_to_start()
+                click_to_start.remove()
+            }
+        })
+    </script>
     <script src="main.js"></script>
 </body>

@@ -53,7 +53,7 @@ MyPlugin.install = function (Vue, options) {
         },
         mounted() {
             if (this.$el && this.$el.style) {
-                this.$el.style.zIndex = "2"
+                // this.$el.style.zIndex = "2"
             }
         },
         methods: {
