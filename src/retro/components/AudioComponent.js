@@ -29,6 +29,8 @@ class AudioComponent extends SceneComponent {
     spatial = true
     tick_rate = 30
     paused = false;
+    glitch_gap = 0.1
+    bound_object = undefined
     /**private */
     current_distance_to_camera = 0
     extra_gizmo_render_data = undefined
@@ -72,6 +74,9 @@ class AudioComponent extends SceneComponent {
             sound.setMaxDistance(this.max_distance)
         }
 
+        console.log(sound, sound.loopStart, sound.buffer.duration)
+        sound.loopStart = 0
+        sound.loopEnd = Math.floor(sound.buffer.duration)
         sound.setLoop(this.loop)
         sound.setVolume(this.volume * global_volume)
     }
@@ -92,7 +97,7 @@ class AudioComponent extends SceneComponent {
         return [
             {
                 object: this.subject,
-                parent: this.game_object
+                parent: this.bound_object || this.game_object
             },
             {
                 object: this.sound,
@@ -191,6 +196,12 @@ class AudioComponent extends SceneComponent {
     }
     on_sound_ended() {
         console.log(`${this.src} ended`)
+    }
+    replay() {
+        if (this.sound) {
+            this.sound.stop()
+            this.sound.play()
+        }
     }
 }
 

@@ -8,6 +8,7 @@ import Schema from "retro/utils/Schema"
 class AudioListener extends SceneComponent {
     anchor = undefined
     audio_listener = undefined
+    bound_object = undefined
     on_create() {
         this.log(`created`)
         this.audio_listener = this.globals.audio_listener
@@ -23,7 +24,7 @@ class AudioListener extends SceneComponent {
         return [
             {
                 object: this.globals.audio_listener,
-                parent: this.globals.camera
+                parent: this.bound_object || this.globals.camera
             }
         ]
     }

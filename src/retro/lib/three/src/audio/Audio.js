@@ -111,7 +111,7 @@ class Audio extends Object3D {
 		source.loopStart = this.loopStart;
 		source.loopEnd = this.loopEnd;
 		source.onended = this.onEnded.bind(this);
-		source.start(this._startedAt, this._progress + this.offset, this.duration);
+		source.start(this._startedAt, this._progress + this.offset);
 
 		console.log(this)
 		this.isPlaying = true;
