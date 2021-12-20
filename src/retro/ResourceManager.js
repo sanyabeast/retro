@@ -191,6 +191,7 @@ class ResourceManager extends BasicObject {
         this.cached_geometries = new CachedDataDict();
         this.cached_materials = new CachedDataDict();
         this.cached_streamed_textures = new CachedDataDict()
+        this.cached_audio_buffers = new CachedDataDict()
         this.cached_images = new CachedDataDict()
         this.gameobject_refs = new RmDict()
         this.shared_contexts = new RmDict()
@@ -518,10 +519,19 @@ class ResourceManager extends BasicObject {
     }
     load_audio_buffer(src) {
         return new Promise((resolve) => {
-            console.log(src)
-            audio_loader.load(`${src}.ogg`, (buffer) => {
+            let buffer = this.cached_audio_buffers[src]
+            if (buffer !== undefined) {
+                console.log(`using cached audio buffer (${src})`)
                 resolve(buffer)
-            });
+                return
+            } else {
+                console.log(src)
+                audio_loader.load(`${src}.ogg`, (buffer) => {
+                    this.cached_audio_buffers[src] = buffer
+                    resolve(buffer)
+                });
+            }
+
         })
     }
     async load_audio(src, spatial = true, autoplay = false) {
