@@ -69,6 +69,7 @@
         "@babel/eslint-parser": "^7.15.8",
         "@esotericsoftware/spine-core": "^4.0.14",
         "@esotericsoftware/spine-threejs": "^4.0.14",
+        "axios": "^0.24.0",
         "coffee-loader": "^1.0.1",
         "color-blend": "^3.0.1",
         "colors": "^1.4.0",

@@ -130,8 +130,8 @@ class Frame {
 
         this.width = 680;
         this.height = 460;
-        this.x = 48;
-        this.y = 48;
+        this.x = 16;
+        this.y = 16;
 
         this.setup_evnts();
 
