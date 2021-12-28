@@ -491,6 +491,10 @@ const async_for_x = async (x, cb) => {
     }
 }
 
+const join_uris = (...args)=>{
+    return args.join("/")
+}
+
 const tools = {
     array: {
         shuffle: shuffle_array,
@@ -530,7 +534,7 @@ const tools = {
         get_query_string_params,
         get_unique_props,
         get_app_name,
-
+        join_uris
     },
     math: {
         round: round,

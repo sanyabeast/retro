@@ -34,10 +34,13 @@ class HTTPAgent extends Component {
     }
     on_tick(time_data) {}
     get(uri = "", opts = {}) {
-        return axios.get(path.join(this.base_uri, uri), opts);
+        return axios.get(this.simple_join_uri(this.base_uri, uri), opts);
     }
     post(uri = "", opts = {}) {
-        return axios.post(path.join(this.base_uri, uri), opts);
+        return axios.post(this.simple_join_uri(this.base_uri, uri), opts);
+    }
+    simple_join_uri (base, endpoint){
+        return base + "/" + endpoint
     }
 }
 
