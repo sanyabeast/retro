@@ -39,7 +39,6 @@ class AudioComponent extends SceneComponent {
         this.extra_gizmo_render_data = []
     }
     on_create() {
-        console.log(ResourceManager)
         this.subject = new Object3D()
         /**gizmo */
         const gizmo_speaker_icon = this.gizmo_speaker_icon = new Sprite(this.spatial ? SPEAKER_ICON_MATERIAL_SPATIAL : SPEAKER_ICON_MATERIAL);
@@ -74,7 +73,6 @@ class AudioComponent extends SceneComponent {
             sound.setMaxDistance(this.max_distance)
         }
 
-        console.log(sound, sound.loopStart, sound.buffer.duration)
         sound.loopStart = 0
         sound.loopEnd = Math.floor(sound.buffer.duration)
         sound.setLoop(this.loop)
@@ -180,7 +178,6 @@ class AudioComponent extends SceneComponent {
             this.sound.is_new = false
             if (this.playing && !this.sound.isPlaying) {
                 this.never_played = false
-                console.log(`a`)
                 this.sound.play()
             }
             if (!this.playing && this.sound.isPlaying) {
@@ -195,7 +192,6 @@ class AudioComponent extends SceneComponent {
         this.playing = true
     }
     on_sound_ended() {
-        console.log(`${this.src} ended`)
     }
     replay() {
         if (this.sound) {
