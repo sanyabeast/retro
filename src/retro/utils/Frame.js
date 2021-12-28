@@ -1,3 +1,5 @@
+import Device from "./Device"
+
 class ButtonController {
     constructor(caption, title, callback, color, on_create_state) {
         this.caption = caption
@@ -26,6 +28,8 @@ class ButtonController {
             margin: "0 4px",
             padding: "2px"
         })
+
+        
 
         div.addEventListener("mousedown", (evt) => {
             evt.stopPropagation()
@@ -73,6 +77,8 @@ class Frame {
             fontSize: "12px",
             zIndex: "10"
         });
+
+        this.dom.classList.add("dev-frame")
 
         this.header_node = document.createElement("div");
         this.header_toolbar_node = document.createElement("div")
@@ -136,6 +142,19 @@ class Frame {
         this.setup_evnts();
 
         this.update();
+
+        this.add_button("MAX", "MAXIMIZE WINDOW", ()=>{
+            this.toggle_maximize();
+        })
+    }
+    toggle_maximize () {
+        if (this.maximized === undefined) this.maximized = false
+        this.maximized = !this.maximized
+        if (this.maximized){
+            this.dom.classList.add("maximized")
+        } else {
+            this.dom.classList.remove("maximized")
+        }
     }
     setup_evnts() {
         let header_node_captured = false;

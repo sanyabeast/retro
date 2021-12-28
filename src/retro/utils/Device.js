@@ -26,6 +26,7 @@ function flatten(data) {
 const ua_parser = new UAParser()
 let parsed_result = flatten(ua_parser.getResult())
 let device_data = {}
+console.log(parsed_result)
 function update_device_data() {
     device_data.os_name = parsed_result.os_name
     device_data.os_version = parsed_result.os_version

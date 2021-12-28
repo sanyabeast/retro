@@ -47,6 +47,10 @@ window.on_click_to_start = () => {
             frame.set_size((window.innerWidth * 0.92), (window.innerWidth * 0.92) / 16 * 9)
             frame.set_caption(APP_NAME);
 
+            if (Device.os_name === "mac os"){
+                frame.toggle_maximize()
+            }
+
             let app = new App()
             frame.content_node.appendChild(app.dom)
 
