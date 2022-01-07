@@ -382,4 +382,26 @@ children:
                   roughness: 1
                   metalness: 1
                   reflectivity: 0.5
+      model_8:
+        prefab: "pbr.model_viewer_item"
+        components:
+          body:
+            name: MeshComponent
+            params:
+              rotation: [0, 1.5707, 0]
+              recieve_shadow: false
+              cast_shadow: false
+              geometry:
+                - "url:res/pbr/models/chess/pawn_a1.obj"
+                - 1
+              material:
+                - AssetMaterial
+                - src: "res/pbr/models/chess/pawn_a1.mtl"
+                  allow_transparency: false
+                  doubleside: true
+                  emissive_intensity: 5
+                  roughness: 1
+                  metalness: 1
+                  reflectivity: 0.5
+
 
