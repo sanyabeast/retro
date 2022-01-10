@@ -3,6 +3,7 @@ import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isN
 import DateTime from "datetime-js"
 import exp from "constants";
 import { Color, Vector2, Vector3 } from "three"
+import device from "./Device"
 const color_blend = require("color-blend")
 /**blend modes*/
 /*  color: (…)
@@ -496,6 +497,7 @@ const join_uris = (...args)=>{
 }
 
 const tools = {
+    device: device,
     array: {
         shuffle: shuffle_array,
     },

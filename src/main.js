@@ -9,7 +9,7 @@ ResourceManager.preload_vue_components("editor", require.context("editor/", fals
 let editor_gui_data = VueGUIComponent.create_vue_app("editor.Main", {})
 let editor_app = window.editor_app = editor_gui_data.vue_app
 let editor_store = window.editor_store = editor_gui_data.vuex_store
-editor_app.$mount(document.getElementById("editor"))
+//editor_app.$mount(document.getElementById("editor"))
 console.log(editor_gui_data)
 
 let App = null
@@ -44,10 +44,13 @@ window.on_click_to_start = () => {
         }
         default: {
             let frame = new Frame();
-            frame.set_size((window.innerWidth * 0.92), (window.innerWidth * 0.92) / 16 * 9)
+            frame.set_size((window.innerWidth * 0.8), (window.innerWidth * 0.8) / 16 * 9)
             frame.set_caption(APP_NAME);
 
             if (Device.os_name === "mac os"){
+                frame.toggle_maximize()
+            }
+            if (Device.is_mobile){
                 frame.toggle_maximize()
             }
 

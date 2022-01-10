@@ -27,6 +27,7 @@ MyPlugin.install = function (Vue, options) {
         beforeMount() {
             let p = this
             this.tools = tools
+            
             while (p.$parent !== undefined) {
                 p = p.$parent
             }
@@ -50,18 +51,24 @@ MyPlugin.install = function (Vue, options) {
             Object.defineProperty(this, "camera", {
                 get: () => gui_component.globals.camera
             })
+            Object.defineProperty(this, "tools", {
+                get: () => gui_component.tools
+            })
         },
         mounted() {
             if (this.$el && this.$el.style) {
+                if (tools.device.is_mobile){
+                    this.$el.classList.add("mobile")
+                }
                 // this.$el.style.zIndex = "2"
             }
         },
         methods: {
             format_money(v) {
                 if (!isNumber(v)) {
-                    return '$ 0'
+                    return `${this.globals.money_format_currency || "?"} 0`
                 }
-                return `$ ${v.toFixed(2)}`
+                return `${this.globals.money_format_currency || "?"} ${v.toFixed(2)}`
             },
             format_round_value(v) {
                 return `x${v.toFixed(2)}`

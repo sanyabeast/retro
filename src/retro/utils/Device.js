@@ -1,7 +1,6 @@
 
 import UAParser from "ua-parser-js";
 import { forEach, set, get, isArray, isString, isUndefined } from "lodash-es"
-import { tools } from "retro/utils/Tools"
 const device_type_aliases = {
     "mobile": "smartphone",
     "tablet": "tablet",
@@ -38,7 +37,7 @@ function update_device_data() {
     device_data.client_type = "browser"
     device_data.client_version = parsed_result.browser_major
     device_data.is_mobile = parsed_result.device_type === "mobile" || parsed_result.device_data === "tablet"
-    tools.console.log(`device info:\n${JSON.stringify(device_data, null, "\t")}`)
+    console.log(`device info:\n${JSON.stringify(device_data, null, "\t")}`)
 }
 
 Object.defineProperty(device_data, "update", {
