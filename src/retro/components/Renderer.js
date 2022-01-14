@@ -122,6 +122,7 @@ class Renderer extends Component {
     resolution = undefined
     progressive_lightmap = undefined
     progressive_lightmap_dirlight = undefined
+    rendering_scale = 1;
 
     current_override_material = null
     override_normal_material = new MeshNormalMaterial()
@@ -197,12 +198,17 @@ class Renderer extends Component {
             "clear_stencil",
             "clear_depth",
             "shadows_enabled",
-            "tonemapping"
+            "tonemapping",
+            "rendering_scale"
         ].concat(super.get_reactive_props())
     }
     on_update(props) {
         props.forEach(prop => {
             switch (prop) {
+                case "rendering_scale": {
+                    this.renderer.setPixelRatio(window.devicePixelRatio * this.rendering_scale)
+                    break;
+                }
                 case "clear_depth": {
                     this.renderer.autoClearDepth = this.clear_depth
                     break
@@ -482,7 +488,6 @@ class Renderer extends Component {
         let distance = Math.abs($v3.z - z_position)
 
         let fov = camera.fov
-        let height = Math.abs(Math.tan(camera.fov) * distance) * 4
         let aspect = camera.aspect
         let width = height * aspect
 
@@ -497,5 +502,7 @@ class Renderer extends Component {
 
         return bounds
     }
+
+
 }
 export default Renderer;
