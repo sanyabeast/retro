@@ -76,6 +76,7 @@ WebGLShadowMap.prototype.render = function (lights, scene, camera) {
 
 }
 
+console.log(Device);
 
 /**!THREEJS PATCHES */
 
@@ -111,10 +112,11 @@ class Renderer extends Component {
     shadows_enabled = true
     tick_rate = 15
     shadowmap_fps = 15
+    useOptimizations = true
     //** private*/
 
     canvas = null
-    pixel_ratio = window.devicePixelRatio
+    pixel_ratio = 1
     prev_frame_time = +new Date()
     render_scene = undefined
     render_items_count = 0
@@ -143,6 +145,11 @@ class Renderer extends Component {
     }
 
     on_create() {
+        if (this.useOptimizations) {
+            let optimized_oss = ["android", "macos", "osc", "mac", "linux"];
+            this.pixel_ratio = Math.min(1.75, optimized_oss.indexOf(Device.os_name) > -1 ? Math.min(1.25, window.devicePixelRatio) : window.devicePixelRatio);
+        }
+
         this.resolution = new Vector2(1, 1)
         this.object_layers = {}
         this.rendering_layers = {
@@ -166,7 +173,6 @@ class Renderer extends Component {
         renderer.toneMappingExposure = 2
         renderer.setClearAlpha(1)
         renderer.setSize(1000, 1000);
-        renderer.setPixelRatio(this.globals.uniforms.pixel_ratio.value);
         renderer.physicallyCorrectLights = this.correct_lights
         if (this.globals.transparent_background) {
             renderer.setClearColor(0x000000, 0);
@@ -183,7 +189,7 @@ class Renderer extends Component {
 
 
         this.globals.uniforms.pixel_ratio.value = this.pixel_ratio
-        renderer.setPixelRatio(this.pixel_ratio)
+        this.update_resolution_scale();
         this.canvas = this.globals.canvas = this.renderer.domElement
         this.canvas.style.position = "absolute";
         this.canvas.style.top = "0";
@@ -202,11 +208,14 @@ class Renderer extends Component {
             "rendering_scale"
         ].concat(super.get_reactive_props())
     }
+    update_resolution_scale() {
+        this.renderer.setPixelRatio(this.pixel_ratio * this.rendering_scale)
+    }
     on_update(props) {
         props.forEach(prop => {
             switch (prop) {
                 case "rendering_scale": {
-                    this.renderer.setPixelRatio(window.devicePixelRatio * this.rendering_scale)
+
                     break;
                 }
                 case "clear_depth": {
@@ -460,10 +469,7 @@ class Renderer extends Component {
             new_rect.width !== this.globals.dom_rect.width ||
             new_rect.height !== this.globals.dom_rect.height
         ) {
-            this.renderer.setPixelRatio(
-                this.pixel_ratio
-            );
-            this.renderer.setPixelRatio(this.pixel_ratio)
+            this.update_resolution_scale()
             this.renderer.setSize(new_rect.width, new_rect.height);
             this.renderer.getSize(this.globals.uniforms.resolution.value);
             this.globals.uniforms.resolution2.value.set(1 / new_rect.width, 1 / new_rect.height)

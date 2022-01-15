@@ -398,8 +398,14 @@ const shuffle_array = (arr) => {
 const random_range = (min, max) => {
     return Math.random() * (max - min) + min;
 }
-const random_choice = (arr) => {
-    return arr[Math.floor(Math.random() * arr.length)]
+const random_choice = (arr, excl) => {
+    if (excl == undefined || arr.length < 2){
+        return arr[Math.floor(Math.random() * arr.length)]
+    } else {
+        let r = arr[Math.floor(Math.random() * arr.length)]
+        if (excl.indexOf(r) > -1) return random_choice(arr, excl)
+        return r
+    }
 }
 const random_string = (length) => {
     let r = ""
