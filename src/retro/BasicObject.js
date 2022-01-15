@@ -229,9 +229,9 @@ class BasicObject extends EventDispatcher {
             }
             this.meta.ticking.rate = this.tick_rate
             this.meta.ticking.enabled = this.tick_enabled
-            if (this.meta.ticking.enabled || force) {
+            if (this.meta.ticking.enabled || force == true) {
                 let now = +new Date()
-                if (force || this.meta.ticking.non_stop === true || now - this.meta.ticking.prev_time >= (1000 / this.meta.ticking.rate)) {
+                if (force == true || this.meta.ticking.non_stop === true || now - this.meta.ticking.prev_time >= (1000 / this.meta.ticking.rate)) {
                     let d = now - this.meta.ticking.prev_time
                     let delta = this.meta.ticking.delta = d / (1000)
                     this.meta.ticking.ticks++
