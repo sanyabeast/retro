@@ -22,6 +22,7 @@ const proxied_game_object_methods = [
     "traverse_components",
     "traverse_child_components",
     "get_component",
+    "get_component_with_tag",
     "find_child_component_of_type",
     "find_component_of_type",
     "find_child_component_of_type",

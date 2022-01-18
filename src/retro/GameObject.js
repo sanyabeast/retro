@@ -59,14 +59,14 @@ class GameObject extends BasicObject {
     tick(time_data) {
         super.tick(time_data)
         if (this.enabled) {
+            this.tasks.on_tick()
+            this.children.forEach((child) => {
+                child.tick(time_data)
+            })
             this.components.forEach((component) => {
                 if (component.enabled) {
                     component.tick(time_data)
                 }
-            })
-            this.tasks.on_tick()
-            this.children.forEach((child) => {
-                child.tick(time_data)
             })
         }
 
@@ -280,6 +280,27 @@ class GameObject extends BasicObject {
         let r = undefined
         for (let a = 0; a < this.components.length; a++) {
             if (this.components[a].name === component_name) {
+                r = this.components[a]
+                break
+            }
+        }
+        if (isFunction(cb)) {
+            if (r !== undefined) {
+                cb(r)
+            } else {
+                if (isFunction(on_not_found)) {
+                    on_not_found(r)
+                }
+            }
+            return r !== undefined
+        } else {
+            return r
+        }
+    }
+    get_component_with_tag(tag, cb, on_not_found) {
+        let r = undefined
+        for (let a = 0; a < this.components.length; a++) {
+            if (this.components[a].tag === tag) {
                 r = this.components[a]
                 break
             }

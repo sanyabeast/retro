@@ -11,6 +11,7 @@ import Vuex from "vuex"
 import { mapState, mapGetters } from "vuex"
 import { keys, set, isFunction, isObject, isArray, isNumber, isNull, isString } from "lodash-es"
 import { tools, log, error } from "retro/utils/Tools"
+import { Object3D, Vector3 } from "three"
 Vue.use(Vuex)
 
 let MyPlugin = {}
@@ -27,7 +28,7 @@ MyPlugin.install = function (Vue, options) {
         beforeMount() {
             let p = this
             this.tools = tools
-            
+
             while (p.$parent !== undefined) {
                 p = p.$parent
             }
@@ -57,7 +58,7 @@ MyPlugin.install = function (Vue, options) {
         },
         mounted() {
             if (this.$el && this.$el.style) {
-                if (tools.device.is_mobile){
+                if (tools.device.is_mobile) {
                     this.$el.classList.add("mobile")
                 }
                 // this.$el.style.zIndex = "2"
@@ -143,20 +144,27 @@ class VueGUIComponent extends Component {
     tick_rate = 5
     root_component = undefined
     module_name = "gui"
+    space = "screen"
     /**private */
     store = undefined
-    props = undefined
+    props = {}
+    world_space_position_vector = undefined
+    renderer_comp = undefined
+    camera_comp = undefined
+    fit_zoom = false
+    min_width = -1
+    max_width = -1
+    min_height = -1
+    min_max_height = -1
     constructor() {
         super(...arguments)
-        this.props = {}
-
+        this.world_space_position_vector = new Vector3()
     }
     get el() {
         return this.ui.$el
     }
     get ui() {
         return this.vue_app.$children[0]
-
     }
     get state() {
         return this.store.state
@@ -165,7 +173,6 @@ class VueGUIComponent extends Component {
         return this.store.state
     }
     on_create() {
-        console.log(this.game_object)
         this.log("creating...", this.store, this.root_component.name)
         this.dom = document.createElement("div")
         this.dom.style.width = "100%";
@@ -175,10 +182,13 @@ class VueGUIComponent extends Component {
         this.dom.style.userSelect = "none";
         this.dom.classList.add('gui-dom')
 
+        let renderer_comp = this.renderer_comp = this.find_component_of_type("Renderer")
+
         let { vue_app, store } = VueGUIComponent.create_vue_app(this.root_component, {
             props: this.props,
             id: this.UUID
         })
+
 
         this.vue_app = vue_app
         this.store = store
@@ -197,7 +207,48 @@ class VueGUIComponent extends Component {
     }
     on_tick(time_data) {
         this.vue_app.tick(time_data)
+        if (this.el && this.space == "world") {
+            let pos = this.get_screen_position();
+            this.el.style.transform = `translate(${this.tools.math.round(pos[0], 0.025)}px, ${this.tools.math.round(pos[1], 0.025)}px)`
+        }
+
+        if (this.fit_zoom) {
+            let new_zoom = 1
+            if (this.min_width > -1 && this.globals.dom_rect.width / this.min_width < 1) {
+                new_zoom = Math.min(this.globals.dom_rect.width / this.min_width, new_zoom)
+            } else {
+                new_zoom = Math.min(1, new_zoom)
+            }
+
+            if (this.min_height > -1 && this.globals.dom_rect.height / this.min_height < 1) {
+                new_zoom = Math.min(1, this.globals.dom_rect.height / this.min_height)
+            } else {
+                new_zoom = Math.min(1, new_zoom)
+            }
+
+            console.log(new_zoom)
+    
+            this.el.style.zoom = new_zoom
+        } else {
+            this.el.style.zoom = "auto"
+        }
     }
+    get_screen_position() {
+        var vector = this.world_space_position_vector
+
+        var widthHalf = 0.5 * this.renderer_comp.resolution.x;
+        var heightHalf = 0.5 * this.renderer_comp.resolution.y;
+
+        // this.subject.updateMatrixWorld();
+        vector.setFromMatrixPosition(this.game_object.transform.matrixWorld);
+        vector.project(this.globals.camera);
+
+        vector.x = (vector.x * widthHalf) + widthHalf;
+        vector.y = - (vector.y * heightHalf) + heightHalf;
+
+        return [vector.x, vector.y]
+
+    };
     store_set(key, value) {
         setTimeout(a => this.store.state[key] = value)
     }

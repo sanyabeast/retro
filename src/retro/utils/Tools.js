@@ -1,5 +1,5 @@
 
-import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRight } from "lodash-es"
+import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRight, throttle, debounce } from "lodash-es"
 import DateTime from "datetime-js"
 import exp from "constants";
 import { Color, Vector2, Vector3 } from "three"
@@ -399,7 +399,7 @@ const random_range = (min, max) => {
     return Math.random() * (max - min) + min;
 }
 const random_choice = (arr, excl) => {
-    if (excl == undefined || arr.length < 2){
+    if (excl == undefined || arr.length < 2) {
         return arr[Math.floor(Math.random() * arr.length)]
     } else {
         let r = arr[Math.floor(Math.random() * arr.length)]
@@ -423,12 +423,8 @@ const wait = (d) => {
     });
 }
 /**MATH*/
-const round = (x, n) => {
-    if (x % 5 == 0) {
-        return Math.floor(x / n) * n;
-    } else {
-        return Math.floor(x / n) * n + n;
-    }
+const round = (x, n, greater = false) => {
+    return greater ? Math.ceil(x / n) * n : Math.floor(x / n) * n;
 }
 const lerp = (start, end, amt) => {
     if (isNumber(start) && isNumber(end)) {
@@ -498,9 +494,10 @@ const async_for_x = async (x, cb) => {
     }
 }
 
-const join_uris = (...args)=>{
+const join_uris = (...args) => {
     return args.join("/")
 }
+
 
 const tools = {
     device: device,
@@ -565,7 +562,9 @@ const tools = {
         string: random_string,
     },
     time: {
-        wait: wait
+        wait: wait,
+        throttle,
+        debounce
     },
 }
 
