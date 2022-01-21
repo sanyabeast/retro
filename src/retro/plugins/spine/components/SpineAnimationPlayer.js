@@ -225,7 +225,7 @@ class SpineAnimationPlayer extends SceneComponent {
                     current_playlist_item.on_start(this)
                     delete current_playlist_item.on_start
                 }
-                this.subject.state.setAnimation(0, current_playlist_item.animation_name, false)
+                setTimeout(a => this.subject.state.setAnimation(0, current_playlist_item.animation_name, false))
                 current_playlist_item.is_playing = true
             }
 
@@ -238,13 +238,13 @@ class SpineAnimationPlayer extends SceneComponent {
                     }
                 } else {
                     if (current_playlist_item.is_playing === false) {
-                        this.subject.state.setAnimation(0, current_playlist_item.animation_name, false)
+                        setTimeout(a => this.subject.state.setAnimation(0, current_playlist_item.animation_name, false))
                         current_playlist_item.is_playing = true
                     }
                 }
             } else {
                 if (current_playlist_item.is_playing === false) {
-                    this.subject.state.setAnimation(0, current_playlist_item.animation_name, false)
+                    setTimeout(a => this.subject.state.setAnimation(0, current_playlist_item.animation_name, false))
                     current_playlist_item.is_playing = true
                 }
             }

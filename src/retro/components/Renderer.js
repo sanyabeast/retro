@@ -110,7 +110,7 @@ class Renderer extends Component {
     correct_lights = true
     current_matcap_id = 1
     shadows_enabled = true
-    tick_rate = 15
+    tick_rate = 5
     shadowmap_fps = 15
     useOptimizations = true
     //** private*/
@@ -125,6 +125,7 @@ class Renderer extends Component {
     progressive_lightmap = undefined
     progressive_lightmap_dirlight = undefined
     rendering_scale = 1;
+    just_rendered = true
 
     current_override_material = null
     override_normal_material = new MeshNormalMaterial()
@@ -147,7 +148,7 @@ class Renderer extends Component {
     on_create() {
         if (this.useOptimizations) {
             let optimized_oss = ["android", "macos", "osc", "mac", "linux"];
-            this.pixel_ratio = Math.min(1.75, optimized_oss.indexOf(Device.os_name) > -1 ? Math.min(1.25, window.devicePixelRatio) : window.devicePixelRatio);
+            this.pixel_ratio = Math.min(1.6, optimized_oss.indexOf(Device.os_name) > -1 ? Math.min(1.15, window.devicePixelRatio) : window.devicePixelRatio);
         }
 
         this.resolution = new Vector2(1, 1)
@@ -258,9 +259,13 @@ class Renderer extends Component {
         this.globals.uniforms.mouse.value.y = y;
     }
     on_tick(time_data) {
-        this.update_object_layers()
-        if (this.use_progressive_lightmap) this.update_progressive_lightmap()
-        this.check_size()
+        if (this.just_rendered){
+            this.just_rendered = false
+            this.update_object_layers()
+            if (this.use_progressive_lightmap) this.update_progressive_lightmap()
+            this.check_size()
+            this.render_list = this.get_rendering_list()
+        }
 
         // this.progressive_lightmap.showDebugLightmap( true );
     }
@@ -337,22 +342,22 @@ class Renderer extends Component {
         return this.get_object_layer_list(this.rendering_layers)
     }
     update_render_scene() {
-        let scene = this.globals.app
+        if (this.render_list !== undefined) {
+            let scene = this.globals.app
 
-        let render_list = this.get_rendering_list()
+            if (this.use_fog !== false) {
+                this.render_scene.fog = scene.fog
+            } else {
+                this.render_scene.fog = null
+            }
 
-        if (this.use_fog !== false) {
-            this.render_scene.fog = scene.fog
-        } else {
-            this.render_scene.fog = null
+            this.render_scene.background = scene.background
+            this.render_scene.refraction_map = scene.refraction_map
+            this.render_scene.environment = scene.environment
+            this.render_scene.children = this.render_list
+            this.render_items_count = this.render_list.length
+            this.render_scene.updateMatrixWorld()
         }
-
-        this.render_scene.background = scene.background
-        this.render_scene.refraction_map = scene.refraction_map
-        this.render_scene.environment = scene.environment
-        this.render_scene.children = render_list
-        this.render_items_count = render_list.length
-        this.render_scene.updateMatrixWorld()
     }
     update_progressive_lightmap() {
 
@@ -405,6 +410,7 @@ class Renderer extends Component {
             let camera = this.find_component_of_type("CameraComponent")
             if (camera && camera.subject) {
 
+                this.just_rendered = true
                 if (this.custom_render_function === undefined || this.use_postfx === false) {
                     this.renderer.render(this.render_scene, camera.subject)
                     // this.renderer.clear(true, true, true)   

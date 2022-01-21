@@ -126,7 +126,6 @@ MyPlugin.install = function (Vue, options) {
                 return this.game_object.get_components(component_name);
             },
             log() {
-                console.log(this)
                 log(`VUE Component "${this.$options.name || '?'}"`, ...arguments)
             },
             error() {
@@ -226,8 +225,6 @@ class VueGUIComponent extends Component {
                 new_zoom = Math.min(1, new_zoom)
             }
 
-            console.log(new_zoom)
-    
             this.el.style.zoom = new_zoom
         } else {
             this.el.style.zoom = "auto"
@@ -250,13 +247,13 @@ class VueGUIComponent extends Component {
 
     };
     store_set(key, value) {
-        setTimeout(a => this.store.state[key] = value)
+        this.store.state[key] = value
     }
     store_commit(mutation_name, payload) {
-        setTimeout(a => this.store.commit(mutation_name, payload))
+        this.store.commit(mutation_name, payload)
     }
     store_dispatch(action_name, payload) {
-        setTimeout(a => this.store.dispatch(action_name, payload))
+        this.store.dispatch(action_name, payload)
     }
     call_method(method_name, ...payload) {
         let root_comp = this.ui
@@ -268,36 +265,30 @@ class VueGUIComponent extends Component {
         this._call_method_on(root_comp, method_name, ...payload)
     }
     _call_method_on(object, method_name, ...payload) {
-        setTimeout(() => {
-            if (isObject(object) && isFunction(object[method_name])) {
-                object[method](...payload)
-            }
-        })
+        if (isObject(object) && isFunction(object[method_name])) {
+            object[method](...payload)
+        }
     }
     call_down_vue(method_name, ...payload) {
-        setTimeout(() => {
-            let root_comp = this.ui
-            if (!root_comp) {
-                this.error(`cannot run nested methods: no root`)
-                return
-            }
-            this._call_down_vue_on_comp(root_comp, method_name, ...payload)
-        })
+        let root_comp = this.ui
+        if (!root_comp) {
+            this.error(`cannot run nested methods: no root`)
+            return
+        }
+        this._call_down_vue_on_comp(root_comp, method_name, ...payload)
     }
     _call_down_vue_on_comp(comp, method_name, ...payload) {
-        setTimeout(() => {
-            comp = comp || this.ui
-            if (!comp) {
-                this.error(`cannot run nested methods: no comp`)
-                return
-            }
-            if (isFunction(comp[method_name])) {
-                comp[method_name](...payload)
-            }
-            if (isArray(comp.$children)) {
-                comp.$children.forEach(child => this._call_down_vue_on_comp(child, method_name, ...payload))
-            }
-        })
+        comp = comp || this.ui
+        if (!comp) {
+            this.error(`cannot run nested methods: no comp`)
+            return
+        }
+        if (isFunction(comp[method_name])) {
+            comp[method_name](...payload)
+        }
+        if (isArray(comp.$children)) {
+            comp.$children.forEach(child => this._call_down_vue_on_comp(child, method_name, ...payload))
+        }
     }
 }
 
