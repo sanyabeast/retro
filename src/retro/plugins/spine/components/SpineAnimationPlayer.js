@@ -48,6 +48,8 @@ class SpineAnimationPlayer extends SceneComponent {
     depth_test = false
     transparent = true
     current_playlist_item_id = 0
+    time_correction = true
+    default_fps = 30
     /**private */
     playlist = []
     get current_playlist_item() {
@@ -203,7 +205,11 @@ class SpineAnimationPlayer extends SceneComponent {
     on_tick(time_data) {
         this.update_queue()
         if (this.subject) {
-            this.subject.update(time_data.delta)
+            if (this.time_correction){
+                this.subject.update(time_data.delta)
+            } else {
+                this.subject.update(1 / this.default_fps)
+            }
         }
     }
     update_queue() {
@@ -315,14 +321,26 @@ class SpineAnimationPlayer extends SceneComponent {
         // let animation_name = payload.
         let animation = payload.animation
         let animation_name = animation.name
+
+        this.emit("animation.start", {
+            animation_name: animation_name
+        })
     }
     handle_animation_interrupt(payload) {
         let animation = payload.animation
         let animation_name = animation.name
+
+        this.emit("animation.interrupt", {
+            animation_name: animation_name
+        })
     }
     handle_animation_end(payload) {
         let animation = payload.animation
         let animation_name = animation.name
+
+        this.emit("animation.end", {
+            animation_name: animation_name
+        })
     }
     handle_animation_complete(payload) {
         let animation = payload.animation
@@ -338,10 +356,18 @@ class SpineAnimationPlayer extends SceneComponent {
             }
             current_playlist_item.played_times++;
         }
+        this.emit("animation.complete", {
+            animation_name: animation_name
+        })
     }
     handle_animation_event(payload) {
         let animation = payload.animation
         let animation_name = animation.name
+
+        this.emit("animation.event", {
+            animation_name: animation_name,
+            event_name: "?"
+        })
     }
 }
 

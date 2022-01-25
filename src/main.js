@@ -45,6 +45,7 @@ window.on_click_to_start = () => {
         default: {
             let frame = new Frame();
             frame.set_size((window.innerWidth * 0.8), (window.innerWidth * 0.8) / 16 * 9)
+            // frame.set_size((window.innerWidth * 0.15), (window.innerWidth * 0.15))
             frame.set_caption(APP_NAME);
 
             if (Device.os_name === "mac os"){

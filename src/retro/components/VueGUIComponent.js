@@ -298,7 +298,7 @@ VueGUIComponent.create_vue_app = function (root_component, options = {}) {
     }
 
     if (!isObject(root_component)) {
-        throw new Error(`bad component template`, root_component)
+        throw new Error(`bad component template ${root_component}` )
     }
 
     let store_template = root_component.store_template

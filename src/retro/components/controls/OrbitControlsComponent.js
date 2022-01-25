@@ -78,7 +78,7 @@ class OrbitControlsComponent extends Component {
     }
     set_controls_state(data) {
         this.target = data.target || [0, 0, 0]
-        this.position = data.position || [0, 1, -4]
+        this.position = data.position || [0, 0, -10]
         this.zoom = data.zoom || 1
     }
     on_update(props) {
@@ -100,7 +100,9 @@ class OrbitControlsComponent extends Component {
                     break
                 }
                 case "position": {
+                    console.log(controls.object.position, this.position)
                     controls.object.position.set(...this.position)
+                    console.log(controls.object.position, this.position)
                     break
                 }
                 case "zoom": {
@@ -160,7 +162,7 @@ OrbitControlsComponent.DEFAULT = {
     max_distance: Infinity,
     max_polar_angle: Math.PI,
     max_zoom: Infinity,
-    min_distance: 0.1,
+    min_distance: 0.01,
     min_zoom: 0.01,
     pan_speed: 1,
     rotate_speed: 1,

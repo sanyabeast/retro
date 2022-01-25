@@ -237,6 +237,9 @@ class ResourceManager extends BasicObject {
         };
         this.log("created");
     }
+    register_texture(src, texture){
+        this.cached_textures[src] = texture
+    }
     get_asset_stats() { return this.asset_stats; }
     get_material_template(template_name) {
         return this.templates_of_materials[template_name]

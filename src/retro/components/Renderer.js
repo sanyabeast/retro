@@ -22,7 +22,7 @@ import {
 } from 'three';
 import Device from "retro/utils/Device";
 import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
-import { isArray, isObject, map, debounce, throttle } from "lodash-es"
+import { isArray, isObject, map, debounce, throttle, isNumber } from "lodash-es"
 import { WebGLShadowMap } from "three/src/renderers/webgl/WebGLShadowMap"
 
 const $v3 = new Vector3()
@@ -86,12 +86,13 @@ class RenderScene extends Scene { }
 const renderer_presets = {
     desktop: {
         antialias: true,
-        alpha: false,
+        alpha: PRESET.RENDERER_ALPHA == true ? true : false,
         stencil: true,
         depth: true
     },
     smartphone: {
         antialias: false,
+        alpha: PRESET.RENDERER_ALPHA == true ? true : false,
         powerPreference: "high-performance"
     }
 }
@@ -110,9 +111,11 @@ class Renderer extends Component {
     correct_lights = true
     current_matcap_id = 1
     shadows_enabled = true
-    tick_rate = 5
+    tick_rate = isNumber(PRESET.RENDERER_UPDATE_RATE) ? PRESET.RENDERER_UPDATE_RATE : 5
     shadowmap_fps = 15
     useOptimizations = true
+    force_resolution = undefined
+
     //** private*/
 
     canvas = null
@@ -148,7 +151,7 @@ class Renderer extends Component {
     on_create() {
         if (this.useOptimizations) {
             let optimized_oss = ["android", "macos", "osc", "mac", "linux"];
-            this.pixel_ratio = Math.min(1.6, optimized_oss.indexOf(Device.os_name) > -1 ? Math.min(1.15, window.devicePixelRatio) : window.devicePixelRatio);
+            this.pixel_ratio = Math.min(2, optimized_oss.indexOf(Device.os_name) > -1 ? Math.min(1.25, window.devicePixelRatio) : window.devicePixelRatio);
         }
 
         this.resolution = new Vector2(1, 1)
@@ -160,8 +163,8 @@ class Renderer extends Component {
         let render_scene = this.render_scene = new RenderScene()
         let renderer = this.renderer = this.globals.renderer = new WebGLRenderer({
             antialias: false,
-            alpha: false,
-            // preserveDrawingBuffer: true,
+            alpha: PRESET.RENDERER_ALPHA == true ? true : false,
+            preserveDrawingBuffer: PRESET.RENDERER_PRESERVE_DRAWING_BUFFER == true ? true : false,
             stencil: this.clear_stencil,
             depth: this.clear_depth,
             ...renderer_presets[Device.device_type]
@@ -172,9 +175,11 @@ class Renderer extends Component {
         this.define_global_var("webgl_capabilities", a => renderer.capabilities)
 
         renderer.toneMappingExposure = 2
-        renderer.setClearAlpha(1)
+        renderer.setClearAlpha(PRESET.RENDERER_ALPHA == true ? 0 : 1)
         renderer.setSize(1000, 1000);
         renderer.physicallyCorrectLights = this.correct_lights
+
+        if (PRESET.RENDERER_ALPHA == true) this.globals.transparent_background = true
         if (this.globals.transparent_background) {
             renderer.setClearColor(0x000000, 0);
         }
@@ -267,18 +272,26 @@ class Renderer extends Component {
             this.render_list = this.get_rendering_list()
         }
 
+        if (PRESET.RENDERER_SYNC == true){
+            this.render();
+        }
+
         // this.progressive_lightmap.showDebugLightmap( true );
     }
     on_destroy() {
         super.on_destroy(...arguments)
-        if (this.raf_loop) {
-            this.raf_loop.stop()
+        if (PRESET.RENDERER_SYNC != true){
+            if (this.raf_loop) {
+                this.raf_loop.stop()
+            }
         }
     }
     on_enable() {
         this.globals.dom.appendChild(this.renderer.domElement)
         let clock = this.find_component_of_type("ClockComponent")
-        this.raf_loop = clock.create(this.render.bind(this))
+        if (PRESET.RENDERER_SYNC != true){
+            this.raf_loop = clock.create(this.render.bind(this))
+        }
         // this.raf_cb_id = clock.add(this.render.bind(this))
     }
     update_object_layers() {
@@ -351,9 +364,9 @@ class Renderer extends Component {
                 this.render_scene.fog = null
             }
 
-            this.render_scene.background = scene.background
-            this.render_scene.refraction_map = scene.refraction_map
-            this.render_scene.environment = scene.environment
+            this.render_scene.background = scene.background || null
+            this.render_scene.refraction_map = scene.refraction_map || null
+            this.render_scene.environment = scene.environment || null
             this.render_scene.children = this.render_list
             this.render_items_count = this.render_list.length
             this.render_scene.updateMatrixWorld()
@@ -470,7 +483,14 @@ class Renderer extends Component {
     }
     check_size() {
         let camera = this.find_component_of_type("CameraComponent")
-        let new_rect = this.globals.dom.getBoundingClientRect();
+        let new_rect;
+
+        if (this.force_resolution !== undefined){
+            new_rect = { x: 0, y: 0, width: this.force_resolution[0], height: this.force_resolution[1] }
+        } else {
+            new_rect = this.globals.dom.getBoundingClientRect();
+        }
+
         if (
             new_rect.width !== this.globals.dom_rect.width ||
             new_rect.height !== this.globals.dom_rect.height
@@ -514,6 +534,16 @@ class Renderer extends Component {
 
         return bounds
     }
+
+    get_frame_image_data(format){
+        switch (format){
+            default: {
+                let mime_type = "image/png"
+                return this.renderer.domElement.toDataURL(mime_type);
+            }
+        }
+    }
+
 
 
 }
