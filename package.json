@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "retro",
-    "version": "1.0.337",
+    "version": "1.0.347",
     "author": {
         "name": "sanyabeast",
         "email": "a.gvrnsk@gmail.com",
@@ -75,6 +75,7 @@
         "colors": "^1.4.0",
         "command-line-args": "^5.2.0",
         "core-js": "^3.17.3",
+        "dateformat": "^5.0.2",
         "datetime-js": "^4.0.0",
         "directory-tree": "^3.0.0",
         "extract-zip": "^2.0.1",

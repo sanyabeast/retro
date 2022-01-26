@@ -4,6 +4,7 @@ import DateTime from "datetime-js"
 import exp from "constants";
 import { Color, Vector2, Vector3 } from "three"
 import device from "./Device"
+import dateformat  from "dateformat";
 const color_blend = require("color-blend")
 /**blend modes*/
 /*  color: (…)
@@ -566,6 +567,9 @@ const tools = {
         throttle,
         debounce
     },
+    date: {
+        format: dateformat
+    }
 }
 
 export {
