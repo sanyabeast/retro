@@ -1,5 +1,5 @@
 <template>
-  <div class="dev-gui" :class="{ mobile: device.device_type !== `desktop` }">
+  <div class="dev-gui" :class="{ mobile: device.device_type !== `desktop`, hidden: !is_dev_env }">
     <div class="status">
       <div class="status-line"><p>dev mode</p></div>
       <div class="status-line">
@@ -66,11 +66,14 @@ export default {
     };
   },
   props: {},
-  computed: {},
+  computed: {
+    is_dev_env () {
+      return process.env.NODE_ENV==="development";
+    }
+  },
   watch: {},
   mounted() {
     window.dev_gui = this;
-    console.log(this.$store);
     this.asset_stats = ResourceManager.get_asset_stats();
   },
   methods: {
@@ -140,6 +143,9 @@ export default {
   font-size: 14px;
   opacity: 0.2;
   text-align: right;
+  &.hidden {
+    display: none;
+  }
   &.mobile {
     font-size: 8px;
     .status .status-line {
