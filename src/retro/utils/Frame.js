@@ -171,7 +171,7 @@ class Frame {
             prev_pointer[0] = evt.pageX;
             prev_pointer[1] = evt.pageY;
         });
-        document.body.addEventListener("mousemove", (evt) => {
+        window.addEventListener("mousemove", (evt) => {
             if (header_node_captured) {
                 let pointer = [0, 0];
                 pointer[0] = evt.pageX;
@@ -191,7 +191,7 @@ class Frame {
                 this.set_size(this.width + dx, this.height + dy);
             }
         });
-        document.body.addEventListener("mouseup", (evt) => {
+        window.addEventListener("mouseup", (evt) => {
             header_node_captured = false;
             resize_node_captured = false;
         });
