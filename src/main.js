@@ -43,7 +43,7 @@ window.on_click_to_start = () => {
             break
         }
         default: {
-            let frame = new Frame();
+            let frame = window._frame = new Frame();
             frame.set_size((window.innerWidth * 0.8), (window.innerWidth * 0.8) / 16 * 9)
             // frame.set_size((window.innerWidth * 0.15), (window.innerWidth * 0.15))
             frame.set_caption(APP_NAME);
