@@ -48,7 +48,7 @@ window.on_click_to_start = () => {
             // frame.set_size((window.innerWidth * 0.15), (window.innerWidth * 0.15))
             frame.set_caption(APP_NAME);
 
-            if (Device.os_name === "mac os"){
+            if (false && Device.os_name === "mac os"){
                 frame.toggle_maximize()
             }
             if (Device.is_mobile){

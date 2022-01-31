@@ -61,6 +61,12 @@ MyPlugin.install = function (Vue, options) {
                 if (tools.device.is_mobile) {
                     this.$el.classList.add("mobile")
                 }
+
+                if (window.innerWidth > window.innerHeight){
+                    this.$el.classList.add("landscape-orientation")
+                } else {
+                    this.$el.classList.remove("landscape-orientation")
+                }
                 // this.$el.style.zIndex = "2"
             }
         },
@@ -140,6 +146,7 @@ MyPlugin.install = function (Vue, options) {
 Vue.use(MyPlugin)
 
 class VueGUIComponent extends Component {
+    zoom = 1
     tick_rate = 5
     root_component = undefined
     module_name = "gui"
@@ -225,7 +232,7 @@ class VueGUIComponent extends Component {
                 new_zoom = Math.min(1, new_zoom)
             }
 
-            this.el.style.zoom = new_zoom
+            this.el.style.zoom = new_zoom * this.zoom
         } else {
             this.el.style.zoom = "auto"
         }
