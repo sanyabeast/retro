@@ -4,7 +4,7 @@ import DateTime from "datetime-js"
 import exp from "constants";
 import { Color, Vector2, Vector3 } from "three"
 import device from "./Device"
-import dateformat  from "dateformat";
+import dateformat from "dateformat";
 const color_blend = require("color-blend")
 /**blend modes*/
 /*  color: (…)
@@ -499,6 +499,23 @@ const join_uris = (...args) => {
     return args.join("/")
 }
 
+const parse_html = (html) => {
+    let div = document.createElement("div")
+    div.innerHTML = html
+    return div.children[0]
+}
+
+const add_css = (css) => {
+    let head = document.getElementsByTagName('head')[0];
+    let s = document.createElement('style');
+    s.setAttribute('type', 'text/css');
+    if (s.styleSheet) {   // IE
+        s.styleSheet.cssText = css;
+    } else {                // the world
+        s.appendChild(document.createTextNode(css));
+    }
+    head.appendChild(s);
+}
 
 const tools = {
     device: device,
@@ -540,7 +557,9 @@ const tools = {
         get_query_string_params,
         get_unique_props,
         get_app_name,
-        join_uris
+        join_uris,
+        parse_html,
+        add_css
     },
     math: {
         round: round,

@@ -75,6 +75,7 @@
         "colors": "^1.4.0",
         "command-line-args": "^5.2.0",
         "core-js": "^3.17.3",
+        "d3": "^7.3.0",
         "dateformat": "^5.0.2",
         "datetime-js": "^4.0.0",
         "directory-tree": "^3.0.0",
