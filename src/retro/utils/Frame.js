@@ -29,7 +29,7 @@ class ButtonController {
             padding: "2px"
         })
 
-        
+
 
         div.addEventListener("mousedown", (evt) => {
             evt.stopPropagation()
@@ -143,14 +143,14 @@ class Frame {
 
         this.update();
 
-        this.add_button("MAX", "MAXIMIZE WINDOW", ()=>{
+        this.add_button("MAX", "MAXIMIZE WINDOW", () => {
             this.toggle_maximize();
         })
     }
-    toggle_maximize () {
+    toggle_maximize() {
         if (this.maximized === undefined) this.maximized = false
         this.maximized = !this.maximized
-        if (this.maximized){
+        if (this.maximized) {
             this.dom.classList.add("maximized")
         } else {
             this.dom.classList.remove("maximized")
@@ -171,7 +171,7 @@ class Frame {
             prev_pointer[0] = evt.pageX;
             prev_pointer[1] = evt.pageY;
         });
-        document.body.addEventListener("mousemove", (evt) => {
+        window.addEventListener("mousemove", (evt) => {
             if (header_node_captured) {
                 let pointer = [0, 0];
                 pointer[0] = evt.pageX;
@@ -191,7 +191,7 @@ class Frame {
                 this.set_size(this.width + dx, this.height + dy);
             }
         });
-        document.body.addEventListener("mouseup", (evt) => {
+        window.addEventListener("mouseup", (evt) => {
             header_node_captured = false;
             resize_node_captured = false;
         });
@@ -205,12 +205,16 @@ class Frame {
         }
     }
     set_size(w, h) {
+        if (typeof this.force_aspect === "number") {
+            h = w / this.force_aspect;
+        }
         this.width = w;
         this.height = h;
         this.update();
         if (typeof this.on_size_changed === "function") {
             this.on_size_changed(this.width, this.height);
         }
+
     }
     set_position(x, y) {
         this.x = x;
