@@ -72,7 +72,7 @@ MyPlugin.install = function (Vue, options) {
         },
         methods: {
             format_money(v) {
-                if (!isNumber(v)) {
+                if (!isNumber(v) || isNaN(v)) {
                     return `${this.globals.money_format_currency || "?"} 0`
                 }
                 return `${this.globals.money_format_currency || "?"} ${v.toFixed(2)}`

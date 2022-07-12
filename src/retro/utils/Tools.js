@@ -517,6 +517,14 @@ const add_css = (css) => {
     head.appendChild(s);
 }
 
+const average_in_array = (arr) => {
+    let sum = 0;
+    for (let i = 0; i < arr.length; i++) {
+        sum += arr[i] || 0
+    }
+    return sum / arr.length;
+}
+
 const tools = {
     device: device,
     array: {
@@ -562,6 +570,7 @@ const tools = {
         add_css
     },
     math: {
+        average_in_array,
         round: round,
         lerp: lerp,
         clamp: clamp,
