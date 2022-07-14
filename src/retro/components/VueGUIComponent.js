@@ -75,7 +75,10 @@ MyPlugin.install = function (Vue, options) {
                 if (!isNumber(v) || isNaN(v)) {
                     return `${this.globals.money_format_currency || "?"} 0`
                 }
-                return `${this.globals.money_format_currency || "?"} ${v.toFixed(2)}`
+                return `${this.globals.money_format_currency || "?"} ${this.round_to(v, 2)}`
+            },
+            round_to(v, d){
+                return Math.round(v * Math.pow(10, d)) / Math.pow(10, d)
             },
             format_round_value(v) {
                 return `x${v.toFixed(2)}`
