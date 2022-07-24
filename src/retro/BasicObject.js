@@ -49,6 +49,9 @@ class BasicObject extends EventDispatcher {
     constructor(params) {
         super(params)
         this.meta = {
+            persistence_inited: false,
+            persistence_autosave: false,
+            has_persistent_state: false,
             game_object: undefined,
             object_type: "",
             enabled: true,
@@ -321,6 +324,63 @@ class BasicObject extends EventDispatcher {
     }
     /**unit conversion */
     /**world/local */
+
+    /**persistance */
+    on_ready() {
+        this.init_persistence()
+    }
+    init_persistence() {
+        if (!this.meta.persistence_inited) {
+            let persistent_props_list = this.get_persistent_props()
+            this.meta.has_persistent_state = isArray(persistent_props_list) && persistent_props_list.length > 0
+
+            if (this.meta.has_persistent_state) {
+                this.load_persistent_state()
+            } else {
+                this.clear_persistent_state()
+            }
+
+
+            this.meta.persistence_inited = true
+        }
+    }
+    get_persistent_props() {
+        return []
+    }
+    save_persistent_state() {
+        if (this.meta.has_persistent_state && "localStorage" in window) {
+            let save_data = {}
+            let persistent_props = this.get_persistent_props()
+            let save_key = this.UUID
+            forEach(persistent_props, (prop_name, index) => {
+                save_data[prop_name] = get(this, prop_name)
+            })
+            window.localStorage.setItem(save_key, JSON.stringify(save_data))
+        }
+    }
+    load_persistent_state() {
+        if (this.meta.has_persistent_state && "localStorage" in window) {
+            let save_key = this.UUID
+            let persistent_props = this.get_persistent_props()
+            let save_data = window.localStorage.getItem(save_key)
+            console.log(33333, save_data)
+            if (isString(save_data)) {
+                save_data = JSON.parse(save_data)
+                forEach(save_data, (prop_data, prop_name) => {
+                    if (persistent_props.indexOf(prop_name) > -1) {
+                        set(this, prop_name, prop_data)
+                    }
+                })
+            }
+
+        }
+    }
+    clear_persistent_state() {
+        if ("localStorage" in window) {
+            let save_key = this.UUID
+            window.localStorage.removeItem(save_key)
+        }
+    }
 }
 
 BasicObject.add_traversal_method = function (context_name = "component", method_name, skip_disabled = false) {

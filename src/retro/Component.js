@@ -55,6 +55,7 @@ class Component extends BasicObject {
         super(params);
         this.meta.object_type = "component"
     }
+
     save_prefab() {
         let r = {
             enabled: this.enabled,
@@ -66,6 +67,7 @@ class Component extends BasicObject {
     get_gizmo_render_data() {
         return []
     }
+    
     on_update() {
         super.on_update(...arguments);
     }

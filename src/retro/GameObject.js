@@ -3,7 +3,7 @@ import { Vector3 } from 'three';
 import ResourceManager from 'retro/ResourceManager';
 import { Task, TaskScheduler } from "retro/utils/TaskScheduler"
 import StateMachine from "retro/utils/StateMachine"
-import { isBoolean, isArray, isObject, isString, isFunction, isUndefined, forEach, sortBy, isNumber } from "lodash-es"
+import { isBoolean, isArray, isObject, isString, isFunction, isUndefined, forEach, sortBy, isNumber, get, set, unset } from "lodash-es"
 import { log, error, get_most_suitable_dict_keys } from "retro/utils/Tools"
 import Schema from "retro/utils/Schema"
 import Component from "retro/Component"
@@ -28,6 +28,7 @@ class GameObject extends BasicObject {
     transform = undefined
     constructor(prefab) {
         super(...arguments)
+
         this.meta.ticking.non_stop = true
         this.position = [0, 0, 0]
         this.rotation = [0, 0, 0]
@@ -47,12 +48,14 @@ class GameObject extends BasicObject {
         this.load_prefab(prefab)
 
     }
+
     get refs() {
         if (ResourceManager.gameobject_refs[this.UUID] === undefined) {
             ResourceManager.gameobject_refs[this.UUID] = {}
         }
         return ResourceManager.gameobject_refs[this.UUID]
     }
+    
     create_game_object() {
         return new GameObject(...arguments)
     }
@@ -72,6 +75,7 @@ class GameObject extends BasicObject {
 
         this.tick_id++
     }
+    
     get_reactive_props() {
         return [
             "position",
@@ -477,7 +481,6 @@ class GameObject extends BasicObject {
 
             component.apply_params()
 
-
             if (ref !== undefined) {
                 component._ref = ref
                 this.refs[ref] = component
@@ -489,7 +492,9 @@ class GameObject extends BasicObject {
                 }
             }
             this.components.push(component)
+
             component.on_create()
+            component.on_ready()
             component.enabled = enabled
             ResourceManager.components_instances[component_name] = ResourceManager.components_instances[component_name] || {}
             ResourceManager.components_instances[component_name][component.UUID] = component
