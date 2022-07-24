@@ -559,15 +559,15 @@ accounting.settings.currency.format = "%s %v";
 
 // Format can be an object, with `pos`, `neg` and `zero`:
 accounting.settings.currency.format = {
-	pos : "%s %v",   // for positive values, eg. "$ 1.00" (required)
-	neg : "%s (%v)", // for negative values, eg. "$ (1.00)" [optional]
-	zero: "%s  -- "  // for zero values, eg. "$  --" [optional]
+	pos : "%s\xa0%v",   // for positive values, eg. "$ 1.00" (required)
+	neg : "%s\xa0(%v)", // for negative values, eg. "$ (1.00)" [optional]
+	zero: "%s\xa0\xa0--\xa0"  // for zero values, eg. "$  --" [optional]
 };
 
 // Example using underscore.js - extend default settings (also works with $.extend in jQuery):
 accounting.settings.number = defaults({
 	precision: 2,
-	thousand: " "
+	thousand: "\xa0"
 }, accounting.settings.number);
 
 
