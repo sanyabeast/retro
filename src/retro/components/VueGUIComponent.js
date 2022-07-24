@@ -71,29 +71,14 @@ MyPlugin.install = function (Vue, options) {
             }
         },
         methods: {
-            format_money(v) {
-                if (!isNumber(v) || isNaN(v)) {
-                    return `${this.globals.money_format_currency || "?"} 0`
-                }
-                return `${this.globals.money_format_currency || "?"} ${this.round_to(v, 2)}`
-            },
-            round_to(v, d){
-                return Math.round(v * Math.pow(10, d)) / Math.pow(10, d)
-            },
-            format_round_value(v) {
-                return `x${v.toFixed(2)}`
-            },
-            format_ms_to_s(v) {
-                return `${(v / 1000).toFixed(2)}s`
-            },
-            clamp(a, min, max) {
-                return Math.min(Math.max(a, min), max)
-            },
-            lerp(value1, value2, amount) {
-                amount = amount < 0 ? 0 : amount;
-                amount = amount > 1 ? 1 : amount;
-                return value1 + (value2 - value1) * amount;
-            },
+            // clamp(a, min, max) {
+            //     return Math.min(Math.max(a, min), max)
+            // },
+            // lerp(value1, value2, amount) {
+            //     amount = amount < 0 ? 0 : amount;
+            //     amount = amount > 1 ? 1 : amount;
+            //     return value1 + (value2 - value1) * amount;
+            // },
             tick(d) {
                 this.$children.forEach(c => c.tick(d))
                 this.on_tick(d)

@@ -1,10 +1,16 @@
 
-import { map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRight, throttle, debounce } from "lodash-es"
+import { defaults, map, isObject, isArray, isRegExp, isString, isUndefined, isBoolean, isNumber, isNaN, isNull, isTypedArray, isFunction, forEach, forEachRight, throttle, debounce } from "lodash-es"
 import DateTime from "datetime-js"
 import exp from "constants";
 import { Color, Vector2, Vector3 } from "three"
 import device from "./Device"
 import dateformat from "dateformat";
+import accounting, { formatNumber } from "accounting"
+import getSymbolFromCurrency from 'currency-symbol-map'
+
+
+
+
 const color_blend = require("color-blend")
 /**blend modes*/
 /*  color: (…)
@@ -517,6 +523,11 @@ const add_css = (css) => {
     head.appendChild(s);
 }
 
+const parse_numeric_float = (data) => {
+    return data.toString().replace(/[^0-9\.]/g, '')
+}
+
+
 const average_in_array = (arr) => {
     let sum = 0;
     for (let i = 0; i < arr.length; i++) {
@@ -524,6 +535,69 @@ const average_in_array = (arr) => {
     }
     return sum / arr.length;
 }
+
+
+/**intl */
+// Settings object that controls default parameters for library methods:
+accounting.settings = {
+	currency: {
+		symbol : "$",   // default currency symbol is '$'
+		format: "%s%v", // controls output: %s = symbol, %v = value/number (can be object: see below)
+		decimal : ".",  // decimal point separator
+		thousand: ",",  // thousands separator
+		precision : 2   // decimal places
+	},
+	number: {
+		precision : 0,  // default precision on numbers is 0
+		thousand: ",",
+		decimal : "."
+	}
+}
+
+// These can be changed externally to edit the library's defaults:
+accounting.settings.currency.format = "%s %v";
+
+// Format can be an object, with `pos`, `neg` and `zero`:
+accounting.settings.currency.format = {
+	pos : "%s %v",   // for positive values, eg. "$ 1.00" (required)
+	neg : "%s (%v)", // for negative values, eg. "$ (1.00)" [optional]
+	zero: "%s  -- "  // for zero values, eg. "$  --" [optional]
+};
+
+// Example using underscore.js - extend default settings (also works with $.extend in jQuery):
+accounting.settings.number = defaults({
+	precision: 2,
+	thousand: " "
+}, accounting.settings.number);
+
+
+let _format_currency_params = {
+    default_currency: "USD",
+    default_currency_precision: 2,
+    default_number_precision: 2,
+}
+
+const set_format_currency_params = (params) => {
+    _format_currency_params.default_currency = params.default_currency || _format_currency_params.default_currency;
+}
+
+
+const format_currency = (data = 0, currency = _format_currency_params.default_currency)=>{
+    data = accounting.unformat(data.toString())
+    return accounting.formatMoney(data, getSymbolFromCurrency(currency), _format_currency_params.default_currency_precision)
+}
+
+const format_number = (data = 0, precision = _format_currency_params.default_number_precision) => {
+    data = accounting.unformat(data.toString())
+    return formatNumber(data, precision)
+}
+
+
+const format_ms_to_s = (v) => {
+    return `${(v / 1000).toFixed(2)}s`
+}
+
+/** combine module */
 
 const tools = {
     device: device,
@@ -567,7 +641,15 @@ const tools = {
         get_app_name,
         join_uris,
         parse_html,
-        add_css
+        add_css,
+        parse_numeric_float,
+    },
+    intl: {
+        format_currency,
+        format_number,
+        set_format_currency_params,
+        format_ms_to_s
+        
     },
     math: {
         average_in_array,
