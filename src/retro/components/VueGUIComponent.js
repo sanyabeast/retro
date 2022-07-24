@@ -12,6 +12,8 @@ import { mapState, mapGetters } from "vuex"
 import { keys, set, isFunction, isObject, isArray, isNumber, isNull, isString } from "lodash-es"
 import { tools, log, error } from "retro/utils/Tools"
 import { Object3D, Vector3 } from "three"
+import VuexPersistence from 'vuex-persist'
+
 Vue.use(Vuex)
 
 let MyPlugin = {}
@@ -62,7 +64,7 @@ MyPlugin.install = function (Vue, options) {
                     this.$el.classList.add("mobile")
                 }
 
-                if (window.innerWidth > window.innerHeight){
+                if (window.innerWidth > window.innerHeight) {
                     this.$el.classList.add("landscape-orientation")
                 } else {
                     this.$el.classList.remove("landscape-orientation")
@@ -287,13 +289,30 @@ class VueGUIComponent extends Component {
     }
 }
 
+
+VueGUIComponent.vuex_persistence_save_keys = {}
+
+VueGUIComponent.get_next_vuex_persistence_id = function (alias = "anonym") {
+    let keys = VueGUIComponent.vuex_persistence_save_keys
+
+    let c = keys[alias]
+    if (c === undefined) {
+        c = keys[alias] = 0
+    } else {
+        c = keys[alias] = c + 1
+    }
+    return `vuex-persist-${alias}-${c}`
+}
+
 VueGUIComponent.create_vue_app = function (root_component, options = {}) {
+
+
     if (isString(root_component)) {
         root_component = ResourceManager.vue_components_templates[root_component]
     }
 
     if (!isObject(root_component)) {
-        throw new Error(`bad component template ${root_component}` )
+        throw new Error(`bad component template ${root_component}`)
     }
 
     let store_template = root_component.store_template
@@ -301,6 +320,12 @@ VueGUIComponent.create_vue_app = function (root_component, options = {}) {
     if (isFunction(store_template)) {
         store_template = store_template(options)
     }
+
+    let vuex_persistence_agent = new VuexPersistence({
+        key: VueGUIComponent.get_next_vuex_persistence_id(isString(root_component) ? root_component : undefined),
+        storage: window.localStorage,
+        reducer: isObject(store_template) && isFunction(store_template.reducer) ? store_template.reducer : state => { }
+    })
 
     if (!isObject(store_template)) {
         store_template = {
@@ -315,6 +340,12 @@ VueGUIComponent.create_vue_app = function (root_component, options = {}) {
     store_template.state = store_template.state || {}
     store_template.actions = store_template.actions || {}
     store_template.mutations = store_template.mutations || {}
+
+    if (false && vuex_persistence_agent !== undefined) {
+        store_template.plugins = [
+            vuex_persistence_agent.plugin
+        ]
+    }
 
     let store = new Vuex.Store(store_template)
     ResourceManager.vuex_stores[options.id || tools.random.string(16)] = store
