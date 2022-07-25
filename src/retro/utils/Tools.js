@@ -540,18 +540,18 @@ const average_in_array = (arr) => {
 /**intl */
 // Settings object that controls default parameters for library methods:
 accounting.settings = {
-	currency: {
-		symbol : "$",   // default currency symbol is '$'
-		format: "%s%v", // controls output: %s = symbol, %v = value/number (can be object: see below)
-		decimal : ".",  // decimal point separator
-		thousand: ",",  // thousands separator
-		precision : 2   // decimal places
-	},
-	number: {
-		precision : 0,  // default precision on numbers is 0
-		thousand: ",",
-		decimal : "."
-	}
+    currency: {
+        symbol: "$",   // default currency symbol is '$'
+        format: "%s%v", // controls output: %s = symbol, %v = value/number (can be object: see below)
+        decimal: ".",  // decimal point separator
+        thousand: ",",  // thousands separator
+        precision: 2   // decimal places
+    },
+    number: {
+        precision: 0,  // default precision on numbers is 0
+        thousand: ",",
+        decimal: "."
+    }
 }
 
 // These can be changed externally to edit the library's defaults:
@@ -559,15 +559,15 @@ accounting.settings.currency.format = "%s %v";
 
 // Format can be an object, with `pos`, `neg` and `zero`:
 accounting.settings.currency.format = {
-	pos : "%s\xa0%v",   // for positive values, eg. "$ 1.00" (required)
-	neg : "%s\xa0(%v)", // for negative values, eg. "$ (1.00)" [optional]
-	zero: "%s\xa0\xa0--\xa0"  // for zero values, eg. "$  --" [optional]
+    pos: "%s\xa0%v",   // for positive values, eg. "$ 1.00" (required)
+    neg: "%s\xa0(%v)", // for negative values, eg. "$ (1.00)" [optional]
+    zero: "%s\xa0\xa0--\xa0"  // for zero values, eg. "$  --" [optional]
 };
 
 // Example using underscore.js - extend default settings (also works with $.extend in jQuery):
 accounting.settings.number = defaults({
-	precision: 2,
-	thousand: "\xa0"
+    precision: 2,
+    thousand: "\xa0"
 }, accounting.settings.number);
 
 
@@ -582,7 +582,10 @@ const set_format_currency_params = (params) => {
 }
 
 
-const format_currency = (data = 0, currency = _format_currency_params.default_currency)=>{
+const format_currency = (data = 0, currency = _format_currency_params.default_currency) => {
+    if (data === 0) {
+        data = 0.00001
+    }
     data = accounting.unformat(data.toString())
     return accounting.formatMoney(data, getSymbolFromCurrency(currency), _format_currency_params.default_currency_precision)
 }
@@ -595,6 +598,26 @@ const format_number = (data = 0, precision = _format_currency_params.default_num
 
 const format_ms_to_s = (v) => {
     return `${(v / 1000).toFixed(2)}s`
+}
+
+/**html */
+const find_relative_parent = (root) => {
+    let p = root.parentElement
+    let type = window.getComputedStyle(p).position
+
+    while (type !== "absolute" && type !== "relative" && p !== null) {
+        p = p.parentElement
+        if (p === window) {
+
+        }
+        type = window.getComputedStyle(p).position
+    }
+
+    return p
+}
+
+const get_html_rect = (el) => {
+    return el.getBoundingClientRect()
 }
 
 /** combine module */
@@ -649,7 +672,7 @@ const tools = {
         format_number,
         set_format_currency_params,
         format_ms_to_s
-        
+
     },
     math: {
         average_in_array,
@@ -679,6 +702,10 @@ const tools = {
     },
     date: {
         format: dateformat
+    },
+    html: {
+        find_relative_parent,
+        get_rect: get_html_rect
     }
 }
 

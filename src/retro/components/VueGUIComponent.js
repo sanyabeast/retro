@@ -9,7 +9,7 @@ import ResourceManager from "retro/ResourceManager";
 import Vue from "vue"
 import Vuex from "vuex"
 import { mapState, mapGetters } from "vuex"
-import { keys, set, isFunction, isObject, isArray, isNumber, isNull, isString } from "lodash-es"
+import { keys, set, isFunction, isObject, isArray, isNumber, isNull, isString, throttle } from "lodash-es"
 import { tools, log, error } from "retro/utils/Tools"
 import { Object3D, Vector3 } from "three"
 import VuexPersistence from 'vuex-persist'
@@ -127,7 +127,6 @@ MyPlugin.install = function (Vue, options) {
             error() {
                 error(`VUE Component "${this.$options.name || '?'}"`, ...arguments)
             }
-
         }
     }
 
@@ -140,18 +139,21 @@ class VueGUIComponent extends Component {
     tick_rate = 5
     root_component = undefined
     module_name = "gui"
+    /**[screen, world, screen2] */
     space = "screen"
+    size = [1550, 850]
+    size_mobile = [850, 550]
+    fit = [0, 1]
     /**private */
     store = undefined
     props = {}
     world_space_position_vector = undefined
     renderer_comp = undefined
     camera_comp = undefined
-    fit_zoom = false
-    min_width = -1
-    max_width = -1
-    min_height = -1
-    min_max_height = -1
+    computed_aspect_ratio = 1
+    computed_landscape_mode = true
+    computed_boundind_rect = { width: 1, height: 1, x: 0, y: 0, left: 0, top: 0 }
+    computed_zoom = 1
     constructor() {
         super(...arguments)
         this.world_space_position_vector = new Vector3()
@@ -189,6 +191,9 @@ class VueGUIComponent extends Component {
         this.vue_app = vue_app
         this.store = store
         vue_app.gui_component = this
+
+        this.update_zoom = throttle(this.update_zoom, 250)
+        this.update_computed_private_props = throttle(this.update_computed_private_props, 1000)
     }
     on_destroy() {
         super.on_destroy(...arguments)
@@ -203,29 +208,56 @@ class VueGUIComponent extends Component {
     }
     on_tick(time_data) {
         this.vue_app.tick(time_data)
-        if (this.el && this.space == "world") {
+        this.update_world_space_state()
+        this.update_computed_private_props()
+        this.update_zoom()
+    }
+    update_world_space_state() {
+        if (this.space == "world" && this.el) {
             let pos = this.get_screen_position();
             this.el.style.transform = `translate(${this.tools.math.round(pos[0], 0.025)}px, ${this.tools.math.round(pos[1], 0.025)}px)`
         }
-
-        if (this.fit_zoom) {
-            let new_zoom = 1
-            if (this.min_width > -1 && this.globals.dom_rect.width / this.min_width < 1) {
-                new_zoom = Math.min(this.globals.dom_rect.width / this.min_width, new_zoom)
-            } else {
-                new_zoom = Math.min(1, new_zoom)
-            }
-
-            if (this.min_height > -1 && this.globals.dom_rect.height / this.min_height < 1) {
-                new_zoom = Math.min(1, this.globals.dom_rect.height / this.min_height)
-            } else {
-                new_zoom = Math.min(1, new_zoom)
-            }
-
-            this.el.style.zoom = new_zoom * this.zoom
-        } else {
-            this.el.style.zoom = "auto"
+    }
+    update_computed_private_props() {
+        if (this.el && this.el.parentElement) {
+            this.computed_boundind_rect = this.el.parentElement.getBoundingClientRect()
+            this.computed_aspect_ratio = this.computed_boundind_rect.width / this.computed_boundind_rect.height
+            this.computed_landscape_mode = this.computed_aspect_ratio > 1
         }
+    }
+    update_zoom() {
+        switch (this.space) {
+            case "screen": {
+                let size = this.size
+                let fit = this.fit
+
+                if (this.tools.device.is_mobile) {
+                    if (this.computed_landscape_mode) {
+                        size = this.size_mobile
+                        fit = this.fit_mobile || fit
+                    } else {
+                        size = [this.size_mobile[1], this.size_mobile[0]]
+                        fit = [this.fit[1], this.fit[0]]
+                        fit = this.fit_mobile_landscape || fit
+                    }
+                }
+
+                let h = this.computed_boundind_rect.height
+                let w = this.computed_boundind_rect.width
+
+                let h_zoom = h / size[1]
+                let w_zoom = w / size[0]
+                let final_zoom = this.tools.math.lerp(1, h_zoom, fit[1])
+                this.computed_zoom = final_zoom = this.tools.math.lerp(final_zoom, w_zoom, fit[0])
+                this.el.style.zoom = final_zoom
+                break
+            }
+            default: {
+                this.el.style.zoom = '1'
+                break
+            }
+        }
+
     }
     get_screen_position() {
         var vector = this.world_space_position_vector
