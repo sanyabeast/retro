@@ -218,6 +218,7 @@ module.exports = (env) => {
 			host: "0.0.0.0"
 		},
 		resolve: {
+			extensions: ['.js', '.coffee'],
 			modules: ["src", "lib", "node_modules", "dist"],
 			alias: {
 				"@": path.resolve(__dirname, "src"),

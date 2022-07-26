@@ -557,6 +557,7 @@ class ResourceManager extends BasicObject {
     }
     resolve_string_placeholders(data) {
         data = data.replace("{{APP_NAME}}", process.env.APP_NAME)
+        data = data.replace("{{PLATFORM}}", this.tools.device.is_mobile ? "MOBILE" : "DESKTOP")
         return data
     }
     load_prefab(id, params) {

@@ -22,8 +22,7 @@ MyPlugin.install = function (Vue, options) {
     let BasicComp = {
         name: "BasicComponent",
         data() {
-            return {
-            }
+            return {}
         },
         props: {},
         watch: {},
@@ -59,34 +58,28 @@ MyPlugin.install = function (Vue, options) {
             })
         },
         mounted() {
-            if (this.$el && this.$el.style) {
-                if (tools.device.is_mobile) {
-                    this.$el.classList.add("mobile")
-                }
-
-                if (window.innerWidth > window.innerHeight) {
-                    this.$el.classList.add("landscape-orientation")
-                } else {
-                    this.$el.classList.remove("landscape-orientation")
-                }
-                // this.$el.style.zIndex = "2"
-            }
+            this.update_platform_attributes = throttle(this.update_platform_attributes.bind(this), 500);
+            this.update_platform_attributes()
         },
         methods: {
-            // clamp(a, min, max) {
-            //     return Math.min(Math.max(a, min), max)
-            // },
-            // lerp(value1, value2, amount) {
-            //     amount = amount < 0 ? 0 : amount;
-            //     amount = amount > 1 ? 1 : amount;
-            //     return value1 + (value2 - value1) * amount;
-            // },
+            update_platform_attributes() {
+                if (this.$el && this.$el.style) {
+                    if (tools.device.is_mobile) {
+                        this.$el.classList.add("mobile")
+                    }
+                    if (window.innerWidth > window.innerHeight) {
+                        this.$el.classList.add("landscape-orientation")
+                    } else {
+                        this.$el.classList.remove("landscape-orientation")
+                    }
+                }
+            },
             tick(d) {
                 this.$children.forEach(c => c.tick(d))
+                this.update_platform_attributes()
                 this.on_tick(d)
             },
-            on_tick(d) {
-            },
+            on_tick(d) { },
             /**CORE COMP COMPAT */
             listen(event_name) {
                 return this.game_object.listen(event_name);
@@ -104,15 +97,13 @@ MyPlugin.install = function (Vue, options) {
                 return this.game_object.find_components_of_type(component_name);
             },
             setup_components(data) {
-                if (Array.isArray(data)) {
+                if (isArray(data)) {
                     return this.game_object.setup_components(data)
-
                 }
             },
             add_component(data) {
                 if (typeof data === 'object') {
                     return this.game_object.add_component(data)
-
                 }
             },
             remove_component(data) {
@@ -186,7 +177,6 @@ class VueGUIComponent extends Component {
             props: this.props,
             id: this.UUID
         })
-
 
         this.vue_app = vue_app
         this.store = store
@@ -337,8 +327,6 @@ VueGUIComponent.get_next_vuex_persistence_id = function (alias = "anonym") {
 }
 
 VueGUIComponent.create_vue_app = function (root_component, options = {}) {
-
-
     if (isString(root_component)) {
         root_component = ResourceManager.vue_components_templates[root_component]
     }
