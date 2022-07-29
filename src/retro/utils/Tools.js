@@ -505,28 +505,28 @@ const join_uris = (...args) => {
     return args.join("/")
 }
 
-const parse_html = (html) => {
-    let div = document.createElement("div")
-    div.innerHTML = html
-    return div.children[0]
-}
 
-const add_css = (css) => {
-    let head = document.getElementsByTagName('head')[0];
-    let s = document.createElement('style');
-    s.setAttribute('type', 'text/css');
-    if (s.styleSheet) {   // IE
-        s.styleSheet.cssText = css;
-    } else {                // the world
-        s.appendChild(document.createTextNode(css));
-    }
-    head.appendChild(s);
-}
 
 const parse_numeric_float = (data) => {
     return data.toString().replace(/[^0-9\.]/g, '')
 }
 
+
+const define_getters = (target, options) => {
+    forEach(options, (token, key)=>{
+        if(isFunction(token)){
+            Object.defineProperty(target, key, {
+                get: token
+            })
+        } else {
+            Object.defineProperty(target, key, {
+                get: ()=>options[key]
+            })
+        }
+    })
+
+    return target
+}
 
 const average_in_array = (arr) => {
     let sum = 0;
@@ -658,6 +658,30 @@ const set_html_style = (el, style) => {
     })
 }
 
+const parse_html = (html) => {
+    let div = document.createElement("div")
+    div.innerHTML = html
+    return div.children[0]
+}
+
+const add_css = (css) => {
+    let head = document.getElementsByTagName('head')[0];
+    let s = document.createElement('style');
+    s.setAttribute('type', 'text/css');
+    if (s.styleSheet) {   // IE
+        s.styleSheet.cssText = css;
+    } else {                // the world
+        s.appendChild(document.createTextNode(css));
+    }
+    head.appendChild(s);
+}
+
+const create_dom = (options) => {
+    let el = isString(options.layout) ? parse_html(options.layout) : document.createElement(options.tag || 'div')
+    return el
+}
+
+
 
 /** combine module */
 
@@ -705,6 +729,7 @@ const tools = {
         parse_html,
         add_css,
         parse_numeric_float,
+        define_getters
     },
     intl: {
         format_currency,

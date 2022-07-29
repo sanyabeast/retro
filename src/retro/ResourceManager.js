@@ -584,13 +584,8 @@ class ResourceManager extends BasicObject {
     /**ASSET PRELOADERS */
     preload_context(context, handler, do_resolve = true) {
         context.keys().forEach((p) => {
-            console.dir(p)
             if (do_resolve) {
                 let _module = context(p)
-                // if (_module.default !== undefined) {
-                //     _module = _module.default
-                // }
-                // console.log(_module)
                 handler(p, _module)
             } else {
                 handler(p)
