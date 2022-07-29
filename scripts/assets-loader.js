@@ -50,9 +50,9 @@ module.exports = function (source_code, map, meta) {
             injected_code += `rm.preload_classes("${context}", require.context("${base_path}/geometry/classes", true, /\.js$|\.coffee$/), "geometries");\n`
         if (fs.existsSync(path.join(root, "src", base_path, "objects")))
             injected_code += `rm.preload_classes("${context}", require.context("${base_path}/objects", true, /\.js$|\.coffee$/), "objects");\n`
-        // if (fs.existsSync(path.join(root, "src", base_path, "textures")))
+        if (fs.existsSync(path.join(root, "src", base_path, "textures")))
         //     injected_code += `rm.preload_textures("${context}", require.context("${base_path}/textures/", true, /\.png$/));\n`
-        if (fs.existsSync(path.join(root, "src", base_path, "gui")))
+        // if (fs.existsSync(path.join(root, "src", base_path, "gui")))
             injected_code += `rm.preload_vue_components("${context}", require.context("${base_path}/gui/", false, /\.vue$/));\n`
         if (fs.existsSync(path.join(root, "src", base_path, "textures")))
             injected_code += `rm.preload_textures2("${context}", require.context("${base_path}/textures/", true, /\.yaml$/));\n`
@@ -70,9 +70,7 @@ module.exports = function (source_code, map, meta) {
     })
 
     source_code = source_code.replace(placeholder_string, injected_code)
-    // log(`injected code: ${injected_code}`)
-
-    console.log(source_code)
+    log(`[scipts/asset-loader] [i] injected code for\n${options.plugins.join(",\n")}`)
 
     return source_code
 }

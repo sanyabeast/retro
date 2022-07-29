@@ -91,7 +91,7 @@ function validate_value(data, schema, prop_path, trace, root_object, root_schema
             break
         }
         case "object": {
-            let validation_result = validation_result || {
+            let validation_result = {
                 path: prop_path,
                 passed: true,
                 root: {

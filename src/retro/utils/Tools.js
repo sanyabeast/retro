@@ -645,6 +645,7 @@ const set_html_class = (el, cls) => {
     }
 }
 
+
 const set_html_style = (el, style) => {
     forEach(style, (token, key)=>{
         if (isString(token) || isNumber(token)){

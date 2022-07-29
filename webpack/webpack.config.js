@@ -5,7 +5,7 @@ const root = path.join(__dirname, '..');
 const { merge } = require('webpack-merge');
 const { VueLoaderPlugin } = require('vue-loader');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
-const { webpack, DefinePlugin } = require('webpack');
+const { webpack, DefinePlugin, ProvidePlugin, ProgressPlugin } = require('webpack');
 const PACKAGE_DATA = require('../package.json')
 const CopyPlugin = require('copy-webpack-plugin');
 const dir_tree = require('directory-tree');
@@ -149,6 +149,10 @@ module.exports = (env) => {
 					loader: 'babel-loader'
 				},
 				{
+					test: /\.png$/,
+					loader: 'base64-image-loader'
+				},
+				{
 					test: /\.html$/,
 					exclude: /node_modules/,
 					loader: 'file-loader',
@@ -164,7 +168,8 @@ module.exports = (env) => {
 					test: /\.css$/,
 					use: [
 						'vue-style-loader',
-						'css-loader'
+						'css-loader',
+						'postcss-loader'
 					]
 				},
 				{
@@ -173,6 +178,7 @@ module.exports = (env) => {
 						// compiles Less to CSS
 						'vue-style-loader',
 						'css-loader',
+						'postcss-loader',
 						'sass-loader',
 					],
 				},
@@ -181,6 +187,7 @@ module.exports = (env) => {
 					use: [
 						'vue-style-loader',
 						'css-loader',
+						'postcss-loader',
 						'sass-loader'
 					]
 				},
@@ -210,12 +217,30 @@ module.exports = (env) => {
 			],
 		},
 		plugins: [
+			new ProgressPlugin({
+				activeModules: false,
+				entries: true,
+				handler(percentage, message, ...args) {
+					// custom logic
+				},
+				modules: true,
+				modulesCount: 5000,
+				profile: false,
+				dependencies: true,
+				dependenciesCount: 10000,
+				percentBy: null,
+			}),
 			new NodePolyfillPlugin(),
 			new CopyPlugin({
 				patterns: get_copy_plugin_patterns(APP_NAME, PRESET)
 			}),
 			new VueLoaderPlugin(),
-			new DefinePlugin(define_plugin_params)
+			new DefinePlugin(define_plugin_params),
+			new ProvidePlugin({
+				JSON5: 'json5',
+				path: 'path'
+			}),
+
 		],
 		devServer: {
 			// publicPath: '/',
@@ -239,7 +264,6 @@ module.exports = (env) => {
 	// Builds
 	const build = env && env.production ? 'prod' : 'dev';
 	const mode_config = require(path.join(root, 'webpack', 'builds', `webpack.config.${build}`))
-	console.log(mode_config)
 	config = merge(
 		config,
 		typeof mode_config === 'function' ? mode_config({
@@ -259,7 +283,6 @@ module.exports = (env) => {
 
 	log(`Build mode: \x1b[33m${config.mode}\x1b[0m`);
 
-	console.log(JSON.stringify(config, null, '\t'))
 	return config;
 };
 
