@@ -1,18 +1,19 @@
-"use strict";
+'use strict';
 
-const path = require("path");
-const root = path.join(__dirname, "..");
-const merge = require("webpack-merge");
+const path = require('path');
+const root = path.join(__dirname, '..');
+const { merge } = require('webpack-merge');
 const { VueLoaderPlugin } = require('vue-loader');
-const { webpack, DefinePlugin } = require("webpack");
-const PACKAGE_DATA = require("../package.json")
-const CopyPlugin = require("copy-webpack-plugin");
-const dir_tree = require("directory-tree");
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const { webpack, DefinePlugin } = require('webpack');
+const PACKAGE_DATA = require('../package.json')
+const CopyPlugin = require('copy-webpack-plugin');
+const dir_tree = require('directory-tree');
 const jsonfile = require('jsonfile')
 const yamlfile = require('yamlfile')
-const colors = require("colors")
+const colors = require('colors')
 const ip = require('ip');
-const fs = require("fs")
+const fs = require('fs')
 const fs_extra = require('fs-extra');
 
 function log() { console.log(`[RETRO] [i]`.green, ...arguments); }
@@ -21,12 +22,12 @@ function err() { console.log(`[RETRO] [!]`.red, ...arguments); }
 
 
 console.log(
-	"_____ _____ _____ _____ _____              \n".red +
-	"| __  |   __|_   _| __  |     |            \n".gray +
-	"|    -|   __| | | |    -|  |  |            \n".yellow +
-	"|__|__|_____| |_| |__|__|_____| ".blue + "v. ${PACKAGE_DATA.version}\n".green +
-	"- - - - - - - - - - - - - - - - - - - - - - - \n".gray +
-	"https://github.com/sanyabeast/retro\n".green
+	'_____ _____ _____ _____ _____              \n'.red +
+	'| __  |   __|_   _| __  |     |            \n'.gray +
+	'|    -|   __| | | |    -|  |  |            \n'.yellow +
+	'|__|__|_____| |_| |__|__|_____| '.blue + 'v. ${PACKAGE_DATA.version}\n'.green +
+	'- - - - - - - - - - - - - - - - - - - - - - - \n'.gray +
+	'https://github.com/sanyabeast/retro\n'.green
 );
 
 function get_copy_plugin_patterns(APP_NAME, PRESET) {
@@ -37,40 +38,40 @@ function get_copy_plugin_patterns(APP_NAME, PRESET) {
 	let plugins = PRESET.PLUGINS || []
 	plugins.forEach((plugin_name) => {
 		let full_path
-		if (plugin_name === "retro") {
+		if (plugin_name === 'retro') {
 			full_path = `src/retro/res`
-		} else if (plugin_name.startsWith("retro/")) {
+		} else if (plugin_name.startsWith('retro/')) {
 			full_path = `src/${plugin_name}/res`
 		} else {
 			full_path = `src/apps/${plugin_name}/res`
 		}
 
 		let res_directory_exists = fs.existsSync(path.join(root, full_path))
-		log(`res directory for "${plugin_name} exists: ${res_directory_exists}"`)
+		log(`res directory for '${plugin_name} exists: ${res_directory_exists}'`)
 		if (!res_directory_exists) {
 			fs.mkdirSync(path.join(root, full_path), { recursive: true })
 		}
-		fs_extra.copySync(path.join(root, "src/retro/res/1x1_black.png"), path.join(root, full_path, "1x1_black.png"));
+		fs_extra.copySync(path.join(root, 'src/retro/res/1x1_black.png'), path.join(root, full_path, '1x1_black.png'));
 		r.push({ from: full_path, to: `res/${plugin_name}` })
 	})
 
 	r.push({ from: `src/apps/${APP_NAME}/res`, to: `res/${APP_NAME}` })
-	log(`copy patterns:\n${JSON.stringify(r, null, "\t")}`)
+	log(`copy patterns:\n${JSON.stringify(r, null, '\t')}`)
 
 	return r
 }
 
 function load_preset(APP_NAME) {
-	log(`loading preset for "${APP_NAME}"`)
+	log(`loading preset for '${APP_NAME}'`)
 	let default_preset = yamlfile.readFileSync(
-		path.join(root, "src", "retro", "PRESET.yaml")
+		path.join(root, 'src', 'retro', 'PRESET.yaml')
 	)
 
 	let PRESET = undefined
 	let error_code = undefined
 	try {
 		PRESET = yamlfile.readFileSync(
-			path.join(root, 'src', 'apps', APP_NAME, "PRESET.yaml")
+			path.join(root, 'src', 'apps', APP_NAME, 'PRESET.yaml')
 		)
 		PRESET = {
 			...default_preset,
@@ -86,7 +87,7 @@ function load_preset(APP_NAME) {
 		if (error_code === 'ENOENT') {
 			warn(`Preset not found. Creating new one with default settings...`)
 			yamlfile.writeFileSync(
-				path.join(root, 'src', 'apps', APP_NAME, "PRESET.yaml"),
+				path.join(root, 'src', 'apps', APP_NAME, 'PRESET.yaml'),
 				PRESET
 			)
 		}
@@ -102,12 +103,12 @@ function get_output_config(APP_NAME, PRESET) {
 	} else {
 		output_path = path.join(root, `src`, 'apps', APP_NAME, 'dist')
 	}
-	log(`"${APP_NAME}" is bundled to "${output_path}"`)
+	log(`'${APP_NAME}' is bundled to '${output_path}'`)
 	return {
-		filename: "[name].js",
+		filename: '[name].js',
 		path: output_path,
-		libraryTarget: "umd",
-		library: "lib",
+		libraryTarget: 'umd',
+		library: 'lib',
 		umdNamedDefine: true,
 	}
 }
@@ -115,7 +116,7 @@ function get_output_config(APP_NAME, PRESET) {
 module.exports = (env) => {
 	const APP_NAME = env.APP_NAME
 	const PRESET = load_preset(APP_NAME)
-	log(`working on app "${APP_NAME}"...`)
+	log(`working on app '${APP_NAME}'...`)
 	let define_plugin_params = {}
 
 	env.PRESET = PRESET
@@ -123,44 +124,41 @@ module.exports = (env) => {
 		define_plugin_params[`process.env.${k}`] = JSON.stringify(process.env[k])
 	}
 
-	define_plugin_params["PACKAGE_DATA"] = JSON.stringify(PACKAGE_DATA)
+
+	// define_plugin_params['__VUE_OPTIONS_API__'] = false
+	// define_plugin_params['__VUE_PROD_DEVTOOLS__'] = false
+	define_plugin_params['PACKAGE_DATA'] = JSON.stringify(PACKAGE_DATA)
 	define_plugin_params[`process.env.APP_NAME`] = JSON.stringify(APP_NAME)
 	define_plugin_params[`PRESET`] = JSON.stringify(PRESET)
 
 	let config = {
 		stats: { assets: false },
 		entry: {
-			main: path.join(root, "src", "main"),
+			main: path.join(root, 'src', 'main'),
 		},
 		output: get_output_config(APP_NAME, PRESET),
 		module: {
 			rules: [
 				{
+					test: /\.vue$/,
+					loader: 'vue-loader'
+				},
+				{
 					test: /\.js$/,
 					exclude: /node_modules|lib/,
-					use: "babel-loader",
+					loader: 'babel-loader'
 				},
 				{
 					test: /\.html$/,
 					exclude: /node_modules/,
-					loader: "file-loader",
+					loader: 'file-loader',
 					options: {
-						name: "[name].[ext]",
+						name: '[name].[ext]',
 					},
 				},
 				{
 					test: /\.ya?ml$/,
-					type: "json", // Required by Webpack v4
-					use: "yaml-loader",
-				},
-				{
-					test: /\.png$/,
-					exclude: /node_modules|lib|res|dist/,
-					use: "base64-image"
-				},
-				{
-					test: /\.vue$/,
-					loader: 'vue-loader'
+					loader: 'yaml-loader'
 				},
 				{
 					test: /\.css$/,
@@ -171,11 +169,11 @@ module.exports = (env) => {
 				},
 				{
 					test: /\.less$/i,
-					loader: [
+					use: [
 						// compiles Less to CSS
-						"vue-style-loader",
-						"css-loader",
-						"sass-loader",
+						'vue-style-loader',
+						'css-loader',
+						'sass-loader',
 					],
 				},
 				{
@@ -188,25 +186,31 @@ module.exports = (env) => {
 				},
 				{
 					test: /\ResourceManager.js$/,
-					loaders: path.join(root, "scripts", "assets-loader.js"),
+					loader: path.join(root, 'scripts', 'assets-loader.js'),
 					options: {
 						app_name: APP_NAME,
-						plugins: ["retro", ...(PRESET.PLUGINS || []), `apps/${APP_NAME}`]
+						plugins: ['retro', ...(PRESET.PLUGINS || []), `apps/${APP_NAME}`]
 					}
 				},
 
 				{
 					test: /\.coffee$/,
-					loader: "coffee-loader",
+					loader: 'coffee-loader',
 					options: {
 						transpile: {
-							presets: ["@babel/env"],
+							presets: ['@babel/env'],
 						}
 					}
+				},
+				{
+					test: /\.tsx?$/,
+					exclude: /node_modules/,
+					loader: 'ts-loader'
 				}
 			],
 		},
 		plugins: [
+			new NodePolyfillPlugin(),
 			new CopyPlugin({
 				patterns: get_copy_plugin_patterns(APP_NAME, PRESET)
 			}),
@@ -214,28 +218,31 @@ module.exports = (env) => {
 			new DefinePlugin(define_plugin_params)
 		],
 		devServer: {
-			overlay: true,
-			host: "0.0.0.0"
+			// publicPath: '/',
+			// contentBase: './public',
+			hot: true,
+			// overlay: true,
+			host: '0.0.0.0'
 		},
 		resolve: {
-			extensions: ['.js', '.coffee'],
-			modules: ["src", "lib", "node_modules", "dist"],
+			extensions: ['.tsx', '.ts', '.js', '.coffee', '.vue'],
+			modules: ['src', 'lib', 'node_modules', 'dist'],
 			alias: {
-				"@": path.resolve(__dirname, "src"),
+				'@': path.resolve(__dirname, 'src'),
 				vue: 'vue/dist/vue.js',
 				three: 'retro/lib/three',
-				"../../../build/three.module.js": "retro/lib/three"
-			},
+				'../../../build/three.module.js': 'retro/lib/three'
+			}
 		},
 	};
 
 	// Builds
-	const build = env && env.production ? "prod" : "dev";
-	const mode_config = require(path.join(root, "webpack", "builds", `webpack.config.${build}`))
+	const build = env && env.production ? 'prod' : 'dev';
+	const mode_config = require(path.join(root, 'webpack', 'builds', `webpack.config.${build}`))
 	console.log(mode_config)
-	config = merge.smart(
+	config = merge(
 		config,
-		typeof mode_config === "function" ? mode_config({
+		typeof mode_config === 'function' ? mode_config({
 			APP_NAME,
 			PRESET
 		}) : mode_config
@@ -244,18 +251,20 @@ module.exports = (env) => {
 	// Addons
 	const addons = getAddons(env);
 	addons.forEach((addon) => {
-		config = merge.smart(
+		config = merge(
 			config,
-			require(path.join(root, "webpack", "addons", `webpack.${addon}`))
+			require(path.join(root, 'webpack', 'addons', `webpack.${addon}`))
 		);
 	});
 
 	log(`Build mode: \x1b[33m${config.mode}\x1b[0m`);
+
+	console.log(JSON.stringify(config, null, '\t'))
 	return config;
 };
 
 function getAddons(env) {
 	if (!env || !env.addons) return [];
-	if (typeof env.addons === "string") return [env.addons];
+	if (typeof env.addons === 'string') return [env.addons];
 	return env.addons;
 }
