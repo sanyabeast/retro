@@ -620,6 +620,44 @@ const get_html_rect = (el) => {
     return el.getBoundingClientRect()
 }
 
+const add_html_class = (el, cls) => {
+    if (isArray(cls)){
+        forEach(cls, c=>add_html_class(el, c))
+        return
+    }
+    el.classList.add(cls)
+}
+
+const remove_html_class = (el, cls) => {
+    if (isArray(cls)){
+        forEach(cls, c=>remove_html_class(el, c))
+        return
+    }
+    el.classList.add(cls)
+}
+
+
+const set_html_class = (el, cls) => {
+    if (isArray(cls)){
+        el.setAttribute("class", cls.join(" "))
+    } else {
+        el.setAttribute("class", cls)
+    }
+}
+
+const set_html_style = (el, style) => {
+    forEach(style, (token, key)=>{
+        if (isString(token) || isNumber(token)){
+            el.style[key] = token
+        } else if (isFunction(token)){
+            el.style[key] = token(el, key)
+        } else {
+            error(`unknown html style token at "${key}"`, token)
+        }
+    })
+}
+
+
 /** combine module */
 
 const tools = {
@@ -705,7 +743,11 @@ const tools = {
     },
     html: {
         find_relative_parent,
-        get_rect: get_html_rect
+        get_rect: get_html_rect,
+        set_style: set_html_style,
+        add_class: add_html_class,
+        remove_class: remove_html_class,
+        set_class: set_html_class
     }
 }
 

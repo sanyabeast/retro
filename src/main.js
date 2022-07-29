@@ -58,6 +58,8 @@ window.on_click_to_start = () => {
             let app = new App()
             frame.content_node.appendChild(app.dom)
 
+            console.log(app)
+
             if (process.env.NODE_ENV === 'development') {
                 window.app = app
             }

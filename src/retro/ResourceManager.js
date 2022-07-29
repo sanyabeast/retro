@@ -584,8 +584,14 @@ class ResourceManager extends BasicObject {
     /**ASSET PRELOADERS */
     preload_context(context, handler, do_resolve = true) {
         context.keys().forEach((p) => {
+            console.dir(p)
             if (do_resolve) {
-                handler(p, context(p))
+                let _module = context(p)
+                // if (_module.default !== undefined) {
+                //     _module = _module.default
+                // }
+                // console.log(_module)
+                handler(p, _module)
             } else {
                 handler(p)
             }
@@ -688,14 +694,15 @@ class ResourceManager extends BasicObject {
         this.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".yaml", "").replace(/\//gm, ".");
             this.asset_stats.geometries_count++
-            this.templates_of_geometries[`${ns}.${name}`] = mod;
+            this.templates_of_geometries[`${ns}.${name}`] = mod.default;
         })
     }
     preload_prefabs(ns, context) {
+        console.dir(context)
         this.templates_of_prefabs = this.templates_of_prefabs || { test: { test_prop1: 1, test_prop2: "hello" } }
         this.preload_context(context, (p, mod) => {
             let name = p.replace("./", "").replace(".yaml", "").replace(/\//gm, ".");
-            let data = mod
+            let data = mod.default
             this.asset_stats.prefabs_count++
             this.register_prefab(`${ns}.${name}`, data)
         })
