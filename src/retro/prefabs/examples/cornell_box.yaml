@@ -1,0 +1,202 @@
+children:
+  lighting:
+    components:
+      ceil_light:
+        name: LightComponent
+        tag: "ceil_light"
+        params:
+          position: [0, 1.8, 0.5]
+          rotation: [-1.5707, 0, 0]
+          
+          type: PointLight
+          distance: 6
+          decay: 1.5
+          intensity: 1.1
+          rect_width: 0.6
+          rect_height: 0.3
+  box:
+    components:
+      floor:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [0, 0, 0]
+          rotation: [-1.5707, 0, 0]
+          geometry:
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
+          material:
+            - MeshLambertMaterial
+            - color: "#ffffff"
+              metalness: 0
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+      ceil:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [0, 2, 0]
+          rotation: [1.5707, 0, 0]
+          geometry:
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
+          material:
+            - MeshLambertMaterial
+            - color: "#ffffff"
+              emissive: "#c5c3c9"
+              emissiveIntensity: 0.5
+              metalness: 0
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+      back_wall:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [0, 1, -1]
+          rotation: [0, 0, 0]
+          geometry:
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
+          material:
+            - MeshLambertMaterial
+            - color: "#ffffff"
+              metalness: 0
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+      red_wall:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [-1, 1, 0]
+          rotation: [0, 1.5707, 0]
+          geometry:
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
+          material:
+            - MeshLambertMaterial
+            - color: "#f44336"
+              metalness: 0
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+      green_wall:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [1, 1, 0]
+          rotation: [0, -1.5707, 0]
+          geometry:
+            - BoxBufferGeometry
+            - [2, 2, 0.01]
+          material:
+            - MeshLambertMaterial
+            - color: "#4caf50"
+              metalness: 0
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+  props:
+    components:
+      box_a:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [0.4, 0.28, 0.3]
+          rotation: [0, -0.6, 0]
+          geometry:
+            - BoxBufferGeometry
+            - [0.56, 0.56, 0.56]
+          material:
+            - MeshLambertMaterial
+            - color: "#ffffff"
+              metalness: 0
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+      box_c:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [0.4, 0.65, 0.3]
+          rotation: [0, -0.1, 0]
+          geometry:
+            - BoxBufferGeometry
+            - [0.2, 0.2, 0.2]
+          material:
+            - MeshLambertMaterial
+            - color: "#eeeeee"
+              metalness: 0
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+      box_b:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [-0.3, 0.7, -0.3]
+          rotation: [0, 0.7, 0]
+          geometry:
+            - BoxBufferGeometry
+            - [0.5, 1.4, 0.5]
+          material:
+            - MeshLambertMaterial
+            - color: "#ffffff"
+              metalness: 0.2
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+      sphere_a:
+        name: MeshComponent
+        params:
+          cast_shadow: true
+          recieve_shadow: true
+          position: [-0.36, 0.26, 0.28]
+          rotation: [0, 0, 0]
+          geometry:
+            - SphereBufferGeometry
+            - [0.26, 32, 16]
+          material:
+            - MeshLambertMaterial
+            - color: "#ffffff"
+              metalness: 0
+              roughness: 0.8
+              reflectivity: 0
+              shininess: 0
+              side: 2
+      # sphere_b:
+      #   name: MeshComponent
+      #   params:
+      #     cast_shadow: true
+      #     recieve_shadow: true
+      #     position: [0.4, 0.74, 0.3]
+      #     rotation: [0, 0, 0]
+      #     geometry:
+      #       - SphereBufferGeometry
+      #       - [0.18, 32, 16]
+      #     material:
+      #       - MeshLambertMaterial
+      #       - color: "#0000ff"
+      #         metalness: 0
+      #         roughness: 0.8
+      #         reflectivity: 0
+      #         shininess: 0
+      #         side: 2

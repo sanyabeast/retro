@@ -1,0 +1,228 @@
+children:
+  sound:
+    components:
+      room_ambience:
+        name: AudioComponent
+        params:
+          position: [2, 1.5, 2]
+          src: "res/retro/plugins/extra-assets/ambient_sound/house_ambience_a1"
+          autoplay: true
+          max_distance: 6
+          loop: true
+          volume: 0.5
+      suburb_ambience:
+        name: AudioComponent
+        params:
+          src: "res/retro/plugins/extra-assets/ambient_sound/suburban_night_a1"
+          autoplay: true
+          spatial: false
+          loop: true
+          volume: 0.5
+  room:
+    components:
+      floor:
+        name: MeshComponent
+        params:
+          recieve_shadow: true
+          cast_shadow: true
+          rotation: [-1.5707, 0, 0]
+          geometry:
+            - PlaneBufferGeometry
+            - [5, 5, 1]
+          material:
+            - PBRMaterial
+            - pbr: "res/retro/plugins/extra-assets/pbr/angled_tile_floor_a1/a"
+              file_format: jpg
+              tiling: [4, 4]
+              color: "#ffffff"
+      ceil:
+        name: MeshComponent
+        params:
+          recieve_shadow: true
+          cast_shadow: true
+          rotation: [1.5707, 0, 0]
+          position: [0, 3, 0]
+          geometry:
+            - PlaneBufferGeometry
+            - [5, 5, 1]
+          material:
+            - PBRMaterial
+            - pbr: "res/retro/plugins/extra-assets/pbr/sprayed_wall_a1/sprayed_wall"
+              file_format: jpg
+              tiling: [12, 12]
+              color: "#ffffff"
+      wall_a:
+        name: MeshComponent
+        params:
+          recieve_shadow: true
+          cast_shadow: true
+          rotation: [0, 0, 0]
+          position: [0, 1.5, -2.5]
+          geometry:
+            - PlaneBufferGeometry
+            - [5, 3, 1]
+          material:
+            - PBRMaterial
+            - pbr: "res/retro/plugins/extra-assets/pbr/sprayed_wall_a1/sprayed_wall"
+              file_format: jpg
+              tiling: [12, 7.2]
+              reflectivity: 0.1
+              color: "#ffffff"
+      wall_b:
+        name: MeshComponent
+        params:
+          recieve_shadow: true
+          cast_shadow: true
+          rotation: [0, 1.5707, 0]
+          position: [-2.5, 1.5, 0]
+          geometry:
+            - PlaneBufferGeometry
+            - [5, 3, 1]
+          material:
+            - PBRMaterial
+            - pbr: "res/retro/plugins/extra-assets/pbr/sprayed_wall_a1/sprayed_wall"
+              file_format: jpg
+              tiling: [12, 7.2]
+              reflectivity: 0.1
+              color: "#ffffff"
+  deco:
+    components:
+      metal_cabinet_1:
+        name: MeshComponent
+        params:
+          debug_transform: false
+          position: [-2.15, 0, 1]
+          rotation: [0, 1.57, 0]
+          geometry:
+            - "url:res/retro/plugins/extra-assets/models/metal_cabinet_a1/metal_cabinet_a1.obj"
+            - 0.125
+          material:
+            - AssetMaterial
+            - src: "res/retro/plugins/extra-assets/models/metal_cabinet_a1/metal_cabinet_a1.mtl"
+              transparent: false
+              doubleside: true
+      metal_cabinet_2:
+        name: MeshComponent
+        params:
+          debug_transform: false
+          position: [0, 0, -2.15]
+          rotation: [0, 0, 0]
+          geometry:
+            - "url:res/retro/plugins/extra-assets/models/metal_cabinet_a1/metal_cabinet_a1.obj"
+            - 0.125
+          material:
+            - AssetMaterial
+            - src: "res/retro/plugins/extra-assets/models/metal_cabinet_a1/metal_cabinet_a1.mtl"
+              transparent: false
+              doubleside: true
+              color: "#8fafba"
+      metal_cabinet_3:
+        name: MeshComponent
+        params:
+          debug_transform: false
+          position: [1.2, 0, -2.15]
+          rotation: [0, 0.02, 0]
+          scale: [-1, 1, 1]
+          geometry:
+            - "url:res/retro/plugins/extra-assets/models/metal_cabinet_a1/metal_cabinet_a1.obj"
+            - 0.125
+          material:
+            - AssetMaterial
+            - src: "res/retro/plugins/extra-assets/models/metal_cabinet_a1/metal_cabinet_a1.mtl"
+              transparent: false
+              doubleside: true
+              color: "#ddd5ea"
+      table:
+        name: MeshComponent
+        params:
+          debug_transform: false
+          position: [-0.2, 0, 0.2]
+          rotation: [0, 0.2, 0]
+          scale: [1, 1, 1]
+          geometry:
+            - "url:res/retro/plugins/extra-assets/models/dining_table_concrete_a1/dining_table_concrete_a1.obj"
+            - 0.113
+          material:
+            - AssetMaterial
+            - src: "res/retro/plugins/extra-assets/models/dining_table_concrete_a1/dining_table_concrete_a1.mtl"
+              transparent: false
+              doubleside: true
+      glasses_1:
+        name: MeshComponent
+        params:
+          debug_transform: false
+          position: [0, 0.664, -0.3]
+          rotation: [0, 1, 0]
+          geometry:
+            - "url:res/retro/plugins/extra-assets/models/free_sunglasses_set_a1/vogue_1.obj"
+            - 1
+          material:
+            - AssetMaterial
+            - src: "res/retro/plugins/extra-assets/models/free_sunglasses_set_a1/vogue_1.mtl"
+              transparent: true
+              doubleside: true
+  bio_chamber:
+    position: [-0.2, 0.672, 0.4]
+    rotation: [0, 0.1, 0]
+    components:
+      body:
+        name: MeshComponent
+        params:
+          debug_transform: false
+
+          geometry:
+            - "url:res/retro/plugins/extra-assets/models/bio_chamber_unit_a1/bio_chamber_unit_a1.obj"
+            - 0.1
+          material:
+            - AssetMaterial
+            - src: "res/retro/plugins/extra-assets/models/bio_chamber_unit_a1/bio_chamber_unit_a1.mtl"
+              transparent: false
+              doubleside: true
+      sound:
+        name: AudioComponent
+        params:
+          src: "res/retro/plugins/extra-assets/ambient_sound/transformer_hum_a1"
+          volume: 0.15
+          loop: true
+          autoplay: true
+          spatial: true
+          max_distance: 1
+          ref_distance: 1
+  lights:
+    children:
+      lamp_a:
+        prefab: retro.examples.fluorescent_lamp
+        position:
+          - 0
+          - 2.8
+          - -1
+      lamp_b:
+        prefab: retro.examples.fluorescent_lamp
+        position:
+          - 0
+          - 2.8
+          - 1
+    components:
+      lambs_controller:
+        order: 1
+        params:
+          tick_rate: 6
+          max_intensity: 70
+          min_intensity: 60
+        inline:
+          methods:
+            on_create:
+              body: |
+                let lights = this.find_child_components_of_type("LightComponent");
+                this.lights = lights
+            on_tick:
+              body: |
+                this.lights.forEach((light)=>{
+                  light.intensity = Math.random() * (this.max_intensity - this.min_intensity) + this.min_intensity;
+                  if (light.type === "PointLight"){
+                    light.intensity *= 0.005;
+                  }
+                  if (Math.random() > 0.97){
+                    light.intensity = 0
+                  }
+                });

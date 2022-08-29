@@ -1,0 +1,23 @@
+{
+    "presets": ["@babel/preset-env"],
+    "plugins": [
+        ["@babel/plugin-proposal-export-namespace-from"],
+        ["@babel/plugin-proposal-class-properties"],
+        ["@babel/plugin-transform-runtime"],
+        ["@babel/plugin-proposal-nullish-coalescing-operator"],
+        ["@babel/plugin-proposal-optional-chaining"],
+        ["@babel/plugin-proposal-object-rest-spread"],
+        ["@babel/plugin-transform-exponentiation-operator"],
+        ["@babel/plugin-proposal-decorators", {
+            "decoratorsBeforeExport": true
+        }],
+        ["@babel/plugin-proposal-do-expressions"],
+        ["@babel/plugin-proposal-function-bind"],
+        ["@babel/plugin-proposal-partial-application"],
+        ["@babel/plugin-proposal-record-and-tuple", {
+            "syntaxType": "hash"
+        }],
+        ["@babel/plugin-proposal-logical-assignment-operators"]
+        
+    ]
+}

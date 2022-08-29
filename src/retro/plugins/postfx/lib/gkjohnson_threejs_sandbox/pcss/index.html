@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - postprocessing - percentage closer soft shadows</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				color: #fff;
+			}
+
+			a {
+				color:#80CBC4;
+			}
+
+			#info {
+				position: absolute;
+				padding-top: 10px;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script type="text/javascript" src="https://rawgit.com/mrdoob/three.js/r94/build/three.js"></script>
+		<script type="text/javascript" src="https://rawgit.com/mrdoob/three.js/r94/examples/js/controls/OrbitControls.js"></script>
+		<script type="text/javascript" src="https://rawgit.com/mrdoob/three.js/r94/examples/js/lights/RectAreaLightUniformsLib.js"></script>
+
+		<script type="text/javascript" src="https://rawgit.com/mrdoob/three.js/r94/examples/js/libs/stats.min.js"></script>
+		<script type="text/javascript" src="https://rawgit.com/mrdoob/three.js/r94/examples/js/libs/dat.gui.min.js"></script>
+		<script type="text/javascript" src="https://rawgit.com/mrdoob/three.js/r94/examples/js/libs/inflate.min.js"></script>
+		<script type="text/javascript" src="https://rawgit.com/mrdoob/three.js/r94/examples/js/loaders/FBXLoader.js"></script>
+
+		<script type="text/javascript" src="./src/PercentageCloserSoftShadows.js"></script>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Percentage Closer Soft Shadows by <a href="http://gkjohnson.github.io" target="_blank" rel="noopener">Garrett Johnson</a>
+
+			<br>Soft shadows with contact hardening based on <a href="http://developer.download.nvidia.com/shaderlibrary/docs/shadow_PCSS.pdf">this paper by NVidia</a>.
+		</div>
+
+		<script>
+
+			var stats;
+			var params = {
+
+				light: {
+					intensity: 1000,
+					distance: 20,
+					width: 10,
+					height: 10,
+					rotationSpeed: 0.25,
+				},
+				shadow: {
+					noiseIntensity: 1,
+					softness: 3,
+					pcfSamples: 16,
+					blockerSamples: 16
+				}
+			};
+
+			var uniforms = {
+				lightSize: { value: new THREE.Vector2() },
+				noiseIntensity: { value: 1 },
+				softness: { value: 1 },
+				roughness: { value: 0 },
+				metalness: { value: 0 }
+			}
+
+			var defines = {
+				STANDARD: "",
+				PCF_SAMPLES: params.shadow.pcfSamples,
+				BLOCKER_SAMPLES: params.shadow.blockerSamples
+			}
+
+			var camera, scene, renderer, controls;
+			var torusMesh1, torusMesh2, torusMesh3;
+			var mixer, clock, animTime = 0;
+
+			var directionalLight, lightQuad, areaLight, areaLightContainer;
+			var materials = []
+
+			init();
+			animate();
+
+			function init() {
+
+				// initialize renderer, scene, camera
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, 5, 5 * 3.5 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x009688 );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				document.body.appendChild( renderer.domElement );
+
+				// geometry
+				var standardMaterial = new THREE.ShaderMaterial( THREE.ShaderLib.standard )
+				standardMaterial.uniforms = Object.assign( {}, standardMaterial.uniforms, uniforms );
+				standardMaterial.defines = defines;
+				standardMaterial.lights = true;
+				materials.push(standardMaterial);
+
+				var geometry = new THREE.TorusKnotBufferGeometry( 2.5, 1, 150, 40 );
+				torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+				torusMesh1.position.set( -6, 0, 6 );
+				torusMesh1.scale.multiplyScalar( 0.5 );
+				torusMesh1.castShadow = true;
+				torusMesh1.receiveShadow = true;
+				scene.add( torusMesh1 );
+
+				torusMesh2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), standardMaterial );
+				torusMesh2.castShadow = true;
+				torusMesh2.receiveShadow = true;
+				torusMesh2.position.set( 6, 0, 6 );
+				torusMesh2.rotation.set( 90, 90, 90 );
+				torusMesh2.scale.set( 2, 2, 2);
+				scene.add(torusMesh2);
+
+				torusMesh3 = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), standardMaterial );
+				torusMesh3.castShadow = true;
+				torusMesh3.receiveShadow = true;
+				torusMesh3.position.set( 0, 0, -7.5 );
+				torusMesh3.scale.y = 10;
+				scene.add(torusMesh3);
+
+				// load samba dancer
+				var loader = new THREE.FBXLoader();
+				loader.load( 'https://rawgit.com/mrdoob/three.js/r94/examples/models/fbx/Samba%20Dancing.fbx', res => {
+
+					scene.add( res );
+					res.scale.multiplyScalar( 0.05 );
+					res.traverse( c => {
+
+						if ( c.type === 'SkinnedMesh' ) {
+
+							var newMat = standardMaterial.clone();
+							newMat.uniforms.diffuse.value.copy( c.material.color );
+							newMat.uniforms.roughness.value = .25;
+							newMat.skinning = true;
+							materials.push( newMat );
+
+							c.material = newMat;
+							c.castShadow = true;
+							c.receiveShadow = true;
+							c.motionBlur = { expand: 0 }
+
+						}
+
+					});
+					res.position.y = -5;
+					mixer = new THREE.AnimationMixer( res );
+					mixer.clipAction( res.animations[ 0 ] ).play();
+
+				});
+
+				clock = new THREE.Clock();
+
+				// Lights
+				scene.add( new THREE.AmbientLight( 0x009688, 0.025 ) );
+
+				areaLightContainer = new THREE.Object3D();
+				scene.add( areaLightContainer );
+
+				areaLight = new THREE.RectAreaLight( 0xffffff, 1, 1, 1 );
+				areaLight.position.set( 5, 5, 5 );
+				areaLight.lookAt( 0, 0, 0 );
+				areaLightContainer.add( areaLight );
+
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				directionalLight.castShadow = true;
+				areaLightContainer.add( directionalLight );
+
+				lightQuad = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }) );
+				areaLight.add( lightQuad );
+
+				var shadowCam = directionalLight.shadow.camera;
+				shadowCam.left = shadowCam.bottom = -15;
+				shadowCam.right = shadowCam.top = 15;
+				directionalLight.shadow.mapSize.width = 1024;
+				directionalLight.shadow.mapSize.height = 1024;
+
+				// Shadow
+				var plane = new THREE.Mesh( new THREE.PlaneBufferGeometry(), standardMaterial );
+				plane.castShadow = true;
+				plane.receiveShadow = true;
+				plane.rotation.set( -Math.PI / 2, 0, 0 );
+				plane.scale.multiplyScalar( 2000 );
+				plane.position.y = -5;
+				scene.add( plane );
+
+				// stats
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// camera controls
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 200;
+				controls.autoRotate = true;
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// dat gui
+				var gui = new dat.GUI();
+				var lightFolder = gui.addFolder( 'light' );
+				lightFolder.add( params.light, 'intensity', 0, 5000 )
+				lightFolder.add( params.light, 'distance', 5, 60 )
+				lightFolder.add( params.light, 'width', 0.1, 50 )
+				lightFolder.add( params.light, 'height', 0.1, 50 )
+				lightFolder.add( params.light, 'rotationSpeed', 0, 1 );
+				lightFolder.open();
+
+				var shadowFolder = gui.addFolder( 'shadow' );
+				shadowFolder.add( params.shadow, 'noiseIntensity', 0, 2 );
+				shadowFolder.add( params.shadow, 'softness', 0, 5 );
+
+
+				shadowFolder.add( params.shadow, 'pcfSamples', 0, 64 )
+					.onFinishChange(val => {
+						defines.PCF_SAMPLES = val;
+						materials.forEach( m => m.needsUpdate = true );
+					});
+				shadowFolder.add( params.shadow, 'blockerSamples', 0, 64 )
+					.onFinishChange(val => {
+							defines.BLOCKER_SAMPLES = val;
+							materials.forEach( m => m.needsUpdate = true );
+						});
+				shadowFolder.open();
+
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				renderer.setPixelRatio( window.devicePixelRatio );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			// flag indicating that we've animated on frame past the
+			// point that we stopped animation
+			var animatedOneFramePast = false;
+			function render() {
+
+				camera.lookAt( scene.position );
+
+				const deltaTime = clock.getDelta();
+
+				animTime += deltaTime;
+				if ( mixer !== undefined ) {
+
+					mixer.update( deltaTime );
+
+				}
+
+				torusMesh1.rotation.y += 0.01;
+				torusMesh2.position.y = Math.sin( animTime ) * 2 - 1.5;
+
+				// areaLight.position.y = Math.sin(window.performance.now() * 0.0001 ) * 10;
+				areaLight.lookAt(0,0,0);
+				areaLight.position.normalize().multiplyScalar( params.light.distance );
+
+				directionalLight.position.copy( areaLight.position );
+				lightQuad.scale.x = areaLight.width = params.light.width;
+				lightQuad.scale.y = areaLight.height = params.light.height;
+
+				areaLight.intensity = params.light.intensity / ( areaLight.width * areaLight.height );
+				areaLightContainer.rotation.y += deltaTime * params.light.rotationSpeed;
+
+				uniforms.lightSize.value.x = params.light.width;
+				uniforms.lightSize.value.y = params.light.height;
+				uniforms.lightSize.needsUpdate = true;
+
+				uniforms.noiseIntensity.value = params.shadow.noiseIntensity;
+				uniforms.noiseIntensity.needsUpdate = true;
+
+				uniforms.softness.value = params.shadow.softness;
+				uniforms.softness.needsUpdate = true;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

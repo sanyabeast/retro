@@ -1,0 +1,41 @@
+
+/* created by @sanyabeast 8/14/2021 1:31:45 AM
+ *
+ *
+*/
+
+
+import {Group} from 'three';
+
+class ArrowA extends Group {
+    constructor(params) {
+        params = {
+            ...params
+        }
+        super(params)
+        this.setup_components([
+            {
+                name: "MeshComponent",
+                ref: "arrow",
+                enabled: true,
+                params: {
+                    geometry: [
+                        "BoxBufferGeometry",
+                        [1, 1, 1]
+                    ],
+                    material: ["MeshBasicMaterial", {
+                        color: "#ff0044"
+                    }],
+                    position: [0, 0, 0],
+                },
+            },
+        ])
+        console.log(params)
+        super(params)
+    }
+    on_tick(time_stats) {
+       
+    }
+}
+
+export default ArrowA

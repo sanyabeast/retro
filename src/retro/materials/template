@@ -1,0 +1,30 @@
+type: ShaderMaterial
+params:
+  vertexShader: |
+      varying vec2 vUv;
+      uniform float opacity;
+      uniform float cell_scale;
+
+      void main() {
+          vUv = uv;
+          vec4 pos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          gl_Position = pos;
+      }
+
+  fragmentShader: |
+      varying vec2 vUv;
+      uniform float time;
+      uniform vec2 resolution;
+      uniform vec2 mouse;
+      uniform float opacity;
+
+      void main(void) {
+          gl_FragColor = vec4(1., 0., 1., 1.);
+      }
+  transparent: true
+  blending: 1
+  uniforms: 
+    opacity: 
+      type: f
+      value: 1
+      

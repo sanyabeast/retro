@@ -1,0 +1,42 @@
+
+/* created by @sanyabeast 9/6/2021 
+ *
+ *
+ */
+
+import Component from "retro/Component";
+import ResourceManager from "retro/ResourceManager";
+import { render } from "less";
+import { Color, Vector3 } from 'three';
+import CSM from "three-csm"
+
+console.log(CSM)
+
+class CSMShadowSystem extends Component {
+    on_create() {
+
+    }
+    on_enable() {
+        let renderer = this.find_component_of_type("Renderer")
+
+
+        renderer.renderer.shadowMap.enabled = true;
+        renderer.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // or any other type of shadowmap
+
+        let csm = this.csm = new CSM({
+            maxFar: this.globals.camera.far,
+            cascades: 4,
+            shadowMapSize: 1024,
+            lightDirection: new THREE.Vector3(1, -1, 1).normalize(),
+            camera: this.globals.camera,
+            parent: renderer.render_scene
+        });
+
+        console.log(csm)
+    }
+    on_tick(time_data) {
+
+    }
+}
+
+export default CSMShadowSystem;

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Škorpion vz. 61
+* source:	https://sketchfab.com/3d-models/skorpion-vz-61-07bc7764f1d2460586c2907ff7f32753
+* author:	kutejnikov (https://sketchfab.com/kutejnikov)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Škorpion vz. 61" (https://sketchfab.com/3d-models/skorpion-vz-61-07bc7764f1d2460586c2907ff7f32753) by kutejnikov (https://sketchfab.com/kutejnikov) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

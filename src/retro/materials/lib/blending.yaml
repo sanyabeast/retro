@@ -1,0 +1,191 @@
+code: |
+  /*
+  Copyright (c) 2012, Romain Dura romain@shazbits.com
+  Permission to use, copy, modify, and/or distribute this software for any 
+  purpose with or without fee is hereby granted, provided that the above 
+  copyright notice and this permission notice appear in all copies.
+
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES 
+  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY 
+  SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES 
+  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
+  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR 
+  IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  */
+  vec3 CAST3(float x){
+    return vec3(x, x, x);
+  }
+  vec4 Desaturate(vec3 color, float Desaturation)
+  {
+    vec3 grayXfer = vec3(0.3, 0.59, 0.11);
+    vec3 gray = CAST3(dot(grayXfer, color));
+    return vec4(mix(color, gray, Desaturation), 1.0);
+  }
+  vec3 RGBToHSL(vec3 color)
+  {
+    vec3 hsl;
+    float fmin = min(min(color.r, color.g), color.b);
+    float fmax = max(max(color.r, color.g), color.b);
+    float delta = fmax - fmin;
+
+    hsl.z = (fmax + fmin) / 2.0;
+
+    if (delta == 0.0)
+    {
+      hsl.x = 0.0;
+      hsl.y = 0.0;
+    }
+    else
+    {
+      if (hsl.z < 0.5)
+        hsl.y = delta / (fmax + fmin);
+      else
+        hsl.y = delta / (2.0 - fmax - fmin);
+      
+      float deltaR = (((fmax - color.r) / 6.0) + (delta / 2.0)) / delta;
+      float deltaG = (((fmax - color.g) / 6.0) + (delta / 2.0)) / delta;
+      float deltaB = (((fmax - color.b) / 6.0) + (delta / 2.0)) / delta;
+      if (color.r == fmax )
+        hsl.x = deltaB - deltaG;
+      else if (color.g == fmax)
+        hsl.x = (1.0 / 3.0) + deltaR - deltaB;
+      else if (color.b == fmax)
+        hsl.x = (2.0 / 3.0) + deltaG - deltaR;
+      if (hsl.x < 0.0)
+        hsl.x += 1.0;
+      else if (hsl.x > 1.0)
+        hsl.x -= 1.0;
+    }
+    return hsl;
+  }
+  float HueToRGB(float f1, float f2, float hue)
+  {
+    if (hue < 0.0)
+      hue += 1.0;
+    else if (hue > 1.0)
+      hue -= 1.0;
+    float res;
+    if ((6.0 * hue) < 1.0)
+      res = f1 + (f2 - f1) * 6.0 * hue;
+    else if ((2.0 * hue) < 1.0)
+      res = f2;
+    else if ((3.0 * hue) < 2.0)
+      res = f1 + (f2 - f1) * ((2.0 / 3.0) - hue) * 6.0;
+    else
+      res = f1;
+    return res;
+  }
+  vec3 HSLToRGB(vec3 hsl)
+  {
+    vec3 rgb;
+    
+    if (hsl.y == 0.0)
+      rgb = CAST3(hsl.z);
+    else
+    {
+      float f2;
+      
+      if (hsl.z < 0.5)
+        f2 = hsl.z * (1.0 + hsl.y);
+      else
+        f2 = (hsl.z + hsl.y) - (hsl.y * hsl.z);
+        
+      float f1 = 2.0 * hsl.z - f2;
+      
+      rgb.r = HueToRGB(f1, f2, hsl.x + (1.0/3.0));
+      rgb.g = HueToRGB(f1, f2, hsl.x);
+      rgb.b= HueToRGB(f1, f2, hsl.x - (1.0/3.0));
+    }
+    
+    return rgb;
+  }
+
+  vec3 ContrastSaturationBrightness(vec3 color, float brt, float sat, float con)
+  {
+    const float AvgLumR = 0.5;
+    const float AvgLumG = 0.5;
+    const float AvgLumB = 0.5;
+    
+    const vec3 LumCoeff = vec3(0.2125, 0.7154, 0.0721);
+    
+    vec3 AvgLumin = vec3(AvgLumR, AvgLumG, AvgLumB);
+    vec3 brtColor = color * brt;
+    vec3 intensity = CAST3(dot(brtColor, LumCoeff));
+    vec3 satColor = mix(intensity, brtColor, sat);
+    vec3 conColor = mix(AvgLumin, satColor, con);
+    return conColor;
+  }
+
+  #define BlendLinearDodgef(albedo_color, blend) (albedo_color + blend)
+  #define BlendLinearBurnf(albedo_color, blend) max(albedo_color + blend - 1.0, 0.0)
+  #define BlendLightenf(albedo_color, blend) max(blend, albedo_color)
+  #define BlendDarkenf(albedo_color, blend) min(blend, albedo_color)
+  #define BlendLinearLightf(albedo_color, blend) (blend < 0.5 ? BlendLinearBurnf(albedo_color, (2.0 * blend)) : BlendLinearDodgef(albedo_color, (2.0 * (blend - 0.5))))
+  #define BlendScreenf(albedo_color, blend) (1.0 - ((1.0 - albedo_color) * (1.0 - blend)))
+  #define BlendOverlayf(albedo_color, blend) (albedo_color < 0.5 ? (2.0 * albedo_color * blend) : (1.0 - 2.0 * (1.0 - albedo_color) * (1.0 - blend)))
+  #define BlendSoftLightf(albedo_color, blend) ((blend < 0.5) ? (2.0 * albedo_color * blend + albedo_color * albedo_color * (1.0 - 2.0 * blend)) : (sqrt(albedo_color) * (2.0 * blend - 1.0) + 2.0 * albedo_color * (1.0 - blend)))
+  #define BlendColorDodgef(albedo_color, blend) ((blend == 1.0) ? blend : min(albedo_color / (1.0 - blend), 1.0))
+  #define BlendColorBurnf(albedo_color, blend) ((blend == 0.0) ? blend : max((1.0 - ((1.0 - albedo_color) / blend)), 0.0))
+  #define BlendVividLightf(albedo_color, blend) ((blend < 0.5) ? BlendColorBurnf(albedo_color, (2.0 * blend)) : BlendColorDodgef(albedo_color, (2.0 * (blend - 0.5))))
+  #define BlendPinLightf(albedo_color, blend) ((blend < 0.5) ? BlendDarkenf(albedo_color, (2.0 * blend)) : BlendLightenf(albedo_color, (2.0 *(blend - 0.5))))
+  #define BlendHardMixf(albedo_color, blend) ((BlendVividLightf(albedo_color, blend) < 0.5) ? 0.0 : 1.0)
+  #define BlendReflectf(albedo_color, blend) ((blend == 1.0) ? blend : min(albedo_color * albedo_color / (1.0 - blend), 1.0))
+  #define BlendNormal(albedo_color, blend) (blend)
+  #define BlendLighten BlendLightenf
+  #define BlendDarken	 BlendDarkenf
+  #define BlendMultiply(albedo_color, blend) (albedo_color * blend)
+  #define BlendAverage(albedo_color, blend) ((albedo_color + blend) / 2.0)
+  #define BlendAdd(albedo_color, blend) min(albedo_color + blend, CAST3(1.0))
+  #define BlendSubstract(albedo_color, blend) max(albedo_color + blend - CAST3(1.0), CAST3(0.0))
+  #define BlendDifference(albedo_color, blend) abs(albedo_color - blend)
+  #define BlendNegation(albedo_color, blend) (CAST3(1.0) - abs(CAST3(1.0) - albedo_color - blend))
+  #define BlendExclusion(albedo_color, blend) (albedo_color + blend - 2.0 * albedo_color * blend)
+  #define BlendScreen(albedo_color, blend) vec3(BlendScreenf(albedo_color.r, blend.r), BlendScreenf(albedo_color.g, blend.g), BlendScreenf(albedo_color.b, blend.b))
+  #define BlendOverlay(albedo_color, blend) vec3(BlendOverlayf(albedo_color.r, blend.r), BlendOverlayf(albedo_color.g, blend.g), BlendOverlayf(albedo_color.b, blend.b))
+  #define BlendSoftLight(albedo_color, blend) vec3(BlendSoftLightf(albedo_color.r, blend.r), BlendSoftLightf(albedo_color.g, blend.g), BlendSoftLightf(albedo_color.b, blend.b))
+  #define BlendHardLight(albedo_color, blend) BlendOverlay(blend, albedo_color)
+  #define BlendColorDodge(albedo_color, blend) vec3(BlendColorDodgef(albedo_color.r, blend.r), BlendColorDodgef(albedo_color.g, blend.g), BlendColorDodgef(albedo_color.b, blend.b))
+  #define BlendColorBurn(albedo_color, blend) vec3(BlendColorBurnf(albedo_color.r, blend.r), BlendColorBurnf(albedo_color.g, blend.g), BlendColorBurnf(albedo_color.b, blend.b))
+  #define BlendLinearDodge BlendAdd
+  #define BlendLinearBurn	BlendSubstract
+  #define BlendLinearLight(albedo_color, blend) vec3(BlendLinearLightf(albedo_color.r, blend.r), BlendLinearLightf(albedo_color.g, blend.g), BlendLinearLightf(albedo_color.b, blend.b))
+  #define BlendVividLight(albedo_color, blend) vec3(BlendVividLightf(albedo_color.r, blend.r), BlendVividLightf(albedo_color.g, blend.g), BlendVividLightf(albedo_color.b, blend.b))
+  #define BlendPinLight(albedo_color, blend) vec3(BlendPinLightf(albedo_color.r, blend.r), BlendPinLightf(albedo_color.g, blend.g), BlendPinLightf(albedo_color.b, blend.b))
+  #define BlendHardMix(albedo_color, blend) vec3(BlendHardMixf(albedo_color.r, blend.r), BlendHardMixf(albedo_color.g, blend.g), BlendHardMixf(albedo_color.b, blend.b))
+  #define BlendReflect(albedo_color, blend) vec3(BlendReflectf(albedo_color.r, blend.r), BlendReflectf(albedo_color.g, blend.g), BlendReflectf(albedo_color.b, blend.b))
+  #define BlendGlow(albedo_color, blend) BlendReflect(blend, albedo_color)
+  #define BlendPhoenix(albedo_color, blend) (min(albedo_color, blend) - max(albedo_color, blend) + CAST3(1.0))
+  #define BlendOpacity(albedo_color, blend, F, O) mix(albedo_color, F(albedo_color, blend), O)
+  #define BlendTint(albedo_color, blend)		(CAST3(max(albedo_color.x, max(albedo_color.y, albedo_color.z))) * blend)
+  /* Hue Blend mode creates the result color by combining the luminance and saturation of the albedo_color color with the hue of the blend color.*/
+  vec3 BlendHue(vec3 albedo_color, vec3 blend)
+  {
+    vec3 albedo_colorHSL = RGBToHSL(albedo_color);
+    return HSLToRGB(vec3(RGBToHSL(blend).r, albedo_colorHSL.g, albedo_colorHSL.b));
+  }
+
+  /* Saturation Blend mode creates the result color by combining the luminance and hue of the albedo_color color with the saturation of the blend color.*/
+  vec3 BlendSaturation(vec3 albedo_color, vec3 blend)
+  {
+    vec3 albedo_colorHSL = RGBToHSL(albedo_color);
+    return HSLToRGB(vec3(albedo_colorHSL.r, RGBToHSL(blend).g, albedo_colorHSL.b));
+  }
+
+  /* Color Mode keeps the brightness of the albedo_color color and applies both the hue and saturation of the blend color.*/
+  vec3 BlendColor(vec3 albedo_color, vec3 blend)
+  {
+    vec3 blendHSL = RGBToHSL(blend);
+    return HSLToRGB(vec3(blendHSL.r, blendHSL.g, RGBToHSL(albedo_color).b));
+  }
+
+  /* Luminosity Blend mode creates the result color by combining the hue and saturation of the albedo_color color with the luminance of the blend color.*/
+  vec3 BlendLuminosity(vec3 albedo_color, vec3 blend)
+  {
+    vec3 albedo_colorHSL = RGBToHSL(albedo_color);
+    return HSLToRGB(vec3(albedo_colorHSL.r, albedo_colorHSL.g, RGBToHSL(blend).b));
+  }
+uniforms: 
+  test: 
+    type: float
+    value: 1

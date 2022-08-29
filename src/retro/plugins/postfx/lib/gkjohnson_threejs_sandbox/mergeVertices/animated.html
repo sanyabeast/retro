@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Merge vertices function</title>
+
+    <script type="text/javascript" src="https://rawgit.com/mrdoob/three.js/r95/build/three.js"></script>
+    <script type="text/javascript" src="https://rawgit.com/mrdoob/three.js/r95/examples/js/BufferGeometryUtils.js"></script>
+    <script type="text/javascript" src="./src/mergeVertices.js"></script>
+</head>
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #output {
+            position: absolute;
+            width: 100%;
+            color: white;
+            text-align: center;
+            font-family: sans-serif;
+            padding: 10px;
+        }
+
+    </style>
+
+    <div id="output"><h3>Animated BufferGeometry vs Merged Animated BufferGeometry</h3></div>
+
+    <script>
+
+        const outputel = document.getElementById( 'output' );
+        function addOutput( s ) {
+
+ 			outputel.innerHTML += `<br>${ s }`;
+
+        }
+
+		// Initialize Scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+        camera.position.set( 0, 3, 6.5 );
+        camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+        const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+        scene.add( ambientLight );
+
+        const directionalLight = new THREE.DirectionalLight();
+        directionalLight.position.set( 10, 10, 0 );
+        scene.add( directionalLight );
+
+        const renderer = new THREE.WebGLRenderer( { antialias: true } );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setClearColor( 0xFF3D00 );
+        document.body.appendChild( renderer.domElement );
+
+		let mixer1 = null;
+		let mixer2 = null;
+		const loader = new THREE.JSONLoader();
+		loader.load( 'https://rawgit.com/mrdoob/three.js/r95/examples/models/animated/sittingBox.js', function( geometry ) {
+
+			var morphMaterial = new THREE.MeshPhongMaterial( {
+				color: 0x333333,
+				shininess: 50,
+				morphTargets: true,
+				side: THREE.DoubleSide,
+				flatShading: true
+			} );
+
+			// Regular Geometry
+			var mesh = new THREE.Mesh( geometry, morphMaterial );
+			// mixer2 = new THREE.AnimationMixer( mesh );
+			// mixer2.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
+			// mesh.scale.set( 3, 3, 3 );
+			// mesh.position.x = -2;
+			// mesh.position.y = -1;
+			// scene.add( mesh );
+			// console.log( 'geometry', geometry );
+
+
+			// Buffer Geometry
+			var bufferGeometry = new THREE.BufferGeometry();
+			bufferGeometry.fromGeometry( geometry );
+			bufferGeometry.removeAttribute( 'normal' );
+			if ( geometry.colors.length === 0 ) bufferGeometry.removeAttribute( 'color' );
+
+			var bmesh = new THREE.Mesh( bufferGeometry, morphMaterial.clone() );
+
+			// conversion hack so the animations work
+			bmesh.morphTargetDictionary = mesh.morphTargetDictionary;
+			for ( var key in bmesh.morphTargetDictionary ) {
+				var index = bmesh.morphTargetDictionary[key];
+				bmesh.geometry.morphAttributes.position[+index].name = key;
+			}
+
+			mixer1 = new THREE.AnimationMixer( bmesh );
+			mixer1.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
+			bmesh.scale.set( 3, 3, 3 );
+			bmesh.position.x = -2;
+			bmesh.position.y = -1;
+			scene.add( bmesh );
+			console.log( 'bufferGeometry', bufferGeometry );
+
+			// Merged Geometry
+			var bufferGeometry2 = new THREE.BufferGeometry();
+			bufferGeometry2.fromGeometry( geometry );
+			bufferGeometry2.removeAttribute( 'normal' );
+			if ( geometry.colors.length === 0 ) bufferGeometry2.removeAttribute( 'color' );
+
+			var mmesh = new THREE.Mesh( bufferGeometry2, morphMaterial.clone() );
+			// conversion hack so the animations work
+			mmesh.morphTargetDictionary = mesh.morphTargetDictionary;
+			for ( var key in mmesh.morphTargetDictionary ) {
+				var index = mmesh.morphTargetDictionary[key];
+				mmesh.geometry.morphAttributes.position[+index].name = key;
+			}
+
+			mixer2 = new THREE.AnimationMixer( mmesh );
+			mixer2.clipAction( geometry.animations[0] ).setDuration( 10 ).play();
+			mmesh.scale.set( 3, 3, 3 );
+			mmesh.position.x = 2;
+			mmesh.position.y = -1;
+			mmesh.geometry = THREE.BufferGeometryUtils.mergeVertices( mmesh.geometry );
+			bufferGeometry2 = mmesh.geometry;
+
+			scene.add( mmesh );
+			console.log( 'merged bufferGeometry', bufferGeometry2 );
+
+			addOutput( `${ bufferGeometry.attributes.position.count } vs ${ bufferGeometry2.attributes.position.count } position attribute length` );
+
+			const bg = bufferGeometry.morphAttributes.position.filter( a => a.count !== bufferGeometry.attributes.position.count ).length === 0;
+			if ( bg ) addOutput( 'Morph targets are the same length as position originally' );
+
+			const bg2 = bufferGeometry2.morphAttributes.position.filter( a => a.count !== bufferGeometry2.attributes.position.count ).length === 0;
+			if ( bg2 ) addOutput( 'Morph targets are the same length as position after' );
+
+
+		} );
+
+        window.addEventListener( 'resize', () => {
+
+        	camera.aspect = window.innerWidth / window.innerHeight;
+        	camera.updateProjectionMatrix();
+        	renderer.setSize( window.innerWidth, window.innerHeight );
+
+        } );
+
+		const clock = new THREE.Clock();
+        ( function renderLoop() {
+
+			const delta = clock.getDelta();
+			if ( mixer1 ) mixer1.update( delta );
+			if ( mixer2 ) mixer2.update( delta );
+
+        	renderer.render( scene, camera );
+        	requestAnimationFrame( renderLoop );
+
+        } )();
+
+    </script>
+</body>
+</html>

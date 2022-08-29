@@ -1,0 +1,29 @@
+components:
+  snow:
+    enabled: true
+    name: PartykalsComponent
+    params:
+      position: [0, 10, 0]
+      particles_global_size: 0.15
+      particles_blending: 1
+      particles_ttl: 3
+      particles_gravity: -2
+      particles_start_color: "#ffffff"
+      particles_end_color: "#eeeeee"
+      particles_velocity: "rand:BoxRandomizer?[-1, -1, -1];[1, -2, 1]"
+      particles_velocity_bonus: [0, -0.5, 0]
+      particles_offset: "rand:BoxRandomizer?[-10, 2, -10];[10, 2, 10]"
+      particles_acceleration: "rand:BoxRandomizer?[-1, -1, -1];[1, -1, 1]"
+      particle_start_size: rand:MixMaxRandomizer?0.3;0.6
+      particle_end_size: rand:MixMaxRandomizer?0.4;0.8
+      particles_texture: "res/retro/flake_a.png"
+      system_particles_count: 2000
+      emitters:
+        - on_interval: "rand:MinMaxRandomizer?0;0.2"
+          interval: 0.001
+  radial_movement:
+    enabled: true
+    name: SimpleRadialMovement
+    params:
+      speed: -1
+      radius: 1

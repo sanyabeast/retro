@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - topographic lines shader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				color: #fff;
+			}
+
+			a {
+				color:#80CBC4;
+			}
+
+			#info {
+				position: absolute;
+				padding-top: 10px;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Topographics Lines Shader by <a href="http://gkjohnson.github.io" target="_blank" rel="noopener">Garrett Johnson</a>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '//cdn.skypack.dev/three@0.130.1/build/three.module.js';
+			import { OrbitControls } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/controls/OrbitControls.js';
+
+			import Stats from '//cdn.skypack.dev/three@0.130.1/examples/jsm/libs/stats.module.js';
+			import dat from '//cdn.skypack.dev/dat.gui/build/dat.gui.module.js';
+
+			import { noise } from './lib/perlin.js';
+			import { TopoLineShaderMixin } from './src/TopographyShader.js';
+			import { BinnedTerrainBufferGeometry } from './src/BinnedTerrainBufferGeometry.js';
+
+			// globals
+			var stats;
+			var camera, scene, renderer, controls;
+			var directionalLight, ambientLight;
+			var plane, binnedPlane;
+			var params = {
+				emphasis: 10,
+				thickness: 0.0,
+				offset: 0,
+				spacing: 0.1,
+				flatShading: false,
+				binnedHeight: false,
+				fadeStart: 40,
+				fadeDist: 20,
+			};
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x263238 );
+				renderer.outputEncoding = THREE.GammaEncoding;
+				renderer.shadowMap.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				// initialize renderer, scene, camera
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 6000 );
+				camera.position.set( 30, 20, 30 );
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x263238, 0.015 );
+
+				directionalLight = new THREE.DirectionalLight();
+				directionalLight.position.set( 1, 2, 3 );
+
+				var dlShadowCam = directionalLight.shadow.camera;
+				dlShadowCam.left = dlShadowCam.bottom = -15;
+				dlShadowCam.top = dlShadowCam.right = 15;
+				scene.add( directionalLight );
+
+				ambientLight = new THREE.AmbientLight( 0xffffff, 0.25 );
+				scene.add( ambientLight );
+
+				const widthSegments = 200;
+				const heightSegments = 200;
+				const dim = 50;
+				const scale = 50;
+				const zScale = 5;
+
+				// Subtract 1 because the width segments refers to the number of squares in the grid
+				// Subtract 1 cells worth of width / height to position the vertices at the center of the binned towers
+				const geom = new THREE.PlaneBufferGeometry( dim - dim / widthSegments, dim - dim / heightSegments, widthSegments - 1, heightSegments - 1);
+				const heightGeom = new BinnedTerrainBufferGeometry( dim, dim, widthSegments, heightSegments );
+				const posAttr = geom.attributes.position;
+
+				// TODO: Modify a plane instead because creating tons of
+				// cubes seems intensive
+				noise.seed( Math.random() );
+				for( let x = 0; x < widthSegments; x ++ ) {
+
+					for( let y = 0; y < heightSegments; y ++ ) {
+
+						const i = y * widthSegments + x;
+						const vx = x / scale;
+						const vy = y / scale;
+
+						const vz = noise.perlin2( vx, vy ) + 1;
+						const vz2 = noise.perlin2( vx * 5, vy * 5 );
+
+						const height = vz2 * 0.5 + vz * zScale;
+						posAttr.setZ( i, height );
+						heightGeom.setZ( x, heightSegments - y - 1, height );
+
+					}
+
+				}
+
+
+				geom.computeVertexNormals();
+
+				const shader = TopoLineShaderMixin( THREE.ShaderLib.phong );
+				const material = new THREE.ShaderMaterial( shader );
+				material.uniforms.topoLineColor.value.set( 0x666666 );
+				material.lights = true;
+				material.side = THREE.DoubleSide;
+				material.fog = true;
+
+				plane = new THREE.Mesh( geom, material );
+				plane.rotation.x = -Math.PI / 2;
+				scene.add( plane );
+
+				binnedPlane = new THREE.Mesh( heightGeom, material.clone() );
+				binnedPlane.rotation.x = -Math.PI / 2;
+				binnedPlane.material.flatShading = true;
+				scene.add( binnedPlane );
+
+				// stats
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// camera controls
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 3000;
+				controls.autoRotate = true;
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				var gui = new dat.GUI();
+				gui.width = 300;
+				gui.add( params, 'offset', 0, 10 );
+				gui.add( params, 'spacing', 0, 1 );
+				gui.add( params, 'thickness', 0, 10, 0.25 );
+				gui.add( params, 'emphasis', 0, 50 );
+				gui.add( params, 'fadeStart', 0, 100, 0.01 );
+				gui.add( params, 'fadeDist', 0, 40, 0.01 );
+				gui.add( params, 'binnedHeight' );
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				renderer.setPixelRatio( window.devicePixelRatio );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.update();
+				render();
+
+			}
+
+			function render() {
+
+				plane.material.uniforms.topoLineThickness.value = params.thickness;
+				plane.material.uniforms.topoLineSpacing.value = params.spacing;
+				plane.material.uniforms.topoLineOffset.value = params.offset;
+				plane.material.uniforms.topoLineEmphasisMod.value = params.emphasis;
+				plane.material.uniforms.topoFadeStart.value = params.fadeStart;
+				plane.material.uniforms.topoFadeDist.value = params.fadeDist;
+
+				binnedPlane.material.uniforms.topoLineThickness.value = params.thickness;
+				binnedPlane.material.uniforms.topoLineSpacing.value = params.spacing;
+				binnedPlane.material.uniforms.topoLineOffset.value = params.offset;
+				binnedPlane.material.uniforms.topoLineEmphasisMod.value = params.emphasis;
+
+				plane.material.needsUpdate = plane.material.flatShading !== params.flatShading;
+				plane.material.flatShading = params.flatShading;
+
+				plane.visible = ! params.binnedHeight;
+				binnedPlane.visible = params.binnedHeight;
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

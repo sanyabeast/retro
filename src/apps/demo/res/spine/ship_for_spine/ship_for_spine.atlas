@@ -1,0 +1,62 @@
+
+ship_for_spine.png
+size: 441,220
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+body
+  rotate: true
+  xy: 2, 95
+  size: 123, 436
+  orig: 123, 436
+  offset: 0, 0
+  index: -1
+engine
+  rotate: false
+  xy: 340, 42
+  size: 99, 51
+  orig: 100, 53
+  offset: 0, 2
+  index: -1
+flame1
+  rotate: true
+  xy: 340, 4
+  size: 36, 69
+  orig: 36, 69
+  offset: 0, 0
+  index: -1
+flame2
+  rotate: true
+  xy: 340, 4
+  size: 36, 69
+  orig: 36, 69
+  offset: 0, 0
+  index: -1
+flame3
+  rotate: true
+  xy: 340, 4
+  size: 36, 69
+  orig: 36, 69
+  offset: 0, 0
+  index: -1
+wing_l
+  rotate: true
+  xy: 2, 18
+  size: 75, 167
+  orig: 76, 167
+  offset: 1, 0
+  index: -1
+wing_m
+  rotate: true
+  xy: 2, 2
+  size: 14, 168
+  orig: 14, 168
+  offset: 0, 0
+  index: -1
+wing_r
+  rotate: true
+  xy: 171, 19
+  size: 74, 167
+  orig: 76, 167
+  offset: 0, 0
+  index: -1

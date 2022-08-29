@@ -1,0 +1,8 @@
+components: 
+  ambient_audio_source:
+    name: AudioComponent
+    params:
+      src: "res/retro/plugins/extra-assets/ambient_sound/polar_wind_a1"
+      autoplay: true
+      loop: true
+      volume: 0.01

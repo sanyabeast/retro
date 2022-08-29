@@ -1,0 +1,78 @@
+prefabs:
+  - default.Postprocessing
+  - retro.sound.default_ambient_audio_source
+  - default.OrbitControlsComponent
+components:
+  sun:
+    name: Sun
+    tag: sun
+    params:
+      use_postfx: false
+      debug_transform: true
+      cycling: 24
+      time: 0
+  fog:
+    name: Fog
+    params:
+      density: 0.02
+  skybox:
+    name: SkyBox
+    params:
+      cubemap: "res/retro/plugins/extra-assets/cubemaps/nalovardo_1"
+      cubemap_format: jpg
+children:
+  # table
+  - components:
+      obj_table:
+          name: MeshRenderer
+          params:
+            scale: 1
+            position: [0, 0.5, 0]
+            src: res/retro/plugins/extra-assets/models/gltf/low_poly_old_vintage_table_desk_-_wooden_table/scene.gltf
+    children: 
+        # tablet
+        - position: [0, 1.16, 0]
+          components: 
+            obj_tablet:
+              name: MeshRenderer
+              params:
+                scale: 1
+                src: res/retro/plugins/extra-assets/models/gltf/tablet/scene.gltf
+            light_1:
+              enabled: true
+              name: "LightComponent"
+              params:
+                position: [0.13, 0.0775, -0.19]
+                rotation: [-1.58, 0, 0]
+                shadows_enabled: true
+                type: "PointLight"
+                rect_width: 2
+                rect_height: 2
+                intensity: 2
+                distance: 5
+                decay: 0.25
+                color: "#f4c8b4"
+            light_controller:
+              tick_rate: 1
+              inline:
+                props:
+                  rate: 8
+                  min: 10
+                  max: 10.5
+                methods:
+                  on_create:
+                    body: >
+                      this.light_comp = this.get_component("LightComponent");
+                  on_tick:
+                    body: >
+                      this.light_comp.intensity = this.tools.math.lerp(this.min, this.max, Math.random());
+        # skorpion
+        - position: [0.55, 1.188, 0]
+          components: 
+            obj_tablet:
+              name: MeshRenderer
+              params:
+                scale: 0.025
+                rotation: [0.075, 1.2, -1.5707]
+                bump_scale: 0.5
+                src: res/retro/plugins/extra-assets/models/gltf/skorpion_vz._61/scene.gltf

@@ -1,0 +1,60 @@
+components:
+  - enabled: true
+    name: MeshComponent
+    tag: cool_box
+    params:
+      position:
+        - 0
+        - 0.5
+        - 0
+      geometry:
+        - BoxBufferGeometry
+        - - 1
+          - 1
+          - 1
+      material:
+        - PBRMaterial
+        - color: "#ffffff"
+          pbr: "res/retro/plugins/extra-assets/pbr/storage-container2-bl/storage-container2"
+  - name: Collider
+    params:
+      collider_type: box
+      sphere_radius: 3
+      box_size: [1.1, 1.1, 1.1]
+  -
+    name: BushController
+    inline:
+      props:
+        tick_rate: 30
+        shake_speed: 1
+        shake_ampl: 1
+        rotation_speed: 1
+        offset: [0, 0.6, 0]
+      construct: >
+        console.log(this)
+      methods:
+        on_tick:
+          args: [time_delta]
+          body: >
+            let date = +new Date();
+            let mesh_comp = this.get_component("MeshComponent");
+            if (mesh_comp){
+              mesh_comp.position = [
+                mesh_comp.position[0] + this.offset[0],
+                (Math.sin(date * 0.001 * this.shake_speed) * 0.1 * this.shake_ampl) + this.offset[1],
+                mesh_comp.position[2] + this.offset[2]
+              ]
+
+              mesh_comp.rotation = [
+                mesh_comp.rotation[0],
+                Math.sin(date * 0.001 * this.rotation_speed),
+                mesh_comp.rotation[2],
+              ]
+            }
+        on_start:
+          body: >
+            console.log("Hello from inline component! The application has been just started. Good luck!")
+    params:
+      shake_speed: 0.2
+      shake_ampl: 1
+      rotation_speed: 0.1

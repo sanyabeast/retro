@@ -1,0 +1,30 @@
+components:
+  - name: MeshContainer
+    ref: testmodel
+    params:
+      components:
+        simple_rotator:
+          enabled: true
+          name: SimpleRotator
+          params:
+            speed: 0.01
+            axis:
+              x: 0
+              y: 1
+              z: 0
+      geometry:
+        - "AssetBufferGeometry"
+        - - "res/retro/plugins/extra-assets/models/teapot.fbx"
+          - 2
+      material:
+        - MeshPhongMaterial
+        - color: "#ffffff"
+          map: "res/retro/uv_checker_a.jpg"
+      scale:
+        - 0.4
+        - 0.4
+        - 0.4
+      position:
+        - 0
+        - 0
+        - 0

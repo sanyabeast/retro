@@ -1,0 +1,55 @@
+children:
+  box1:
+    prefab: "retro.actors.test_box_1"
+  scene:
+    components:
+      ground:
+        enabled: true
+        name: MeshComponent
+        tag: ground_mesh
+        params:
+          recieve_shadow: true
+          cast_shadow: false
+          position:
+            - 0
+            - 0
+            - 0
+          geometry:
+            - CircleGeometry
+            - - 3
+              - 6
+          rotation: [-1.5707, 0, 0]
+          material:
+            - PBRMaterial
+            - color: "#daefe5"
+              pbr: "res/retro/plugins/extra-assets/pbr/dusty_groun_gravel_a1/t"
+              file_format: jpg
+              tiling: 6
+      caption_a:
+        enabled: true
+        name: TroikaTextComponent
+        params:
+          text: "Hello World!"
+          font_size: 0.36
+          color: "#ffffff"
+          anchor_x: 0
+          position:
+            - -0.75
+            - 2.5
+            - 0
+      time_component:
+        inline: 
+          methods:
+            on_tick:
+              body: >
+                let caption = this.get_component("TroikaTextComponent");
+                caption.text = "test"
+        params:
+          tick_rate: 1
+  snow_fx:
+    prefab: "retro.snow_fx"
+    components:
+      snow:
+        params:
+          particles_global_size: 0.3
+          particles_end_color: "#ffffff"

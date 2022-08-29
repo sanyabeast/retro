@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - 3d lut effect</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				color: #fff;
+			}
+
+			a {
+				color:#80CBC4;
+			}
+
+			#info {
+				position: absolute;
+				padding-top: 10px;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - 3D LUT Effect by <a href="http://gkjohnson.github.io" target="_blank" rel="noopener">Garrett Johnson</a>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '//cdn.skypack.dev/three@0.130.1/build/three.module.js';
+			import { OrbitControls } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/controls/OrbitControls.js';
+			import { CopyShader } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/shaders/CopyShader.js';
+			import { EffectComposer } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/postprocessing/ShaderPass.js';
+			import { GammaCorrectionShader } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/shaders/GammaCorrectionShader.js';
+			import { FXAAShader } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/shaders/FXAAShader.js';
+			import { LUTCubeLoader } from './src/LUTCubeLoader.js';
+			import { LUT3dlLoader } from './src/LUT3dlLoader.js';
+			import { LUTPass } from './src/LUTPass.js';
+			import { TetrahedralUpscaler } from './src/TetrahedralUpscaler.js';
+
+			import Stats from '//cdn.skypack.dev/three@0.130.1/examples/jsm/libs/stats.module.js';
+			import dat from '//cdn.skypack.dev/dat.gui/build/dat.gui.module.js';
+
+			const luts = [
+				'2³ no op',
+				'4³ no op',
+				'8³ no op',
+				'16³ no op',
+				'32³ no op',
+				'./luts/Presetpro-Cinematic.3dl',
+				'./luts/Presetpro-Cinematic.cube',
+				'./luts/Arabica 12.CUBE',
+				'./luts/Ava 614.CUBE',
+				'./luts/Azrael 93.CUBE',
+				'./luts/Bourbon 64.CUBE',
+				'./luts/Byers 11.CUBE',
+				'./luts/Chemical 168.CUBE',
+				'./luts/Clayton 33.CUBE',
+				'./luts/Clouseau 54.CUBE',
+				'./luts/Cobi 3.CUBE',
+				'./luts/Contrail 35.CUBE',
+				'./luts/Cubicle 99.CUBE',
+				'./luts/Django 25.CUBE',
+				'./luts/Domingo 145.CUBE',
+				'./luts/Faded 47.CUBE',
+				'./luts/Folger 50.CUBE',
+				'./luts/Fusion 88.CUBE',
+				'./luts/Hyla 68.CUBE',
+				'./luts/Korben 214.CUBE',
+				'./luts/Lenox 340.CUBE',
+				'./luts/Lucky 64.CUBE',
+				'./luts/McKinnon 75.CUBE',
+				'./luts/Milo 5.CUBE',
+				'./luts/Neon 770.CUBE',
+				'./luts/Paladin 1875.CUBE',
+				'./luts/Pasadena 21.CUBE',
+				'./luts/Pitaya 15.CUBE',
+				'./luts/Reeve 38.CUBE',
+				'./luts/Remy 24.CUBE',
+				'./luts/Sprocket 231.CUBE',
+				'./luts/Teigen 28.CUBE',
+				'./luts/Trent 18.CUBE',
+				'./luts/Tweed 71.CUBE',
+				'./luts/Vireo 37.CUBE',
+				'./luts/Zed 32.CUBE',
+				'./luts/Zeke 39.CUBE',
+			];
+			const lutMap = {};
+			const images = {};
+
+			// globals
+			var stats;
+			var params = {
+				enabled: true,
+				lut: luts[ 6 ],
+				intensity: 1.0,
+				displayLut: false,
+				use3dTexture: true,
+				tetrahedralResize: false,
+				resizeDimensions: 32,
+				image: 'car',
+			};
+			var camera, scene, renderer, controls;
+			var composer;
+			var renderPass, lutPass, gammaPass, fxaaPass;
+			var lut3dl, lutCube;
+			var lutMesh, mesh, currLut;
+
+
+			init();
+			animate();
+
+			function generateNoOpLUT( size ) {
+
+				const data = new Uint8Array( size * size * size * 3 );
+				for ( let r = 0; r < size; r ++ ) {
+
+					for ( let g = 0; g < size; g ++ ) {
+
+						for ( let b = 0; b < size; b ++ ) {
+
+							const index = r + g * size + b * size * size;
+							data[ index * 3 + 0 ] = Math.round( 255 * r / ( size - 1 ) );
+							data[ index * 3 + 1 ] = Math.round( 255 * g / ( size - 1 ) );
+							data[ index * 3 + 2 ] = Math.round( 255 * b / ( size - 1 ) );
+
+						}
+
+					}
+
+				}
+
+				const texture = new THREE.DataTexture();
+				texture.image.data = data;
+				texture.image.width = size;
+				texture.image.height = size * size;
+				texture.format = THREE.RGBFormat;
+				texture.type = THREE.UnsignedByteType;
+				texture.magFilter = THREE.LinearFilter;
+				texture.minFilter = THREE.LinearFilter;
+				texture.wrapS = THREE.ClampToEdgeWrapping;
+				texture.wrapT = THREE.ClampToEdgeWrapping;
+				texture.generateMipmaps = false;
+
+				const texture3D = new THREE.DataTexture3D();
+				texture3D.image.data = data;
+				texture3D.image.width = size;
+				texture3D.image.height = size;
+				texture3D.image.depth = size;
+				texture3D.format = THREE.RGBFormat;
+				texture3D.type = THREE.UnsignedByteType;
+				texture3D.magFilter = THREE.LinearFilter;
+				texture3D.minFilter = THREE.LinearFilter;
+				texture3D.wrapS = THREE.ClampToEdgeWrapping;
+				texture3D.wrapT = THREE.ClampToEdgeWrapping;
+				texture3D.wrapR = THREE.ClampToEdgeWrapping;
+				texture3D.generateMipmaps = false;
+				texture3D.unpackAlignment = 1;
+
+				return { texture, texture3D, size };
+
+			}
+
+			function init() {
+
+				// initialize renderer, scene, camera
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, 0, 5 * 3.5 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x151515 ).convertSRGBToLinear();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// geometry
+				const material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+				const textureLoader = new THREE.TextureLoader();
+				images.car = textureLoader.load( './images/photo.jpg', function ( map ) {
+
+					map.encoding = THREE.sRGBEncoding;
+					material.map = map;
+					material.needsUpdate = true;
+
+				} );
+
+				images.sponza = textureLoader.load( './images/sponza.png', function ( map ) {
+
+					map.encoding = THREE.sRGBEncoding;
+					material.map = map;
+					material.needsUpdate = true;
+
+				} );
+
+				const planeGeometry = new THREE.PlaneBufferGeometry();
+				lutMesh = new THREE.Mesh( planeGeometry );
+				scene.add( lutMesh );
+
+				mesh = new THREE.Mesh( planeGeometry, material );
+				scene.add( mesh );
+
+				luts.forEach( l => {
+
+
+					if ( l === '64³ no op' ) {
+
+						lutMap[ l ] = generateNoOpLUT( 64 );
+
+					} else if ( l === '32³ no op' ) {
+
+						lutMap[ l ] = generateNoOpLUT( 32 );
+
+					} else if ( l === '16³ no op' ) {
+
+						lutMap[ l ] = generateNoOpLUT( 16 );
+
+					} else if ( l === '8³ no op' ) {
+
+						lutMap[ l ] = generateNoOpLUT( 8 );
+
+					} else if ( l === '4³ no op' ) {
+
+						lutMap[ l ] = generateNoOpLUT( 4 );
+
+					} else if ( l === '2³ no op' ) {
+
+						lutMap[ l ] = generateNoOpLUT( 2 );
+
+					} else if ( /3dl$/.test( l ) ) {
+
+						new LUT3dlLoader().load( l, res => {
+
+							lutMap[ l ] = res;
+
+							if ( l === params.lut ) {
+
+								regenerateLut();
+
+							}
+
+						} );
+
+					} else {
+
+						new LUTCubeLoader().load( l, res => {
+
+							lutMap[ l ] = res;
+
+							if ( l === params.lut ) {
+
+								regenerateLut();
+
+							}
+
+						} );
+
+					}
+
+
+				} );
+
+				// Render Pass Setup
+				renderPass = new RenderPass( scene, camera );
+				lutPass = new LUTPass();
+				gammaPass = new ShaderPass( GammaCorrectionShader );
+				fxaaPass = new ShaderPass( FXAAShader );
+
+				const rt = new THREE.WebGLRenderTarget( 1, 1, {
+
+					minFilter: THREE.LinearFilter,
+					magFilter: THREE.LinearFilter,
+					format: THREE.RGBAFormat,
+					type: renderer.capabilities.floatFragmentTextures ? THREE.HalfFloatType : THREE.UnsignedByteType,
+
+				} );
+
+				composer = new EffectComposer( renderer, rt );
+				composer.setSize( window.innerWidth, window.innerHeight );
+				composer.setPixelRatio( window.devicePixelRatio );
+				composer.addPass( renderPass );
+				composer.addPass( gammaPass );
+				composer.addPass( lutPass );
+				composer.addPass( fxaaPass );
+
+				// camera controls
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 200;
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// dat gui
+				var gui = new dat.GUI();
+				gui.width = 450;
+
+				gui.add( params, 'enabled' );
+				gui.add( params, 'lut', luts ).onChange( regenerateLut );
+				gui.add( params, 'intensity' ).min( 0.0 ).max( 1.0 ).step( 0.01 );
+				gui.add( params, 'displayLut' );
+				gui.add( params, 'tetrahedralResize' ).onChange( regenerateLut );
+				gui.add( params, 'resizeDimensions', [ 4, 16, 32, 64, 128, 256 ] ).onChange( regenerateLut );
+
+				if ( renderer.capabilities.isWebGL2 ) {
+
+					gui.add( params, 'use3dTexture' );
+
+				} else {
+
+					params.use3dTexture = false;
+
+				}
+
+				gui.add( params, 'image', [ 'car', 'sponza' ] );
+
+				gui.open();
+
+				onWindowResize();
+
+			}
+
+			function regenerateLut() {
+
+				if ( currLut ) {
+
+					currLut.texture.dispose();
+					currLut.texture3D.dispose();
+
+				}
+
+				let lut = lutMap[ params.lut ];
+				if ( params.tetrahedralResize ) {
+
+					const upscaler = new TetrahedralUpscaler();
+
+					console.time( 'LUT resize' );
+					const texture3D = upscaler.generate( lut.texture3D, params.resizeDimensions );
+					console.timeEnd( 'LUT resize' );
+					const texture = lut.texture.clone();
+					texture.image = { ...texture3D.image };
+					texture.image.height *= texture.image.height;
+
+					currLut = {
+
+						...lut,
+						texture3D,
+						texture,
+
+					};
+
+				} else {
+
+					currLut = lut;
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				renderer.setPixelRatio( window.devicePixelRatio );
+
+				composer.setSize( width, height );
+				composer.setPixelRatio( window.devicePixelRatio );
+
+				fxaaPass.material.uniforms.resolution.value.set( 1 / width, 1 / height ).multiplyScalar( 1 / window.devicePixelRatio );
+				window.fxaaPass = fxaaPass;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				const map = images[ params.image ];
+				if ( map.image ) {
+
+					const aspect = map.image.width / map.image.height;
+					mesh.scale.set( 7 * aspect, 7, 1 );
+					mesh.material.map = map;
+
+				}
+
+				mesh.visible = ! params.displayLut;
+				lutMesh.visible = params.displayLut;
+
+				const prevMap = lutMesh.material.map;
+				lutMesh.material.map = currLut && currLut.texture;
+				lutPass.intensity = params.intensity;
+
+				if ( lutMesh.material.map ) {
+
+					if ( ! prevMap ) {
+
+						lutMesh.material.needsUpdate = true;
+
+					}
+
+					const lut = currLut;
+					const image = lutMesh.material.map.image;
+					const aspect = image.width / image.height;
+
+					lutMesh.scale.x = 10 * aspect;
+					lutMesh.scale.y = 10;
+
+					if ( params.use3dTexture ) {
+
+						lutPass.lut = lut.texture3D;
+
+					} else {
+
+						lutPass.lut = lut.texture;
+
+					}
+
+				}
+
+				lutPass.enabled = params.enabled && ! params.displayLut;
+				gammaPass.enabled = ! params.displayLut;
+
+				composer.render();
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

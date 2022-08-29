@@ -1,0 +1,52 @@
+{
+    "compilerOptions": {
+        "module": "es6",
+        "target": "es2015",
+        "sourceMap": true,
+        "declaration": true,
+        "esModuleInterop": true,
+        "declarationDir": "./dist/typing",
+        "noImplicitOverride": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "allowUnreachableCode": false,
+        "lib": [
+            "webworker",
+            "es6",
+            "es5",
+            "dom"
+        ],
+        "types": [
+            "node"
+        ],
+        "paths": {
+            "axios": [
+                "./node_modules/axios/index.d.ts"
+            ]
+        }
+    },
+    "exclude": [
+        "node_modules",
+        "src/retro/plugins/d3",
+        "src/retro/plugins/extra-assets",
+        "src/retro/plugins/meshworks",
+        "src/retro/plugins/storage",
+        "src/apps/archive/city",
+        "src/apps/archive/gizmos",
+        "src/apps/archive/input",
+        "src/apps/archive/lab",
+        "src/apps/archive/office",
+        "src/apps/archive/pbr",
+        "src/apps/archive/plot",
+        "src/apps/archive/snake",
+        "src/apps/archive/snowbox",
+        "src/apps/archive/spinetools",
+        "src/apps/archive/ssgi",
+        "src/apps/default",
+        "src/apps/demo",
+        "src/apps/subway"
+    ],
+    "include": [
+        "src/**/*"
+    ]
+}

@@ -1,0 +1,47 @@
+components:
+  body:
+    name: MeshComponent
+    params:
+      debug_transform: false
+      rotation: [0, 1.5707, 0]
+      recieve_shadow: false
+      cast_shadow: false
+      geometry:
+        - "url:res/retro/plugins/extra-assets/models/fluorescent_lamp_a1/lamp.obj"
+        - 0.125
+      material:
+        - AssetMaterial
+        - src: "res/retro/plugins/extra-assets/models/fluorescent_lamp_a1/lamp.mtl"
+          allow_transparency: false
+          doubleside: false
+          emissive_intensity: 10
+  light:
+    name: LightComponent
+    enabled: true
+    params:
+      position: [0, -0.1, 0]
+      rotation: [-1.5707, 0, 0]
+      type: RectAreaLight
+      intensity: 150
+      distance: 5
+      rect_width: 1
+      rect_height: 0.1
+      color: "#eee0e5"
+  light2:
+    name: LightComponent
+    enabled: true
+    params:
+      position: [0, -0.1, 0]
+      rotation: [-1.5707, 0, 0]
+      type: PointLight
+      intensity: 0.8
+      distance: 4
+      color: "#eee0e5"
+  sfx_ambient:
+    name: AudioComponent
+    params:
+      src: "res/retro/plugins/extra-assets/ambient_sound/fluorescent_lamp_ambience_a1"
+      autoplay: true
+      max_distance: 4
+      loop: true
+      volume: 0.7

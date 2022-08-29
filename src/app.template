@@ -1,0 +1,17 @@
+import RetroApp from "retro/App"
+import Main from "apps/aviator/gui/Main.vue"
+import store from "apps/aviator/gui/store"
+import AssetManager from "retro/utils/AssetManager";
+
+class App extends RetroApp {
+    constructor(params) {
+        super({
+            ...params,
+        });
+    }
+    on_tick() {
+        let time = this.globals.uniforms.time.value
+    }
+}
+
+export default App;

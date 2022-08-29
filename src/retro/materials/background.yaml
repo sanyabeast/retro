@@ -1,0 +1,28 @@
+type: ShaderMaterial
+params:
+  vertexShader: >
+      varying vec2 vUv;
+
+      void main() {
+          vUv = uv;
+      
+          vec4 rpos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          gl_Position = vec4(position.x * 2., position.y * 2., 1., 1.);
+
+      }
+
+  fragmentShader: >
+      #define NUM_OCTAVES 16
+      
+      uniform sampler2D map;
+
+      #import retro.corelib
+      
+      void main(void) {
+          gl_FragColor = texture2D(map, vUv);
+          apply_bc(gl_FragColor);
+      }
+  uniforms: 
+    map: 
+        type: t
+    

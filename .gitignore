@@ -1,0 +1,7 @@
+node_modules/
+npm-debug.log
+src/apps/*
+!src/apps/demo/
+dist/*
+!dist/demo
+.DS_Store

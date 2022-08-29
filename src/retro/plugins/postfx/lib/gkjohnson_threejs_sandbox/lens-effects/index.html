@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - lens distortion effects</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				color: #fff;
+			}
+
+			a {
+				color:#80CBC4;
+			}
+
+			#info {
+				position: absolute;
+				padding-top: 10px;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Lens Distortion Effects by <a href="http://gkjohnson.github.io" target="_blank" rel="noopener">Garrett Johnson</a>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '//cdn.skypack.dev/three@0.130.1/build/three.module.js';
+			import { OrbitControls } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/controls/OrbitControls.js';
+			import { CopyShader } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/shaders/CopyShader.js';
+			import { EffectComposer } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/postprocessing/ShaderPass.js';
+			import { GammaCorrectionShader } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/shaders/GammaCorrectionShader.js';
+			import { FXAAShader } from '//cdn.skypack.dev/three@0.130.1/examples/jsm/shaders/FXAAShader.js';
+			import { FilmGrainShader } from './src/FilmGrainShader.js';
+			import { LensDistortionShader } from './src/LensDistortionShader.js';
+
+			import Stats from '//cdn.skypack.dev/three@0.130.1/examples/jsm/libs/stats.module.js';
+			import dat from '//cdn.skypack.dev/dat.gui/build/dat.gui.module.js';
+
+			// globals
+			var stats;
+			var params = {
+				enableNoise: true,
+				noiseSpeed: 0.02,
+				noiseIntensity: 0.025,
+
+				enableDistortion: true,
+				baseIor: 0.8,
+				bandOffset: 0.003,
+				jitterIntensity: 1.0,
+				samples: 7,
+				distortionMode: 'rygcbv',
+
+				image: 'car'
+			};
+			var camera, scene, renderer, controls;
+			var composer;
+			var mesh;
+			var renderPass, distortPass, grainPass, gammaPass, fxaaPass;
+
+			const textureMap = {};
+
+			init();
+			animate();
+
+			function init() {
+
+				// initialize renderer, scene, camera
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, 0, 5 * 3.5 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0 );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// geometry
+				var material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+				var textureLoader = new THREE.TextureLoader();
+
+				textureMap.car = textureLoader.load( '../3d-lut/images/photo.jpg', map => {
+
+					map.encoding = THREE.sRGBEncoding;
+
+				} );
+
+				textureMap.grid = textureLoader.load( './images/grid.png', map => {
+
+					map.encoding = THREE.sRGBEncoding;
+
+				}  );
+
+				const planeGeometry = new THREE.PlaneBufferGeometry();
+				mesh = new THREE.Mesh( planeGeometry, material );
+				scene.add( mesh );
+
+				// Render Pass Setup
+				renderPass = new RenderPass( scene, camera );
+				grainPass = new ShaderPass( FilmGrainShader );
+				gammaPass = new ShaderPass( GammaCorrectionShader );
+				fxaaPass = new ShaderPass( FXAAShader );
+				distortPass = new ShaderPass( LensDistortionShader );
+				distortPass.material.defines.CHROMA_SAMPLES = params.samples;
+
+				composer = new EffectComposer( renderer );
+				composer.setSize( window.innerWidth, window.innerHeight );
+				composer.setPixelRatio( window.devicePixelRatio );
+				composer.addPass( renderPass );
+				composer.addPass( gammaPass );
+				composer.addPass( fxaaPass );
+				composer.addPass( distortPass );
+				composer.addPass( grainPass );
+
+				// camera controls
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 200;
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// dat gui
+				var gui = new dat.GUI();
+				gui.width = 300;
+
+				gui.add( params, 'image', Object.keys( textureMap ) );
+
+				const noiseFolder = gui.addFolder( 'noise' );
+				noiseFolder.add( params, 'enableNoise' );
+				noiseFolder.add( params, 'noiseSpeed' ).min( 0 ).max( 0.1 ).step( 0.00001 );
+				noiseFolder.add( params, 'noiseIntensity' ).min( 0 ).max( 1 ).step( 0.001 );
+				noiseFolder.open();
+
+				const distortionFolder = gui.addFolder( 'distortion' );
+				distortionFolder.add( params, 'enableDistortion' );
+				distortionFolder.add( params, 'baseIor' ).min( 0.75 ).max( 1.25 ).step( 0.001 );
+				distortionFolder.add( params, 'bandOffset' ).min( - 0.02 ).max( 0.02 ).step( 0.001 );
+				distortionFolder.add( params, 'jitterIntensity' ).min( 0 ).max( 2.0 ).step( 0.01 );
+				distortionFolder.add( params, 'samples' ).min( 1 ).max( 20 ).step( 1 ).onChange( v => {
+
+					distortPass.material.defines.CHROMA_SAMPLES = v;
+					distortPass.material.needsUpdate = true;
+
+				} );
+				distortionFolder.add( params, 'distortionMode', [ 'none', 'rgb', 'rygcbv' ] ).onChange( v => {
+
+					switch ( v ) {
+						case 'none':
+							distortPass.material.defines.BAND_MODE = 0;
+							break;
+						case 'rgb':
+							distortPass.material.defines.BAND_MODE = 1;
+							break;
+						case 'rygcbv':
+							distortPass.material.defines.BAND_MODE = 2;
+							break;
+					}
+					distortPass.material.needsUpdate = true;
+
+				} );
+				distortionFolder.open();
+
+				gui.open();
+
+				onWindowResize();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				renderer.setPixelRatio( window.devicePixelRatio );
+
+				composer.setSize( width, height );
+				composer.setPixelRatio( window.devicePixelRatio );
+
+				fxaaPass.material.uniforms.resolution.value.set( 1 / width, 1 / height ).multiplyScalar( 1 / window.devicePixelRatio );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				grainPass.enabled = params.enableNoise;
+				grainPass.material.uniforms.noiseOffset.value += params.noiseSpeed;
+				grainPass.material.uniforms.intensity.value = params.noiseIntensity;
+
+				distortPass.enabled = params.enableDistortion;
+				distortPass.material.uniforms.baseIor.value = params.baseIor;
+				distortPass.material.uniforms.bandOffset.value = params.bandOffset;
+				distortPass.material.uniforms.jitterOffset.value += 0.01;
+				distortPass.material.uniforms.jitterIntensity.value = params.jitterIntensity;
+
+				const tex = textureMap[ params.image ];
+				mesh.material.map = tex;
+
+				if ( tex.image ) {
+
+					const aspect = tex.image.width / tex.image.height;
+					mesh.scale.set( 7 * aspect, 7, 1 );
+
+				}
+
+
+
+				composer.render();
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

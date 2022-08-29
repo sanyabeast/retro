@@ -1,0 +1,14 @@
+components:
+  - name: MeshComponent
+    params:
+      debug_transform: false
+      position: [-2.15, 0, 1]
+      rotation: [0, 1.57, 0]
+      geometry:
+        - "url:res/retro/plugins/extra-assets/models/little_tokyo/little_tokyo.obj"
+        - 0.125
+      material:
+        - AssetMaterial
+        - src: "res/retro/plugins/extra-assets/models/little_tokyo/little_tokyo.mtl"
+          transparent: false
+          doubleside: true

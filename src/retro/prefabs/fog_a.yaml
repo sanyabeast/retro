@@ -1,0 +1,29 @@
+components:
+  foggy:
+    enabled: true
+    name: PartykalsComponent
+    tag: ""
+    params:
+      position: [0, 0, 0]
+      rotation: [0, 0, 0]
+      scale: [0, 0, 0]
+      particles_global_size: 300
+      particles_blending: 1
+      particles_ttl: 5
+      particles_gravity: -1
+      particles_start_color: "#ffffff"
+      particles_end_color: "#eeeeee"
+      particles_start_alpha: 0
+      particles_end_alpha: 0.666
+      particles_rotation_speed: rand:MinMaxRandomizer?-1;1
+      particles_velocity: "rand:BoxRandomizer?[-39, 0, -37];[-39, 0, 39]"
+      particles_velocity_bonus: [0, 0, 0]
+      particles_offset: "rand:BoxRandomizer?[-300, 0, -300];[300, 0, -300]"
+      particles_acceleration: "rand:BoxRandomizer?[-1,0, 5];[1, 0, 15]"
+      particle_start_size: rand:MixMaxRandomizer?2;4
+      particle_end_size: rand:MixMaxRandomizer?4;2
+      particles_texture: "res/retro/smoke_a.png"
+      system_particles_count: 5
+      emitters:
+        - on_interval: "rand:MinMaxRandomizer?0;2"
+          interval: 0.5

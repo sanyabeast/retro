@@ -1,0 +1,20 @@
+components: 
+  - name: MeshComponent
+    tag: ""
+    params:
+      position:
+        - -2
+        - 0
+        - 0
+      scale: [1, 1, 1]
+      rotation: [0, 0, 0]
+      geometry:
+        - BoxBufferGeometry
+        - - 1
+          - 1
+          - 1
+          - 1
+      material:
+        - PBRMaterial
+        - color: "#ffffff"
+          pbr: "res/retro/plugins/extra-assets/pbr/storage-container2-bl/storage-container2"

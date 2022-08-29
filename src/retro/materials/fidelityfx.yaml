@@ -1,0 +1,145 @@
+type: ShaderMaterial
+params:
+  vertexShader: |
+    varying vec2 vUv;
+    uniform float opacity;
+    uniform float cell_scale;
+
+    void main() {
+        vUv = uv;
+        vec4 pos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        gl_Position = pos;
+    }
+
+  fragmentShader: |
+    #ifdef FRAMEBUFFER_PRECISION_HIGH
+        uniform highp sampler2D map;
+    #else
+        uniform lowp sampler2D map;
+    #endif
+    uniform float sharpness_scale;
+    uniform float contrast_kernel_radius;
+    uniform float sharpness_kernel_radius;
+    uniform float effect_power;
+    uniform int contrast_kernel_azimuth_steps;
+    uniform int contrast_kernel_polar_steps;
+
+    #define TEXEL_SIZE 0.0025
+
+    #import retro.blending
+
+    vec4 get_texel(sampler2D map, vec2 uv, float step, float x, float y){
+        return texture2D(map, vec2(uv.x + step * x, uv.y + step * y));
+    }
+    vec4 get_sharpen_color2(vec2 uv, float scale){
+        int steps_i = contrast_kernel_azimuth_steps;
+        int steps_k = contrast_kernel_polar_steps;
+        float radius = 0.1 * sharpness_kernel_radius * scale * sharpness_scale;
+        vec4 sib_color = vec4(0., 0., 0., 0.);
+
+        for (int k = 0; k < steps_k; k++){
+            for (int i = 0; i < steps_i * (k + 1); i++){
+                float cp = float(i)/float(steps_i * (k + 1)) * 2. * 3.14;
+                float x = sin(cp) * (float(k)/float(steps_k)) * radius;
+                float y = cos(cp) * (float(k)/float(steps_k)) * radius;
+                vec4 col = get_texel(map, uv, TEXEL_SIZE, x, y);
+                float p = (col.x + col.y + col.z) / 3.;
+                sib_color += col * -2.;
+            }
+        }
+        float total_steps = float(steps_i * steps_k * steps_k);
+        vec4 albedo_color = get_texel(map, uv, TEXEL_SIZE, 0., 0.);
+        sib_color += albedo_color * total_steps * 1.275;
+
+        albedo_color.xyz = sib_color.xyz;
+        vec3 hsl = RGBToHSL(albedo_color.xyz);
+        hsl.y = 0.25;
+        albedo_color.xyz = HSLToRGB(hsl);
+        return albedo_color;
+    }
+    vec4 get_local_contrast2(vec2 uv){
+        int steps_i = contrast_kernel_azimuth_steps;
+        int steps_k = contrast_kernel_polar_steps;
+        float radius = 32. * contrast_kernel_radius;
+        float min_color = 1.;
+        float max_color = 0.;
+        float total_color = 0.;
+        for (int k = 0; k < steps_k; k++){
+            for (int i = 0; i < steps_i * (k + 1); i++){
+                float cp = float(i)/float(steps_i * (k + 1)) * 2. * 3.14;
+                float x = sin(cp) * (float(k)/float(steps_k)) * radius;
+                float y = cos(cp) * (float(k)/float(steps_k)) * radius;
+                vec4 col = get_texel(map, uv, TEXEL_SIZE, x, y);
+                float p = (col.x + col.y + col.z) / 3.;
+                min_color = min(min_color, p);
+                max_color = max(max_color, p);
+                total_color += p;
+            }
+        }
+        float average_color = total_color / float(steps_i * steps_k * steps_k);
+        float local_contrast = abs(min_color - average_color) +  abs(average_color - max_color);
+        local_contrast = clamp(local_contrast, 0., 1.);
+        return vec4(
+            min_color,
+            average_color,
+            max_color,
+            local_contrast
+        );
+    }
+    vec4 get_local_contrast(vec2 uv){
+        int steps_i = 2;
+        int steps_k = 2;
+        float radius = 32. * contrast_kernel_radius;
+        float total = 0.;
+        for (int k = 0; k < steps_k; k++){
+            for (int i = 0; i < steps_i * (k + 1); i++){
+                float cp = float(i)/float(steps_i * (k + 1)) * 2. * 3.14;
+                float x = sin(cp) * (float(k)/float(steps_k)) * radius;
+                float y = cos(cp) * (float(k)/float(steps_k)) * radius;
+                vec4 ctrst = get_local_contrast2(vec2(uv.x + TEXEL_SIZE * x, uv.y + TEXEL_SIZE * y));
+                total += ctrst.a;
+            }
+        }
+        float average_contrast = total / float(steps_i * steps_k * steps_k);
+        return vec4(
+            pow(clamp(average_contrast * 1., 0., 1.), 0.5),
+            pow(clamp(average_contrast * 1., 0., 1.), 0.5),
+            pow(clamp(average_contrast * 1., 0., 1.), 0.5),
+            pow(clamp(average_contrast * 1., 0., 1.), 0.5)
+        );
+    }
+    void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+        float power = 1. * effect_power;
+        vec4 local_contrast = get_local_contrast(uv);
+        vec4 albedo_color = texture2D(map, uv);
+        vec4 sharpen_color = get_sharpen_color2(uv, 1. - local_contrast.a);
+        float alpha = (1. - local_contrast.a) * power;
+        outputColor = albedo_color;
+        outputColor.xyz = mix(outputColor.xyz, BlendLuminosity(outputColor.xyz, sharpen_color.xyz), clamp(alpha * 0.6666, 0., 1.));
+
+        //if (uv.x>0.33){
+        //  outputColor.xyz = albedo_color.xyz;
+        //}
+        //if (uv.x>0.66){
+        //  outputColor.xyz = BlendLuminosity(outputColor.xyz, sharpen_color.xyz);
+        //}
+    }
+  uniforms:
+    sharpness_kernel_radius:
+      type: f
+      value: 1
+    sharpness_scale:
+      type: f
+      value: 0.5
+    contrast_kernel_polar_steps:
+      type: f
+      value: 4
+    contrast_kernel_azimuth_steps:
+      type: f
+      value: 3
+    contrast_kernel_radius:
+      type: f
+      value: 1
+    effect_power:
+      type: f
+      value: 0.6

@@ -1,0 +1,112 @@
+$:
+  COMPONENT: 
+    type: object
+  PREFAB: 
+    type: "object"
+    properties: 
+      prefab:
+        type: 
+          - string
+      prefabs: 
+        type: 
+          - array
+        items: 
+          type: 
+            - string
+      children:
+        type: 
+          - array
+          - object
+        items: 
+          type: 
+            - string
+      components:
+        type: 
+          - array
+          - object
+        items:
+          $ref: /COMPONENT
+      position:
+        type: array
+        items: 
+          type: number
+      rotation:
+        type: array
+        items: 
+          type: number
+      scale:
+        type: array
+        items: 
+          type: number
+
+PREFAB:
+  type: object
+  strict_props: true
+  props:
+    prefab: string|none
+    prefabs:
+      type: array|none
+      any_prop: string
+    children:
+      type: array|object|none
+      any_prop:
+      - string
+      - ":PREFAB"
+    components:
+      type: array|object|none
+      any_prop: 
+        - ":COMPONENT"
+    position: array|none
+    scale: array|none
+    rotation: array|none
+    visible: array|none
+COMPONENT_PARAMS_META:
+  type: object|none
+  props:
+    layers: 
+      type: object|none
+      props:
+        include: 
+          type: array|none
+          any_prop: string
+        exclude: 
+          type: array|none
+          any_prop: string
+    ticking:
+      type: object|none
+      props:
+        rate: number|none
+COMPONENT:
+  type: object|none
+  strict_props: true
+  props:
+    inline: ["none", :INLINE_COMPONENT]
+    meta: ["none", :COMPONENT_PARAMS_META]
+    name: string|none
+    order: number|none
+    enabled: bool|none
+    context: string|none
+    ref: string|none
+    tag: string|none
+    tick_rate: number|none
+    tick_enabled: bool|none
+    params: object|none
+INLINE_COMPONENT:
+  type: object
+  strict_props: true
+  props:
+    props: object|none
+    construct: string|none
+    methods:
+      type: object|none
+      any_prop: :INLINE_COMPONENT_FUNCTION
+INLINE_COMPONENT_FUNCTION:
+  type: object
+  strict_props: true
+  props:
+    args: 
+      type: array|none
+      any_prop: string
+    body: string
+    throttle: number|none
+    debounce: number|none
