@@ -9,7 +9,8 @@ components:
     params:
       use_postfx: false
       debug_transform: true
-      cycling: 24
+      global_intensity: 1
+      cycling: 512
       time: 0.2
   fog:
     name: Fog
@@ -32,13 +33,27 @@ children:
             src: res/demo/models/wizard_table/scene.gltf
       light: 
         name: "LightComponent"
+        order: 1
         params:
           type: "RectAreaLight"
-          position: [0, 2, 0]
+          position: [0, 2.2, 0]
           rotation: [-1.5707, 0, 0]
           rect_width: 0.5
           rect_height: 0.5
-          intensity: 50
+          intensity: 75
+      light_controller:
+        order: 2
+        inline:
+          props:
+            max_intensity: 75
+          methods:
+            on_create:
+              body: >
+                this.light = this.get_component("LightComponent");
+            on_tick:
+              body: >
+                this.sun = this.sun || this.find_component_of_type("Sun");
+                this.light.intensity = this.sun.time < 0.3 || this.sun.time > 0.7 ? this.max_intensity : 0;
       title: 
         name: "TroikaTextComponent"
         params:
@@ -47,3 +62,15 @@ children:
           position: [0.5, 2, -0.5]
           font_size: 0.05
           rotation: [0, 0, 0]
+      floating_title:
+        order: 2
+        inline:
+          props:
+            max_intensity: 75
+          methods:
+            on_create:
+              body: >
+                this.title = this.get_component("TroikaTextComponent");
+            on_tick:
+              body: >
+                this.title.position = [0.5, 1.98 + (Math.sin(+new Date() / 1000 * 1) * 0.04),-0.5];

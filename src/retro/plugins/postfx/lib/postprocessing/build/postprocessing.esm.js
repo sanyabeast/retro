@@ -1128,7 +1128,7 @@ var shader_default26 = `
       float radius=RADIUS;
 
       #endif
-      float noise=mod(texture2D(noiseTexture,vUv2 / 2.).r + (time / 50.), 1.);
+      float noise=mod(texture2D(noiseTexture,vUv2 / 2.).r + (time), 1.);
       float baseAngle=noise*PI2;
       float invSamples=1.0/SAMPLES_FLOAT;
       float rings=SPIRAL_TURNS*PI2;

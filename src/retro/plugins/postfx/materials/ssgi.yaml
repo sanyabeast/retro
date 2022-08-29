@@ -1,0 +1,97 @@
+type: ShaderMaterial
+params:
+  vertexShader: |
+    varying vec2 vUv;
+    uniform float opacity;
+    uniform float cell_scale;
+
+    void main() {
+        vUv = uv;
+        vec4 pos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        gl_Position = pos;
+    }
+
+  fragmentShader: |
+    #ifdef FRAMEBUFFER_PRECISION_HIGH
+        uniform highp sampler2D map;
+    #else
+        uniform lowp sampler2D map;
+    #endif
+
+    uniform sampler2D noise_texture;  
+    uniform sampler2D normal_buffer;
+    uniform sampler2D depth_buffer;
+    uniform float aspect;
+
+    #import retro.blending
+    #import retro.convert
+
+    vec3 decode_normal(vec3 n){
+      return vec3(
+        (n.x * 2.) - 1.,
+        (n.y * 2.) - 1.,
+        (n.z * 2.) - 1.
+      );
+    }
+
+    vec3 czm_saturation(vec3 rgb, float adjustment)
+    {
+        // Algorithm from Chapter 16 of OpenGL Shading Language
+        const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+        vec3 intensity = vec3(dot(rgb, W));
+        return mix(intensity, rgb, adjustment);
+    }
+
+    void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+        outputColor = inputColor;
+
+        vec3 rn_local = texture2D(normal_buffer, uv).xyz;
+        vec3 n_local = decode_normal(rn_local);
+
+        float noise_scale = 32.;
+        float noise_speed = 4.;
+        float noise = 0.5 + (mod(texture2D(noise_texture, vec2(uv.x * noise_scale, uv.y * noise_scale * aspect)).r + (time * noise_speed), 1.)) * 0.5;
+
+        float uv_step = 1. / 6.;
+        float steps_a = 6.;
+        float steps_b = 3.;
+        float acml_luma_corr = 1. / (steps_a * steps_b / 2.);
+        vec3  acml_color = vec3(1., 1., 1.) * acml_luma_corr;
+
+        /*factors*/
+        float acml_color_f = 4.;
+
+        for (int i = 0; i < int(steps_a); i++){
+            for (int j = 0; j < int(steps_b); j++){
+              float rp = float(j) / steps_b;
+              float rad_progress = 2. * 3.14 * (float(i) / steps_a); 
+              float rad_dist = rp * uv_step * noise;
+              float uv_dx = sin(rad_progress) * rad_dist;
+              float uv_dy = cos(rad_progress) * rad_dist * aspect;
+              vec2 probe_uv = uv + vec2(uv_dx, uv_dy);
+              vec3 n_alien = decode_normal(texture2D(normal_buffer, probe_uv).xyz);
+              vec3 c_alien = texture2D(map, probe_uv).xyz;
+              float dir_factor = pow(1. - (length(n_local + n_alien)/2.), 2.);
+              acml_color += c_alien * acml_luma_corr * dir_factor * acml_color_f;
+            }
+          }
+
+          acml_color = normalize(acml_color), 5.;
+          outputColor.xyz = BlendSoftLight(inputColor.xyz, acml_color);
+
+    }
+  transparent: true
+  blending: 1
+  uniforms:
+    opacity:
+      type: f
+      value: 1
+    aspect:
+      type: f
+      value: 1
+    normal_buffer:
+      type: t
+    depth_buffer:
+      type: t
+    noise_texture:
+      type: t

@@ -2,6 +2,8 @@ node_modules/
 npm-debug.log
 src/apps/*
 !src/apps/demo/
+!src/apps/cornell/
 dist/*
 !dist/demo
+!dist/cornell
 .DS_Store

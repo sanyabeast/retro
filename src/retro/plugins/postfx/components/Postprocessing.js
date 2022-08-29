@@ -63,7 +63,7 @@ class FXAAEffect extends postfx.Effect {
     constructor({
         blendFunction = postfx.BlendFunction.NORMAL
     } = {}) {
-        let material_template = ResourceManager.get_material_template("retro.fxaa")
+        let material_template = ResourceManager.get_material_template("retro/plugins/postfx.fxaa")
         super("fxaa", material_template.params.fragmentShader, {
             blendFunction,
             uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new Uniform(uniform.value)])),
@@ -77,7 +77,7 @@ class FFXEffect extends postfx.Effect {
     constructor({
         blendFunction = postfx.BlendFunction.NORMAL
     } = {}) {
-        let material_template = ResourceManager.get_material_template("retro.fidelityfx")
+        let material_template = ResourceManager.get_material_template("retro/plugins/postfx.fidelityfx")
         super("FidelityFX", material_template.params.fragmentShader, {
             blendFunction,
             uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new Uniform(uniform.value)]))
@@ -93,7 +93,7 @@ class SSGIEffect extends postfx.Effect {
         height = Resizer.AUTO_SIZE,
         resolution_scale = 1
     } = {}) {
-        let material_template = ResourceManager.get_material_template("retro.ssgi")
+        let material_template = ResourceManager.get_material_template("retro/plugins/postfx.ssgi")
         super("ssgi", material_template.params.fragmentShader, {
             blendFunction,
             width,
@@ -144,6 +144,7 @@ class SSGIEffect extends postfx.Effect {
         this.renderTarget.setSize(w, h);
         this.blurPass.setSize(w, h);
         this.depthPass.setSize(w, h);
+        this.uniforms.get("aspect").value = w / h
         
     }
     initialize(renderer, alpha, frameBufferType) {
@@ -315,23 +316,24 @@ class Postprocessing extends Component {
 
 
             if (this.use_ssao) this.setup_ssao(renderer, scene, camera, composer)
+            if (this.use_ssgi) this.setup_ssgi(renderer, scene, camera, composer)
 
-            if (this.use_hs) this.setup_hs(renderer, scene, camera, composer)
-            if (this.use_bc) this.setup_bc(renderer, scene, camera, composer)
+            
             if (this.use_ffx) this.setup_ffx(renderer, scene, camera, composer)
             if (this.use_fxaa) this.setup_fxaa(renderer, scene, camera, composer)
-            if (this.use_ssgi) this.setup_ssgi(renderer, scene, camera, composer)
+            
             if (this.use_tonemapping) this.setup_tonemapping(renderer, scene, camera, composer)
             if (this.use_chromatic_abberation) this.setup_chromatic_abberation(renderer, scene, camera, composer)
             if (this.use_godrays) this.setup_godrays(renderer, scene, camera, composer)
             if (this.use_bloom) this.setup_bloom(renderer, scene, camera, composer)
            
-
             if (this.use_outline) this.setup_outline(renderer, scene, camera, composer)
             if (this.use_grain) this.setup_grain(renderer, scene, camera, composer)
             if (this.use_vignette) this.setup_vignette(renderer, scene, camera, composer)
-            if (this.use_gc) this.setup_gc(renderer, scene, camera, composer)
 
+            if (this.use_hs) this.setup_hs(renderer, scene, camera, composer)
+            if (this.use_bc) this.setup_bc(renderer, scene, camera, composer)
+            if (this.use_gc) this.setup_gc(renderer, scene, camera, composer)
 
             if (this.use_smaa) this.setup_smaa(renderer, scene, camera, composer)
             if (this.use_taa) this.setup_taa(renderer, scene, camera, composer)
@@ -532,8 +534,8 @@ class Postprocessing extends Component {
                 rangeFalloff: 0.0001,			// with ~0.1 units of falloff.
                 luminanceInfluence: 1,
                 minRadiusScale: 32,
-                radius: 0.2,
-                intensity: 32,
+                radius: 0.125,
+                intensity: 12,
                 bias: 0.4,
                 fade: 3,
                 color: 0x000108,
