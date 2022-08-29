@@ -215,7 +215,7 @@ class ResourceManager {
         this.widget_component_instances = new RmDict()
 
         /**loading texture placeholder */
-        let placeholder_texture = this.placeholder_texture = this.load_texture("res/retro/uv_checker_b.jpg")
+        let placeholder_texture = this.placeholder_texture = this.load_texture("res/retro/helper_uv_b.jpg")
         placeholder_texture.is_placeholder = true
 
 
