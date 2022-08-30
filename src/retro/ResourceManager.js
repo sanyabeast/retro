@@ -58,6 +58,14 @@ import SCHEMA_CORE from "retro/SCHEMA.yaml"
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js';
 import ImageFilter from "retro/utils/ImageFilter"
 
+if (true){
+    let xhr_open = XMLHttpRequest.prototype.open
+    XMLHttpRequest.prototype.open = function(){
+        console.log(arguments)
+        xhr_open.apply(this, arguments)
+    }
+}
+
 function is_class_excluded_from_mixin(data) {
     let r = data.__proto__ !== window.Object.prototype
     return r
@@ -852,6 +860,11 @@ class ResourceManager {
                 error(`RM`, `failed to apply patch ${name}: patch is not a function`)
             }
         })
+    }
+
+    /**asset index */
+    load_asset_index(data){
+        console.log(data)
     }
 }
 

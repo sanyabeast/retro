@@ -90,11 +90,11 @@ module.exports = (env) => {
 					]
 				},
 				{
-					test: /\ResourceManager.js$/,
-					loader: path.join(root, 'scripts', 'assets-loader.js'),
+					test: /ResourceManager.js$/,
+					loader: path.join(root, 'scripts', 'rm-context-preloader.js'),
 					options: {
-						app_name: APP_NAME,
-						plugins: ['retro', ...(PRESET.PLUGINS || []), `apps/${APP_NAME}`]
+						APP_NAME: APP_NAME,
+						PLUGINS: ['retro', ...(PRESET.PLUGINS || []), `apps/${APP_NAME}`]
 					}
 				},
 

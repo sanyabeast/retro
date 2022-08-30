@@ -41,6 +41,8 @@ class Tools {
             ret = `src/retro`
         } else if (plugin_alias.startsWith('retro/')) {
             ret = `src/${plugin_alias}`
+        } else if (plugin_alias.startsWith('apps/')) {
+            ret = `src/${plugin_alias}`
         } else {
             ret = `src/apps/${plugin_alias}`
         }
@@ -109,7 +111,6 @@ class Tools {
         tools.log(`used plugins:\n`.white + _.map(PRESET.PLUGINS, (data, index) => `   #${index}: ${data}`.magenta).join("\n"))
         return PRESET
     }
-
     get_output_config(APP_NAME, PRESET) {
         let output_path
         if (PRESET.IS_EXAMPLE) {

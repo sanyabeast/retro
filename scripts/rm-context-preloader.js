@@ -2,27 +2,75 @@ const path = require("path")
 const root = path.join(__dirname, "..");
 const loader_utils = require('loader-utils')
 const colors = require("colors")
-const { forEach } = require("lodash")
+const { forEach, update } = require("lodash")
 const fs = require("fs")
-
+const directory_tree = require("directory-tree")
+const tools = require("../webpack/tools")
 
 function log() {
     console.log(`[AssetLoader] [i]`.magenta, ...arguments)
 }
 
-const placeholder_string = "/**ASSETS_LOADER_INJECTED_CODE**/"
+if (String.prototype.splice === undefined) {
+    /**
+     * Splices text within a string.
+     * @param {int} offset The position to insert the text at (before)
+     * @param {string} text The text to insert
+     * @param {int} [removeCount=0] An optional number of characters to overwrite
+     * @returns {string} A modified string containing the spliced text.
+     */
+    String.prototype.splice = function (offset, text, removeCount = 0) {
+        let calculatedOffset = offset < 0 ? this.length + offset : offset;
+        return this.substring(0, calculatedOffset) +
+            text + this.substring(calculatedOffset + removeCount);
+    };
+}
+
+const CURSOR_STRING = "export default"
+const ASSET_INDEX = {
+    items: []
+}
+
+function traverse_tree(tree, cb) {
+    if (tree) {
+        cb(tree, !!tree.children)
+        if (tree.children) {
+            if (!fs.existsSync(path.join(tree.path, '.noindex'))){
+                tree.children.forEach((node) => traverse_tree(node, cb))
+            }
+        }
+    }
+}
+
+function update_asset_index(plugins) {
+    let items = []
+    forEach(plugins, (plugin_name) => {
+        let res_directory_data = directory_tree(path.join(root, tools.resolve_plugin_path(plugin_name), 'res'))
+        traverse_tree(res_directory_data, (node, is_file)=>{
+            items.push([node.path.replace(root, '').replace(/\\/gi, '/'), is_file])
+        })
+    })
+    ASSET_INDEX.items = items
+}
 
 module.exports = function (source_code, map, meta) {
-    let options = loader_utils.getOptions(this)
 
-    if (source_code.indexOf(placeholder_string) < 0) {
-        this.emitError(new Error("please add '/**ASSETS_LOADER_INJECTED_CODE**/' line to retro/ResourceManager"))
+    let options = loader_utils.getOptions(this)
+    update_asset_index(options.PLUGINS)
+
+    if (source_code.indexOf(CURSOR_STRING) < 0) {
+        this.emitError(new Error("please add 'export default' section to ResourceManager.js"))
         return source_code
     }
 
     let loaded = []
     let injected_code = `/**this code has been injected with 'scripts/assets-loader.js'**/\n`
-    forEach(options.plugins, (plugin_name) => {
+
+    injected_code += `
+        rm.load_asset_index(${JSON.stringify(ASSET_INDEX, null, "\t")})
+    `
+
+    forEach(options.PLUGINS, (plugin_name) => {
         if (loaded.indexOf(plugin_name) > -1) return
         let context = plugin_name
         let base_path = plugin_name
@@ -30,7 +78,6 @@ module.exports = function (source_code, map, meta) {
         log(`loading plugin "${context}" ...`)
 
         injected_code += `/** PRELOADING PLUGIN: ${plugin_name.toUpperCase()}**/`
-
 
         if (fs.existsSync(path.join(root, "src", base_path, "patch")))
             injected_code += `rm.load_patches("${context}", require.context("${base_path}/patch/", true, /\.js$|\.coffee$|\.ts/));\n`
@@ -43,8 +90,8 @@ module.exports = function (source_code, map, meta) {
         if (fs.existsSync(path.join(root, "src", base_path, "objects")))
             injected_code += `rm.preload_classes("${context}", require.context("${base_path}/objects", true, /\.js$|\.coffee$|\.ts/), "objects");\n`
         if (fs.existsSync(path.join(root, "src", base_path, "textures")))
-        //     injected_code += `rm.preload_textures("${context}", require.context("${base_path}/textures/", true, /\.png$/));\n`
-        // if (fs.existsSync(path.join(root, "src", base_path, "widget")))
+            //     injected_code += `rm.preload_textures("${context}", require.context("${base_path}/textures/", true, /\.png$/));\n`
+            // if (fs.existsSync(path.join(root, "src", base_path, "widget")))
             injected_code += `rm.preload_vue_components("${context}", require.context("${base_path}/widget/", false, /\.vue$/));\n`
         if (fs.existsSync(path.join(root, "src", base_path, "textures")))
             injected_code += `rm.preload_textures2("${context}", require.context("${base_path}/textures/", true, /\.yaml$/));\n`
@@ -61,8 +108,7 @@ module.exports = function (source_code, map, meta) {
         loaded.push(plugin_name)
     })
 
-    source_code = source_code.replace(placeholder_string, injected_code)
-    log(`[scipts/asset-loader] [i] injected code for\n${options.plugins.join(",\n")}`)
+    source_code = source_code.splice(source_code.indexOf(CURSOR_STRING), injected_code)
 
     return source_code
 }
