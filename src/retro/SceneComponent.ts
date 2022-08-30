@@ -79,7 +79,7 @@ class SceneComponent extends Component {
 		].concat(super.get_reactive_props())
 	}
 
-	override get_gizmo_render_data(): Array<IComponentGizmoRenderDataItem> {
+	override get_gizmo_render_data(): Array<IRetroComponentGizmoRenderDataItem> {
 		if (this.subject) {
 			return [{
 				object: this.anchor_gizmo,
@@ -180,7 +180,7 @@ class SceneComponent extends Component {
 
 	override on_tick(): void { }
 
-	get_render_data(): Array<IComponentRenderDataItem> {
+	get_render_data(): Array<IRetroComponentRenderDataItem> {
 		if (this.subject && this.game_object) {
 			return [{
 				object: this.subject,

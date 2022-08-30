@@ -46,7 +46,7 @@ const proxied_game_object_props: Array<string> = [
     "tasks"
 ]
 
-export default class Component extends BasicObject implements IComponent {
+export default class Component extends BasicObject implements IRetroComponent {
     static component_name: string = "Component"
     static tick_rate: number = 1
     static prev_tick_time: number = +new Date()

@@ -122,7 +122,7 @@ export default class BasicObject extends EventDispatcher implements IRetroObject
     public call_inside(method_name, ...args: any) {
         let game_object: GameObject = this.game_object
         for (let a = 0; a < game_object.components.length; a++) {
-            let comp: IComponent = game_object.components[a]
+            let comp: IRetroComponent = game_object.components[a]
             if (!isFunction(comp[method_name])) continue
             comp[method_name](...args)
         }
@@ -137,7 +137,7 @@ export default class BasicObject extends EventDispatcher implements IRetroObject
     public call_up(method_name: string, ...args: any) {
         let game_object: GameObject = this.game_object
         for (let a = 0; a < game_object.components.length; a++) {
-            let comp: IComponent = game_object.components[a]
+            let comp: IRetroComponent = game_object.components[a]
             if (!isFunction(comp[method_name])) continue
             comp[method_name](...args)
         }

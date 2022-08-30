@@ -58,12 +58,12 @@ declare global {
         z: number
     }
 
-    interface IComponentRenderDataItem {
+    interface IRetroComponentRenderDataItem {
         object: Object3D
         parent: GameObject
     }
 
-    interface IComponentGizmoRenderDataItem {
+    interface IRetroComponentGizmoRenderDataItem {
         object: Object3D
         parent: Object3D
         layers: {
@@ -136,12 +136,29 @@ declare global {
 
     interface IGameObject extends IRetroObject { }
 
-    interface IComponent extends IRetroObject {
+    interface IRetroComponent extends IRetroObject {
         component_name: string
         is_component: boolean
     }
 
-    interface IClockComponent extends IComponent {
+    interface IWidgetComponent extends IRetroComponent {
+        store_commit: (token_name: string, data: any) => void
+        store_set: (token_name: string, data: any) => void
+        call_inside_widget_application: (method_mame: string) => void
+        fit_zoom_upscale: boolean
+        zoom: number
+    }
+
+    interface IRendererComponent extends IRetroComponent {
+        target_fps: number
+        rendering_scale: number
+    }
+
+    interface IAudioListenerComponent extends IRetroComponent {
+        bound_object: GameObject
+    }
+
+    interface IClockComponent extends IRetroComponent {
         begin_tick(): void
     }
 
@@ -208,6 +225,9 @@ declare global {
             [x: string]: Function
         },
         math: {
+            [x: string]: Function
+        }
+        random: {
             [x: string]: Function
         }
     }

@@ -38,7 +38,7 @@ export class MeshRenderer extends SceneComponent {
 		]
 	}
 
-	override get_render_data(): IComponentRenderDataItem[] {
+	override get_render_data(): IRetroComponentRenderDataItem[] {
 		return [{
 			object: this.scene,
 			parent: this.game_object
