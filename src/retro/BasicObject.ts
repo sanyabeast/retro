@@ -156,6 +156,9 @@ export default class BasicObject extends EventDispatcher implements IRetroObject
     }
     public init(): void {
         this.UUID = `${this.constructor.name}_${this.id}`
+        if (PRESET.RUNTIME_IMMUTABLE_CONTEXT_ENABLED){
+            this.tools.extra.make_immutable_context_for_object(this);
+        }
         this.init_reactivity()
     }
     public get_reactive_props(): string[] {

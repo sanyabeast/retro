@@ -946,6 +946,17 @@ document.addEventListener('visibilitychange', e => {
     is_document_visible = document.visibilityState === 'visible'
 }, false);
 
+const make_immutable_context_for_object = (target) => {
+    Object.getOwnPropertyNames(target).forEach((prop_name) => {
+        let prop = target[prop_name]
+        if (isFunction(prop)) {
+            console.log(prop_name)
+            target[prop_name] = prop.bind(target)
+        }
+    })
+
+}
+
 /**sound */
 // window.addEventListener('play', (evt)=>{
 //     clearInterval(evt.target.retro_daemon_tmid)
@@ -1038,7 +1049,8 @@ const tools = {
         add_css,
         parse_numeric_float,
         define_getters,
-        recreate_reference_properties
+        recreate_reference_properties,
+        make_immutable_context_for_object
     },
     intl: {
         format_currency,

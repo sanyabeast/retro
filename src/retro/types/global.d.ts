@@ -47,6 +47,7 @@ declare global {
         static PERSISTENT_SCENE_PREFAB: string
         static WORK_IN_BACKGROUND_MOBILE: boolean
         static WORK_IN_BACKGROUND: boolean
+        static RUNTIME_IMMUTABLE_CONTEXT_ENABLED: boolean
     }
 
     interface ReflectedObject {
@@ -230,6 +231,10 @@ declare global {
         }
         random: {
             [x: string]: Function
+        }
+        extra: {
+            [x: string]: Function
+            make_immutable_context_for_object: (target: object) => void
         }
     }
 
