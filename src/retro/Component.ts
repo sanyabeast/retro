@@ -55,6 +55,7 @@ export default class Component extends BasicObject implements IRetroComponent {
     name: string
     tag: string
     _ref: any
+    context: any
     constructor(params: object) {
         super(params);
         this.meta.object_type = "component"

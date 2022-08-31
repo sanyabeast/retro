@@ -770,6 +770,12 @@ const set_html_style = (el, style) => {
     })
 }
 
+const add_html_attributes = (el, attributes) => {
+    forEach(attributes, (value, name) => {
+        el.setAttribute(name, value);
+    })
+}
+
 const parse_html = (html) => {
     let div = document.createElement("div")
     div.innerHTML = html
@@ -1079,7 +1085,8 @@ const tools = {
         parse_html,
         add_css,
         create_dom,
-        is_descedant: is_html_descedant
+        is_descedant: is_html_descedant,
+        add_attributes: add_html_attributes
     },
     runtime: {
         exec: exec_code,

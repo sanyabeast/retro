@@ -66,9 +66,7 @@ module.exports = function (source_code, map, meta) {
     let loaded = []
     let injected_code = `/**this code has been injected with 'scripts/assets-loader.js'**/\n`
 
-    injected_code += `
-        rm.load_asset_index(${JSON.stringify(ASSET_INDEX, null, "\t")})
-    `
+    injected_code += `rm.load_asset_index(${JSON.stringify(ASSET_INDEX, null, "\t")})\n`
 
     forEach(options.PLUGINS, (plugin_name) => {
         if (loaded.indexOf(plugin_name) > -1) return
@@ -107,6 +105,8 @@ module.exports = function (source_code, map, meta) {
         injected_code += `\n\n`
         loaded.push(plugin_name)
     })
+
+    injected_code += `rm.run_postload_tasks();\n`
 
     source_code = source_code.splice(source_code.indexOf(CURSOR_STRING), injected_code)
 

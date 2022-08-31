@@ -1,0 +1,5 @@
+IS_EXAMPLE: true
+PLUGINS:
+  - retro/plugins/postfx
+  - retro/plugins/extra-assets
+  - retro/plugins/meshworks

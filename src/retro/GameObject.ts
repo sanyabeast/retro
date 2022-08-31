@@ -461,26 +461,38 @@ export default class GameObject extends BasicObject implements IGameObject {
     add_component(data: IGameObjectPrefabComponentDeclaration) {
         let component_name: string = data.name;
         let params: IGameObjectPrefabComponentDeclarationParams = data.params
-        let enabled = typeof data.enabled === 'boolean' ? data.enabled : true
-        let ref = typeof data.ref === 'string' ? data.ref : undefined
+        
+        
         let creator: { new(params: IGameObjectPrefabComponentDeclarationParams): void }
         creator = ResourceManager.classes_of_components[component_name]
-        let component
+        let component: Component
         if (isFunction(creator)) {
-            component = new creator(params)
+            component = new creator(params) as any as Component
             component.recreate_reference_properties()
         } else if (isObject(creator)) {
-            component = Object.assign({}, creator)
+            component = Object.assign({}, creator as any as  Component)
         } else if (isUndefined(creator)) {
             if (isObject(data.inline)) {
                 if (Schema.validate(data.inline, ":INLINE_COMPONENT")) {
                     creator = Component.create(data.inline, component_name)
-                    component = new creator(params)
+                    component = new creator(params) as any as Component
                     component.recreate_reference_properties()
                 }
             }
         }
         if (component !== undefined) {
+            this.attach_component(component, data)
+        } else {
+            error(`GameObject`, `failed to create component: ${component_name}`, creator)
+        }
+        return component
+    }
+    attach_component(component: Component, data: IGameObjectPrefabComponentDeclaration = { name: Component.constructor.name }){
+        if (component !== undefined) {
+            let component_name: string = data.name;
+            let ref = isString(data.ref) ? data.ref : undefined
+            let enabled = isBoolean(data.enabled) ? data.enabled : true
+
             component.context = ResourceManager.load_context(data.context)
             component._game_object = this
             component.init()
@@ -515,10 +527,7 @@ export default class GameObject extends BasicObject implements IGameObject {
                 ResourceManager.components_tags[data.tag] = component
             }
             // console.log(`creating component ${component_name}`, params, creator)
-        } else {
-            error(`GameObject`, `failed to create component: ${component_name}`, creator)
-        }
-        return component
+        } 
     }
     remove_component(data: string | Component): void {
         if (isString(data)) {

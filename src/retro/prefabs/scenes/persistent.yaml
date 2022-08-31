@@ -13,7 +13,3 @@ components:
         - 0
         - 0
         - 5
-  devgui:
-    name: WidgetComponent
-    params:
-      root_component: retro.DevGUI

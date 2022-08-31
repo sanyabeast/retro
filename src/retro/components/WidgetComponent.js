@@ -14,7 +14,10 @@ import { Vector3 } from "three"
 import VuexPersistence from 'vuex-persist'
 
 Vue.use(Vuex)
+
+
 let RetroPlugin = {
+	installed: false,
 	install(app, options) {
 		let empty_arr = []
 		let comp_id = 0
@@ -26,6 +29,9 @@ let RetroPlugin = {
 		}
 		let BasicComp = {
 			name: "retro",
+			components: {
+				...ResourceManager.widget_proxy_components
+			},
 			data() {
 				return {
 					id: 0,
@@ -57,21 +63,26 @@ let RetroPlugin = {
 				if (this.gui_component === undefined) {
 					this.tools = tools
 					this.tools.extra.define_getters(this, {
-						"gui_component": () => this.$root.gui_component,
-						"game_object": () => this.$root.gui_component.game_object,
-						"globals": () => this.$root.gui_component.globals,
-						"app": () => this.$root.gui_component.globals.app,
-						"launcher": () => this.$root.gui_component.globals.launcher,
-						"camera": () => this.$root.gui_component.globals.camera,
-						"tools": () => this.$root.gui_component.tools,
+						"gui_component": () => this.$store.getters.gui_component,
+						"game_object": () => this.$store.getters.game_object,
+						"globals": () => this.$store.getters.globals,
+						"app": () => this.$store.getters.app,
+						"launcher": () => this.$store.getters.launcher,
+						"camera": () => this.$store.getters.camera,
+						"tools": () => this.$store.getters.tools,
 					})
 				}
+
 			},
 			mounted() {
 				this.update_platform_attributes()
 				this.on_init();
 				this.on_enable();
 				this.on_create();
+
+				if (this.retro.is_root) {
+					this.init_basic_dom_state()
+				}
 
 				this.retro.ready = true
 			},
@@ -136,27 +147,43 @@ let RetroPlugin = {
 				on_destroy() { },
 
 				/**CORE COMP COMPAT */
-				listen() { return this.game_object.listen(...arguments); },
-				broadcast(event_name, payload) { return this.game_object.broadcast(...arguments); },
-				get_component(component_name) { return this.game_object.get_component(...arguments); },
-				find_component_of_type(component_name) { return this.game_object.find_component_of_type(...arguments); },
-				find_components_of_type(component_name) { return this.game_object.find_components_of_type(...arguments); },
-				setup_components(data) { return this.game_object.setup_components(...arguments); },
-				add_component(data) { return this.game_object.add_component(data); },
-				remove_component(data) { return this.game_object.remove_component(data); },
-				get_components(component_name) { return this.game_object.get_components(component_name); },
+				listen() { return this.$store.getters.game_object.listen(...arguments); },
+				broadcast(event_name, payload) { return this.$store.getters.game_object.broadcast(...arguments); },
+				get_component(component_name) { return this.$store.getters.game_object.get_component(...arguments); },
+				find_component_of_type(component_name) { return this.$store.getters.game_object.find_component_of_type(...arguments); },
+				find_components_of_type(component_name) { return this.$store.getters.game_object.find_components_of_type(...arguments); },
+				setup_components(data) { return this.$store.getters.game_object.setup_components(...arguments); },
+				add_component(data) { return this.$store.getters.game_object.add_component(data); },
+				remove_component(data) { return this.$store.getters.game_object.remove_component(data); },
+				get_components(component_name) { return this.$store.getters.game_object.get_components(component_name); },
 				log() { log(`(Widget)"${this.$options.name || '?'}"`, ...arguments); },
 				error() { error(`(Widget)"${this.$options.name || '?'}"`, ...arguments); },
 				/**widget components */
 				find_widget_component() { return ResourceManager.find_widget_component(...arguments); },
-				find_widget_components() { return ResourceManager.find_widget_components(...arguments); }
+				find_widget_components() { return ResourceManager.find_widget_components(...arguments); },
+
+				init_basic_dom_state() {
+					tools.html.add_class(this.$el, [
+						'retro-widget'
+					])
+
+					tools.html.add_attributes(this.$el, {
+						'retro-widget-id': this.id
+					})
+
+					tools.html.set_style(this.$el, {
+						position: "absolute",
+						top: "0px",
+						left: "0px"
+					})
+				}
 			}
 		}
 		app.mixin(BasicComp)
 	}
 }
 
-Vue.use(RetroPlugin)
+
 class WidgetComponent extends Component {
 	zoom = 1
 	tick_rate = 5
@@ -178,6 +205,10 @@ class WidgetComponent extends Component {
 	computed_boundind_rect = { width: 1, height: 1, x: 0, y: 0, left: 0, top: 0 }
 	computed_zoom = 1
 	constructor() {
+		if (!RetroPlugin.installed) {
+			Vue.use(RetroPlugin)
+			RetroPlugin.installed = true
+		}
 		super(...arguments)
 		this.world_space_position_vector = new Vector3()
 	}
@@ -192,7 +223,18 @@ class WidgetComponent extends Component {
 		this.renderer_comp = this.find_component_of_type("Renderer")
 		let { vue_app, store } = WidgetComponent.create_widget_application(this.root_component, {
 			props: this.props,
-			id: this.UUID
+			id: this.UUID,
+			store: {
+				getters: {
+					game_object: () => this.game_object,
+					gui_component: () => this,
+					globals: () => this.globals,
+					app: () => this.globals.app,
+					launcher: () => this.globals.launcher,
+					camera: () => this.globals.camera,
+					tools: () => this.tools
+				}
+			}
 		})
 
 		this.vue_app = vue_app
@@ -335,7 +377,7 @@ WidgetComponent.get_next_widget_store_persistence_id = function (alias = "anonym
 	}
 	return `widget-state-${alias}-${c}`
 }
-WidgetComponent.create_widget_application = function (root_component, options = {}) {
+WidgetComponent.create_widget_application = function (root_component, options = { store: {} }) {
 	if (isString(root_component)) {
 		root_component = ResourceManager.widget_component_templates[root_component]
 	}
@@ -363,6 +405,13 @@ WidgetComponent.create_widget_application = function (root_component, options = 
 	store_template.state = store_template.state || {}
 	store_template.actions = store_template.actions || {}
 	store_template.mutations = store_template.mutations || {}
+
+	if (isObject(options.store.getters)) {
+		store_template.getters = {
+			...store_template.getters,
+			...options.store.getters
+		}
+	}
 
 	if (false && vuex_persistence_agent !== undefined) {
 		store_template.plugins = [

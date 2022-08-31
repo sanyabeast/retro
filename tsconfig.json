@@ -28,8 +28,8 @@
     "exclude": [
         "node_modules",
         "src/retro/plugins/d3",
-        "src/retro/plugins/extra-assets",
-        "src/retro/plugins/meshworks",
+        "src/retro/plugins/networking",
+        "src/retro/plugins/spine",
         "src/retro/plugins/storage",
         "src/apps/archive/city",
         "src/apps/archive/default",
@@ -50,8 +50,9 @@
         "src/apps/archive/spinetools",
         "src/apps/archive/ssgi",
         "src/apps/archive/subway",
-        "src/apps/cornell",
-        "src/apps/demo"
+        "src/apps/avi2",
+        "src/apps/demo",
+        "src/apps/demo_alt"
     ],
     "include": [
         "src/**/*"
