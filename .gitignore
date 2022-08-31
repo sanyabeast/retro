@@ -9,3 +9,4 @@ dist/*
 !dist/demo_alt
 !dist/cornell
 .DS_Store
+tsconfig.json
