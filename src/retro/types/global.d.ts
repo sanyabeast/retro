@@ -8,6 +8,7 @@ declare global {
 
     var IS_DEV: boolean
     var IS_PROD: boolean
+    var VERSION_TAG: string
 
     interface Window {
         on_click_to_start: Function,

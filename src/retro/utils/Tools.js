@@ -119,7 +119,6 @@ const log2 = (tag, ...data) => {
     _console.log(`%c[${tag}]`, `color: ${get_random_color_for_string(tag)}`, ...data);
 }
 const error = (tag, ...data) => {
-    if (!VERBOSE) return
     if (!isString(tag)) {
         return error('ANONYMOUS', ...data)
     }
@@ -686,9 +685,12 @@ const set_format_currency_params = (params) => {
 
 
 const format_currency = (data = 0, currency = _format_currency_params.default_currency) => {
+    data = data ?? 0
+
     if (data === 0) {
         data = 0.00001
     }
+
     data = accounting.unformat(data.toString())
     return accounting.formatMoney(data, getSymbolFromCurrency(currency), _format_currency_params.default_currency_precision)
 }

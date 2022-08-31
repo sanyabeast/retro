@@ -35,7 +35,7 @@ export default class BasicObject extends EventDispatcher implements IRetroObject
     id: number
     _children: GameObject[]
     get children(): GameObject[] { return this._children }
-    set children(value: GameObject[]){this._children = value}
+    set children(value: GameObject[]) { this._children = value }
     globals: IGlobalsDict
     _game_object: GameObject
     _on_enable?: Function
@@ -285,7 +285,7 @@ export default class BasicObject extends EventDispatcher implements IRetroObject
         if (isFunction(this._on_create)) this._on_create()
     }
     public async on_destroy(): Promise<void> {
-        if (isFunction(this._on_destroy)){
+        if (isFunction(this._on_destroy)) {
             await this._on_destroy()
         }
     }
@@ -359,26 +359,37 @@ export default class BasicObject extends EventDispatcher implements IRetroObject
             forEach(persistent_props, (prop_name: string, index: number) => {
                 save_data[prop_name] = get(this, prop_name)
             })
-            try {
-                window.localStorage.setItem(save_key, JSON.stringify(save_data))
-            } catch (err) {
-                console.warn(err)
-            }
+            window.localStorage.setItem(save_key, JSON.stringify({
+                ver: VERSION_TAG,
+                data: save_data
+            }))
         }
     }
     public load_persistent_state(): void {
         if (this.meta.has_persistent_state && "localStorage" in window) {
-            let save_key: string = this.UUID
-            let persistent_props: string[] = this.get_persistent_props()
-            let save_data_json: string = window.localStorage.getItem(save_key)
+            try {
+                let save_key: string = this.UUID
+                let persistent_props: string[] = this.get_persistent_props()
+                let save_data_json: string = window.localStorage.getItem(save_key)
 
-            if (isString(save_data_json)) {
-                let save_data: object = JSON.parse(save_data_json)
-                forEach(save_data, (prop_data: any, prop_name: string) => {
-                    if (persistent_props.indexOf(prop_name) > -1) {
-                        set(this, prop_name, prop_data)
+                if (isString(save_data_json)) {
+                    let save_data: any = JSON.parse(save_data_json)
+                    let ver: string = save_data.ver;
+                    if (ver === VERSION_TAG) {
+                        if (isObject(save_data.data)){
+                            forEach(save_data.data, (prop_data: any, prop_name: string) => {
+                                if (persistent_props.indexOf(prop_name) > -1) {
+                                    set(this, prop_name, prop_data)
+                                }
+                            })
+                        }
+                    } else {
+                        window.localStorage.removeItem(save_key)
+                        this.log(`skip loading persistent state for ${this.UUID}. version changed`)
                     }
-                })
+                }
+            } catch (err) {
+                this.error(err)
             }
         }
     }

@@ -143,13 +143,17 @@ class Tools {
 
         // ret['__VUE_OPTIONS_API__'] = false
         // ret['__VUE_PROD_DEVTOOLS__'] = false
+        let REPO_RETRO = this.get_repo_info()
+        let REPO_APP = this.get_repo_info(path.join(root, `src`, 'apps', APP_NAME))
+
         ret['PACKAGE_DATA'] = JSON.stringify(PACKAGE_DATA)
         ret['process.env.APP_NAME'] = JSON.stringify(APP_NAME)
         ret['PRESET'] = JSON.stringify(PRESET)
-        ret['REPO_RETRO'] = JSON.stringify(this.get_repo_info())
-        ret['REPO_APP'] = JSON.stringify(this.get_repo_info(path.join(root, `src`, 'apps', APP_NAME)))
+        ret['REPO_RETRO'] = JSON.stringify(REPO_RETRO)
+        ret['REPO_APP'] = JSON.stringify(REPO_APP)
         ret['IS_DEV'] = JSON.stringify(!env.production)
         ret['IS_PROD'] = JSON.stringify(!!env.production)
+        ret['VERSION_TAG'] = JSON.stringify(`${REPO_APP.abbreviatedSha}:${REPO_RETRO.abbreviatedSha}`)
 
         return ret
     }

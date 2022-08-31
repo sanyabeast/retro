@@ -30,7 +30,7 @@ let RetroPlugin = {
 		let BasicComp = {
 			name: "retro",
 			components: {
-				...ResourceManager.widget_proxy_components
+				...ResourceManager.extra_widget_components
 			},
 			data() {
 				return {

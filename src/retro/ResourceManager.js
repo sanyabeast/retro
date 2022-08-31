@@ -59,14 +59,6 @@ import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudi
 import ImageFilter from "retro/utils/ImageFilter"
 import GameObject from "./GameObject"
 
-if (true) {
-    let xhr_open = XMLHttpRequest.prototype.open
-    XMLHttpRequest.prototype.open = function () {
-        console.log(arguments)
-        xhr_open.apply(this, arguments)
-    }
-}
-
 function is_class_excluded_from_mixin(data) {
     let r = data.__proto__ !== window.Object.prototype
     return r
@@ -219,6 +211,7 @@ class ResourceManager {
         this.components_instances = new RmDict()
         this.classes_of_components = new ClassesDataDict()
         this.defined_globals = new RmDict()
+        this.extra_widget_components = new RmDict();
         /**vue */
         this.widget_stores = new RmDict()
         this.widget_component_instances = new RmDict()
@@ -873,11 +866,15 @@ class ResourceManager {
         let classes_of_components = this.classes_of_components;
         console.log(classes_of_components)
 
-        this.widget_proxy_components["R_Object"] = this.create_proxy_object_widget()
-        forEach(classes_of_components, (cls, name) => {
-            let ProxyComponent = this.create_proxy_component_widget(cls, name)
-            this.widget_proxy_components[`R_${name}`] = ProxyComponent
-        })
+        if (PRESET.FEATURE_WIDGETATION_ENABLE){
+            let prefix = PRESET.FEATURE_WIDGETATION_PREFIX ?? "R_"
+            this.widget_proxy_components[`${prefix}Object`] = this.create_proxy_object_widget()
+            forEach(classes_of_components, (cls, name) => {
+                let ProxyComponent = this.create_proxy_component_widget(cls, name)
+                this.widget_proxy_components[`${prefix}${name}`] = ProxyComponent
+                this.extra_widget_components[`${prefix}${name}`] = ProxyComponent
+            })
+        }
     }
 
     /** proxy widgets */
