@@ -48,6 +48,8 @@ declare global {
         static WORK_IN_BACKGROUND_MOBILE: boolean
         static WORK_IN_BACKGROUND: boolean
         static RUNTIME_IMMUTABLE_CONTEXT_ENABLED: boolean
+        static FEATURE_WIDGETATION_PREFIX: string
+        static FEATURE_WIDGETATION_ENABLE: boolean
     }
 
     interface ReflectedObject {

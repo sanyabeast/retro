@@ -58,6 +58,7 @@ import SCHEMA_CORE from "retro/SCHEMA.yaml"
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js';
 import ImageFilter from "retro/utils/ImageFilter"
 import GameObject from "./GameObject"
+import { Widgetation } from "./Widgetation"
 
 function is_class_excluded_from_mixin(data) {
     let r = data.__proto__ !== window.Object.prototype
@@ -99,6 +100,7 @@ class ResourceManager {
         if (ResourceManager.singleton instanceof ResourceManager) {
             return ResourceManager.singleton
         }
+        this.widgetation = new Widgetation()
         this.globals = new GlobalsDict({
             now: +new Date(),
             audio_listener,
@@ -214,8 +216,6 @@ class ResourceManager {
         this.extra_widget_components = new RmDict();
         /**vue */
         this.widget_stores = new RmDict()
-        this.widget_component_instances = new RmDict()
-        this.widget_proxy_components = new RmDict()
 
         /**loading texture placeholder */
         let placeholder_texture = this.placeholder_texture = this.load_texture("res/retro/helper_uv_b.jpg")
@@ -865,167 +865,15 @@ class ResourceManager {
     run_postload_tasks() {
         let classes_of_components = this.classes_of_components;
         console.log(classes_of_components)
-
-        if (PRESET.FEATURE_WIDGETATION_ENABLE){
-            let prefix = PRESET.FEATURE_WIDGETATION_PREFIX ?? "R_"
-            this.widget_proxy_components[`${prefix}Object`] = this.create_proxy_object_widget()
-            forEach(classes_of_components, (cls, name) => {
-                let ProxyComponent = this.create_proxy_component_widget(cls, name)
-                this.widget_proxy_components[`${prefix}${name}`] = ProxyComponent
-                this.extra_widget_components[`${prefix}${name}`] = ProxyComponent
-            })
-        }
-    }
-
-    /** proxy widgets */
-    static proxy_widget_base = {
-        methods: {
-            detect_domain_game_object() {
-                let domain_game_object = this.$store.getters.game_object
-                let parent = this
-                let root_game_object_uuid = this.game_object.UUID
-
-                while (true) {
-                    if (parent && parent.is_retro_object_proxy && parent.retro_object !== this.retro_object) {
-                        domain_game_object = parent.retro_object;
-                        break;
-                    }
-
-                    parent = parent.$parent;
-
-                    if (!parent) {
-                        break;
-                    }
-                }
-
-                while (parent !== undefined && parent.is_retro_object_proxy === false) {
-                    console.log(parent)
-                    parent = parent.$parent
-                }
-
-                console.log(`found domain game object: ${domain_game_object.UUID} (${root_game_object_uuid === domain_game_object.UUID ? 'root' : ''})`)
-                this.domain_game_object = domain_game_object
-            }
-        }
-    }
-
-    create_proxy_object_widget() {
-        let ProxyComp = {
-            name: `R_Object`,
-            mixins: [ResourceManager.proxy_widget_base],
-            template: `
-                <div 
-                    :data-name="$options.name" 
-                    :data-id="id"  
-                    style="display: none;"
-                >
-                    <slot/>
-                </div>  
-            `,
-            data() {
-                return {
-                    id: 0,
-                    is_retro_component_proxy: false,
-                    is_retro_object_proxy: true
-                }
-            },
-            props: {
-                props: {}
-            },
-            beforeMount() {
-                console.log(`new proxy object`);
-                this.retro_object = new GameObject()
-
-            },
-            mounted() {
-                this.detect_domain_game_object()
-                this.domain_game_object.add(this.retro_object)
-            },
-            destroyed() {
-                console.log(`destoryed proxy object`)
-                this.retro_object.destroy()
-                this.domain_game_object.remove(this.retro_object)
-            },
-            methods: {
-
-            }
-        }
-
-        return ProxyComp
-    }
-
-    create_proxy_component_widget(cls, name) {
-        let props = {}
-        let data = {}
-        let methods = {}
-        let component_name = name;
-
-        // console.log(name, cls.prototype)
-        let ProxyComp = {
-            name: `R_${name}`,
-            mixins: [ResourceManager.proxy_widget_base],
-            template: `
-                <p 
-                    :data-name="$options.name" 
-                    :data-id="id" 
-                    style="display: none"
-                ></p>
-            `,
-            data() {
-                return {
-                    id: 0,
-                    is_retro_component_proxy: true,
-                    is_retro_object_proxy: false
-                }
-            },
-            props: {
-                tag: {
-                    type: String,
-                    default() { return undefined }
-                },
-                params: {
-                    type: Object,
-                    default() { return {} }
-                }
-            },
-            mounted() {
-                console.log(`new component ${name}`)
-                this.component_instance = new cls(this.params)
-                this.detect_domain_game_object()
-                this.game_object.attach_component(this.component_instance, {
-                    name: component_name,
-                    tag: this.tag
-                })
-            },
-            destroyed() {
-                console.log(3001, this.$options.name)
-                if (this.component_instance) {
-                    this.game_object.remove_component(this.component_instance)
-                }
-            },
-            methods: {
-
-            }
-        }
-
-        // console.log(name, ProxyComp)
-        // console.dir(cls.prototype)
-
-        return ProxyComp
+        this.widgetation.init(this)
     }
 }
 
 rm = new ResourceManager()
 window.F_TEXTURE_STREAMING_FUNCTION = rm.texture_stream_function.bind(rm)
 
-/**ASSETS_LOADER_INJECTED_CODE**/
-
 if (IS_DEV) {
     window.rm = rm
 }
-
-// let kek = require.context("retro/widget", true, /\.vue$/)
-// console.log(kek)
-// debugger
 
 export default rm;
