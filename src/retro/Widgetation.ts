@@ -53,9 +53,9 @@ let proxy_widget_base: IWidgetationProxyComp = {
     },
     methods: {
         detect_domain_game_object() {
-            let domain_game_object = this.$store.getters.game_object
+            let domain_game_object: GameObject = this.$store.getters.game_object
             let parent = this as any
-            let root_game_object_uuid = this.game_object.UUID
+            let root_game_object_uuid: string = this.game_object.UUID
             while (true) {
                 if (parent && parent.is_retro_object_proxy && parent.retro_object !== this.retro_object) {
                     domain_game_object = parent.retro_object;
@@ -82,18 +82,18 @@ export class Widgetation {
 
     public init(rm: any): void {
         ResourceManager = rm
-        
+
         if (PRESET.FEATURE_WIDGETATION_ENABLE) {
-            let prefix = PRESET.FEATURE_WIDGETATION_PREFIX ?? "R_"
-            let ObjectProxyComp = this.create_proxy_object_widget()
+            let prefix: string = PRESET.FEATURE_WIDGETATION_PREFIX ?? "R_"
+            let ObjectProxyComp: IWidgetationProxyComp = this.create_proxy_object_widget()
             this.widget_components[`${prefix}Object`] = ObjectProxyComp
-            forEach(ResourceManager.classes_of_components, (cls, name) => {
-                let ProxyComponent = this.create_proxy_component_widget(cls, name)
+            forEach(ResourceManager.classes_of_components, (cls, name: string) => {
+                let ProxyComponent: IWidgetationProxyComp = this.create_proxy_component_widget(cls, name)
                 this.widget_components[`${prefix}${name}`] = ProxyComponent
             })
         }
     }
-    create_proxy_object_widget() {
+    private create_proxy_object_widget(): IWidgetationProxyComp {
         let ProxyComp: IWidgetationProxyComp = {
             name: `R_Object`,
             mixins: [proxy_widget_base],
@@ -125,8 +125,8 @@ export class Widgetation {
         }
         return ProxyComp
     }
-    create_proxy_component_widget(cls: new (params: any) => Component, name: string) {
-        let component_name = name;
+    private create_proxy_component_widget(cls: new (params: any) => Component, name: string): IWidgetationProxyComp {
+        let component_name: string = name;
 
         let ProxyComp: IWidgetationProxyComp = {
             name: `R_${name}`,
