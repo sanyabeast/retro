@@ -129,11 +129,11 @@ let RetroPlugin = {
 					if (this.retro.ready) {
 						if (ResourceManager.globals.now - this.retro.prev_tick_time > 1000 / this.retro.tick_rate) {
 							this.retro.prev_tick_time = ResourceManager.globals.now
-							this.$children.forEach(c => c.tick(time_data))
-
 							this.set_platform_attributes()
 							this.on_tick(time_data)
 						}
+
+						this.$children.forEach(c => c.tick(time_data))
 					}
 				},
 				/** RETRO LIFECYCLE EMULATION */
@@ -186,7 +186,7 @@ let RetroPlugin = {
 
 class WidgetComponent extends Component {
 	zoom = 1
-	tick_rate = 5
+	tick_rate = 60
 	root_component = undefined
 	module_name = "widget"
 	/**[screen, world, screen2] */

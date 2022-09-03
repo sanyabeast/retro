@@ -12,7 +12,7 @@ class App extends RetroApp {
 
 		this.load_stage(ResourceManager.load_prefab("{{APP_NAME}}.scenes.main"))
 		this.find_component_of_type("Renderer")
-		
+
 		let postfx = this.find_component_of_type("Postprocessing")
 		// postfx.use_ssgi = true
 
@@ -21,8 +21,8 @@ class App extends RetroApp {
 
 		let orbit = this.find_component_of_type('OrbitControlsComponent') as any
 		orbit.set_controls_state({
-			position: [0.06709046098670876, 1.4560641215969266, 2.762232087737593],
-			target: [0.07783611134107367, 0.9827307616883895, -0.01875572798565418],
+			position: [0.929241595859249, 1.8136047161671325, 2.274839086785093],
+			target: [0.03767997569932003, 0.7096796787072052, 0.0013812853566007584],
 			zoom: 1
 		})
 

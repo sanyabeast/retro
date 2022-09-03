@@ -4,8 +4,8 @@
             use_postfx: false,
             debug_transform: true,
             global_intensity: 1,
-            cycling: 512,
-            time: 0.5,
+            cycling: 15,
+            time: 0.2,
         }" />
         <R_Fog :params="{
             density: 0.02
@@ -25,13 +25,16 @@
                     position: [0, 0.35, 0],
                     src: 'res/demo_alt/models/wizard_table/scene.gltf',
                 }" />
-                <R_LightComponent :params="{
-                    type: 'RectAreaLight',
-                    position: [0, 2.2, 2],
-                    rotation: [-1.5707, 0, 0],
-                    rect_width: 0.5,
-                    rect_height: 0.5,
-                    intensity: 75
+                <R_LightComponent v-for="(index, key) in 3" :key="key" :params="{
+                    type: 'PointLight',
+                    position: [
+                        0 + math_cos((time + index) * (1 + index) / 5) * (2 + index),
+                        2+ math_sin((time + index) * 2) * 0.5,
+                        0 + math_sin((time + index) * (1 + index) / 5) * (2 + index)
+                    ],
+                    intensity: 12 + math_sin(time + index) * 4,
+                    distance: 15,
+                    color: light_colors[index]
                 }" />
                 <R_TroikaTextComponent :params="{
                     text: '`Wizard Table` by Asylum Nox',
@@ -49,7 +52,8 @@ export default {
     name: "Main",
     data() {
         return {
-            light_height: 2
+            light_colors: ["#e91e63", "#03a9f4", "#3f51b5"],
+            time: 0
         }
     },
     mounted() {
@@ -57,8 +61,14 @@ export default {
         console.log(this)
     },
     methods: {
-        on_tick() {
-            this.light_height = Math.sin(+ new Date() / 1000)
+        math_sin(v) {
+            return Math.sin(v)
+        },
+        math_cos(v) {
+            return Math.cos(v)
+        },
+        on_tick(time_data) {
+            this.time += time_data.delta
         }
     }
 }

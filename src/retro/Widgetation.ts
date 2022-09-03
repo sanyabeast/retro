@@ -11,18 +11,24 @@ interface IWidgetationCompPropertyDescriptor {
 interface IWidgetationProxyCompData {
     [x: string]: any
 }
-interface IWidgetationProxyCompProps {
+interface IWidgetationProxyCompWatchers extends IWidgetationProxyCompData {
+    [x: string]: any
+}
+interface IWidgetationProxyCompProps extends IWidgetationProxyCompWatchers {
     params?: IWidgetationCompPropertyDescriptor
     tag?: IWidgetationCompPropertyDescriptor
 }
-export interface IWidgetationProxyCompMethods {
+export interface IWidgetationProxyCompMethods extends IWidgetationProxyCompProps {
     detect_domain_game_object?: Function
+    save_params?: Function
+    check_updates?: Function
     $store?: any
+    params?: any
     game_object?: GameObject
     retro_object?: GameObject
     domain_game_object?: GameObject
 }
-export interface IWidgetationProxyComp extends IWidgetationProxyCompMethods, IWidgetationProxyCompProps {
+export interface IWidgetationProxyComp extends IWidgetationProxyCompMethods {
     component_instance?: Component
     name?: string
     mixins?: any[]
@@ -34,6 +40,8 @@ export interface IWidgetationProxyComp extends IWidgetationProxyCompMethods, IWi
     mounted?: Function
     destroyed?: Function
     methods?: IWidgetationProxyCompMethods
+    watch?: IWidgetationProxyCompWatchers
+    saved_params?: { [x: string]: any }
     $options?: {
         [x: string]: any
     }
@@ -51,7 +59,36 @@ let proxy_widget_base: IWidgetationProxyComp = {
             default() { return undefined }
         }
     },
+    watch: {
+        params: {
+            deep: true,
+            handler(new_val) {
+                this.check_updates()
+                this.save_params()
+            }
+        }
+    },
+    beforeMount() {
+        this.save_params()
+    },
     methods: {
+        save_params() {
+            let r = {}
+            forEach(this.params, (value, key) => {
+                r[key] = value
+            })
+            this.saved_params = r
+        },
+        check_updates() {
+            forEach(this.params, (value, key) => {
+                if (value !== this.saved_params[key]) {
+                    this.handle_property_change(value, key)
+                }
+            })
+        },
+        handle_property_change(value, prop_name) {
+            console.log(`prop "${prop_name}" changed`, value)
+        },
         detect_domain_game_object() {
             let domain_game_object: GameObject = this.$store.getters.game_object
             let parent = this as any
@@ -121,6 +158,11 @@ export class Widgetation {
                 console.log(`destoryed proxy object`)
                 this.retro_object.destroy()
                 this.domain_game_object.remove(this.retro_object)
+            },
+            methods: {
+                handle_property_change(value, prop_name) {
+                    this.retro_object[prop_name] = value
+                }
             }
         }
         return ProxyComp
@@ -158,6 +200,11 @@ export class Widgetation {
                 console.log(3001, this.$options.name)
                 if (this.component_instance) {
                     this.domain_game_object.remove_component(this.component_instance)
+                }
+            },
+            methods: {
+                handle_property_change(value, prop_name) {
+                    this.component_instance[prop_name] = value
                 }
             }
         }
