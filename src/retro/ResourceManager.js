@@ -49,7 +49,7 @@ import {
 
 } from 'three';
 import { tools, log, error, get_query_string_params, get_app_name, mixin_object, get_unique_props, is_none, schema_validate, camel_to_snake, is_inline_dict, parse_inline_dict, console, get_most_suitable_dict_keys } from "retro/utils/Tools";
-import { isObject, isArray, merge, forEach, isString, isUndefined, isFunction, keys, values, set, map, filter } from "lodash-es";
+import { isObject, isArray, merge, forEach, isString, isUndefined, isFunction, keys, values, set, map, filter, isNil } from "lodash-es";
 import Schema from "retro/utils/Schema"
 import RenderTarget from "retro/components/scene/RenderTarget"
 import AssetBufferGeometry from 'retro/geometry/classes/AssetBufferGeometry';
@@ -95,6 +95,13 @@ class ResourceManager {
     }
     error() {
         error('ResourceManager', ...arguments)
+    }
+    add_dict(name){
+        if (isNil(this[name])){
+            this[name] = new RmDict()
+        } else {
+            this.error(`unable to add dict to ResourceManager. incorrect name "${name}"`)
+        }
     }
     constructor() {
         if (ResourceManager.singleton instanceof ResourceManager) {
@@ -801,7 +808,7 @@ class ResourceManager {
     get_component_instance(type, UUID) {
         return this.components_instances[type] ? this.components_instances[type][UUID] : undefined
     }
-    /**contexts */
+    /** contexts */
     load_context() {
 
     }
@@ -809,7 +816,7 @@ class ResourceManager {
         return new this.classes_of_objects[object_class](options)
     }
 
-    /*widget components*/
+    /* widget components*/
     find_widget_component = function (name, cb) {
         if (isObject(this.widget_component_instances[name])) {
             let r = undefined
@@ -832,7 +839,7 @@ class ResourceManager {
             return r
         }
     }
-    /**universal method */
+    /** universal method */
     using(query, callback) {
         let result = undefined
         console.log(query, callback)
@@ -840,7 +847,7 @@ class ResourceManager {
         return result
     }
 
-    /**patches */
+    /** patches */
     load_patches(ns, context) {
         this.preload_context(context, (p, mod) => {
             this.asset_stats.components_count++;
@@ -857,11 +864,12 @@ class ResourceManager {
         })
     }
 
-    /**asset index */
+    /** asset index */
     load_asset_index(data) {
         console.log(data)
     }
 
+    /** postload tasks */
     run_postload_tasks() {
         let classes_of_components = this.classes_of_components;
         console.log(classes_of_components)

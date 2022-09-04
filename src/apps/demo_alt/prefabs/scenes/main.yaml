@@ -1,7 +1,7 @@
 prefabs:
   - default.Postprocessing
-  - retro.sound.default_ambient_audio_source
-  - default.OrbitControlsComponent
+  # - retro.sound.default_ambient_audio_source
+  # - default.OrbitControlsComponent
 components:
   main:
     name: WidgetComponent

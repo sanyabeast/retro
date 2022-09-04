@@ -957,6 +957,17 @@ const make_immutable_context_for_object = (target) => {
 
 }
 
+const do_once = (callback, context) => {
+    if (callback.$do_once$complete !== true) {
+        if (isObject(context)) {
+            callback.call(context)
+        } else {
+            callback()
+        }
+        callback.$do_once$complete = true
+    }
+}
+
 /**sound */
 // window.addEventListener('play', (evt)=>{
 //     clearInterval(evt.target.retro_daemon_tmid)
@@ -1050,7 +1061,8 @@ const tools = {
         parse_numeric_float,
         define_getters,
         recreate_reference_properties,
-        make_immutable_context_for_object
+        make_immutable_context_for_object,
+        do_once
     },
     intl: {
         format_currency,
@@ -1104,7 +1116,8 @@ const tools = {
     },
     runtime: {
         exec: exec_code,
-        resolve: resolve_code
+        resolve: resolve_code,
+        do_once
     }
 }
 
@@ -1160,5 +1173,6 @@ export {
     angle,
     translate_range,
     recreate_reference_properties,
-    spawn_retro_greetings
+    spawn_retro_greetings,
+    do_once
 }

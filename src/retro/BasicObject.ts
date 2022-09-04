@@ -44,6 +44,9 @@ export default class BasicObject extends EventDispatcher implements IRetroObject
     _on_destroy?: Function
     _on_tick?: (td: IRetroObjectTimeData) => void
     _on_start?: Function
+    get ResourceManager (): ResourceManager {
+        return ResourceManager
+    }
 
     constructor(params: any) {
         super()

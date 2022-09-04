@@ -126,6 +126,9 @@ class Sun extends SceneComponent {
 
         this.skybox = this.find_component_of_type("SkyBox")
     }
+    on_destroy(){
+        super.on_destroy()
+    }
     get_render_data() {
         return [{
             object: this.light,
