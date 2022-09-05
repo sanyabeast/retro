@@ -46,15 +46,16 @@ params:
         outputColor = inputColor;
 
         vec3 rn_local = texture2D(normal_buffer, uv).xyz;
+        float voidness = length(rn_local);
         vec3 n_local = decode_normal(rn_local);
 
-        float noise_scale = 32.;
-        float noise_speed = 4.;
-        float noise = 0.5 + (mod(texture2D(noise_texture, vec2(uv.x * noise_scale, uv.y * noise_scale * aspect)).r + (time * noise_speed), 1.)) * 0.5;
+        float noise_scale = 16.;
+        float noise_speed = 2.;
+        float noise = 0.5 + (mod(texture2D(noise_texture, vec2(uv.x * noise_scale * aspect, uv.y * noise_scale)).r + (time * noise_speed), 1.)) * 0.5;
 
-        float uv_step = 1. / 6.;
+        float uv_step = 0.5;
         float steps_a = 6.;
-        float steps_b = 3.;
+        float steps_b = 4.;
         float acml_luma_corr = 1. / (steps_a * steps_b / 2.);
         vec3  acml_color = vec3(1., 1., 1.) * acml_luma_corr;
 
@@ -64,20 +65,21 @@ params:
         for (int i = 0; i < int(steps_a); i++){
             for (int j = 0; j < int(steps_b); j++){
               float rp = float(j) / steps_b;
-              float rad_progress = 2. * 3.14 * (float(i) / steps_a); 
-              float rad_dist = rp * uv_step * noise;
+              float rad_progress = 2. * 3.14 * (float(i) / steps_a) * (noise * 3.14 * 2.); 
+              float rad_dist = rp * pow(uv_step, 1. + 2. * noise);
               float uv_dx = sin(rad_progress) * rad_dist;
               float uv_dy = cos(rad_progress) * rad_dist * aspect;
               vec2 probe_uv = uv + vec2(uv_dx, uv_dy);
               vec3 n_alien = decode_normal(texture2D(normal_buffer, probe_uv).xyz);
               vec3 c_alien = texture2D(map, probe_uv).xyz;
-              float dir_factor = pow(1. - (length(n_local + n_alien)/2.), 2.);
-              acml_color += c_alien * acml_luma_corr * dir_factor * acml_color_f;
+              float dir_factor = 1. - pow((length(n_local + n_alien)/2.), 2.);
+              acml_color += c_alien * acml_luma_corr * dir_factor * acml_color_f * voidness;
             }
           }
 
-          acml_color = normalize(acml_color), 5.;
-          outputColor.xyz = BlendSoftLight(inputColor.xyz, acml_color);
+          acml_color = normalize(acml_color) * 0.75;
+          //outputColor.xyz = BlendTint(inputColor.xyz, acml_color);
+          outputColor.xyz = acml_color;
 
     }
   transparent: true

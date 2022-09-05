@@ -3,7 +3,7 @@
 
         <div class="level-selection">
             <h2>Level Selection</h2>
-            <div v-for="(item, index) in scenes" class="button" :class="{active: active_scene_index === index}"
+            <div v-for="(item, index) in scenes" class="button" :class="{ active: active_scene_index === index }"
                 :key="index" @mousedown="set_active_scene_index(index)">
                 <p v-html="item.name"></p>
             </div>
@@ -18,11 +18,6 @@
         }" />
 
         <R_OrbitControlsComponent :params="active_scene.orbit ?? default_orbit_control_params" />
-
-        <R_Fog :params="{
-            density: 0.02
-        }" />
-
         <DefaultScene v-if="active_scene_index === 0" />
         <OneMoreScene v-if="active_scene_index === 1" />
         <EvenOneMoreScene v-if="active_scene_index === 2" />
@@ -49,11 +44,11 @@ export default {
             scenes: [
                 {
                     name: "Default",
-                    time: 0.2,
-                    day_speed: 0,
+                    time: 0.35,
+                    day_speed: 16,
                     orbit: {
-                        position : [-0.804327808109709, 1.1654925486072987, 1.5054976510375697],
-                        target : [-0.06468297831367632, 0.6248641020499907, -0.018214616625668166]
+                        position: [-13.542572692545463, 3.592200776787272, -6.4934313948673825],
+                        target: [0.19434647713159492, 0.05095554279356872, -3.2017953660358636]
                     }
                 },
                 {
@@ -61,14 +56,14 @@ export default {
                     time: 0.5,
                     day_speed: 2048,
                     orbit: {
-                        position: [-1.1978937228860436, 0.5976177295902825, 2.2044420170181827],
-                        target: [-0.07080320746888534, 0.4503999418148126, -0.22251840267729847]
+                        position: [2.7923308510870486, 0.07054184254091939, -1.3596392192912055],
+                        target: [0.5920534624453714, 0.44571568006174944, 0.5988835532186334]
                     }
                 },
                 {
                     name: "Even One More",
-                    time: 0.65,
-                    day_speed: 64,
+                    time: 0.6,
+                    day_speed: 0,
                     orbit: {
                         position: [5.660666380532865, 5.032615474101596, -7.424760544009651],
                         target: [3.20915372639969, 1.6426733064675614, 1.2838366079394254]
@@ -78,7 +73,7 @@ export default {
         }
     },
     computed: {
-        active_scene(){
+        active_scene() {
             return this.scenes[this.active_scene_index]
         }
     },
@@ -86,7 +81,7 @@ export default {
 
     },
     methods: {
-        set_active_scene_index(index){
+        set_active_scene_index(index) {
             console.log(index)
             this.active_scene_index = index
         }

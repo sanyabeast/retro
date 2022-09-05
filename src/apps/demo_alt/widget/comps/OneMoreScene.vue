@@ -5,7 +5,9 @@
                 cubemap: 'res/retro/plugins/extra-assets/cubemaps/nissi_beach_1',
                 cubemap_format: 'jpg'
             }" />
-            
+            <R_Fog :params="{
+                density: 0.05
+            }" />
             <R_Object :params="{
                 rotation: [0, 0, 0],
             }">
@@ -32,30 +34,30 @@
     </div>
 </template>
 <script>
-    export default {
-        name: "OneMoreScene",
-        data() {
-            return {
-                light_colors: ["#e91e63", "#03a9f4", "#3f51b5"],
-                time: 0
-            }
+export default {
+    name: "OneMoreScene",
+    data() {
+        return {
+            light_colors: ["#e91e63", "#03a9f4", "#3f51b5"],
+            time: 0
+        }
+    },
+    mounted() {
+        this.retro.tick_rate = 30
+        console.log(this)
+    },
+    methods: {
+        math_sin(v) {
+            return Math.sin(v)
         },
-        mounted() {
-            this.retro.tick_rate = 30
-            console.log(this)
+        math_cos(v) {
+            return Math.cos(v)
         },
-        methods: {
-            math_sin(v) {
-                return Math.sin(v)
-            },
-            math_cos(v) {
-                return Math.cos(v)
-            },
-            on_tick(time_data) {
-                this.time += time_data.delta
-            }
+        on_tick(time_data) {
+            this.time += time_data.delta
         }
     }
+}
 </script>
 <style>
 </style>

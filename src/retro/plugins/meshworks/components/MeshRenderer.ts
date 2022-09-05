@@ -40,7 +40,7 @@ export class MeshRenderer extends SceneComponent {
 		console.log(this)
 	}
 
-	override async on_destroy(){
+	override async on_destroy() {
 		await super.on_destroy()
 		delete this.scene
 	}

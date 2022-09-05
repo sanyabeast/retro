@@ -87,7 +87,7 @@ class FFXEffect extends postfx.Effect {
 
 class SSGIEffect extends postfx.Effect {
     constructor(scene, camera, {
-        blendFunction = postfx.BlendFunction.NORMAL,
+        blendFunction = postfx.BlendFunction.SOFT_LIGHT,
         normal_buffer = null,
         width = Resizer.AUTO_SIZE,
         height = Resizer.AUTO_SIZE,
@@ -101,29 +101,23 @@ class SSGIEffect extends postfx.Effect {
             uniforms: new Map(map(material_template.params.uniforms, (uniform, name) => [name, new Uniform(uniform.value)]))
         });
         this.resolution_scale = resolution_scale
-        this.renderTarget = new WebGLRenderTarget(1024, 1024, {
+        this.renderTarget = new WebGLRenderTarget(Math.ceil(width * this.resolution_scale), Math.ceil(height * this.resolution_scale), {
             minFilter: LinearFilter,
             magFilter: LinearFilter,
             stencilBuffer: false,
             depthBuffer: false
         });
 
-        this.noise_texture = new postfx.NoiseTexture(100, 100)
+        this.noise_texture = new postfx.NoiseTexture(128, 128)
         this.noise_texture.wrapS = this.noise_texture.wrapT = RepeatWrapping;
-        this.renderTarget.texture.name = "ssgi.blur";
+        this.renderTarget.texture.name = "ssgi.rt";
         this.renderTarget.texture.generateMipmaps = false;
-        
-        this.depthPass = new postfx.DepthPass(scene, camera);
-        this.blurPass = new postfx.BlurPass({
-            resolutionScale: 1,
-            width,
-            height,
-            kernelSize: postfx.KernelSize.VERY_LARGE
+
+        this.depthPass = new postfx.DepthPass(scene, camera, {
+            resolutionScale: this.resolution_scale
         });
 
         this.render_pass_scene = new Scene();
-        this.blurPass.convolutionMaterial.uniforms.scale.value = 6
-        this.blurPass.resolution.resizable = this;
         this.uniforms.get("normal_buffer").value = normal_buffer
         this.uniforms.get("depth_buffer").value = this.depthPass.texture
         this.uniforms.get("noise_texture").value = this.noise_texture
@@ -132,23 +126,21 @@ class SSGIEffect extends postfx.Effect {
         let renderTarget = this.renderTarget
         //this.depthPass.render(renderer)
         // this.blurPass.scene = this.render_pass_scene
-        this.blurPass.scene.children = this.render_pass_list ?? []
-        this.blurPass.render(renderer, inputBuffer, renderTarget);
+        // this.blurPass.scene.children = this.render_pass_list ?? []
+        // this.blurPass.render(renderer, inputBuffer, renderTarget);
     }
     get resolution() {
-        return this.blurPass.resolution;
+        return this.renderTarget.resolution;
     }
     setSize(width, height) {
-        const w = width * this.resolution_scale;
-        const h = height * this.resolution_scale;
+        const w = Math.ceil(width * this.resolution_scale);
+        const h = Math.ceil(height * this.resolution_scale);
         this.renderTarget.setSize(w, h);
-        this.blurPass.setSize(w, h);
         this.depthPass.setSize(w, h);
         this.uniforms.get("aspect").value = w / h
-        
+
     }
     initialize(renderer, alpha, frameBufferType) {
-        this.blurPass.initialize(renderer, alpha, frameBufferType);
         this.depthPass.initialize(renderer, alpha, frameBufferType);
         if (!alpha && frameBufferType === UnsignedByteType) {
             this.renderTarget.texture.format = RGBFormat;
@@ -318,15 +310,15 @@ class Postprocessing extends Component {
             if (this.use_ssao) this.setup_ssao(renderer, scene, camera, composer)
             if (this.use_ssgi) this.setup_ssgi(renderer, scene, camera, composer)
 
-            
+
             if (this.use_ffx) this.setup_ffx(renderer, scene, camera, composer)
             if (this.use_fxaa) this.setup_fxaa(renderer, scene, camera, composer)
-            
+
             if (this.use_tonemapping) this.setup_tonemapping(renderer, scene, camera, composer)
             if (this.use_chromatic_abberation) this.setup_chromatic_abberation(renderer, scene, camera, composer)
             if (this.use_godrays) this.setup_godrays(renderer, scene, camera, composer)
             if (this.use_bloom) this.setup_bloom(renderer, scene, camera, composer)
-           
+
             if (this.use_outline) this.setup_outline(renderer, scene, camera, composer)
             if (this.use_grain) this.setup_grain(renderer, scene, camera, composer)
             if (this.use_vignette) this.setup_vignette(renderer, scene, camera, composer)
@@ -535,7 +527,7 @@ class Postprocessing extends Component {
                 luminanceInfluence: 1,
                 minRadiusScale: 32,
                 radius: 0.125,
-                intensity: 12,
+                intensity: 32,
                 bias: 0.4,
                 fade: 3,
                 color: 0x000108,
@@ -563,7 +555,7 @@ class Postprocessing extends Component {
 
         let ssgi_effect = this.ssgi_effect = new SSGIEffect(scene, camera, {
             normal_buffer: normal_pass.texture,
-            height: 1024
+            resolution_scale: 0.2
         });
         let ssgi_pass = this.ssgi_pass = new postfx.EffectPass(camera, this.ssgi_effect);
         composer.addPass(ssgi_pass)
