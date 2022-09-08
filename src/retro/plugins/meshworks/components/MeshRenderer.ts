@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RoughnessMipmapper } from 'three/examples/jsm/utils/RoughnessMipmapper.js';
 import path from "path"
 import { DoubleSide, Event, Group, Mesh, MeshStandardMaterial, Object3D, WebGLRenderer } from "three";
-import { isArray, isNil, isString } from "lodash";
+import { isArray, isNil, isNumber, isString } from "lodash";
 import { do_once } from "retro/utils/Tools"
 import ResourceManager from "retro/ResourceManager"
 
@@ -129,10 +129,21 @@ export class MeshRenderer extends SceneComponent {
 							mesh.receiveShadow = this.recieve_shadow;
 							mesh.castShadow = this.cast_shadow;
 							let mat = mesh.material as MeshStandardMaterial
-							mat.normalScale.x *= this.normal_scale
-							mat.normalScale.y *= this.normal_scale
-							mat.bumpScale * this.bump_scale
-							mat.emissiveIntensity *= this.emission_scale
+
+							if (!isNil(mat.normalScale)){
+								mat.normalScale.x *= this.normal_scale
+								mat.normalScale.y *= this.normal_scale
+							}
+
+							if (isNumber(mat.bumpScale)){
+								mat.bumpScale * this.bump_scale
+							}
+
+							if (isNumber(mat.emissiveIntensity)){
+								mat.emissiveIntensity *= this.emission_scale
+							}
+
+							mat.envMapIntensity = 0.75
 						}
 
 						if (isString(this.hide_object) && this.hide_object === child.name) {

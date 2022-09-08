@@ -486,8 +486,8 @@ const lerp = (start, end, amt) => {
         })
         return r
     } else if (isObject(start) && isObject(end)) {
-        let r = []
-        forEach((v, i) => {
+        let r = {}
+        forEach(end, (v, i) => {
             r[i] = lerp(start[i] ?? 0, end[i] ?? 0, amt)
         })
         return r

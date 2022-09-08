@@ -100,9 +100,7 @@ class OrbitControlsComponent extends Component {
                     break
                 }
                 case "position": {
-                    console.log(controls.object.position, this.position)
                     controls.object.position.set(...this.position)
-                    console.log(controls.object.position, this.position)
                     break
                 }
                 case "zoom": {
@@ -134,18 +132,9 @@ class OrbitControlsComponent extends Component {
         })
     }
     on_create() {
-        let camera = this.find_component_of_type("CameraComponent")
-        if (camera) {
-            const controls = this.controls = new OrbitControls.OrbitControls(camera.subject, this.globals.dom);
-        } else {
-            console.error(`OrbitControls requires "CameraComponent" presense on scene`)
-        }
+        this.controls = new OrbitControls.OrbitControls(this.globals.camera, this.globals.dom);
     }
     on_tick(time_data) {
-        let camera = this.find_component_of_type("CameraComponent")
-        camera.position[0] = camera.subject.position.x
-        camera.position[1] = camera.subject.position.y
-        camera.position[2] = camera.subject.position.z
         this.controls.update();
     }
 }

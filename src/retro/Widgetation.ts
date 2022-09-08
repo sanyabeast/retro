@@ -87,7 +87,6 @@ let proxy_widget_base: IWidgetationProxyComp = {
             })
         },
         handle_property_change(value, prop_name) {
-            console.log(`prop "${prop_name}" changed`, value)
         },
         detect_domain_game_object() {
             let domain_game_object: GameObject = this.$store.getters.game_object
@@ -104,10 +103,8 @@ let proxy_widget_base: IWidgetationProxyComp = {
                 }
             }
             while (parent !== undefined && parent.is_retro_object_proxy === false) {
-                console.log(parent)
                 parent = parent.$parent
             }
-            console.log(`found domain game object: ${domain_game_object.UUID} (${root_game_object_uuid === domain_game_object.UUID ? 'root' : ''})`)
             this.domain_game_object = domain_game_object
         }
     }
@@ -147,7 +144,6 @@ export class Widgetation {
                 }
             },
             beforeMount() {
-                console.log(`new proxy object`);
                 this.retro_object = new GameObject()
             },
             mounted() {
@@ -155,7 +151,6 @@ export class Widgetation {
                 this.domain_game_object.add(this.retro_object)
             },
             destroyed() {
-                console.log(`destoryed proxy object`)
                 this.retro_object.destroy()
                 this.domain_game_object.remove(this.retro_object)
             },
@@ -188,7 +183,6 @@ export class Widgetation {
                 }
             },
             mounted() {
-                console.log(`new component ${name}`)
                 this.component_instance = new cls(this.params)
                 this.detect_domain_game_object()
                 this.domain_game_object.attach_component(this.component_instance, {
@@ -197,7 +191,6 @@ export class Widgetation {
                 })
             },
             destroyed() {
-                console.log(3001, this.$options.name)
                 if (this.component_instance) {
                     this.domain_game_object.remove_component(this.component_instance)
                 }

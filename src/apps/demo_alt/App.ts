@@ -3,6 +3,7 @@ import ResourceManager from "retro/ResourceManager";
 import Device from "retro/utils/Device"
 import { map } from "lodash-es"
 import Component from "../../retro/Component";
+import { PerspectiveCamera } from "three";
 
 class App extends RetroApp {
 	constructor(params) {
@@ -10,14 +11,7 @@ class App extends RetroApp {
 			...params,
 		});
 
-		this.load_stage(ResourceManager.load_prefab("{{APP_NAME}}.scenes.main"))
-		this.find_component_of_type("Renderer")
-
-		let postfx = this.find_component_of_type("Postprocessing")
-		// postfx.use_ssgi = true
-
-		let camera = this.find_component_of_type("CameraComponent") as any
-		camera.fov = 45
+		(this.globals.camera as PerspectiveCamera).fov = 60
 
 		let orbit = this.find_component_of_type('OrbitControlsComponent') as any
 		this.start()

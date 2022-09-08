@@ -1307,11 +1307,6 @@ function WebGLRenderer(parameters = {}) {
 		materialProperties.fog = scene.fog;
 		materialProperties.envMap = (material.isMeshStandardMaterial ? cubeuvmaps : cubemaps).get(material.envMap || materialProperties.environment);
 
-		/**PATCH !PATCH !PATCH */
-		if (material.isMeshStandardMaterial || materialProperties.isMeshPhongMaterial || materialProperties.isMeshPhysicalMaterial || materialProperties.isMeshBasicMaterial) {
-			materialProperties.envMapIntensity = 1
-		}
-
 		if (material.material_layers) {
 			material.material_layers.forEach(mat => {
 				let user_data = mat.userData

@@ -24,6 +24,7 @@ class RetroApp extends GameObject {
 
         this.setup_app()
         this.define_global_var("app", a => this)
+        console.log(`loading persisten scene`);
         this.load_prefab(ResourceManager.load_prefab(PRESET.PERSISTENT_SCENE_PREFAB, {
             "components.renderer.params.pixel_ratio": Math.min(window.devicePixelRatio, 2)
         }))

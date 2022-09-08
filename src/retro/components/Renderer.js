@@ -115,7 +115,7 @@ class Renderer extends Component {
     tick_rate = isNumber(PRESET.RENDERER_UPDATE_RATE) ? PRESET.RENDERER_UPDATE_RATE : 5
     shadowmap_fps = 15
     useOptimizations = true
-    tonemapping = LinearToneMapping
+    tonemapping = ACESFilmicToneMapping
     tonemapping_exposure = 1
 
     //** private*/
@@ -151,10 +151,10 @@ class Renderer extends Component {
 
     constructor() {
         super(...arguments)
-        this.check_size = throttle(this.check_size.bind(this), 250)
-        this.persist_perspective_camera.position.set(0, 0, 5)
-        this.persist_orthographic_camera.position.set(0, 0, 5)
-        this.active_render_camera = this.persist_perspective_camera
+        this.check_size = throttle(this.check_size.bind(this), 250);
+        this.persist_perspective_camera.position.set(0, 0, 5);
+        this.persist_orthographic_camera.position.set(0, 0, 5);
+        this.active_render_camera = this.persist_perspective_camera;
     }
 
     on_create() {
@@ -180,12 +180,6 @@ class Renderer extends Component {
             ...renderer_presets[Device.device_type]
         });
 
-        this.define_global_var("renderer", () => {
-            return this.renderer
-        })
-        this.define_global_var("camera", () => {
-            return this.active_render_camera
-        })
 
         if (this.tools.device.is_mobile) {
             this.tools.html.set_style(renderer.domElement, {
@@ -226,6 +220,13 @@ class Renderer extends Component {
         this.canvas.style.height = "100%";
         this.handle_mousemove = this.handle_mousemove.bind(this);
         document.body.addEventListener("mousemove", this.handle_mousemove);
+
+        this.define_global_var("renderer", () => {
+            return this.renderer
+        })
+        this.define_global_var("camera", () => {
+            return this.active_render_camera
+        })
     }
     get_reactive_props() {
         return [
@@ -594,15 +595,15 @@ class Renderer extends Component {
         this.renderer.webgl_background.set_tint(val)
     }
     update_camera() {
+        let proj_matrix_needs_update = false
         if (!isNil(this.active_camera)) {
             switch (this.active_camera.type) {
                 case "OrthographicCamera": {
-
                     break;
                 }
                 default: {
                     //this.active_render_camera.matrixWorld.copy(this.active_camera.matrixWorld)
-                    let proj_matrix_needs_update = false
+                    
 
                     this.active_render_camera.near = this.active_camera.near
                     this.active_render_camera.far = this.active_camera.far
@@ -621,14 +622,21 @@ class Renderer extends Component {
                         proj_matrix_needs_update = true
                     }
 
-                    if (proj_matrix_needs_update) {
-                        this.active_render_camera.updateProjectionMatrix()
-                    }
-
                     // this.active_render_camera.position.copy(this.active_camera.position)
                     // this.active_render_camera.position.copy(this.active_camera.position)
                 }
             }
+        } else {
+            let aspect = this.globals.uniforms.resolution.value.x / this.globals.uniforms.resolution.value.y;
+
+            if (this.active_render_camera.aspect !== aspect) {
+                this.active_render_camera.aspect = aspect
+                proj_matrix_needs_update = true
+            }
+        }
+
+        if (proj_matrix_needs_update) {
+            this.active_render_camera.updateProjectionMatrix()
         }
     }
 }

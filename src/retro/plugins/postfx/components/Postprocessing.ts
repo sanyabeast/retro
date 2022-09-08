@@ -17,9 +17,9 @@ class Postprocessing extends Component {
 
     public bloom_params = {
         exposure: 1,
-        strength: 0.3,
-        treshold: 0.3,
-        radius: 1
+        strength: 0.25,
+        treshold: 0.25,
+        radius: 0.5
     }
 
     protected renderer: IRendererComponent
@@ -51,7 +51,7 @@ class Postprocessing extends Component {
         if (renderer) {
             renderer.custom_render_function = this.postfx_render_function
             renderer.tonemapping = ACESFilmicToneMapping
-            renderer.tonemapping_exposure = 0.55
+            renderer.tonemapping_exposure = 0.85
             // renderer.clear_depth = false
             // renderer.clear_stencil = false
         }

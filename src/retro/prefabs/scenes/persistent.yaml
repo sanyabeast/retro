@@ -1,15 +1,16 @@
-prefabs: 
-  - default.Gizmos
-  - default.InputComponent
-  - default.ClockComponent
-  - default.Renderer
-  - default.Animator
-  - default.AudioListener
 components:
-  camera:
-    name: "CameraComponent"
-    params:
-      position:
-        - 0
-        - 0
-        - 5
+  gizmos:
+    name: Gizmos
+    order: 2
+  input:
+    name: InputComponent
+    order: 1
+  clock: 
+    name: ClockComponent
+    order: 0
+  audio_listener:
+    name: AudioListener
+    order: 3
+  renderer:
+    name: Renderer
+    order: 4

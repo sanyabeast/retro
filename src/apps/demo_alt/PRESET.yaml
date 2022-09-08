@@ -1,5 +1,6 @@
 IS_EXAMPLE: true
-RENDERER_LOGARITHMIC_DEPTH_BUFFER: false
+RENDERER_LOGARITHMIC_DEPTH_BUFFER: true
+PERSISTENT_SCENE_PREFAB: retro.scenes.persistent_widgetation_postfx
 PLUGINS:
   - retro/plugins/postfx
   - retro/plugins/extra-assets

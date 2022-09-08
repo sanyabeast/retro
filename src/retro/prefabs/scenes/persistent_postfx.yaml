@@ -1,0 +1,19 @@
+components:
+  gizmos:
+    name: Gizmos
+    order: 2
+  input:
+    name: InputComponent
+    order: 1
+  clock: 
+    name: ClockComponent
+    order: 0
+  audio_listener:
+    name: AudioListener
+    order: 3
+  renderer:
+    name: Renderer
+    order: 4
+  postfx:
+    name: Postprocessing
+    order: 5

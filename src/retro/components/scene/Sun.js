@@ -26,11 +26,11 @@ class Sun extends SceneComponent {
     d_color = "#e9e9e9"
     sun_size = 3
 
-    d_amb_color = "#f5f5f5"
-    n_amb_color = "#4b4b4b"
+    d_amb_color = "#ffffff"
+    n_amb_color = "#ffffff"
 
     d_amb_intensity = 5
-    n_amb_intensity = 0.01
+    n_amb_intensity = 1
 
     /**common */
     shadows_enabled = true
@@ -192,15 +192,6 @@ class Sun extends SceneComponent {
                     
                     if (this.use_fog && this.fog_comp){
                         this.fog_comp.color = this.tools.math.multiply(c_amb_color, this.tools.math.clamp(p, 0, 0.5))
-                    }
-
-                    if (this.use_postfx) {
-                        let postfx = this.find_component_of_type("Postprocessing")
-                        if (postfx) {
-                            postfx.grain_power = this.tools.math.lerp(this.n_grain_power, this.d_grain_power, p)
-                            postfx.bloom_smoothing = this.tools.math.lerp(this.n_bloom_smoothing, this.d_bloom_smoothing, p)
-                            postfx.bloom_threshold = this.tools.math.lerp(this.n_bloom_threshold, this.d_bloom_threshold, p)
-                        }
                     }
 
                     if (this.use_skybox && this.skybox){

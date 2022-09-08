@@ -1,4 +1,5 @@
 IS_EXAMPLE: true
+PERSISTENT_SCENE_PREFAB: retro.scenes.persistent_postfx
 PLUGINS:
   - retro/plugins/postfx
   - retro/plugins/extra-assets

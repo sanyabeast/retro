@@ -1,5 +1,0 @@
-FOO:
-  type: object|array
-  any_prop: :BAR
-BAR:
-  type: number

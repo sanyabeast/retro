@@ -760,7 +760,7 @@ class ResourceManager {
     }
     undefine_global_var(owner_id, name) {
         if (!isString(owner_id)) {
-            this.error(`failed to ndefine global variable. plz provied owner id`, arguments)
+            this.error(`failed to ndefine global variable ${name}. plz provied owner id`, arguments)
             return
         }
         Object.defineProperty(this.globals, name, {

@@ -1,5 +1,4 @@
 prefabs:
-  - default.Postprocessing
   - retro.sound.default_ambient_audio_source
   - default.OrbitControlsComponent
 components:
@@ -7,70 +6,46 @@ components:
     name: Sun
     tag: sun
     params:
-      use_postfx: false
       debug_transform: true
       global_intensity: 1
       cycling: 512
-      time: 0.2
+      time: 0.5
   fog:
     name: Fog
     params:
-      density: 0.02
+      density: 0.05
   skybox:
     name: SkyBox
     params:
       cubemap: "res/retro/plugins/extra-assets/cubemaps/nalovardo_1"
       cubemap_format: jpg
 children:
-  # table
   - components:
-      obj_table:
+      teapot:
           name: MeshRenderer
           params:
-            scale: 0.2
-            rotation: [0, 3.14, 0]
-            position: [0, 0.35, 0]
-            src: res/demo/models/wizard_table/scene.gltf
-      light: 
-        name: "LightComponent"
-        order: 1
-        params:
-          type: "RectAreaLight"
-          position: [0, 2.2, 0]
-          rotation: [-1.5707, 0, 0]
-          rect_width: 0.5
-          rect_height: 0.5
-          intensity: 75
-      light_controller:
-        order: 2
-        inline:
-          props:
-            max_intensity: 75
-          methods:
-            on_create:
-              body: >
-                this.light = this.get_component("LightComponent");
-            on_tick:
-              body: >
-                this.sun = this.sun || this.find_component_of_type("Sun");
-                this.light.intensity = this.sun.time < 0.3 || this.sun.time > 0.7 ? this.max_intensity : 0;
+            scale: 0.1
+            rotation: [0.5, 0, 0]
+            position: [0, 1, 0]
+            src: res/demo/models/nes_controller_free/scene.gltf
+            emission_scale: 5
       title: 
         name: "TroikaTextComponent"
         params:
           text: > 
-            "Wizard Table" by Asylum Nox
-          position: [0.5, 2, -0.5]
+            "NES Controller Free" by donnichols
+          position: [0, 3, -0.5]
           font_size: 0.05
-          rotation: [0, 0, 0]
       floating_title:
         order: 2
         inline:
-          props:
-            max_intensity: 75
           methods:
             on_create:
               body: >
                 this.title = this.get_component("TroikaTextComponent");
             on_tick:
+              args:
+                - td
               body: >
-                this.title.position = [0.5, 1.98 + (Math.sin(+new Date() / 1000 * 1) * 0.04),-0.5];
+                this.title.rotation.y += 3 * td.delta;
+                this.title.position = [0, 2 + (Math.sin(+new Date() / 1000 * 1) * 0.04),-0.5];
