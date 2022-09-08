@@ -9,6 +9,7 @@
  *
  */
 
+import { isNil } from "lodash";
 import SceneComponent from "retro/SceneComponent";
 import { PerspectiveCamera, Matrix4, OrthographicCamera, Vector3 } from 'three';
 
@@ -26,6 +27,7 @@ class CameraComponent extends SceneComponent {
     moved = false
     /**privte */
     prev_camera_matrix = undefined
+    renderer = undefined
     constructor() {
         super(...arguments)
         this.prev_camera_matrix = new Matrix4()
@@ -40,17 +42,41 @@ class CameraComponent extends SceneComponent {
         });
 
         let p_camera = this.subject = this.p_camera = new PerspectiveCamera(this.fov, this.aspect, this.near, this.far);
-
-        this.define_global_var("camera", a => this.subject)
         this.log(`created`, this.meta.params)
-
     }
 
+    on_enable(){
+        if (!this.renderer){
+            this.renderer = this.find_component_of_type("Renderer")
+        }
+        if (this.renderer){
+            this.renderer.set_active_camera(this.subject)
+        }
+    }
+    on_disable(){
+        if (!this.renderer){
+            this.renderer = this.find_component_of_type("Renderer")
+        }
+        this.renderer.set_active_camera(undefined)
+    }
     on_tick() {
+        if (!this.renderer){
+            this.renderer = this.find_component_of_type("Renderer")
+        }
+
+        if (this.renderer){
+            if (isNil(this.renderer.active_camera)){
+                this.renderer.active_camera = this.subject
+            }
+            
+        }
+        
         let current_camera_matrix = this.subject.matrixWorld
         let camera_matrix_changed = !this.prev_camera_matrix.equals(current_camera_matrix)
         this.prev_camera_matrix.copy(current_camera_matrix)
         this.moved = camera_matrix_changed
+
+        this.subject.aspect = this.globals.uniforms.resolution.value.x / this.globals.uniforms.resolution.value.y
     }
 
     save_prefab() {

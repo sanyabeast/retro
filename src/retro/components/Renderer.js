@@ -18,11 +18,17 @@ import {
     Object3D,
     WebGLRenderer,
     PCFSoftShadowMap,
-    DirectionalLight
+    DirectionalLight,
+    ReinhardToneMapping,
+    ACESFilmicToneMapping,
+    CineonToneMapping,
+    LinearToneMapping,
+    OrthographicCamera,
+    PerspectiveCamera
 } from 'three';
 import Device from "retro/utils/Device";
 import { ProgressiveLightMap } from 'three/examples/jsm/misc/ProgressiveLightMap.js';
-import { isArray, isObject, map, debounce, throttle, isNumber } from "lodash-es"
+import { isArray, isObject, map, debounce, throttle, isNumber, isNil } from "lodash-es"
 import { WebGLShadowMap } from "three/src/renderers/webgl/WebGLShadowMap"
 
 const $v3 = new Vector3()
@@ -109,9 +115,10 @@ class Renderer extends Component {
     tick_rate = isNumber(PRESET.RENDERER_UPDATE_RATE) ? PRESET.RENDERER_UPDATE_RATE : 5
     shadowmap_fps = 15
     useOptimizations = true
+    tonemapping = LinearToneMapping
+    tonemapping_exposure = 1
 
     //** private*/
-
     canvas = null
     pixel_ratio = 1
     render_scene = undefined
@@ -136,9 +143,18 @@ class Renderer extends Component {
     original_threejs_webgl_shadowmap_render = undefined
     prev_shadowmap_render_time = +new Date
 
+    persist_orthographic_camera = new OrthographicCamera(-1, 1, -1, 1, 0.01, 1000)
+    persist_perspective_camera = new PerspectiveCamera(60, 1, 0.001, 1000)
+
+    active_render_camera = undefined
+    active_camera = undefined
+
     constructor() {
         super(...arguments)
         this.check_size = throttle(this.check_size.bind(this), 250)
+        this.persist_perspective_camera.position.set(0, 0, 5)
+        this.persist_orthographic_camera.position.set(0, 0, 5)
+        this.active_render_camera = this.persist_perspective_camera
     }
 
     on_create() {
@@ -154,7 +170,7 @@ class Renderer extends Component {
             gizmo: IS_DEV
         }
         let render_scene = this.render_scene = new RenderScene()
-        let renderer = this.renderer = this.globals.renderer = new WebGLRenderer({
+        let renderer = this.renderer = new WebGLRenderer({
             antialias: false,
             alpha: PRESET.RENDERER_ALPHA == true ? true : false,
             preserveDrawingBuffer: PRESET.RENDERER_PRESERVE_DRAWING_BUFFER == true ? true : false,
@@ -163,6 +179,13 @@ class Renderer extends Component {
             depth: this.clear_depth,
             ...renderer_presets[Device.device_type]
         });
+
+        this.define_global_var("renderer", () => {
+            return this.renderer
+        })
+        this.define_global_var("camera", () => {
+            return this.active_render_camera
+        })
 
         if (this.tools.device.is_mobile) {
             this.tools.html.set_style(renderer.domElement, {
@@ -174,7 +197,6 @@ class Renderer extends Component {
         this.setup_progressive_lightmap()
         this.define_global_var("webgl_capabilities", a => renderer.capabilities)
 
-        renderer.toneMappingExposure = 2
         renderer.setClearAlpha(PRESET.RENDERER_ALPHA == true ? 0 : 1)
         renderer.setSize(1000, 1000);
         renderer.physicallyCorrectLights = this.correct_lights
@@ -211,7 +233,9 @@ class Renderer extends Component {
             "clear_depth",
             "shadows_enabled",
             "tonemapping",
-            "rendering_scale"
+            "tonemapping_exposure",
+            "rendering_scale",
+            "active_camera"
         ].concat(super.get_reactive_props())
     }
     update_resolution_scale() {
@@ -244,6 +268,31 @@ class Renderer extends Component {
                     this.renderer.shadowMap.enabled = this.shadows_enabled && !Device.is_mobile
                     break
                 }
+                case "tonemapping": {
+                    this.renderer.toneMapping = this.tonemapping
+                    break
+                }
+                case "tonemapping_exposure": {
+                    this.renderer.toneMappingExposure = this.tonemapping_exposure
+                    break
+                }
+                case "active_camera": {
+                    if (!isNil(this.active_camera)) {
+                        switch (this.active_camera.type) {
+                            case "OrthographicCamera": {
+                                this.active_render_camera = this.persist_orthographic_camera
+                                break;
+                            }
+                            default: {
+                                this.active_render_camera = this.persist_perspective_camera
+                                break;
+                            }
+                        }
+                    } else {
+                        this.active_camera = undefined
+                    }
+                    break;
+                }
             }
         })
     }
@@ -252,7 +301,7 @@ class Renderer extends Component {
     }
     compile() {
         this.update_render_scene()
-        let camera = this.find_component_of_type("CameraComponent").subject
+        let camera = this.active_render_camera
         if (camera) {
             this.renderer.compile(this.render_scene, camera)
         }
@@ -407,26 +456,25 @@ class Renderer extends Component {
         this.progressive_lightmap.scene.add(this.progressive_lightmap_dirlight)
     }
     accumulate_progressive_lightmap() {
-        let camera = this.find_component_of_type("CameraComponent")
-        this.progressive_lightmap.update(camera.subject, 200, true);
+        let camera = this.active_render_camera
+        this.progressive_lightmap.update(camera, 200, true);
     }
     add_object_to_lightmap(object) {
         this.progressive_lightmap.addObjectsToLightMap(object)
     }
     render() {
         let scene = this.globals.app
-        let camera = this.find_component_of_type("CameraComponent")
+        let camera = this.active_render_camera
 
-        if (camera) {
-            this.just_rendered = true
-            this.update_render_scene()
-            scene.update_transform()
-            if (this.custom_render_function === undefined || this.use_postfx === false) {
-                this.renderer.render(this.render_scene, camera.subject)
-                // this.renderer.clear(true, true, true)   
-            } else {
-                this.custom_render_function(this.render_scene, camera.subject)
-            }
+        this.just_rendered = true
+        this.update_camera()
+        this.update_render_scene()
+        scene.update_transform()
+        if (this.custom_render_function === undefined || this.use_postfx === false) {
+            this.renderer.render(this.render_scene, camera)
+            // this.renderer.clear(true, true, true)   
+        } else {
+            this.custom_render_function(this.render_scene, camera)
         }
     }
     set_render_layer_name(mode = "rendering") {
@@ -478,11 +526,11 @@ class Renderer extends Component {
         this.render_scene.overrideMaterial = this.current_override_material
     }
     check_size() {
-        if (!this.globals.dom){
+        if (!this.globals.dom) {
             return;
         }
-        
-        let camera = this.find_component_of_type("CameraComponent")
+
+        let camera = this.active_render_camera
         let new_rect;
 
         if (this.force_resolution !== undefined) {
@@ -501,7 +549,6 @@ class Renderer extends Component {
             this.globals.uniforms.resolution2.value.set(1 / new_rect.width, 1 / new_rect.height)
             this.globals.need_render = true
             this.resolution.set(new_rect.width, new_rect.height)
-            camera.aspect = this.globals.uniforms.resolution.value.x / this.globals.uniforms.resolution.value.y
         }
         this.globals.dom_rect = new_rect;
     }
@@ -532,7 +579,6 @@ class Renderer extends Component {
 
         return bounds
     }
-
     get_frame_image_data(format) {
         switch (format) {
             default: {
@@ -541,14 +587,49 @@ class Renderer extends Component {
             }
         }
     }
-    set_background_brightness(val){
+    set_background_brightness(val) {
         this.renderer.webgl_background.set_brightness(val)
     }
-    set_background_tint(val){
+    set_background_tint(val) {
         this.renderer.webgl_background.set_tint(val)
     }
+    update_camera() {
+        if (!isNil(this.active_camera)) {
+            switch (this.active_camera.type) {
+                case "OrthographicCamera": {
 
+                    break;
+                }
+                default: {
+                    //this.active_render_camera.matrixWorld.copy(this.active_camera.matrixWorld)
+                    let proj_matrix_needs_update = false
 
+                    this.active_render_camera.near = this.active_camera.near
+                    this.active_render_camera.far = this.active_camera.far
 
+                    this.active_render_camera.position.copy(this.active_camera.position)
+                    this.active_render_camera.scale.copy(this.active_camera.scale)
+                    this.active_render_camera.rotation.copy(this.active_camera.rotation)
+
+                    if (this.active_render_camera.aspect !== this.active_camera.aspect) {
+                        this.active_render_camera.aspect = this.active_camera.aspect
+                        proj_matrix_needs_update = true
+                    }
+
+                    if (this.active_render_camera.fov !== this.active_camera.fov) {
+                        this.active_render_camera.fov = this.active_camera.fov
+                        proj_matrix_needs_update = true
+                    }
+
+                    if (proj_matrix_needs_update) {
+                        this.active_render_camera.updateProjectionMatrix()
+                    }
+
+                    // this.active_render_camera.position.copy(this.active_camera.position)
+                    // this.active_render_camera.position.copy(this.active_camera.position)
+                }
+            }
+        }
+    }
 }
 export default Renderer;

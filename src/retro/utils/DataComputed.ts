@@ -3,6 +3,8 @@
  *
  */
 
+import { isFunction } from "lodash";
+
 export default class DataComputed<T> {
     value: Function = function () { };
     cached_value: T | undefined
@@ -11,10 +13,16 @@ export default class DataComputed<T> {
     changed: boolean = true
     constructor(v: () => T, throttle: number = 1) {
         this.throttle = throttle
-        this.value = v;
+        this.set(v)
     }
     set(v: Function): void {
-        this.value = v;
+        if (isFunction(v)){
+            this.value = v;
+        } else {
+            
+            // throw new Error(`computed value has no computing function. plz provide`)
+        }
+        
     }
     get(): T {
         let r = this.cached_value;

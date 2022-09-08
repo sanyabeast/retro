@@ -62,8 +62,9 @@ namespace Retro {
 
                 frame.add_button("|", "", i => i, "#ffffff")
                 frame.add_button("PSFX", "Postprocessing toggle", (button) => {
-                    app.refs.renderer.use_postfx = !app.refs.renderer.use_postfx
-                    button.set_active(app.refs.renderer.use_postfx)
+                    let postfx = app.find_component_of_type("Postprocessing") as any
+                    postfx.enabled = !postfx.enabled
+                    button.set_active(postfx.enabled)
                 }, "#cddc39", a => app.refs.renderer.use_postfx)
                 frame.add_button("FFX", "Fidelity FX toggls", (button) => {
                     let postfx = app.find_component_of_type("Postprocessing") as any

@@ -176,6 +176,7 @@ function setValueV2f( gl, v ) {
 
 	const cache = this.cache;
 
+
 	if (v != undefined){
 		v = v.valueOf()
 	}

@@ -169,7 +169,7 @@ class SceneComponent extends Component {
 						break
 					}
 					case "render_order": {
-						scene.renderOrder = this.render_order;
+						//scene.renderOrder = this.render_order;
 						break
 					}
 				}

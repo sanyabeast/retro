@@ -21,6 +21,7 @@
         <DefaultScene v-if="active_scene_index === 0" />
         <OneMoreScene v-if="active_scene_index === 1" />
         <EvenOneMoreScene v-if="active_scene_index === 2" />
+        <Cornell v-if="active_scene_index === 3" />
 
     </div>
 </template>
@@ -29,10 +30,11 @@
 import DefaultScene from "./comps/DefaultScene"
 import OneMoreScene from "./comps/OneMoreScene"
 import EvenOneMoreScene from "./comps/EvenOneMoreScene"
+import Cornell from "./comps/Cornell"
 
 export default {
     name: "Main",
-    components: { DefaultScene, OneMoreScene, EvenOneMoreScene },
+    components: { DefaultScene, OneMoreScene, EvenOneMoreScene, Cornell },
     data() {
         return {
             default_orbit_control_params: {
@@ -40,7 +42,7 @@ export default {
                 target: [0.03767997569932003, 0.7096796787072052, 0.0013812853566007584],
                 zoom: 1
             },
-            active_scene_index: 1,
+            active_scene_index: 0,
             scenes: [
                 {
                     name: "Default",
@@ -67,6 +69,15 @@ export default {
                     orbit: {
                         position: [5.660666380532865, 5.032615474101596, -7.424760544009651],
                         target: [3.20915372639969, 1.6426733064675614, 1.2838366079394254]
+                    }
+                },
+                {
+                    name: "Cornell",
+                    time: 0.6,
+                    day_speed: 0,
+                    orbit: {
+                        position: [0.447998442066265, 1.5733136624828687, -3.1536275521533788],
+                        target: [-0.0864485980027549, 0.11978348771564601, 2.119004970766437]
                     }
                 }
             ]

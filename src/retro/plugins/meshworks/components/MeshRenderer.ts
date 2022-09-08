@@ -133,7 +133,6 @@ export class MeshRenderer extends SceneComponent {
 							mat.normalScale.y *= this.normal_scale
 							mat.bumpScale * this.bump_scale
 							mat.emissiveIntensity *= this.emission_scale
-
 						}
 
 						if (isString(this.hide_object) && this.hide_object === child.name) {

@@ -1,4 +1,4 @@
-import { Object3D, WebGLRenderer } from "three";
+import { Object3D, WebGLRenderer, Scene, Camera } from "three";
 import GameObject from "../GameObject";
 import DeviceData from "../utils/Device";
 
@@ -134,6 +134,12 @@ declare global {
     interface IGlobalsDict {
         now: number
         renderer?: WebGLRenderer
+        camera: Camera
+        uniforms: {
+            [x: string]: {
+                value: any
+            }
+        }
     }
 
     interface IRetroObject { }
@@ -156,6 +162,13 @@ declare global {
     interface IRendererComponent extends IRetroComponent {
         target_fps: number
         rendering_scale: number
+        renderer: WebGLRenderer
+        render_scene: Scene
+        custom_render_function?: (scene: Scene, camera: Camera) => void
+        clear_depth: boolean
+        clear_stencil: boolean
+        tonemapping: number
+        tonemapping_exposure: number
     }
 
     interface IAudioListenerComponent extends IRetroComponent {
