@@ -27,10 +27,10 @@ class Sun extends SceneComponent {
     sun_size = 3
 
     d_amb_color = "#ffffff"
-    n_amb_color = "#ffffff"
+    n_amb_color = "#eeeeff"
 
     d_amb_intensity = 5
-    n_amb_intensity = 1
+    n_amb_intensity = 0.1
 
     /**common */
     shadows_enabled = true
@@ -56,6 +56,9 @@ class Sun extends SceneComponent {
 
     /**fog */
     use_fog = true
+
+    /**skybox */
+    use_skybox = true
 
 
     /**private */
@@ -122,11 +125,11 @@ class Sun extends SceneComponent {
 
 
         sphere.scale.set(this.sun_size, this.sun_size, this.sun_size)
-        
+
 
         this.skybox = this.find_component_of_type("SkyBox")
     }
-    on_destroy(){
+    on_destroy() {
         super.on_destroy()
     }
     get_render_data() {
@@ -175,7 +178,7 @@ class Sun extends SceneComponent {
                     this.position[0] = pos_x
                     this.position[1] = pos_y
                     this.position[2] = pos_z
-                    
+
                     let intensity = this.tools.math.lerp(this.n_intensity, this.d_intensity, Math.pow(p, 2))
                     this.light.intensity = intensity * this.global_intensity
                     let emissive = this.tools.math.lerp(this.n_emissive, this.d_emissive, p)
@@ -189,17 +192,19 @@ class Sun extends SceneComponent {
 
                     this.amb_light.color.set_any(c_amb_color)
                     this.amb_light.intensity = amb_intensity * this.global_intensity
-                    
-                    if (this.use_fog && this.fog_comp){
+
+                    if (this.use_fog && this.fog_comp) {
                         this.fog_comp.color = this.tools.math.multiply(c_amb_color, this.tools.math.clamp(p, 0, 0.5))
                     }
 
-                    if (this.use_skybox && this.skybox){
-                        this.skybox
-                    }
+                    if (this.use_skybox) {
+                        this.skybox = this.skybox ?? this.find_component_of_type("SkyBox");
+                        if (this.skybox) {
+                            this.skybox.brightness = (this.tools.math.lerp(this.d_background_intensity, this.n_background_intensity, 1 - p));
+                            this.skybox.tint_color = (this.tools.math.lerp(hex_to_rgb(this.d_amb_color), hex_to_rgb(this.n_amb_color), 1 - p));
+                        }
 
-                    this.renderer_component.set_background_brightness(this.tools.math.lerp(this.d_background_intensity, this.n_background_intensity, 1-p));
-                    this.renderer_component.set_background_tint(this.tools.math.lerp(hex_to_rgb(this.d_amb_color), hex_to_rgb(this.n_amb_color), 1-p));
+                    }
 
                     break
                 }
@@ -224,6 +229,7 @@ class Sun extends SceneComponent {
     }
     on_tick(time_data) {
         super.on_tick(time_data)
+
         if (this.cycling > 0) {
             let step = (1 / 86400) * this.cycling * time_data.delta
             this.time = (this.time + step) % 1

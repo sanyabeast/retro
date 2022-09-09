@@ -12,7 +12,7 @@ import { isNil } from "lodash-es";
 let page_reloading_requesting: Boolean = false
 
 
-class RetroApp extends GameObject {
+class RetroApp extends GameObject implements IRetroApp {
     /**private */
     dom: HTMLElement = undefined
     stage: GameObject = undefined

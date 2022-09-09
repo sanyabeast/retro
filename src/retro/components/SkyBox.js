@@ -14,20 +14,25 @@ class SkyBox extends SceneComponent {
     color = "#ffffff"
     cubemap = undefined
     cubemap_format = undefined
+    cubemap_gamma = 1
     texture = undefined
     light_probe_enabled = false
-    light_probe_intensity = 0.1
+    light_probe_intensity = 0.45
     /**private */
     scene_background = undefined
     refraction_map = undefined
     light_probe = undefined
     light_probe_updated = false
+    brightness = 1
+    tint_color = "#ffffff"
     get_reactive_props() {
         return [
             "cubemap",
             "light_probe_intensity",
             "light_probe_enabled",
-            super.get_reactive_props()
+            "brightness",
+            "tint_color",
+            ...super.get_reactive_props()
         ]
     }
     on_update(props) {
@@ -68,6 +73,12 @@ class SkyBox extends SceneComponent {
                         this.light_probe_updated = true
                     }
                 }
+                case "brightness": {
+                    this.renderer_component.set_background_brightness(this.brightness + (1 - this.cubemap_gamma))
+                }
+                case "tint_color": {
+                    this.renderer_component.set_background_tint(this.tint_color)
+                }
             }
         })
     }
@@ -81,6 +92,7 @@ class SkyBox extends SceneComponent {
         ]
     }
     on_create() {
+        this.renderer_component = this.find_component_of_type("Renderer");
         let light_probe = this.light_probe = new LightProbe()
         light_probe.intensity = this.light_probe_intensity
     }

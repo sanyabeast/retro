@@ -3,8 +3,8 @@
         <R_Object>
             <R_Sun :params="{
                 global_intensity: 0.5,
-                cycling: 4,
-                time: 0.8,
+                cycling: 16,
+                time: 0.1,
             }" />
             <R_OrbitControlsComponent :params="{
                 position: [0.6771750234492657, 0.713310910409051, -2.203436932973154],
@@ -12,7 +12,8 @@
             }" />
             <R_SkyBox :params="{
                 cubemap: 'res/retro/plugins/extra-assets/cubemaps/nalovardo_1',
-                cubemap_format: 'jpg'
+                cubemap_format: 'jpg',
+                cubemap_gamma: 0.1
             }" />
             <R_Fog :params="{
                 density: 0.01

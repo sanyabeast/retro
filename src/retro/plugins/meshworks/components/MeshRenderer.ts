@@ -34,7 +34,10 @@ enum ModelFormats {
 interface SkAction {
 	action?: AnimationAction
 	weight: number
+	is_pose: boolean
 }
+
+const pose_duration_treshold = 0.09 // s
 
 export class MeshRenderer extends SceneComponent {
 	public src: string = "";
@@ -206,13 +209,10 @@ export class MeshRenderer extends SceneComponent {
 					for (let i = 0; i !== found_actions_count; ++i) {
 						let clip = animations[i];
 						const name = clip.name;
-						if (isNil(first_animation_name)){
-							first_animation_name = name;
-						}
-						
 						this.actions[name] = {
-							weight: 1,
-							action: mixer.clipAction(clip)
+							weight: i === 0 ? 1 : 0,
+							action: mixer.clipAction(clip),
+							is_pose: clip.duration < pose_duration_treshold
 						}
 					}
 
@@ -221,9 +221,9 @@ export class MeshRenderer extends SceneComponent {
 					roughness_mipmapper.dispose();
 					// render();
 
-					if (!isNil(first_animation_name)){
-						this.start_action(first_animation_name)
-					}
+					forEach(this.actions, (action, name) => {
+						this.start_action(name)
+					})
 
 					this.scene = scene;
 					resolve();

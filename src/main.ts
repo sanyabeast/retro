@@ -37,47 +37,32 @@ namespace Retro {
                 try {
                     document.querySelector('body > .version').innerHTML = PACKAGE_DATA.version
                 } catch (err) { }
-                frame.add_button("RNDR", "View Final Render", () => {
+                frame.add_button("RENDER", "View Final Render", () => {
                     app.refs.renderer.set_render_layer_name("rendering")
                 }, "#9c27b0")
-                frame.add_button("GZMO", "Toggle Gizmos", (button) => {
+                frame.add_button("GIZMO", "Toggle Gizmos", (button) => {
                     app.refs.renderer.rendering_layers.gizmo = !app.refs.renderer.rendering_layers.gizmo
                     button.set_active(app.refs.renderer.rendering_layers.gizmo)
                 }, "#f44336", a => app.refs.renderer.rendering_layers.gizmo)
-                frame.add_button("NRML", "View Normals", () => {
+                frame.add_button("NORMAL", "View Normals", () => {
                     app.refs.renderer.set_render_layer_name("normal")
                 }, "#7e6ae5")
-                frame.add_button("DPTH", "View Depth", () => {
+                frame.add_button("DEPTH", "View Depth", () => {
                     app.refs.renderer.set_render_layer_name("depth")
                 }, "#e91e63")
-                frame.add_button("WRFM", "View Wireframe", () => {
+                frame.add_button("WIREFRAME", "View Wireframe", () => {
                     app.refs.renderer.set_render_layer_name("wireframe")
                 }, "#fe8dff")
-                frame.add_button("MTCP", "View Matcap", () => {
+                frame.add_button("MATCAP", "View Matcap", () => {
                     app.refs.renderer.set_render_layer_name("matcap")
                 }, "#e91e1e")
-                frame.add_button("CLID", "Color Id", () => {
-                    app.refs.renderer.set_render_layer_name("colorid")
-                }, "#4b00ff")
 
                 frame.add_button("|", "", i => i, "#ffffff")
-                frame.add_button("PSFX", "Postprocessing toggle", (button) => {
+                frame.add_button("POSTFX", "Postprocessing toggle", (button) => {
                     let postfx = app.find_component_of_type("Postprocessing") as any
                     postfx.enabled = !postfx.enabled
                     button.set_active(postfx.enabled)
                 }, "#cddc39", a => app.refs.renderer.use_postfx)
-                frame.add_button("FFX", "Fidelity FX toggls", (button) => {
-                    let postfx = app.find_component_of_type("Postprocessing") as any
-                    if (!postfx) return
-                    postfx.use_ffx = !postfx.use_ffx
-                    button.set_active(postfx.use_ffx)
-                }, "#cddc39", a => app.find_component_of_type("Postprocessing") ? (app.find_component_of_type("Postprocessing") as any).use_ffx : false)
-                frame.add_button("SSGI", "Screen Space Global Illumination Toggle", (button) => {
-                    let postfx = app.find_component_of_type("Postprocessing") as any
-                    if (!postfx) return
-                    postfx.use_ssgi = !postfx.use_ssgi
-                    button.set_active(postfx.use_ssgi)
-                }, "#cddc39", a => app.find_component_of_type("Postprocessing") ? (app.find_component_of_type("Postprocessing") as any).use_ssgi : false)
                 frame.add_button("FOG", "Toggle Fog", () => {
                     app.refs.renderer.use_fog = !app.refs.renderer.use_fog
                 }, "#6fdc39")

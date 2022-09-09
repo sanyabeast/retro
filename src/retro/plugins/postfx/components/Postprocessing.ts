@@ -50,8 +50,8 @@ class Postprocessing extends Component {
         radius: 0
     }, {
         exposure: 1,
-        strength: 0.265,
-        treshold: 0.265,
+        strength: 0.3,
+        treshold: 0.225,
         radius: 0.5
     })
 

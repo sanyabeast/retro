@@ -214,7 +214,7 @@ class SceneComponent extends Component {
 		]
 	}
 
-	static DEFAULT = {
+	static DEFAULT: IGameObjectPrefab = {
 		position: [0, 0, 0],
 		scale: [1, 1, 1],
 		rotation: [0, 0, 0]

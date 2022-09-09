@@ -4,7 +4,7 @@
             <R_Sun :params="{
                 global_intensity: 1,
                 cycling: 8,
-                time: 0.6,
+                time: 0,
             }" />
             <R_MapControlsComponent :params="{
                 position: [16.619918756677336, 2.656135238693106, -15.688689921895433],
@@ -12,7 +12,8 @@
             }" />
             <R_SkyBox :params="{
                 cubemap: 'res/retro/plugins/extra-assets/cubemaps/tantolunden_1',
-                cubemap_format: 'jpg'
+                cubemap_format: 'jpg',
+                cubemap_gamma: 0.8
             }" />
             <R_Fog :params="{
                 density: 0.01

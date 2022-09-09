@@ -3,8 +3,8 @@
         <R_Object>
             <R_Sun :params="{
                 global_intensity: 1,
-                cycling: 512,
-                time: 0.3,
+                cycling: 1024,
+                time: 0.5,
             }" />
             <R_OrbitControlsComponent :params="{
                 position: [4.478374654333801, -0.15902620548700136, -2.4388380423563714],
@@ -12,7 +12,8 @@
             }" />
             <R_SkyBox :params="{
                 cubemap: 'res/retro/plugins/extra-assets/cubemaps/nissi_beach_1',
-                cubemap_format: 'jpg'
+                cubemap_format: 'jpg',
+                cubemap_gamma: 1.2
             }" />
             <R_Fog :params="{
                 density: 0.05

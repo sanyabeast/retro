@@ -3,16 +3,17 @@
         <R_Object>
             <R_Sun :params="{
                 global_intensity: 1,
-                cycling: 16,
-                time: 0.7,
+                cycling: 1,
+                time: 0.25,
             }" />
             <R_OrbitControlsComponent :params="{
-                position: [0.6771750234492657, 0.713310910409051, -2.203436932973154],
-                target: [-0.14573447685923396, 0.8348631412120733, 1.749587158542458]
+                position:[-0.1752421164654105, 1.0710630744243492, 2.640019650461639],
+                target:[0.0035584294804567322, 0.9388281297505157, 0.876047726004135]
             }" />
             <R_SkyBox :params="{
-                cubemap: 'res/retro/plugins/extra-assets/cubemaps/tantolunden_1',
-                cubemap_format: 'jpg'
+                cubemap: 'res/retro/plugins/extra-assets/cubemaps/cntower_1',
+                cubemap_format: 'jpg',
+                cubemap_gamma: 2
             }" />
             <R_Fog :params="{
                 density: 0.03
@@ -26,7 +27,6 @@
                     rotation: [0, 0, 0],
                     position: [0, 0, 0],
                     src: 'res/retro/plugins/extra-assets/models/xbot.glb',
-                    override_texture_filter: 'NearestFilter',
                     emission_scale: 0
                 }" />
             </R_Object>
@@ -42,7 +42,7 @@ export default {
     mixins: [BaseScene],
     data() {
         return {
-            fov: 90
+            fov: 45
         }
     },
     mounted() { },

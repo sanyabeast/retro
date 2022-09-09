@@ -141,7 +141,6 @@ export default class Component extends BasicObject implements IRetroComponent {
     get tasks () { return this.game_object.tasks }
 }
 
-
 /**inline components (components that logic is confgured directly in prefab using special syntax (see retro/SCHEMA.yaml -> COMPONENT)) */
 Component.create = (params: IGameObjectPrefabInlineComponentDeclaration, name: string) => {
     name = isString(name) ? name : `Component_${makeid(16, false, true, false)}`

@@ -68,17 +68,6 @@ Object3D.prototype.updateMatrixWorld = function (force) {
     this.children.forEach(child => child.updateMatrixWorld(force))
 }
 
-let shadowmap_fps = 10
-let original_threejs_webgl_shadowmap_render = WebGLShadowMap.prototype.render
-WebGLShadowMap.prototype.render = function (lights, scene, camera) {
-    let now = +new Date
-    this.prev_render_time = this.prev_render_time || now
-    let delta = now - this.prev_render_time
-    if (delta > (1000 / shadowmap_fps)) {
-        this.prev_render_time = now
-        original_threejs_webgl_shadowmap_render.call(this, lights, scene, camera)
-    }
-}
 
 /**!THREEJS PATCHES */
 
@@ -111,9 +100,7 @@ class Renderer extends Component {
     use_fog = undefined
     correct_lights = true
     current_matcap_id = 1
-    shadows_enabled = true
     tick_rate = isNumber(PRESET.RENDERER_UPDATE_RATE) ? PRESET.RENDERER_UPDATE_RATE : 5
-    shadowmap_fps = 15
     useOptimizations = true
     tonemapping = ACESFilmicToneMapping
     tonemapping_exposure = 1
@@ -139,9 +126,6 @@ class Renderer extends Component {
 
     object_layers = undefined
     zero_object = new Object3D()
-
-    original_threejs_webgl_shadowmap_render = undefined
-    prev_shadowmap_render_time = +new Date
 
     persist_orthographic_camera = new OrthographicCamera(-1, 1, -1, 1, 0.01, 1000)
     persist_perspective_camera = new PerspectiveCamera(60, 1, 0.01, 1000)
@@ -190,7 +174,6 @@ class Renderer extends Component {
         }
 
         /**lightmap */
-        this.setup_progressive_lightmap()
         this.define_global_var("webgl_capabilities", a => renderer.capabilities)
 
         renderer.setClearAlpha(PRESET.RENDERER_ALPHA == true ? 0 : 1)
@@ -201,16 +184,6 @@ class Renderer extends Component {
         if (this.globals.transparent_background) {
             renderer.setClearColor(0x000000, 0);
         }
-
-        /**shadowmap */
-        renderer.shadowMap.enabled = this.shadows_enabled && !Device.is_mobile
-        renderer.shadowMap.type = PCFSoftShadowMap
-        renderer.shadowMap.autoUpdate = false
-
-        /**@TODO:move shadowmap patch to prototype of WebGLShadowMap class ? */
-        let original_threejs_webgl_shadowmap_render = this.original_threejs_webgl_shadowmap_render = renderer.shadowMap.render
-        renderer.shadowMap.render = this.render_shadowmap.bind(this)
-
 
         this.globals.uniforms.pixel_ratio.value = this.pixel_ratio
         this.update_resolution_scale();
@@ -234,7 +207,6 @@ class Renderer extends Component {
         return [
             "clear_stencil",
             "clear_depth",
-            "shadows_enabled",
             "tonemapping",
             "tonemapping_exposure",
             "rendering_scale",
@@ -265,10 +237,6 @@ class Renderer extends Component {
                 }
                 case "auto_clear": {
                     this.renderer.autoClear = this.auto_clear
-                    break
-                }
-                case "shadows_enabled": {
-                    this.renderer.shadowMap.enabled = this.shadows_enabled && !Device.is_mobile
                     break
                 }
                 case "tonemapping": {
@@ -319,7 +287,6 @@ class Renderer extends Component {
         if (this.just_rendered) {
             this.just_rendered = false
             this.update_object_layers()
-            if (this.use_progressive_lightmap) this.update_progressive_lightmap()
             this.check_size()
             this.render_list = this.get_rendering_list()
         }
@@ -424,44 +391,6 @@ class Renderer extends Component {
             this.render_scene.updateMatrixWorld()
         }
     }
-    update_progressive_lightmap() {
-
-        let children = []
-        this.render_scene.traverse((c) => {
-            if (c.isMesh) {
-                children.push(c)
-            }
-        })
-
-        let sun = this.find_component_of_type("Sun")
-        if (sun) {
-            this.progressive_lightmap_dirlight.position.set(...sun.position)
-            // this.progressive_lightmap_dirlight.color.set_any(1, 1, 1)
-            this.progressive_lightmap_dirlight.intensity = sun.subject.intensity
-        }
-
-        this.progressive_lightmap.addObjectsToLightMap(children)
-
-    }
-    setup_progressive_lightmap() {
-        let renderer = this.renderer
-        this.progressive_lightmap = new ProgressiveLightMap(renderer, 1024);
-        let dirlight = this.progressive_lightmap_dirlight = new DirectionalLight(0xffffff, 1.0)
-        dirlight.castShadow = true;
-        dirlight.shadow.camera.near = 100;
-        dirlight.shadow.camera.far = 5000;
-        dirlight.shadow.camera.right = 150;
-        dirlight.shadow.camera.left = - 150;
-        dirlight.shadow.camera.top = 150;
-        dirlight.shadow.camera.bottom = - 150;
-        dirlight.shadow.mapSize.width = 512;
-        dirlight.shadow.mapSize.height = 512;
-        this.progressive_lightmap.scene.add(this.progressive_lightmap_dirlight)
-    }
-    accumulate_progressive_lightmap() {
-        let camera = this.active_render_camera
-        this.progressive_lightmap.update(camera, 200, true);
-    }
     add_object_to_lightmap(object) {
         this.progressive_lightmap.addObjectsToLightMap(object)
     }
@@ -555,15 +484,6 @@ class Renderer extends Component {
         }
         this.globals.dom_rect = new_rect;
     }
-    render_shadowmap(lights, scene, camera) {
-        let now = +new Date
-        let delta = now - this.prev_shadowmap_render_time
-        if (delta > (1000 / this.shadowmap_fps)) {
-            this.prev_shadowmap_render_time = now
-            this.original_threejs_webgl_shadowmap_render.call(this.renderer.shadowMap, lights, scene, camera)
-            this.renderer.shadowMap.needsUpdate = true
-        }
-    }
     get_camera_bounds(z_position = 0) {
         let camera = this.globals.camera
         camera.getWorldPosition($v3)
@@ -605,7 +525,7 @@ class Renderer extends Component {
                 }
                 default: {
                     //this.active_render_camera.matrixWorld.copy(this.active_camera.matrixWorld)
-                    
+
 
                     this.active_render_camera.near = this.active_camera.near
                     this.active_render_camera.far = this.active_camera.far

@@ -1,4 +1,5 @@
 import { Object3D, WebGLRenderer, Scene, Camera } from "three";
+import RetroApp from "../App";
 import GameObject from "../GameObject";
 import DeviceData from "../utils/Device";
 
@@ -12,7 +13,7 @@ declare global {
 
     interface Window {
         on_click_to_start: Function,
-        app: App
+        app: IRetroApp
         editor_app: any,
         editor_store: any,
         _frame: Frame,
@@ -24,7 +25,13 @@ declare global {
         rm: any
     }
 
-    class App { }
+    interface IRetroApp {
+        load_stage: Function
+        unload_stage: Function
+        reload_stage: Function
+        start: Function
+    }
+
     class Frame { }
 
     class PackageDataDict {
@@ -68,9 +75,9 @@ declare global {
     }
 
     interface IRetroComponentGizmoRenderDataItem {
-        object: Object3D
-        parent: Object3D
-        layers: {
+        object?: Object3D
+        parent?: Object3D
+        layers?: {
             [x: string]: boolean
         }
     }
@@ -97,14 +104,14 @@ declare global {
         }
         reactivated: boolean,
         layers: {
-            rendering: boolean
-            normal: boolean
-            raycast: boolean
-            collision: boolean
-            gizmo: boolean
-            lights: boolean
-            include: Array<string>
-            exclude: Array<string>
+            rendering?: boolean
+            normal?: boolean
+            raycast?: boolean
+            collision?: boolean
+            gizmo?: boolean
+            lights?: boolean
+            include?: Array<string>
+            exclude?: Array<string>
         }
         params_applied: boolean,
         ticking: IRetroObjectTimeData
@@ -135,6 +142,8 @@ declare global {
         now: number
         renderer?: WebGLRenderer
         camera: Camera
+        dom?: HTMLElement
+        app: RetroApp
         uniforms: {
             [x: string]: {
                 value: any
