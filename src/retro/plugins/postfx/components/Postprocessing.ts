@@ -8,19 +8,74 @@ import Component from "retro/Component";
 import ResourceManager from "retro/ResourceManager";
 import { EffectComposer } from 'retro/lib/three/examples/jsm/postprocessing/EffectComposer.js';
 import { SSAOPass } from 'retro/lib/three/examples/jsm/postprocessing/SSAOPass.js';
+import { SAOPass } from 'retro/lib/three/examples/jsm/postprocessing/SAOPass.js';
+import { ShaderPass } from 'retro/lib/three/examples/jsm/postprocessing/ShaderPass.js';
 import { RenderPass } from 'retro/lib/three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'retro/lib/three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { GammaCorrectionShader } from 'retro/lib/three/examples/jsm/shaders/GammaCorrectionShader.js';
 import { ACESFilmicToneMapping, Camera, NoToneMapping, ReinhardToneMapping, Scene, Vector2 } from "three";
+import { lerp } from "retro/utils/Tools"
+
+interface PostprocessingEffectParams {
+    [x: string]: any
+}
+
+class PostprocessingEffectDescriptor {
+    power: number = 1
+    pass?: any
+    params?: PostprocessingEffectParams
+    min: PostprocessingEffectParams
+    max: PostprocessingEffectParams
+    get enabled(): boolean {
+        return this.power > 0;
+    }
+    constructor(min: PostprocessingEffectParams, max: PostprocessingEffectParams, value: number = 1) {
+        this.min = min
+        this.max = max
+        this.power = value
+        this.generate_params()
+    }
+    private generate_params(power: number = 1) {
+        this.params = lerp(this.min, this.max, power);
+    }
+}
 
 class Postprocessing extends Component {
     public static DEFAULT = {}
 
-    public bloom_params = {
+    public bloom: PostprocessingEffectDescriptor = new PostprocessingEffectDescriptor({
         exposure: 1,
-        strength: 0.25,
+        strength: 0,
         treshold: 0.25,
+        radius: 0
+    }, {
+        exposure: 1,
+        strength: 0.265,
+        treshold: 0.265,
         radius: 0.5
-    }
+    })
+
+    public sao: PostprocessingEffectDescriptor = new PostprocessingEffectDescriptor({
+        saoBias: 0,
+        saoIntensity: 0,
+        saoScale: 0,
+        saoKernelRadius: 0,
+        saoMinResolution: 0,
+        saoBlur: true,
+        saoBlurRadius: 0,
+        saoBlurStdDev: 0,
+        saoBlurDepthCutoff: 0
+    }, {
+        saoBias: 5,
+        saoIntensity: 0.001,
+        saoScale: 1,
+        saoKernelRadius: 150,
+        saoMinResolution: 0,
+        saoBlur: true,
+        saoBlurRadius: 8,
+        saoBlurStdDev: 4,
+        saoBlurDepthCutoff: 0.01
+    })
 
     protected renderer: IRendererComponent
     protected composer: EffectComposer
@@ -35,32 +90,58 @@ class Postprocessing extends Component {
         let composer = this.composer = new EffectComposer(this.renderer.renderer);
 
         let camera = this.globals.camera
+        let scene = renderer.render_scene
 
-        const renderScene = new RenderPass( renderer.render_scene, camera );
+        const renderScene = new RenderPass(scene, camera);
 
-        const bloomPass = new UnrealBloomPass( new Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-        bloomPass.threshold = this.bloom_params.treshold;
-        bloomPass.strength = this.bloom_params.strength;
-        bloomPass.radius = this.bloom_params.radius;
+        /**bloom */
+        const bloomPass = this.bloom.pass = new UnrealBloomPass(new Vector2(1, 1), 1.5, 0.4, 0.85);
+        bloomPass.threshold = this.bloom.params.treshold;
+        bloomPass.strength = this.bloom.params.strength;
+        bloomPass.radius = this.bloom.params.radius;
 
+        /**sao */
+        let saoPass = this.sao.pass = new SAOPass(scene, camera, false, true);
+        saoPass.params.output = parseInt(SAOPass.OUTPUT.Default)
+        // saoPass.params.output = 0
+        saoPass.params.saoBias = this.sao.params.saoBias
+        saoPass.params.saoIntensity = this.sao.params.saoIntensity
+        saoPass.params.saoScale = this.sao.params.saoScale
+        saoPass.params.saoKernelRadius = this.sao.params.saoKernelRadius
+        saoPass.params.saoMinResolution = this.sao.params.saoMinResolution
+        saoPass.params.saoBlur = this.sao.params.saoBlur
+        saoPass.params.saoBlurRadius = this.sao.params.saoBlurRadius
+        saoPass.params.saoBlurStdDev = this.sao.params.saoBlurStdDev
+        saoPass.params.saoBlurDepthCutoff = this.sao.params.saoBlurDepthCutoff
+
+        /**gamma corr */
+        const gammaCorrection = new ShaderPass( GammaCorrectionShader );
+
+
+        /**adding passes */
         composer.addPass(renderScene)
+        composer.addPass(gammaCorrection)
         composer.addPass(bloomPass)
+        
+        // composer.addPass(saoPass)
+
+
     }
     override on_enable() {
         let renderer = this.renderer
         if (renderer) {
             renderer.custom_render_function = this.postfx_render_function
             renderer.tonemapping = ACESFilmicToneMapping
-            renderer.tonemapping_exposure = 0.85
+            renderer.tonemapping_exposure = 1
             // renderer.clear_depth = false
             // renderer.clear_stencil = false
         }
     }
-    override on_tick(td: IRetroObjectTimeData){
+    override on_tick(td: IRetroObjectTimeData) {
         this.composer.setSize(
             this.globals.uniforms.resolution.value.x,
             this.globals.uniforms.resolution.value.y
-        )   
+        )
     }
     override on_disable() {
         let renderer = this.renderer

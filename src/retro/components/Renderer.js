@@ -180,6 +180,8 @@ class Renderer extends Component {
             ...renderer_presets[Device.device_type]
         });
 
+        renderer.gammaFactor = 1
+
 
         if (this.tools.device.is_mobile) {
             this.tools.html.set_style(renderer.domElement, {

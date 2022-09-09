@@ -476,19 +476,32 @@ const wait = (d) => {
 const round = (x, n, greater = false) => {
     return greater ? Math.ceil(x / n) * n : Math.floor(x / n) * n;
 }
-const lerp = (start, end, amt) => {
+const lerp = (start, end, amt = 1) => {
     if (isNumber(start) && isNumber(end)) {
-        return (1 - amt) * start + amt * end;
+        if (isNumber(start) && isNumber(end)) {
+            return (1 - amt) * start + amt * end;
+        } else {
+            return amt > 0.5 ? end : start;
+        }
+
     } else if (isArray(start) && isArray(end)) {
         let r = []
         start.forEach((v, i) => {
-            r[i] = lerp(start[i] ?? 0, end[i] ?? 0, amt)
+            if (isNumber(start[i]) && isNumber(end[i])) {
+                r[i] = lerp(start[i] ?? 0, end[i] ?? 0, amt)
+            } else {
+                r[i] = amt > 0.5 ? end[i] : start[i]
+            }
         })
         return r
     } else if (isObject(start) && isObject(end)) {
         let r = {}
         forEach(end, (v, i) => {
-            r[i] = lerp(start[i] ?? 0, end[i] ?? 0, amt)
+            if (isNumber(start[i]) && isNumber(end[i])) {
+                r[i] = lerp(start[i] ?? 0, end[i] ?? 0, amt)
+            } else {
+                r[i] = amt > 0.5 ? end[i] : start[i]
+            }
         })
         return r
     } else {
