@@ -13,6 +13,7 @@
         <BikeClubScene v-if="active_scene_index === 1" />
         <VillageHouseScene v-if="active_scene_index === 2" />
         <CornellBoxScene v-if="active_scene_index === 3" />
+        <Skinning v-if="active_scene_index === 4" />
 
     </div>
 </template>
@@ -22,12 +23,13 @@ import RetroCityScene from "./scenes/RetroCity"
 import BikeClubScene from "./scenes/BikeClub"
 import VillageHouseScene from "./scenes/VillageHouse"
 import CornellBoxScene from "./scenes/CornellBox"
+import Skinning from "./scenes/Skinning"
 
 import { isNumber } from "lodash-es"
 
 export default {
     name: "Main",
-    components: { RetroCityScene, BikeClubScene, VillageHouseScene, CornellBoxScene },
+    components: { RetroCityScene, BikeClubScene, VillageHouseScene, CornellBoxScene, Skinning },
     data() {
         return {
             active_scene_index: 0,
@@ -43,6 +45,9 @@ export default {
                 },
                 {
                     name: "Cornell Box"
+                },
+                {
+                    name: "Skinning"
                 }
             ]
         }

@@ -178,7 +178,7 @@ class SceneComponent extends Component {
 		super.on_update(props);
 	}
 
-	override on_tick(): void { }
+	override on_tick(td: IRetroObjectTimeData): void { }
 
 	get_render_data(): Array<IRetroComponentRenderDataItem> {
 		if (this.subject && this.game_object) {

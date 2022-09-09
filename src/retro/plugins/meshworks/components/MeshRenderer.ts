@@ -5,7 +5,7 @@ import SceneComponent from "retro/SceneComponent";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RoughnessMipmapper } from 'three/examples/jsm/utils/RoughnessMipmapper.js';
 import path from "path"
-import { DoubleSide, Event, Group, Mesh, MeshStandardMaterial, Object3D, Texture, WebGLRenderer } from "three";
+import { AnimationAction, AnimationClip, AnimationMixer, DoubleSide, Event, Group, Mesh, MeshStandardMaterial, Object3D, Texture, WebGLRenderer } from "three";
 import { forEach, isArray, isNil, isNumber, isString } from "lodash";
 import { do_once } from "retro/utils/Tools"
 import ResourceManager from "retro/ResourceManager"
@@ -26,6 +26,16 @@ function get_texture_filter_with_name(name: string): number {
 	}
 }
 
+enum ModelFormats {
+	gltf = "gltf",
+	glb = "glb"
+}
+
+interface SkAction {
+	action?: AnimationAction
+	weight: number
+}
+
 export class MeshRenderer extends SceneComponent {
 	public src: string = "";
 	public recieve_shadow: boolean = true
@@ -36,13 +46,17 @@ export class MeshRenderer extends SceneComponent {
 	public hide_object?: string | string[];
 	public override_texture_filter?: string
 
+	private actions: {
+		[x: string]: SkAction
+	} = {};
 	private base_path: string = "";
 	private main_file_name: string = "";
-	private object_format: string = '.gltf';
+	private object_format: string = ModelFormats.gltf;
 	private scene: Group
 	private texturePropNames: string[] = [
 		"map"
 	];
+	private mixer: AnimationMixer;
 
 	constructor(params: any) {
 		super(params);
@@ -94,7 +108,12 @@ export class MeshRenderer extends SceneComponent {
 
 	private async load_object(): Promise<void> {
 		switch (this.object_format) {
-			case 'gltf': {
+			case ModelFormats.gltf: {
+				// if (!this.check_and_set_cached_scene()) 
+				await this.load_object_gltf();
+				break;
+			}
+			case ModelFormats.glb: {
 				// if (!this.check_and_set_cached_scene()) 
 				await this.load_object_gltf();
 				break;
@@ -119,10 +138,6 @@ export class MeshRenderer extends SceneComponent {
 		}
 	}
 
-	private cache_scene(): void {
-		ResourceManager.meshworks_cache[this.src] = this.scene;
-	}
-
 	private load_object_gltf(): Promise<void> {
 		gltf_loader.setPath(this.base_path);
 		let scene: Group = new Group();
@@ -135,8 +150,8 @@ export class MeshRenderer extends SceneComponent {
 
 		return new Promise((resolve: Function, reject: Function) => {
 			setTimeout(() => {
-				gltf_loader.load(this.main_file_name, (loaded_object) => {
-					loaded_object.scene.traverse((child: Object3D) => {
+				gltf_loader.load(this.main_file_name, (gltf) => {
+					gltf.scene.traverse((child: Object3D) => {
 						if (!isNil(roughness_mipmapper) && (child as Mesh).isMesh) {
 							roughness_mipmapper.generateMipmaps((child as Mesh).material);
 						}
@@ -181,17 +196,60 @@ export class MeshRenderer extends SceneComponent {
 							child.visible = false
 						}
 					});
-					scene.add(loaded_object.scene);
+
+					/**animations */
+					let animations: AnimationClip[] = gltf.animations;
+					let mixer: AnimationMixer = this.mixer = new AnimationMixer(gltf.scene)
+					let found_actions_count: number = animations.length;
+					let first_animation_name: string
+
+					for (let i = 0; i !== found_actions_count; ++i) {
+						let clip = animations[i];
+						const name = clip.name;
+						if (isNil(first_animation_name)){
+							first_animation_name = name;
+						}
+						
+						this.actions[name] = {
+							weight: 1,
+							action: mixer.clipAction(clip)
+						}
+					}
+
+					/**general */
+					scene.add(gltf.scene);
 					roughness_mipmapper.dispose();
 					// render();
 
-					this.scene = scene;
-					// this.cache_scene();
+					if (!isNil(first_animation_name)){
+						this.start_action(first_animation_name)
+					}
 
+					this.scene = scene;
 					resolve();
 				});
 			}, 0)
 		})
 	}
 
+	private start_action(action_name: string): void {
+		let action_data: SkAction = this.actions[action_name]
+		let action: AnimationAction = action_data.action;
+		let weight: number = action_data.weight;
+		let clip: AnimationClip = action.getClip();
+		this.set_action_weight(action, weight);
+		action.play();
+	}
+
+	private set_action_weight(action: AnimationAction, weight: number): void {
+		action.enabled = true;
+		action.setEffectiveTimeScale(1);
+		action.setEffectiveWeight(weight);
+	}
+
+	override on_tick(td: IRetroObjectTimeData): void {
+		if (!isNil(this.mixer)) {
+			this.mixer.update(td.delta);
+		}
+	}
 }
