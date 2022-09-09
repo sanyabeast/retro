@@ -77,6 +77,16 @@ class Postprocessing extends Component {
         saoBlurDepthCutoff: 0.01
     })
 
+    public ssao: PostprocessingEffectDescriptor = new PostprocessingEffectDescriptor({
+        min_distance: 0.005,
+        max_distance: 0.05,
+        kernel_radius: 8
+    }, {
+        min_distance: 0.005,
+        max_distance: 0.05,
+        kernel_radius: 8
+    })
+
     protected renderer: IRendererComponent
     protected composer: EffectComposer
     protected default_renderer_tonemapping: number
@@ -115,14 +125,21 @@ class Postprocessing extends Component {
         saoPass.params.saoBlurDepthCutoff = this.sao.params.saoBlurDepthCutoff
 
         /**gamma corr */
-        const gammaCorrection = new ShaderPass( GammaCorrectionShader );
+        const gammaCorrection = new ShaderPass(GammaCorrectionShader);
 
+        /**ssao0 */
+        const ssaoPass = this.ssao.pass = new SSAOPass(scene, camera, 512, 512);
+        ssaoPass.kernelRadius = this.ssao.params.kernel_radius;
+        ssaoPass.minDistance = this.ssao.params.min_distance;
+        ssaoPass.maxDistance = this.ssao.params.max_distance;
+        ssaoPass.output = SSAOPass.OUTPUT.Default
 
         /**adding passes */
         composer.addPass(renderScene)
         composer.addPass(gammaCorrection)
         composer.addPass(bloomPass)
-        
+        // composer.addPass(ssaoPass)
+
         // composer.addPass(saoPass)
 
 

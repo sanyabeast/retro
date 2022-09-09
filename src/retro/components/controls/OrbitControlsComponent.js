@@ -69,6 +69,9 @@ class OrbitControlsComponent extends Component {
     on_disable() {
         this.controls.enabled = false
     }
+    on_destroy() {
+        this.controls.dispose()
+    }
     get_controls_state() {
         return {
             target: [this.controls.target.x, this.controls.target.y, this.controls.target.z],

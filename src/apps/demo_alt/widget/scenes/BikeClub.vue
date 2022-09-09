@@ -1,6 +1,15 @@
 <template>
     <div>
         <R_Object>
+            <R_Sun :params="{
+                global_intensity: 1,
+                cycling: 512,
+                time: 0.3,
+            }" />
+            <R_OrbitControlsComponent :params="{
+                position: [4.478374654333801, -0.15902620548700136, -2.4388380423563714],
+                target: [0.803509710406148, 0.4675825987034759, 0.8322525554630225]
+            }" />
             <R_SkyBox :params="{
                 cubemap: 'res/retro/plugins/extra-assets/cubemaps/nissi_beach_1',
                 cubemap_format: 'jpg'
@@ -34,30 +43,21 @@
     </div>
 </template>
 <script>
+
+import BaseScene from "./BaseScene"
+
 export default {
     name: "OneMoreScene",
+    mixins: [BaseScene],
     data() {
         return {
-            light_colors: ["#e91e63", "#03a9f4", "#3f51b5"],
-            time: 0
+            fov: 45
         }
     },
-    mounted() {
-        this.retro.tick_rate = 30
-        console.log(this)
-    },
-    methods: {
-        math_sin(v) {
-            return Math.sin(v)
-        },
-        math_cos(v) {
-            return Math.cos(v)
-        },
-        on_tick(time_data) {
-            this.time += time_data.delta
-        }
-    }
+    mounted() { },
+    methods: {}
 }
 </script>
 <style>
+
 </style>

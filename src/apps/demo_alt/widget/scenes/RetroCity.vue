@@ -1,6 +1,15 @@
 <template>
     <div>
         <R_Object>
+            <R_Sun :params="{
+                global_intensity: 1,
+                cycling: 16,
+                time: 0.7,
+            }" />
+            <R_MapControlsComponent :params="{
+                position: [-11.294560793680253, 0.1889378449363967, -1.8473739934966689],
+                target: [-10.054951874718869, 0.6395549681604925, -0.3840704194996165]
+            }" />
             <R_SkyBox :params="{
                 cubemap: 'res/retro/plugins/extra-assets/cubemaps/tantolunden_1',
                 cubemap_format: 'jpg'
@@ -19,17 +28,6 @@
                     override_texture_filter: 'NearestFilter',
                     emission_scale: 0
                 }" />
-                <!-- <R_LightComponent v-for="(index, key) in 3" :key="key" :params="{
-                    type: 'PointLight',
-                    position: [
-                        0 + math_cos((time + index) * (1 + index) / 5) * (2 + index),
-                        2+ math_sin((time + index) * 2) * 0.5,
-                        0 + math_sin((time + index) * (1 + index) / 5) * (2 + index)
-                    ],
-                    intensity: 1 + math_sin(time + index) * 2   ,
-                    distance: 1,
-                    color: light_colors[index]
-                }" /> -->
                 <R_TroikaTextComponent :params="{
                     text: '`Wizard Table` by Asylum Nox',
                     position: [0.5, 2, -0.5],
@@ -41,29 +39,19 @@
     </div>
 </template>
 <script>
+
+import BaseScene from "./BaseScene"
+
 export default {
-    name: "DefaultScene",
+    name: "RetroCity",
+    mixins: [BaseScene],
     data() {
         return {
-            light_colors: ["#ff9a92", "#a392ff", "#9eff92"],
-            time: 0
+            fov: 90
         }
     },
-    mounted() {
-        this.retro.tick_rate = 30
-        console.log(this)
-    },
-    methods: {
-        math_sin(v) {
-            return Math.sin(v)
-        },
-        math_cos(v) {
-            return Math.cos(v)
-        },
-        on_tick(time_data) {
-            this.time += time_data.delta
-        }
-    }
+    mounted() { },
+    methods: {}
 }
 </script>
 <style>

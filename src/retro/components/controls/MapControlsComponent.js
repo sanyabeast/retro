@@ -69,6 +69,9 @@ class MapControlsComponent extends Component {
     on_disable() {
         this.controls.enabled = false
     }
+    on_destroy() {
+        this.controls.dispose()
+    }
     get_controls_state() {
         return {
             target: [this.controls.target.x, this.controls.target.y, this.controls.target.z],
@@ -100,9 +103,7 @@ class MapControlsComponent extends Component {
                     break
                 }
                 case "position": {
-                    console.log(controls.object.position, this.position)
                     controls.object.position.set(...this.position)
-                    console.log(controls.object.position, this.position)
                     break
                 }
                 case "zoom": {
@@ -134,18 +135,9 @@ class MapControlsComponent extends Component {
         })
     }
     on_create() {
-        let camera = this.find_component_of_type("CameraComponent")
-        if (camera) {
-            const controls = this.controls = new MapControls.MapControls(camera.subject, this.globals.dom);
-        } else {
-            console.error(`MapControls requires "CameraComponent" presense on scene`)
-        }
+        this.controls = new MapControls.MapControls(this.globals.camera, this.globals.dom);
     }
     on_tick(time_data) {
-        let camera = this.find_component_of_type("CameraComponent")
-        camera.position[0] = camera.subject.position.x
-        camera.position[1] = camera.subject.position.y
-        camera.position[2] = camera.subject.position.z
         this.controls.update();
     }
 }

@@ -54,7 +54,7 @@ export class MeshRenderer extends SceneComponent {
 	}
 
 	override on_create(): void {
-		console.log(this)
+
 	}
 
 	override async on_destroy() {
@@ -160,10 +160,10 @@ export class MeshRenderer extends SceneComponent {
 								mat.emissiveIntensity *= this.emission_scale
 							}
 
-							if (isString(this.override_texture_filter)){
-								this.texturePropNames.forEach((name: string)=>{
+							if (isString(this.override_texture_filter)) {
+								this.texturePropNames.forEach((name: string) => {
 									let t: Texture = mat[name] as Texture
-									if (!isNil(t)){
+									if (!isNil(t)) {
 										t.magFilter = get_texture_filter_with_name(this.override_texture_filter);
 										t.minFilter = t.magFilter;
 									}

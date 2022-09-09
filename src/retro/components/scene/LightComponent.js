@@ -62,7 +62,6 @@ class LightComponent extends SceneComponent {
             }
             case "PointLight": {
                 light = this.subject = new PointLight(this.color, this.intensity, this.distance, this.decay)
-                console.log(this)
                 break
             }
             case "RectAreaLight": {

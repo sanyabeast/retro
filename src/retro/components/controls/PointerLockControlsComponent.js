@@ -77,6 +77,9 @@ class PointerLockControlsComponent extends Component {
     on_disable() {
         this.controls.enabled = false
     }
+    on_destroy(){
+        this.controls.dispose()
+    }
     get_controls_state() {
         return {
 

@@ -144,7 +144,7 @@ class Renderer extends Component {
     prev_shadowmap_render_time = +new Date
 
     persist_orthographic_camera = new OrthographicCamera(-1, 1, -1, 1, 0.01, 1000)
-    persist_perspective_camera = new PerspectiveCamera(60, 1, 0.001, 1000)
+    persist_perspective_camera = new PerspectiveCamera(60, 1, 0.01, 1000)
 
     active_render_camera = undefined
     active_camera = undefined

@@ -1,6 +1,15 @@
 <template>
     <div>
         <R_Object>
+            <R_Sun :params="{
+                global_intensity: 0.5,
+                cycling: 4,
+                time: 0.8,
+            }" />
+            <R_OrbitControlsComponent :params="{
+                position: [0.6771750234492657, 0.713310910409051, -2.203436932973154],
+                target: [-0.14573447685923396, 0.8348631412120733, 1.749587158542458]
+            }" />
             <R_SkyBox :params="{
                 cubemap: 'res/retro/plugins/extra-assets/cubemaps/nalovardo_1',
                 cubemap_format: 'jpg'
@@ -23,20 +32,21 @@
     </div>
 </template>
 <script>
+
+import BaseScene from "./BaseScene"
+
 export default {
-    name: "Cornell",
+    name: "CornellBox",
+    mixins: [BaseScene],
     data() {
         return {
-
+            fov: 75
         }
     },
-    mounted() {
-
-    },
-    methods: {
-
-    }
+    mounted() { },
+    methods: {}
 }
 </script>
 <style>
+
 </style>

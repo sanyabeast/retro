@@ -1,6 +1,15 @@
 <template>
     <div>
         <R_Object>
+            <R_Sun :params="{
+                global_intensity: 1,
+                cycling: 8,
+                time: 0.6,
+            }" />
+            <R_MapControlsComponent :params="{
+                position: [16.619918756677336, 2.656135238693106, -15.688689921895433],
+                target: [1.636843780338092, 3.7179910781808103, -1.2230025832643918]
+            }" />
             <R_SkyBox :params="{
                 cubemap: 'res/retro/plugins/extra-assets/cubemaps/tantolunden_1',
                 cubemap_format: 'jpg'
@@ -39,30 +48,21 @@
     </div>
 </template>
 <script>
+
+import BaseScene from "./BaseScene"
+
 export default {
-    name: "EvenOneMoreScene",
+    name: "VillageHouse",
+    mixins: [BaseScene],
     data() {
         return {
-            light_colors: ["#e91e63", "#03a9f4", "#3f51b5"],
-            time: 0
+            fov: 30
         }
     },
-    mounted() {
-        this.retro.tick_rate = 30
-        console.log(this)
-    },
-    methods: {
-        math_sin(v) {
-            return Math.sin(v)
-        },
-        math_cos(v) {
-            return Math.cos(v)
-        },
-        on_tick(time_data) {
-            this.time += time_data.delta
-        }
-    }
+    mounted() { },
+    methods: {}
 }
 </script>
 <style>
+
 </style>

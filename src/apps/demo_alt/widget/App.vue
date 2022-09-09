@@ -4,116 +4,53 @@
         <div class="level-selection">
             <h2>Level Selection</h2>
             <div v-for="(item, index) in scenes" class="button" :class="{ active: active_scene_index === index }"
-                :key="index" @mousedown="set_active_scene_index(index)">
+                :key="index" @mousedown="active_scene_index = index">
                 <p v-html="item.name"></p>
             </div>
         </div>
 
-        <R_Sun :params="{
-            use_postfx: false,
-            debug_transform: true,
-            global_intensity: 1,
-            cycling: active_scene.day_speed,
-            time: active_scene.time,
-        }" />
-
-        <R_OrbitControlsComponent :params="active_scene.orbit ?? default_orbit_control_params" />
-        <DefaultScene v-if="active_scene_index === 0" />
-        <OneMoreScene v-if="active_scene_index === 1" />
-        <EvenOneMoreScene v-if="active_scene_index === 2" />
-        <Cornell v-if="active_scene_index === 3" />
+        <RetroCityScene v-if="active_scene_index === 0" />
+        <BikeClubScene v-if="active_scene_index === 1" />
+        <VillageHouseScene v-if="active_scene_index === 2" />
+        <CornellBoxScene v-if="active_scene_index === 3" />
 
     </div>
 </template>
 <script>
 
-import DefaultScene from "./scenes/RetroCity"
-import OneMoreScene from "./scenes/BikeClub"
-import EvenOneMoreScene from "./scenes/VillageHouse"
-import Cornell from "./scenes/CornellBox"
+import RetroCityScene from "./scenes/RetroCity"
+import BikeClubScene from "./scenes/BikeClub"
+import VillageHouseScene from "./scenes/VillageHouse"
+import CornellBoxScene from "./scenes/CornellBox"
 
 import { isNumber } from "lodash-es"
 
 export default {
     name: "Main",
-    components: { DefaultScene, OneMoreScene, EvenOneMoreScene, Cornell },
+    components: { RetroCityScene, BikeClubScene, VillageHouseScene, CornellBoxScene },
     data() {
         return {
-            default_orbit_control_params: {
-                position: [0.929241595859249, 1.8136047161671325, 2.274839086785093],
-                target: [0.03767997569932003, 0.7096796787072052, 0.0013812853566007584],
-                zoom: 1
-            },
             active_scene_index: 0,
             scenes: [
                 {
-                    name: "Retro City",
-                    time: 0.7,
-                    day_speed: 16,
-                    fov: 100,
-                    orbit: {
-                        position: [-11.294560793680253, 0.1889378449363967, -1.8473739934966689],
-                        target: [-10.054951874718869, 0.6395549681604925, -0.3840704194996165]
-                    }
+                    name: "Retro City"
                 },
                 {
-                    name: "Bike Club",
-                    time: 0.5,
-                    day_speed: 2048,
-                    fov: 30,
-                    orbit: {
-                        position: [4.478374654333801, -0.15902620548700136, -2.4388380423563714],
-                        target: [0.803509710406148, 0.4675825987034759, 0.8322525554630225]
-                    }
+                    name: "Bike Club"
                 },
                 {
-                    name: "Village House",
-                    time: 0.6,
-                    day_speed: 0,
-                    fov: 20,
-                    orbit: {
-                        position: [16.619918756677336, 2.656135238693106, -15.688689921895433],
-                        target: [1.636843780338092, 3.7179910781808103, -1.2230025832643918]
-                    }
+                    name: "Village House"
                 },
                 {
-                    name: "Cornell Box",
-                    time: 0.6,
-                    day_speed: 0,
-                    fov: 75,
-                    orbit: {
-                        position: [0.6771750234492657, 0.713310910409051, -2.203436932973154],
-                        target: [-0.14573447685923396, 0.8348631412120733, 1.749587158542458]
-                    }
+                    name: "Cornell Box"
                 }
             ]
         }
     },
-    watch: {
-        active_scene_index(new_index) {
-            this.init_scene(new_index)
-        }
-    },
-    computed: {
-        active_scene() {
-            return this.scenes[this.active_scene_index]
-        }
-    },
-    mounted() {
-        this.init_scene(this.active_scene_index)
-    },
-    methods: {
-        init_scene() {
-            let scene_data = this.scenes[this.active_scene_index]
-            if (isNumber(scene_data.fov)) {
-                this.globals.camera.fov = scene_data.fov
-                this.globals.camera.updateProjectionMatrix();
-            }
-        },
-        set_active_scene_index(index) {
-            this.active_scene_index = index
-        }
-    }
+    watch: {},
+    computed: {},
+    mounted() { },
+    methods: {}
 }
 </script>
 <style lang="scss">

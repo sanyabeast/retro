@@ -10,3 +10,4 @@ dist/*
 !dist/cornell
 .DS_Store
 tsconfig.json
+**/*/Desktop.ini
