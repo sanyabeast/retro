@@ -5,13 +5,26 @@ import SceneComponent from "retro/SceneComponent";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RoughnessMipmapper } from 'three/examples/jsm/utils/RoughnessMipmapper.js';
 import path from "path"
-import { DoubleSide, Event, Group, Mesh, MeshStandardMaterial, Object3D, WebGLRenderer } from "three";
-import { isArray, isNil, isNumber, isString } from "lodash";
+import { DoubleSide, Event, Group, Mesh, MeshStandardMaterial, Object3D, Texture, WebGLRenderer } from "three";
+import { forEach, isArray, isNil, isNumber, isString } from "lodash";
 import { do_once } from "retro/utils/Tools"
 import ResourceManager from "retro/ResourceManager"
+import { NearestFilter, LinearFilter, LinearMipMapLinearFilter, LinearMipMapNearestFilter, NearestMipMapLinearFilter, NearestMipmapNearestFilter } from "three"
 
 const gltf_loader = new GLTFLoader()
 // const roughnessMipmapper = new RoughnessMipmapper( renderer );
+
+function get_texture_filter_with_name(name: string): number {
+	switch (name) {
+		case "NearestFilter": return NearestFilter;
+		case "LinearFilter": return LinearFilter;
+		case "LinearMipMapLinearFilter": return LinearMipMapLinearFilter;
+		case "NearestMipmapNearestFilter": return NearestMipmapNearestFilter;
+		case "LinearMipMapNearestFilter": return LinearMipMapNearestFilter;
+		case "NearestMipMapLinearFilter": return NearestMipMapLinearFilter;
+		default: return LinearFilter;
+	}
+}
 
 export class MeshRenderer extends SceneComponent {
 	public src: string = "";
@@ -21,11 +34,15 @@ export class MeshRenderer extends SceneComponent {
 	public bump_scale: number = 1
 	public emission_scale: number = 1
 	public hide_object?: string | string[];
+	public override_texture_filter?: string
 
 	private base_path: string = "";
 	private main_file_name: string = "";
 	private object_format: string = '.gltf';
 	private scene: Group
+	private texturePropNames: string[] = [
+		"map"
+	];
 
 	constructor(params: any) {
 		super(params);
@@ -130,17 +147,27 @@ export class MeshRenderer extends SceneComponent {
 							mesh.castShadow = this.cast_shadow;
 							let mat = mesh.material as MeshStandardMaterial
 
-							if (!isNil(mat.normalScale)){
+							if (!isNil(mat.normalScale)) {
 								mat.normalScale.x *= this.normal_scale
 								mat.normalScale.y *= this.normal_scale
 							}
 
-							if (isNumber(mat.bumpScale)){
+							if (isNumber(mat.bumpScale)) {
 								mat.bumpScale * this.bump_scale
 							}
 
-							if (isNumber(mat.emissiveIntensity)){
+							if (isNumber(mat.emissiveIntensity)) {
 								mat.emissiveIntensity *= this.emission_scale
+							}
+
+							if (isString(this.override_texture_filter)){
+								this.texturePropNames.forEach((name: string)=>{
+									let t: Texture = mat[name] as Texture
+									if (!isNil(t)){
+										t.magFilter = get_texture_filter_with_name(this.override_texture_filter);
+										t.minFilter = t.magFilter;
+									}
+								})
 							}
 
 							mat.envMapIntensity = 0.75

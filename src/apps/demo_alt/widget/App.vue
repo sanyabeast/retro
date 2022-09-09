@@ -27,10 +27,12 @@
 </template>
 <script>
 
-import DefaultScene from "./comps/DefaultScene"
-import OneMoreScene from "./comps/OneMoreScene"
-import EvenOneMoreScene from "./comps/EvenOneMoreScene"
-import Cornell from "./comps/Cornell"
+import DefaultScene from "./scenes/RetroCity"
+import OneMoreScene from "./scenes/BikeClub"
+import EvenOneMoreScene from "./scenes/VillageHouse"
+import Cornell from "./scenes/CornellBox"
+
+import { isNumber } from "lodash-es"
 
 export default {
     name: "Main",
@@ -45,42 +47,51 @@ export default {
             active_scene_index: 0,
             scenes: [
                 {
-                    name: "Default",
-                    time: 0.35,
+                    name: "Retro City",
+                    time: 0.7,
                     day_speed: 16,
+                    fov: 100,
                     orbit: {
-                        position: [-13.542572692545463, 3.592200776787272, -6.4934313948673825],
-                        target: [0.19434647713159492, 0.05095554279356872, -3.2017953660358636]
+                        position: [-11.294560793680253, 0.1889378449363967, -1.8473739934966689],
+                        target: [-10.054951874718869, 0.6395549681604925, -0.3840704194996165]
                     }
                 },
                 {
-                    name: "One More",
+                    name: "Bike Club",
                     time: 0.5,
                     day_speed: 2048,
+                    fov: 30,
                     orbit: {
-                        position: [2.7923308510870486, 0.07054184254091939, -1.3596392192912055],
-                        target: [0.5920534624453714, 0.44571568006174944, 0.5988835532186334]
+                        position: [4.478374654333801, -0.15902620548700136, -2.4388380423563714],
+                        target: [0.803509710406148, 0.4675825987034759, 0.8322525554630225]
                     }
                 },
                 {
-                    name: "Even One More",
+                    name: "Village House",
                     time: 0.6,
                     day_speed: 0,
+                    fov: 20,
                     orbit: {
-                        position: [5.660666380532865, 5.032615474101596, -7.424760544009651],
-                        target: [3.20915372639969, 1.6426733064675614, 1.2838366079394254]
+                        position: [16.619918756677336, 2.656135238693106, -15.688689921895433],
+                        target: [1.636843780338092, 3.7179910781808103, -1.2230025832643918]
                     }
                 },
                 {
-                    name: "Cornell",
+                    name: "Cornell Box",
                     time: 0.6,
                     day_speed: 0,
+                    fov: 75,
                     orbit: {
-                        position: [0.447998442066265, 1.5733136624828687, -3.1536275521533788],
-                        target: [-0.0864485980027549, 0.11978348771564601, 2.119004970766437]
+                        position: [0.6771750234492657, 0.713310910409051, -2.203436932973154],
+                        target: [-0.14573447685923396, 0.8348631412120733, 1.749587158542458]
                     }
                 }
             ]
+        }
+    },
+    watch: {
+        active_scene_index(new_index) {
+            this.init_scene(new_index)
         }
     },
     computed: {
@@ -89,11 +100,17 @@ export default {
         }
     },
     mounted() {
-
+        this.init_scene(this.active_scene_index)
     },
     methods: {
+        init_scene() {
+            let scene_data = this.scenes[this.active_scene_index]
+            if (isNumber(scene_data.fov)) {
+                this.globals.camera.fov = scene_data.fov
+                this.globals.camera.updateProjectionMatrix();
+            }
+        },
         set_active_scene_index(index) {
-            console.log(index)
             this.active_scene_index = index
         }
     }
