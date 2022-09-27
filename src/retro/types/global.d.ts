@@ -256,6 +256,9 @@ declare global {
         random: {
             [x: string]: Function
         }
+        number: {
+            [x: string]: Function
+        }
         extra: {
             [x: string]: Function
             make_immutable_context_for_object: (target: object) => void

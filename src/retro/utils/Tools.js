@@ -718,6 +718,10 @@ const parse_float = (data = "", precision = _format_currency_params.default_numb
     return parseFloat(data)
 }
 
+const strip_float = (value = 0, precision = 12) => {
+    return parseFloat(parseFloat(value).toPrecision(precision))
+}
+
 const parse_int = (...args) => {
     return Math.round(parse_float(...args));
 }
@@ -1025,7 +1029,8 @@ const tools = {
     },
     number: {
         parse_float,
-        parse_int
+        parse_int,
+        strip_float
     },
     array: {
         shuffle: shuffle_array,

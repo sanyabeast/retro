@@ -1,0 +1,97 @@
+<style>
+    body,
+    html {
+        overflow: hidden;
+        margin: 0;
+        background: rgb(63, 94, 251);
+        background-color: #000000;
+        background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+        /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+        /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+        font-family: 'Nunito', sans-serif;
+    }
+
+    body>.version {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        z-index: 9999;
+        font-family: monospace;
+        font-weight: 900;
+        font-size: 14px;
+        /* backdrop-filter: invert(1); */
+        color: #fff;
+        outline: #000;
+    }
+
+    .click_to_start {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #151515;
+        z-index: 999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: #9e9e9e;
+        font-size: 56px;
+        user-select: none;
+        cursor: pointer;
+        font-family: fangsong;
+    }
+
+    .dev-frame {}
+
+    .dev-frame.maximized {
+        transform: translate(0, 0) !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    p {
+        text-align: center;
+    }
+</style>
+
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+</head>
+
+<body>
+    <div id="editor"></div>
+    <div class="version"></div>
+    <div class="click_to_start">
+        <p>CLICK TO START</p>
+    </div>
+    <script>
+        let click_to_start = document.querySelector(".click_to_start")
+        let started = false
+        click_to_start.addEventListener("click", function () {
+            if (started) return
+            started = true
+            if (window.on_click_to_start) {
+                window.on_click_to_start()
+                click_to_start.remove()
+            }
+        })
+
+        window.addEventListener("keydown", function () {
+            if (started) return
+            started = true
+            if (window.on_click_to_start) {
+                window.on_click_to_start()
+                click_to_start.remove()
+            }
+        })
+        
+    </script>
+    <script src="main.js"></script>
+</body>
